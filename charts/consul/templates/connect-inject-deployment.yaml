@@ -1,0 +1,69 @@
+# The deployment for running the Connect sidecar injector
+{{- if .Values.connectInject.enabled }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: consul-connect-injector-webhook-deployment
+  labels:
+    app: consul-connect-injector
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: consul-connect-injector
+  template:
+    metadata:
+      labels:
+        app: consul-connect-injector
+    spec:
+      containers:
+        - name: sidecar-injector
+          image: us.gcr.io/mitchellh-k8s/consul-k8s:latest
+          env:
+            - name: NAMESPACE
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.namespace
+          command:
+            - "/bin/sh"
+            - "-ec"
+            - |
+              consul-k8s inject \
+                -default-inject={{ .Values.connectInject.default }} \
+                -listen=:8080 \
+{{- if .Values.connectInject.certs.secretName }}
+                -tls-cert-file=/etc/connect-injector/certs/{{ .Values.connectInject.certs.certName }}
+                -tls-key-file=/etc/connect-injector/certs/{{ .Values.connectInject.certs.keyName }}
+{{- else }}
+                -tls-auto=consul-connect-injector-cfg \
+                -tls-auto-hosts=consul-connect-injector-svc,consul-connect-injector-svc.${NAMESPACE},consul-connect-injector-svc.${NAMESPACE}.svc
+{{- end }}
+          livenessProbe:
+            tcpSocket:
+              port: 8080
+            failureThreshold: 2
+            initialDelaySeconds: 1
+            periodSeconds: 2
+            successThreshold: 1
+            timeoutSeconds: 5
+          readinessProbe:
+            httpGet:
+              path: /health/ready
+              port: 8080
+              scheme: HTTPS
+            failureThreshold: 2
+            initialDelaySeconds: 2
+            periodSeconds: 2
+            successThreshold: 1
+            timeoutSeconds: 5
+{{- if .Values.connectInject.certs.secretName }}
+          volumeMounts:
+            - name: certs
+              mountPath: /etc/connect-injector/certs
+              readOnly: true
+      volumes:
+        - name: certs
+          secret:
+            secretName: {{ .Values.connectInject.certs.secretName }}
+{{- end }}
+{{- end }}

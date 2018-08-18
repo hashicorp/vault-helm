@@ -1,0 +1,16 @@
+# The service for the Connect sidecar injector
+{{- if .Values.connectInject.enabled }}
+apiVersion: v1
+kind: Service
+metadata:
+  name: consul-connect-injector-svc
+  labels:
+    app: consul-connect-injector
+spec:
+  ports:
+  - port: 443
+    targetPort: 8080
+  selector:
+    app: consul-connect-injector
+{{- end }}
+

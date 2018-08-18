@@ -1,0 +1,126 @@
+# StatefulSet to run the actual Consul server cluster.
+{{- if .Values.server.enabled }}
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: consul-server
+spec:
+  selector:
+    matchLabels:
+      app: consul-server
+  serviceName: consul-server
+  podManagementPolicy: Parallel
+  replicas: {{ .Values.server.replicas }}
+  {{- if (gt (int .Values.server.updatePartition) 0) }}
+  updateStrategy:
+    type: RollingUpdate
+    rollingUpdate:
+      partition: {{ .Values.server.updatePartition }}
+  {{- end }}
+  template:
+    metadata:
+      labels:
+        app: consul-server
+      annotations:
+        "consul.hashicorp.com/connect-inject": "false"
+    spec:
+      affinity:
+        podAntiAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            - labelSelector:
+                matchExpressions:
+                  - key: app
+                    operator: In
+                    values:
+                      - consul-server
+              topologyKey: kubernetes.io/hostname
+      terminationGracePeriodSeconds: 10
+      securityContext:
+        fsGroup: 1000
+      volumes:
+        - name: config
+          configMap:
+            name: consul-server-config
+      containers:
+        - name: consul
+          image: "{{ .Values.server.image }}"
+          env:
+            - name: POD_IP
+              valueFrom:
+                fieldRef:
+                  fieldPath: status.podIP
+            - name: NAMESPACE
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.namespace
+          command:
+            - "/bin/sh"
+            - "-ec"
+            - |
+              exec /bin/consul agent \
+                -advertise="${POD_IP}" \
+                -bind=0.0.0.0 \
+                -bootstrap-expect={{ .Values.server.bootstrapExpect }} \
+                -client=0.0.0.0 \
+                -config-dir=/consul/config \
+                -datacenter={{ .Values.server.datacenter }} \
+                -data-dir=/consul/data \
+                -domain={{ .Values.common.domain }} \
+                {{- if .Values.server.connect }}
+                -hcl="connect { enabled = true }" \
+                {{- end }}
+                {{- if .Values.ui.enabled }}
+                -ui \
+                {{- end }}
+                {{- range $index := until (.Values.server.replicas | int) }}
+                -retry-join=consul-server-{{ $index }}.consul-server.${NAMESPACE}.svc \
+                {{- end }}
+                -server
+          volumeMounts:
+            - name: data
+              mountPath: /consul/data
+            - name: config
+              mountPath: /consul/config
+          lifecycle:
+            preStop:
+              exec:
+                command:
+                - /bin/sh
+                - -c
+                - consul leave
+          ports:
+            - containerPort: 8500
+              name: http
+            - containerPort: 8301
+              name: serflan
+            - containerPort: 8302
+              name: serfwan
+            - containerPort: 8300
+              name: server
+            - containerPort: 8600
+              name: dns
+          readinessProbe:
+            # NOTE(mitchellh): when our HTTP status endpoints support the
+            # proper status codes, we should switch to that. This is temporary.
+            exec:
+              command:
+                - "/bin/sh"
+                - "-ec"
+                - |
+                  curl http://127.0.0.1:8500/v1/status/leader 2>/dev/null | \
+                  grep -E '".+"'
+            failureThreshold: 2
+            initialDelaySeconds: 5
+            periodSeconds: 3
+            successThreshold: 1
+            timeoutSeconds: 5
+  volumeClaimTemplates:
+    - metadata:
+        name: data
+      spec:
+        accessModes:
+          - ReadWriteOnce
+        resources:
+          requests:
+            storage: {{ .Values.server.storage }}
+{{- end }}

@@ -1,0 +1,10 @@
+# StatefulSet to run the actual Consul server cluster.
+{{- if .Values.server.enabled }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: consul-server-config
+data:
+  extra-from-values.json: |-
+{{ tpl .Values.server.extraConfig . | indent 4 }}
+{{- end }}
