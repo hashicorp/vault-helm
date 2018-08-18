@@ -36,4 +36,10 @@ resource "null_resource" "kubectl" {
     on_failure = "continue"
     command    = "kubectl config get-clusters | grep ${google_container_cluster.cluster.name} | xargs -n1 kubectl config delete-cluster"
   }
+
+  provisioner "local-exec" {
+    when       = "destroy"
+    on_failure = "continue"
+    command    = "kubectl config get-contexts | grep ${google_container_cluster.cluster.name} | xargs -n1 kubectl config delete-context"
+  }
 }
