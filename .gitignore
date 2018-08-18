@@ -2,4 +2,3 @@
 .terraform/
 terraform.tfstate*
 terraform.tfvars
-values.yaml

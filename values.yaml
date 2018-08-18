@@ -1,0 +1,111 @@
+# Available parameters and their default values for the Consul chart.
+
+# Server, when enabled, configures a server cluster to run. This should
+# be disabled if you plan on connecting to a Consul cluster external to
+# the Kube cluster.
+
+common:
+  # Domain to register the Consul DNS server to listen for.
+  domain: consul
+
+server:
+  enabled: true
+  image: "consul:1.2.2"
+  replicas: 3
+  bootstrapExpect: 3 # Should <= replicas count
+  storage: 10Gi
+
+  # connect will enable Connect on all the servers, initializing a CA
+  # for Connect-related connections. Other customizations can be done
+  # via the extraConfig setting.
+  connect: true
+
+  # Datacenter is the name of the datacenter that the server should register
+  # as. This shouldn't be changed once the Consul cluster is up and running
+  # since Consul doesn't support an automatic way to change this value
+  # currently: https://github.com/hashicorp/consul/issues/1858
+  datacenter: dc1
+
+  # Resource requests, limits, etc. for the server cluster placement. This
+  # should map directly to the value of the resources field for a PodSpec.
+  # By default no direct resource request is made.
+  resources: {}
+
+  # updatePartition is used to control a careful rolling update of Consul
+  # servers. This should be done particularly when changing the version
+  # of Consul. Please refer to the documentation for more information.
+  updatePartition: 0
+
+  # disruptionBudget enables the creation of a PodDisruptionBudget to
+  # prevent voluntary degrading of the Consul server cluster.
+  disruptionBudget:
+    enabled: true
+
+    # maxUnavailable will default to (n/2)-1 where n is the number of
+    # replicas. If you'd like a custom value, you can specify an override here.
+    maxUnavailable: null
+
+  # extraConfig is a raw string of extra configuration to set with the
+  # server. This should be JSON or HCL.
+  extraConfig: |
+    {}
+
+# Client, when enabled, configures Consul clients to run on every node
+# within the Kube cluster. The current deployment model follows a traditional
+# DC where a single agent is deployed per node.
+client:
+  enabled: true
+  image: "consul:1.2.2"
+  join: null
+
+# ConnectInject will enable the automatic Connect sidecar injector.
+connectInject:
+  enabled: true
+  default: false # true will inject by default, otherwise requires annotation
+  caBundle: "" # empty will auto generate the bundle
+
+  # namespaceSelector is the selector for restricting the webhook to only
+  # specific namespaces. This should be set to a multiline string.
+  namespaceSelector: null
+
+  # The certs section configures how the webhook TLS certs are configured.
+  # These are the TLS certs for the Kube apiserver communicating to the
+  # webhook. By default, the injector will generate and manage its own certs,
+  # but this requires the ability for the injector to update its own
+  # MutatingWebhookConfiguration. In a production environment, custom certs
+  # should probaly be used. Configure the values below to enable this.
+  certs:
+    # secretName is the name of the secret that has the TLS certificate and
+    # private key to serve the injector webhook. If this is null, then the
+    # injector will default to its automatic management mode.
+    secretName: null
+
+    # caBundle is a base64-encoded PEM-encoded certificate bundle for the
+    # CA that signed the TLS certificate that the webhook serves. This must
+    # be set if secretName is non-null.
+    caBundle: ""
+
+    # certName and keyName are the names of the files within the secret for
+    # the TLS cert and private key, respectively. These have reasonable
+    # defaults but can be customized if necessary.
+    certName: tls.crt
+    keyName: tls.key
+
+ui:
+  # True if you want to enable the Consul UI. The UI will run only
+  # on the server nodes. This makes UI access via the service below (if
+  # enabled) predictable rather than "any node" if you're running Consul
+  # clients as well.
+  enabled: true
+
+  # True if you want to create a Service entry for the Consul UI.
+  #
+  # serviceType can be used to control the type of service created. For
+  # example, setting this to "LoadBalancer" will create an external load
+  # balancer (for supported K8S installations) to access the UI.
+  service: true
+  serviceType: null
+
+test:
+  image: lachlanevenson/k8s-kubectl
+  imageTag: v1.4.8-bash

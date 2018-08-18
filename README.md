@@ -17,12 +17,13 @@ of this README. Please refer to the Kubernetes and Helm documentation.
 ## Usage
 
 For now, we do not host a Chart repository. To use the charts, you must
-download this repository and unpack it into a directory. Then, the chart can
-be installed directly:
+download this repository and unpack it into a directory. Assuming this
+repository was unpacked into the directory `consul-helm`, the chart can
+then be installed directly:
 
-    helm install ./charts/consul
+    helm install ./consul-helm
 
-Please see the many options supported in the `./charts/consul/values.yaml`
+Please see the many options supported in the `values.yaml`
 file. These are also fully documented directly on the
 [Consul website](https://www.consul.io/docs/).
 
@@ -37,7 +38,7 @@ To run the Bats test: `kubectl` must be configured locally to be authenticated
 to a running Kubernetes cluster with Helm installed. With that in place,
 just run bats:
 
-    bats ./charts/consul/test
+    bats ./test
 
 If the tests fail, deployed resources in the Kubernetes cluster may not
 be properly cleaned up. We recommend recycling the Kubernetes cluster to
