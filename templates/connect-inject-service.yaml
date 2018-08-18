@@ -3,14 +3,19 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: consul-connect-injector-svc
+  name: {{ template "consul.fullname" . }}-connect-injector-svc
   labels:
-    app: consul-connect-injector
+    app: {{ template "consul.name" . }}
+    chart: {{ template "consul.chart" . }}
+    heritage: {{ .Release.Service }}
+    release: {{ .Release.Name }}
 spec:
   ports:
   - port: 443
     targetPort: 8080
   selector:
-    app: consul-connect-injector
+    app: {{ template "consul.name" . }}
+    release: "{{ .Release.Name }}"
+    component: connect-injector
 {{- end }}
 

@@ -7,12 +7,17 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: consul-ui
+  name: {{ template "consul.fullname" . }}-ui
   labels:
-    name: consul-ui
+    app: {{ template "consul.name" . }}
+    chart: {{ template "consul.chart" . }}
+    heritage: {{ .Release.Service }}
+    release: {{ .Release.Name }}
 spec:
   selector:
-    app: consul-server
+    app: {{ template "consul.name" . }}
+    release: "{{ .Release.Name }}"
+    component: server
   ports:
     - name: http
       port: 80

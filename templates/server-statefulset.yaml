@@ -3,12 +3,14 @@
 apiVersion: apps/v1
 kind: StatefulSet
 metadata:
-  name: consul-server
+  name: {{ template "consul.fullname" . }}-server
+  labels:
+    app: {{ template "consul.name" . }}
+    chart: {{ template "consul.chart" . }}
+    heritage: {{ .Release.Service }}
+    release: {{ .Release.Name }}
 spec:
-  selector:
-    matchLabels:
-      app: consul-server
-  serviceName: consul-server
+  serviceName: {{ template "consul.fullname" . }}-server
   podManagementPolicy: Parallel
   replicas: {{ .Values.server.replicas }}
   {{- if (gt (int .Values.server.updatePartition) 0) }}
@@ -17,10 +19,19 @@ spec:
     rollingUpdate:
       partition: {{ .Values.server.updatePartition }}
   {{- end }}
+  selector:
+    matchLabels:
+      app: {{ template "consul.name" . }}
+      chart: {{ template "consul.chart" . }}
+      release: {{ .Release.Name }}
+      component: server
   template:
     metadata:
       labels:
-        app: consul-server
+        app: {{ template "consul.name" . }}
+        chart: {{ template "consul.chart" . }}
+        release: {{ .Release.Name }}
+        component: server
       annotations:
         "consul.hashicorp.com/connect-inject": "false"
     spec:
@@ -28,11 +39,10 @@ spec:
         podAntiAffinity:
           requiredDuringSchedulingIgnoredDuringExecution:
             - labelSelector:
-                matchExpressions:
-                  - key: app
-                    operator: In
-                    values:
-                      - consul-server
+                matchLabels:
+                  app: {{ template "consul.name" . }}
+                  release: "{{ .Release.Name }}"
+                  component: server
               topologyKey: kubernetes.io/hostname
       terminationGracePeriodSeconds: 10
       securityContext:
@@ -40,7 +50,7 @@ spec:
       volumes:
         - name: config
           configMap:
-            name: consul-server-config
+            name: {{ template "consul.fullname" . }}-server-config
       containers:
         - name: consul
           image: "{{ .Values.server.image }}"
@@ -57,6 +67,8 @@ spec:
             - "/bin/sh"
             - "-ec"
             - |
+              CONSUL_FULLNAME="{{template "consul.fullname" . }}"
+
               exec /bin/consul agent \
                 -advertise="${POD_IP}" \
                 -bind=0.0.0.0 \
@@ -73,7 +85,7 @@ spec:
                 -ui \
                 {{- end }}
                 {{- range $index := until (.Values.server.replicas | int) }}
-                -retry-join=consul-server-{{ $index }}.consul-server.${NAMESPACE}.svc \
+                -retry-join=${CONSUL_FULLNAME}-server-{{ $index }}.${CONSUL_FULLNAME}-server.${NAMESPACE}.svc \
                 {{- end }}
                 -server
           volumeMounts:

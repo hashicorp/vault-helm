@@ -3,14 +3,17 @@
 apiVersion: admissionregistration.k8s.io/v1beta1
 kind: MutatingWebhookConfiguration
 metadata:
-  name: consul-connect-injector-cfg
+  name: {{ template "consul.fullname" . }}-connect-injector-cfg
   labels:
-    app: consul-connect-injector
+    app: {{ template "consul.name" . }}
+    chart: {{ template "consul.chart" . }}
+    heritage: {{ .Release.Service }}
+    release: {{ .Release.Name }}
 webhooks:
-  - name: consul-connect-injector.consul.hashicorp.com
+  - name: {{ template "consul.fullname" . }}-connect-injector.consul.hashicorp.com
     clientConfig:
       service:
-        name: consul-connect-injector-svc
+        name: {{ template "consul.fullname" . }}-connect-injector-svc
         namespace: default
         path: "/mutate"
       caBundle: {{ .Values.connectInject.caBundle }}
