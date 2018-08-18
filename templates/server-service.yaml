@@ -7,9 +7,12 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: consul-server
+  name: {{ template "consul.fullname" . }}-server
   labels:
-    name: consul-server
+    app: {{ template "consul.name" . }}
+    chart: {{ template "consul.chart" . }}
+    heritage: {{ .Release.Service }}
+    release: {{ .Release.Name }}
   annotations:
     # This must be set in addition to publishNotReadyAddresses due
     # to an open issue where it may not work:
@@ -47,5 +50,7 @@ spec:
       port: 8600
       targetPort: 8600
   selector:
-    app: consul-server
+    app: {{ template "consul.name" . }}
+    release: "{{ .Release.Name }}"
+    component: server
 {{- end }}

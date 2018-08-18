@@ -3,18 +3,27 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: consul-connect-injector-webhook-deployment
+  name: {{ template "consul.fullname" }}-connect-injector-webhook-deployment
   labels:
-    app: consul-connect-injector
+    app: {{ template "consul.name" . }}
+    chart: {{ template "consul.chart" . }}
+    heritage: {{ .Release.Service }}
+    release: {{ .Release.Name }}
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: consul-connect-injector
+      app: {{ template "consul.name" . }}
+      chart: {{ template "consul.chart" . }}
+      release: {{ .Release.Name }}
+      component: connect-injector
   template:
     metadata:
       labels:
-        app: consul-connect-injector
+        app: {{ template "consul.name" . }}
+        chart: {{ template "consul.chart" . }}
+        release: {{ .Release.Name }}
+        component: connect-injector
     spec:
       containers:
         - name: sidecar-injector
@@ -28,6 +37,8 @@ spec:
             - "/bin/sh"
             - "-ec"
             - |
+              CONSUL_FULLNAME="{{template "consul.fullname" . }}"
+
               consul-k8s inject \
                 -default-inject={{ .Values.connectInject.default }} \
                 -listen=:8080 \
@@ -36,7 +47,7 @@ spec:
                 -tls-key-file=/etc/connect-injector/certs/{{ .Values.connectInject.certs.keyName }}
 {{- else }}
                 -tls-auto=consul-connect-injector-cfg \
-                -tls-auto-hosts=consul-connect-injector-svc,consul-connect-injector-svc.${NAMESPACE},consul-connect-injector-svc.${NAMESPACE}.svc
+                -tls-auto-hosts=${CONSUL_FULLNAME}-connect-injector-svc,${CONSUL_FULLNAME}-connect-injector-svc.${NAMESPACE},${CONSUL_FULLNAME}-connect-injector-svc.${NAMESPACE}.svc
 {{- end }}
           livenessProbe:
             tcpSocket:

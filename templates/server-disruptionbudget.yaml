@@ -4,10 +4,17 @@
 apiVersion: policy/v1beta1
 kind: PodDisruptionBudget
 metadata:
-  name: consul-pdb
+  name: {{ template "consul.fullname" . }}-server
+  labels:
+    app: {{ template "consul.name" . }}
+    chart: {{ template "consul.chart" . }}
+    heritage: {{ .Release.Service }}
+    release: {{ .Release.Name }}
 spec:
   maxUnavailable: {{ template "consul.pdb.maxUnavailable" . }}
   selector:
     matchLabels:
-      app: consul-server
+      app: {{ template "consul.name" . }}
+      release: "{{ .Release.Name }}"
+      component: server
 {{- end }}
