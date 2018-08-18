@@ -1,0 +1,13 @@
+# PodDisruptionBudget to prevent degrading the server cluster through
+# voluntary cluster changes.
+{{- if (.Values.server.enabled) and (.Values.server.disruptionBudget.enabled) }}
+apiVersion: policy/v1beta1
+kind: PodDisruptionBudget
+metadata:
+  name: consul-pdb
+spec:
+  maxUnavailable: {{ template "consul.pdb.maxUnavailable" . }}
+  selector:
+    matchLabels:
+      app: consul-server
+{{- end }}

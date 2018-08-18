@@ -1,0 +1,23 @@
+# Headless service for Consul server DNS entries. This service should only
+# point to Consul servers. For access to an agent, one should assume that
+# the agent is installed locally on the node and the NODE_IP should be used.
+# If the node can't run a Consul agent, then this service can be used to
+# communicate directly to a server agent.
+{{- if (.Values.server.enabled) and (.Values.ui.enabled) and (.Values.ui.service) }}
+apiVersion: v1
+kind: Service
+metadata:
+  name: consul-ui
+  labels:
+    name: consul-ui
+spec:
+  selector:
+    app: consul-server
+  ports:
+    - name: http
+      port: 80
+      targetPort: 8500
+  {{- if .Values.ui.serviceType }}
+  type: {{ .Values.ui.serviceType }}
+  {{- end }}
+{{- end }}

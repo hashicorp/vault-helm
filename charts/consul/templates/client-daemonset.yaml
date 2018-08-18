@@ -1,0 +1,85 @@
+# DaemonSet to run the Consul clients on every node.
+{{- if .Values.client.enabled }}
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: consul
+spec:
+  selector:
+    matchLabels:
+      app: consul
+  template:
+    metadata:
+      labels:
+        app: consul
+      annotations:
+        "consul.hashicorp.com/connect-inject": "false"
+    spec:
+      terminationGracePeriodSeconds: 10
+
+      # Consul agents require a directory for data, even clients. The data
+      # is okay to be wiped though if the Pod is removed, so just use an
+      # emptyDir volume.
+      volumes:
+        - name: data
+          emptyDir: {}
+
+      containers:
+        - name: consul
+          image: "{{ .Values.client.image }}"
+          env:
+            - name: POD_IP
+              valueFrom:
+                fieldRef:
+                  fieldPath: status.podIP
+            - name: NAMESPACE
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.namespace
+          command:
+            - "/bin/sh"
+            - "-ec"
+            - |
+              exec /bin/consul agent \
+                -advertise="${POD_IP}" \
+                -bind=0.0.0.0 \
+                -client=0.0.0.0 \
+                -datacenter={{ .Values.server.datacenter }} \
+                -data-dir=/consul/data \
+                {{- if (.Values.client.join) and (gt (len .Values.client.join) 0) }}
+                {{- range $value := .Values.client.join }}
+                -retry-join={{ $value }} \
+                {{- end }}
+                {{- else }}
+                {{- if .Values.server.enabled }}
+                {{- range $index := until (.Values.server.replicas | int) }}
+                -retry-join=consul-server-{{ $index }}.consul-server.${NAMESPACE}.svc \
+                {{- end }}
+                {{- end }}
+                {{- end }}
+                -domain={{ .Values.common.domain }}
+          volumeMounts:
+            - name: data
+              mountPath: /consul/data
+          lifecycle:
+            preStop:
+              exec:
+                command:
+                - /bin/sh
+                - -c
+                - consul leave
+          ports:
+            - containerPort: 8500
+              hostPort: 8500
+              name: http
+            - containerPort: 8301
+              name: serflan
+            - containerPort: 8302
+              name: serfwan
+            - containerPort: 8300
+              name: server
+            - containerPort: 8600
+              name: dns
+          resources:
+{{ toYaml .Values.server.resources | indent 12 }}
+{{- end }}
