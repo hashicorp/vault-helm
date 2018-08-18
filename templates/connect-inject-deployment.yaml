@@ -3,7 +3,7 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: {{ template "consul.fullname" }}-connect-injector-webhook-deployment
+  name: {{ template "consul.fullname" . }}-connect-injector-webhook-deployment
   labels:
     app: {{ template "consul.name" . }}
     chart: {{ template "consul.chart" . }}
