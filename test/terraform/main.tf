@@ -52,6 +52,7 @@ resource "null_resource" "kubectl" {
 
 resource "null_resource" "helm" {
   count = "${var.init_cli ? 1 : 0 }"
+  depends_on = ["null_resource.kubectl"]
 
   triggers {
     cluster = "${google_container_cluster.cluster.id}"
