@@ -15,3 +15,8 @@ variable "zone" {
   default     = "us-central1-a"
   description = "The zone to launch all the GKE nodes in."
 }
+
+variable "init_cli" {
+  default = false
+  description = "Whether to init the CLI tools kubectl, helm, etc. or not."
+}
