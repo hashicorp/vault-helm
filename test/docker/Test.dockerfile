@@ -19,7 +19,8 @@ RUN apk update && apk add --no-cache --virtual .build-deps \
     bash \
     openssl \
     python \
-    git
+    git \
+    jq
 
 # gcloud
 RUN curl -OL https://dl.google.com/dl/cloudsdk/channels/rapid/install_google_cloud_sdk.bash && \
