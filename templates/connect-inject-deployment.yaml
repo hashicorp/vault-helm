@@ -27,7 +27,7 @@ spec:
     spec:
       containers:
         - name: sidecar-injector
-          image: us.gcr.io/mitchellh-k8s/consul-k8s:latest
+          image: "{{ .Values.connectInject.image }}"
           env:
             - name: NAMESPACE
               valueFrom:

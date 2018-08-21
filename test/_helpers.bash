@@ -3,9 +3,20 @@ name_prefix() {
     printf "consul"
 }
 
-# helm_install installs the Consul chart.
+# helm_install installs the Consul chart. This will source overridable
+# values from the "values.yaml" file in this directory. This can be set
+# by CI or other environments to do test-specific overrides. Note that its
+# easily possible to break tests this way so be careful.
 helm_install() {
-    helm install --name consul --wait ${BATS_TEST_DIRNAME}/..
+    local values="${BATS_TEST_DIRNAME}/values.yaml"
+    if [ ! -f "${values}" ]; then
+        touch $values
+    fi
+
+    helm install -f ${values} \
+        --name consul \
+        --wait \
+        ${BATS_TEST_DIRNAME}/..
 }
 
 # helm_delete deletes the Consul chart and all resources.
