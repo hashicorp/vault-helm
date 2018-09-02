@@ -3,7 +3,7 @@
 # the agent is installed locally on the node and the NODE_IP should be used.
 # If the node can't run a Consul agent, then this service can be used to
 # communicate directly to a server agent.
-{{- if (.Values.server.enabled) and (.Values.ui.enabled) and (.Values.ui.service) }}
+{{- if (and (default .Values.server.enabled .Values.global.enabled) (default .Values.ui.enabled .Values.global.enabled) (default .Values.ui.service .Values.global.enabled)) }}
 apiVersion: v1
 kind: Service
 metadata:

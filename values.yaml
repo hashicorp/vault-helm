@@ -4,12 +4,19 @@
 # be disabled if you plan on connecting to a Consul cluster external to
 # the Kube cluster.
 
+global:
+  # enabled is the master enabled switch. Setting this to true or false
+  # will enable or disable all the components within this chart by default.
+  # Each component can be overridden using the component-specific "enabled"
+  # value.
+  enabled: true
+
 common:
   # Domain to register the Consul DNS server to listen for.
   domain: consul
 
 server:
-  enabled: true
+  enabled: null
   image: "consul:1.2.2"
   replicas: 3
   bootstrapExpect: 3 # Should <= replicas count
@@ -39,7 +46,7 @@ server:
   # disruptionBudget enables the creation of a PodDisruptionBudget to
   # prevent voluntary degrading of the Consul server cluster.
   disruptionBudget:
-    enabled: true
+    enabled: null
 
     # maxUnavailable will default to (n/2)-1 where n is the number of
     # replicas. If you'd like a custom value, you can specify an override here.
@@ -54,13 +61,13 @@ server:
 # within the Kube cluster. The current deployment model follows a traditional
 # DC where a single agent is deployed per node.
 client:
-  enabled: true
+  enabled: null
   image: "consul:1.2.2"
   join: null
 
 # ConnectInject will enable the automatic Connect sidecar injector.
 connectInject:
-  enabled: true
+  enabled: null
   image: "us.gcr.io/mitchellh-k8s/consul-k8s:latest"
   default: false # true will inject by default, otherwise requires annotation
   caBundle: "" # empty will auto generate the bundle
@@ -97,7 +104,7 @@ ui:
   # on the server nodes. This makes UI access via the service below (if
   # enabled) predictable rather than "any node" if you're running Consul
   # clients as well.
-  enabled: true
+  enabled: null
 
   # True if you want to create a Service entry for the Consul UI.
   #

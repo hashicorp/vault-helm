@@ -1,5 +1,5 @@
 # The service for the Connect sidecar injector
-{{- if .Values.connectInject.enabled }}
+{{- if (default .Values.connectInject.enabled .Values.global.enabled) }}
 apiVersion: v1
 kind: Service
 metadata:

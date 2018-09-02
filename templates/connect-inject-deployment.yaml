@@ -1,5 +1,5 @@
 # The deployment for running the Connect sidecar injector
-{{- if .Values.connectInject.enabled }}
+{{- if (default .Values.connectInject.enabled .Values.global.enabled) }}
 apiVersion: apps/v1
 kind: Deployment
 metadata:
