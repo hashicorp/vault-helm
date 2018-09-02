@@ -77,7 +77,7 @@ spec:
                 -config-dir=/consul/config \
                 -datacenter={{ .Values.server.datacenter }} \
                 -data-dir=/consul/data \
-                -domain={{ .Values.common.domain }} \
+                -domain={{ .Values.global.domain }} \
                 {{- if .Values.server.connect }}
                 -hcl="connect { enabled = true }" \
                 {{- end }}

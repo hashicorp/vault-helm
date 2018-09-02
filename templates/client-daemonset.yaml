@@ -70,7 +70,7 @@ spec:
                 {{- end }}
                 {{- end }}
                 {{- end }}
-                -domain={{ .Values.common.domain }}
+                -domain={{ .Values.global.domain }}
           volumeMounts:
             - name: data
               mountPath: /consul/data
