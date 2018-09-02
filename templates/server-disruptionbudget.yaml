@@ -1,6 +1,6 @@
 # PodDisruptionBudget to prevent degrading the server cluster through
 # voluntary cluster changes.
-{{- if (.Values.server.enabled) and (.Values.server.disruptionBudget.enabled) }}
+{{- if (and (default .Values.server.enabled .Values.global.enabled) (default .Values.server.disruptionBudget.enabled .Values.global.enabled)) }}
 apiVersion: policy/v1beta1
 kind: PodDisruptionBudget
 metadata:
