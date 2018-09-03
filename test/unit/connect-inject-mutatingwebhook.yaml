@@ -2,13 +2,13 @@
 
 load _helpers
 
-@test "connectInject/MutatingWebhookConfiguration: enabled by default" {
+@test "connectInject/MutatingWebhookConfiguration: disabled by default" {
   cd `chart_dir`
   local actual=$(helm template \
       -x templates/connect-inject-mutatingwebhook.yaml  \
       . | tee /dev/stderr |
       yq 'length > 0' | tee /dev/stderr)
-  [ "${actual}" = "true" ]
+  [ "${actual}" = "false" ]
 }
 
 @test "connectInject/MutatingWebhookConfiguration: enable with global.enabled false" {
