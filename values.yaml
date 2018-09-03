@@ -45,7 +45,7 @@ server:
   # disruptionBudget enables the creation of a PodDisruptionBudget to
   # prevent voluntary degrading of the Consul server cluster.
   disruptionBudget:
-    enabled: null
+    enabled: true
 
     # maxUnavailable will default to (n/2)-1 where n is the number of
     # replicas. If you'd like a custom value, you can specify an override here.
