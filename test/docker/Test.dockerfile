@@ -1,4 +1,4 @@
-# This Dockerfile installs all the dependencies necessary to run the
+# This Dockerfile installs all the dependencies necessary to run the unit and
 # acceptance tests. This image also contains gcloud so you can run tests
 # against a GKE cluster easily.
 #
@@ -19,8 +19,12 @@ RUN apk update && apk add --no-cache --virtual .build-deps \
     bash \
     openssl \
     python \
+    py-pip \
     git \
     jq
+
+# yq
+RUN pip install yq
 
 # gcloud
 RUN curl -OL https://dl.google.com/dl/cloudsdk/channels/rapid/install_google_cloud_sdk.bash && \

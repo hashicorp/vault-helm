@@ -1,5 +1,5 @@
 # StatefulSet to run the actual Consul server cluster.
-{{- if (default .Values.server.enabled .Values.global.enabled) }}
+{{- if (or (and (ne (.Values.server.enabled | toString) "-") .Values.server.enabled) (and (eq (.Values.server.enabled | toString) "-") .Values.global.enabled)) }}
 apiVersion: v1
 kind: ConfigMap
 metadata:

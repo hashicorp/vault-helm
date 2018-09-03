@@ -15,7 +15,7 @@ global:
   domain: consul
 
 server:
-  enabled: null
+  enabled: "-"
   image: "consul:1.2.2"
   replicas: 3
   bootstrapExpect: 3 # Should <= replicas count
