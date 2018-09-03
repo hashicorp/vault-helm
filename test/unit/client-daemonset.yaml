@@ -1,0 +1,52 @@
+#!/usr/bin/env bats
+
+load _helpers
+
+@test "client/DaemonSet: enabled by default" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      -x templates/client-daemonset.yaml  \
+      . | tee /dev/stderr |
+      yq 'length > 0' | tee /dev/stderr)
+  [ "${actual}" = "true" ]
+}
+
+@test "client/DaemonSet: enable with global.enabled false" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      -x templates/client-daemonset.yaml  \
+      --set 'global.enabled=false' \
+      --set 'client.enabled=true' \
+      . | tee /dev/stderr |
+      yq 'length > 0' | tee /dev/stderr)
+  [ "${actual}" = "true" ]
+}
+
+@test "client/DaemonSet: disable with client.enabled" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      -x templates/client-daemonset.yaml  \
+      --set 'client.enabled=false' \
+      . | tee /dev/stderr |
+      yq 'length > 0' | tee /dev/stderr)
+  [ "${actual}" = "false" ]
+}
+
+@test "client/DaemonSet: disable with global.enabled" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      -x templates/client-daemonset.yaml  \
+      --set 'global.enabled=false' \
+      . | tee /dev/stderr |
+      yq 'length > 0' | tee /dev/stderr)
+  [ "${actual}" = "false" ]
+}
+
+@test "client/DaemonSet: no updateStrategy when not updating" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      -x templates/client-daemonset.yaml  \
+      . | tee /dev/stderr |
+      yq -r '.spec.updateStrategy' | tee /dev/stderr)
+  [ "${actual}" = "null" ]
+}
