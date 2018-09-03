@@ -29,19 +29,24 @@ file. These are also fully documented directly on the
 
 ## Testing
 
-The Helm charts are tested in two forms: [Bats](https://github.com/bats-core/bats-core)
-tests and `helm test` tests. The Bats tests test changing Helm chart values and
-the effect on the install. The `helm test` tests verify that a deployed chart
-appears healthy.
+The Helm chart ships with both unit and acceptance tests.
 
-To run the Bats test: `kubectl` must be configured locally to be authenticated
-to a running Kubernetes cluster with Helm installed. With that in place,
-just run bats:
+The unit tests don't require any active Kubernetes cluster and complete
+very quickly. These should be used for fast feedback during development.
+The acceptance tests require a Kubernetes cluster with a configured `kubectl`.
+Both require [Bats](https://github.com/bats-core/bats-core) and `helm` to
+be installed and available on the CLI.
 
-    bats ./test
+To run the unit tests:
 
-If the tests fail, deployed resources in the Kubernetes cluster may not
-be properly cleaned up. We recommend recycling the Kubernetes cluster to
+    bats ./test/unit
+
+To run the acceptance tests:
+
+    bats ./test/acceptance
+
+If the acceptance tests fail, deployed resources in the Kubernetes cluster
+may not be properly cleaned up. We recommend recycling the Kubernetes cluster to
 start from a clean slate.
 
 **Note:** There is a Terraform configuration in the
