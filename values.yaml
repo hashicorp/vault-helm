@@ -60,7 +60,7 @@ server:
 # within the Kube cluster. The current deployment model follows a traditional
 # DC where a single agent is deployed per node.
 client:
-  enabled: null
+  enabled: "-"
   image: "consul:1.2.2"
   join: null
 

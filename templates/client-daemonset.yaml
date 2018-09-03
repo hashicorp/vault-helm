@@ -1,5 +1,5 @@
 # DaemonSet to run the Consul clients on every node.
-{{- if (default .Values.client.enabled .Values.global.enabled) }}
+{{- if (or (and (ne (.Values.client.enabled | toString) "-") .Values.client.enabled) (and (eq (.Values.client.enabled | toString) "-") .Values.global.enabled)) }}
 apiVersion: apps/v1
 kind: DaemonSet
 metadata:
