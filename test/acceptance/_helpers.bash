@@ -16,7 +16,7 @@ helm_install() {
     helm install -f ${values} \
         --name consul \
         --wait \
-        ${BATS_TEST_DIRNAME}/..
+        ${BATS_TEST_DIRNAME}/../..
 }
 
 # helm_delete deletes the Consul chart and all resources.
