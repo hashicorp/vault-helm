@@ -2,13 +2,13 @@
 
 load _helpers
 
-@test "connectInject/Deployment: enabled by default" {
+@test "connectInject/Deployment: disabled by default" {
   cd `chart_dir`
   local actual=$(helm template \
       -x templates/connect-inject-deployment.yaml  \
       . | tee /dev/stderr |
       yq 'length > 0' | tee /dev/stderr)
-  [ "${actual}" = "true" ]
+  [ "${actual}" = "false" ]
 }
 
 @test "connectInject/Deployment: enable with global.enabled false" {
@@ -46,18 +46,21 @@ load _helpers
   cd `chart_dir`
   local actual=$(helm template \
       -x templates/connect-inject-deployment.yaml  \
+      --set 'connectInject.enabled=true' \
       . | tee /dev/stderr |
       yq '.spec.template.spec.containers[0].command | any(contains("-tls-cert-file"))' | tee /dev/stderr)
   [ "${actual}" = "false" ]
 
   local actual=$(helm template \
       -x templates/connect-inject-deployment.yaml  \
+      --set 'connectInject.enabled=true' \
       . | tee /dev/stderr |
       yq '.spec.template.spec.containers[0].command | any(contains("-tls-key-file"))' | tee /dev/stderr)
   [ "${actual}" = "false" ]
 
   local actual=$(helm template \
       -x templates/connect-inject-deployment.yaml  \
+      --set 'connectInject.enabled=true' \
       . | tee /dev/stderr |
       yq '.spec.template.spec.containers[0].command | any(contains("-tls-auto"))' | tee /dev/stderr)
   [ "${actual}" = "true" ]
@@ -68,6 +71,7 @@ load _helpers
   local actual=$(helm template \
       -x templates/connect-inject-deployment.yaml  \
       --set 'connectInject.certs.secretName=foo' \
+      --set 'connectInject.enabled=true' \
       . | tee /dev/stderr |
       yq '.spec.template.spec.containers[0].command | any(contains("-tls-cert-file"))' | tee /dev/stderr)
   [ "${actual}" = "true" ]
@@ -75,6 +79,7 @@ load _helpers
   local actual=$(helm template \
       -x templates/connect-inject-deployment.yaml  \
       --set 'connectInject.certs.secretName=foo' \
+      --set 'connectInject.enabled=true' \
       . | tee /dev/stderr |
       yq '.spec.template.spec.containers[0].command | any(contains("-tls-key-file"))' | tee /dev/stderr)
   [ "${actual}" = "true" ]
@@ -82,6 +87,7 @@ load _helpers
   local actual=$(helm template \
       -x templates/connect-inject-deployment.yaml  \
       --set 'connectInject.certs.secretName=foo' \
+      --set 'connectInject.enabled=true' \
       . | tee /dev/stderr |
       yq '.spec.template.spec.containers[0].command | any(contains("-tls-auto"))' | tee /dev/stderr)
   [ "${actual}" = "false" ]
