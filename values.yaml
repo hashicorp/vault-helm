@@ -66,8 +66,8 @@ client:
 
 # ConnectInject will enable the automatic Connect sidecar injector.
 connectInject:
-  enabled: "-"
-  image: "us.gcr.io/mitchellh-k8s/consul-k8s:latest"
+  enabled: false # "-" disable this by default for now until the image is public
+  image: "TODO"
   default: false # true will inject by default, otherwise requires annotation
   caBundle: "" # empty will auto generate the bundle
 
