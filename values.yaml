@@ -14,9 +14,13 @@ global:
   # Domain to register the Consul DNS server to listen for.
   domain: consul
 
+  # Image is the name (and tag) of the Consul Docker image for clients and
+  # servers below. This can be overridden per component.
+  image: "consul:1.2.2"
+
 server:
   enabled: "-"
-  image: "consul:1.2.2"
+  image: null
   replicas: 3
   bootstrapExpect: 3 # Should <= replicas count
   storage: 10Gi
@@ -61,7 +65,7 @@ server:
 # DC where a single agent is deployed per node.
 client:
   enabled: "-"
-  image: "consul:1.2.2"
+  image: null
   join: null
 
 # ConnectInject will enable the automatic Connect sidecar injector.

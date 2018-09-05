@@ -37,7 +37,7 @@ spec:
 
       containers:
         - name: consul
-          image: "{{ .Values.client.image }}"
+          image: "{{ default .Values.global.image .Values.client.image }}"
           env:
             - name: POD_IP
               valueFrom:
