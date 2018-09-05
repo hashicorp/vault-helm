@@ -42,6 +42,27 @@ load _helpers
   [ "${actual}" = "false" ]
 }
 
+@test "server/StatefulSet: image defaults to global.image" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      -x templates/server-statefulset.yaml  \
+      --set 'global.image=foo' \
+      . | tee /dev/stderr |
+      yq -r '.spec.template.spec.containers[0].image' | tee /dev/stderr)
+  [ "${actual}" = "foo" ]
+}
+
+@test "server/StatefulSet: image can be overridden with server.image" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      -x templates/server-statefulset.yaml  \
+      --set 'global.image=foo' \
+      --set 'server.image=bar' \
+      . | tee /dev/stderr |
+      yq -r '.spec.template.spec.containers[0].image' | tee /dev/stderr)
+  [ "${actual}" = "bar" ]
+}
+
 @test "server/StatefulSet: no updateStrategy when not updating" {
   cd `chart_dir`
   local actual=$(helm template \

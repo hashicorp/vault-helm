@@ -53,7 +53,7 @@ spec:
             name: {{ template "consul.fullname" . }}-server-config
       containers:
         - name: consul
-          image: "{{ .Values.server.image }}"
+          image: "{{ default .Values.global.image .Values.server.image }}"
           env:
             - name: POD_IP
               valueFrom:

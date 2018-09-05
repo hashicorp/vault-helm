@@ -42,6 +42,27 @@ load _helpers
   [ "${actual}" = "false" ]
 }
 
+@test "client/DaemonSet: image defaults to global.image" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      -x templates/client-daemonset.yaml  \
+      --set 'global.image=foo' \
+      . | tee /dev/stderr |
+      yq -r '.spec.template.spec.containers[0].image' | tee /dev/stderr)
+  [ "${actual}" = "foo" ]
+}
+
+@test "client/DaemonSet: image can be overridden with client.image" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      -x templates/client-daemonset.yaml  \
+      --set 'global.image=foo' \
+      --set 'client.image=bar' \
+      . | tee /dev/stderr |
+      yq -r '.spec.template.spec.containers[0].image' | tee /dev/stderr)
+  [ "${actual}" = "bar" ]
+}
+
 @test "client/DaemonSet: no updateStrategy when not updating" {
   cd `chart_dir`
   local actual=$(helm template \
