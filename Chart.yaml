@@ -5,4 +5,5 @@ description: Install and configure Consul on Kubernetes.
 home: https://www.consul.io
 sources:
   - https://github.com/hashicorp/consul
+  - https://github.com/hashicorp/consul-helm
   - https://github.com/hashicorp/consul-k8s
