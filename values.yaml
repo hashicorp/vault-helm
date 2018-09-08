@@ -68,6 +68,11 @@ client:
   image: null
   join: null
 
+  # Resource requests, limits, etc. for the client cluster placement. This
+  # should map directly to the value of the resources field for a PodSpec.
+  # By default no direct resource request is made.
+  resources: {}
+
   # extraConfig is a raw string of extra configuration to set with the
   # server. This should be JSON or HCL.
   extraConfig: |

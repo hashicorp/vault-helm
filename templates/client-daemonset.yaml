@@ -99,6 +99,16 @@ spec:
               name: server
             - containerPort: 8600
               name: dns
+          readinessProbe:
+            # NOTE(mitchellh): when our HTTP status endpoints support the
+            # proper status codes, we should switch to that. This is temporary.
+            exec:
+              command:
+                - "/bin/sh"
+                - "-ec"
+                - |
+                  curl http://127.0.0.1:8500/v1/status/leader 2>/dev/null | \
+                  grep -E '".+"'
           resources:
-{{ toYaml .Values.server.resources | indent 12 }}
+{{ toYaml .Values.client.resources | indent 12 }}
 {{- end }}
