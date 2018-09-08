@@ -63,6 +63,9 @@ load _helpers
   [ "${actual}" = "bar" ]
 }
 
+#--------------------------------------------------------------------
+# updateStrategy
+
 @test "server/StatefulSet: no updateStrategy when not updating" {
   cd `chart_dir`
   local actual=$(helm template \
@@ -88,3 +91,97 @@ load _helpers
       yq -r '.spec.updateStrategy.rollingUpdate.partition' | tee /dev/stderr)
   [ "${actual}" = "2" ]
 }
+
+#--------------------------------------------------------------------
+# extraVolumes
+
+@test "server/StatefulSet: adds extra volume" {
+  cd `chart_dir`
+
+  # Test that it defines it
+  local object=$(helm template \
+      -x templates/server-statefulset.yaml  \
+      --set 'server.extraVolumes[0].type=configMap' \
+      --set 'server.extraVolumes[0].name=foo' \
+      . | tee /dev/stderr |
+      yq -r '.spec.template.spec.volumes[] | select(.name == "userconfig-foo")' | tee /dev/stderr)
+
+  local actual=$(echo $object |
+      yq -r '.configMap.name' | tee /dev/stderr)
+  [ "${actual}" = "foo" ]
+
+  local actual=$(echo $object |
+      yq -r '.configMap.secretName' | tee /dev/stderr)
+  [ "${actual}" = "null" ]
+
+  # Test that it mounts it
+  local object=$(helm template \
+      -x templates/server-statefulset.yaml  \
+      --set 'server.extraVolumes[0].type=configMap' \
+      --set 'server.extraVolumes[0].name=foo' \
+      . | tee /dev/stderr |
+      yq -r '.spec.template.spec.containers[0].volumeMounts[] | select(.name == "userconfig-foo")' | tee /dev/stderr)
+
+  local actual=$(echo $object |
+      yq -r '.readOnly' | tee /dev/stderr)
+  [ "${actual}" = "true" ]
+
+  local actual=$(echo $object |
+      yq -r '.mountPath' | tee /dev/stderr)
+  [ "${actual}" = "/consul/userconfig/foo" ]
+
+  # Doesn't load it
+  local actual=$(helm template \
+      -x templates/server-statefulset.yaml  \
+      --set 'server.extraVolumes[0].type=configMap' \
+      --set 'server.extraVolumes[0].name=foo' \
+      . | tee /dev/stderr |
+      yq -r '.spec.template.spec.containers[0].command | map(select(test("userconfig"))) | length' | tee /dev/stderr)
+  [ "${actual}" = "0" ]
+}
+
+@test "server/StatefulSet: adds extra secret volume" {
+  cd `chart_dir`
+
+  # Test that it defines it
+  local object=$(helm template \
+      -x templates/server-statefulset.yaml  \
+      --set 'server.extraVolumes[0].type=secret' \
+      --set 'server.extraVolumes[0].name=foo' \
+      . | tee /dev/stderr |
+      yq -r '.spec.template.spec.volumes[] | select(.name == "userconfig-foo")' | tee /dev/stderr)
+
+  local actual=$(echo $object |
+      yq -r '.secret.name' | tee /dev/stderr)
+  [ "${actual}" = "null" ]
+
+  local actual=$(echo $object |
+      yq -r '.secret.secretName' | tee /dev/stderr)
+  [ "${actual}" = "foo" ]
+
+  # Test that it mounts it
+  local object=$(helm template \
+      -x templates/server-statefulset.yaml  \
+      --set 'server.extraVolumes[0].type=configMap' \
+      --set 'server.extraVolumes[0].name=foo' \
+      . | tee /dev/stderr |
+      yq -r '.spec.template.spec.containers[0].volumeMounts[] | select(.name == "userconfig-foo")' | tee /dev/stderr)
+
+  local actual=$(echo $object |
+      yq -r '.readOnly' | tee /dev/stderr)
+  [ "${actual}" = "true" ]
+
+  local actual=$(echo $object |
+      yq -r '.mountPath' | tee /dev/stderr)
+  [ "${actual}" = "/consul/userconfig/foo" ]
+
+  # Doesn't load it
+  local actual=$(helm template \
+      -x templates/server-statefulset.yaml  \
+      --set 'server.extraVolumes[0].type=configMap' \
+      --set 'server.extraVolumes[0].name=foo' \
+      . | tee /dev/stderr |
+      yq -r '.spec.template.spec.containers[0].command | map(select(test("userconfig"))) | length' | tee /dev/stderr)
+  [ "${actual}" = "0" ]
+}
+
