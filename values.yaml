@@ -86,6 +86,14 @@ client:
   extraConfig: |
     {}
 
+  # extraVolumes is a list of extra volumes to mount. These will be exposed
+  # to Consul in the path `/consul/userconfig/<name>/`. The value below is
+  # an array of objects, examples are shown below.
+  extraVolumes: []
+    # - type: secret (or "configMap")
+    #   name: my-secret
+    #   load: false # if true, will add to `-config-dir` to load by Consul
+
 # ConnectInject will enable the automatic Connect sidecar injector.
 connectInject:
   enabled: false # "-" disable this by default for now until the image is public

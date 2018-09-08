@@ -185,3 +185,14 @@ load _helpers
   [ "${actual}" = "0" ]
 }
 
+@test "server/StatefulSet: adds loadable volume" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      -x templates/server-statefulset.yaml  \
+      --set 'server.extraVolumes[0].type=configMap' \
+      --set 'server.extraVolumes[0].name=foo' \
+      --set 'server.extraVolumes[0].load=true' \
+      . | tee /dev/stderr |
+      yq -r '.spec.template.spec.containers[0].command | map(select(test("/consul/userconfig/foo"))) | length' | tee /dev/stderr)
+  [ "${actual}" = "1" ]
+}

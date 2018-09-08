@@ -37,6 +37,15 @@ spec:
         - name: config
           configMap:
             name: {{ template "consul.fullname" . }}-client-config
+        {{- range .Values.client.extraVolumes }}
+        - name: userconfig-{{ .name }}
+          {{ .type }}:
+            {{- if (eq .type "configMap") }}
+            name: {{ .name }}
+            {{- else if (eq .type "secret") }}
+            secretName: {{ .name }}
+            {{- end }}
+        {{- end }}
 
       containers:
         - name: consul
@@ -61,6 +70,11 @@ spec:
                 -bind=0.0.0.0 \
                 -client=0.0.0.0 \
                 -config-dir=/consul/config \
+                {{- range .Values.client.extraVolumes }}
+                {{- if .load }}
+                -config-dir=/consul/userconfig/{{ .name }}
+                {{- end }}
+                {{- end }}
                 -datacenter={{ .Values.global.datacenter }} \
                 -data-dir=/consul/data \
                 {{- if (.Values.client.join) and (gt (len .Values.client.join) 0) }}
@@ -80,6 +94,11 @@ spec:
               mountPath: /consul/data
             - name: config
               mountPath: /consul/config
+            {{- range .Values.client.extraVolumes }}
+            - name: userconfig-{{ .name }}
+              readOnly: true
+              mountPath: /consul/userconfig/{{ .name }}
+            {{- end }}
           lifecycle:
             preStop:
               exec:
