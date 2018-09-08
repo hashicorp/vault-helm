@@ -51,6 +51,15 @@ spec:
         - name: config
           configMap:
             name: {{ template "consul.fullname" . }}-server-config
+        {{- range .Values.server.extraVolumes }}
+        - name: userconfig-{{ .name }}
+          {{ .type }}:
+            {{- if (eq .type "configMap") }}
+            name: {{ .name }}
+            {{- else if (eq .type "secret") }}
+            secretName: {{ .name }}
+            {{- end }}
+        {{- end }}
       containers:
         - name: consul
           image: "{{ default .Values.global.image .Values.server.image }}"
@@ -75,6 +84,11 @@ spec:
                 -bootstrap-expect={{ .Values.server.bootstrapExpect }} \
                 -client=0.0.0.0 \
                 -config-dir=/consul/config \
+                {{- range .Values.server.extraVolumes }}
+                {{- if .load }}
+                -config-dir=/consul/userconfig/{{ .name }}
+                {{- end }}
+                {{- end }}
                 -datacenter={{ .Values.global.datacenter }} \
                 -data-dir=/consul/data \
                 -domain={{ .Values.global.domain }} \
@@ -93,6 +107,11 @@ spec:
               mountPath: /consul/data
             - name: config
               mountPath: /consul/config
+            {{- range .Values.server.extraVolumes }}
+            - name: userconfig-{{ .name }}
+              readOnly: true
+              mountPath: /consul/userconfig/{{ .name }}
+            {{- end }}
           lifecycle:
             preStop:
               exec:
