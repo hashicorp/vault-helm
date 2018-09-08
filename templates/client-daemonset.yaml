@@ -61,7 +61,7 @@ spec:
                 -bind=0.0.0.0 \
                 -client=0.0.0.0 \
                 -config-dir=/consul/config \
-                -datacenter={{ .Values.server.datacenter }} \
+                -datacenter={{ .Values.global.datacenter }} \
                 -data-dir=/consul/data \
                 {{- if (.Values.client.join) and (gt (len .Values.client.join) 0) }}
                 {{- range $value := .Values.client.join }}

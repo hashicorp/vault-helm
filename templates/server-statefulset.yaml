@@ -75,7 +75,7 @@ spec:
                 -bootstrap-expect={{ .Values.server.bootstrapExpect }} \
                 -client=0.0.0.0 \
                 -config-dir=/consul/config \
-                -datacenter={{ .Values.server.datacenter }} \
+                -datacenter={{ .Values.global.datacenter }} \
                 -data-dir=/consul/data \
                 -domain={{ .Values.global.domain }} \
                 {{- if .Values.server.connect }}

@@ -18,6 +18,12 @@ global:
   # servers below. This can be overridden per component.
   image: "consul:1.2.2"
 
+  # Datacenter is the name of the datacenter that the agents should register
+  # as. This shouldn't be changed once the Consul cluster is up and running
+  # since Consul doesn't support an automatic way to change this value
+  # currently: https://github.com/hashicorp/consul/issues/1858
+  datacenter: dc1
+
 server:
   enabled: "-"
   image: null
@@ -29,12 +35,6 @@ server:
   # for Connect-related connections. Other customizations can be done
   # via the extraConfig setting.
   connect: true
-
-  # Datacenter is the name of the datacenter that the server should register
-  # as. This shouldn't be changed once the Consul cluster is up and running
-  # since Consul doesn't support an automatic way to change this value
-  # currently: https://github.com/hashicorp/consul/issues/1858
-  datacenter: dc1
 
   # Resource requests, limits, etc. for the server cluster placement. This
   # should map directly to the value of the resources field for a PodSpec.
