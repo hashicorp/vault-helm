@@ -34,6 +34,9 @@ spec:
       volumes:
         - name: data
           emptyDir: {}
+        - name: config
+          configMap:
+            name: {{ template "consul.fullname" . }}-client-config
 
       containers:
         - name: consul
@@ -57,6 +60,7 @@ spec:
                 -advertise="${POD_IP}" \
                 -bind=0.0.0.0 \
                 -client=0.0.0.0 \
+                -config-dir=/consul/config \
                 -datacenter={{ .Values.server.datacenter }} \
                 -data-dir=/consul/data \
                 {{- if (.Values.client.join) and (gt (len .Values.client.join) 0) }}
@@ -74,6 +78,8 @@ spec:
           volumeMounts:
             - name: data
               mountPath: /consul/data
+            - name: config
+              mountPath: /consul/config
           lifecycle:
             preStop:
               exec:
