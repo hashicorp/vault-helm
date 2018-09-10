@@ -4,9 +4,9 @@ This repository contains the official HashiCorp Helm chart for installing
 and configuring Consul on Kubernetes. This chart supports multiple use
 cases of Consul on Kubernetes depending on the values provided.
 
-Please see the [consul-k8s project](https://github.com/hashicorp/consul-k8s)
-for the various ways that Consul integrates with Kubernetes. This Helm chart
-installs and configures `consul-k8s` in some cases.
+For full documentation on this Helm chart along with all the ways you can
+use Consul with Kubernetes, please see the
+[Consul and Kubernetes documentation](https://www.consul.io/docs/platform/k8s/index.html).
 
 ## Prerequisites
 
@@ -25,7 +25,7 @@ then be installed directly:
 
 Please see the many options supported in the `values.yaml`
 file. These are also fully documented directly on the
-[Consul website](https://www.consul.io/docs/).
+[Consul website](https://www.consul.io/docs/platform/k8s/helm.html).
 
 ## Testing
 
@@ -53,4 +53,5 @@ start from a clean slate.
 [test/terraform/ directory](https://github.com/hashicorp/consul-helm/tree/master/test/terraform)
 that can be used to quickly bring up a GKE cluster and configure
 `kubectl` and `helm` locally. This can be used to quickly spin up a test
+cluster for acceptance tests. Unit tests _do not_ require a running Kubernetes
 cluster.
