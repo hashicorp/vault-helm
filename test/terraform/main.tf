@@ -10,14 +10,18 @@ resource "random_id" "suffix" {
   byte_length = 4
 }
 
+data "google_container_engine_versions" "main" {
+  zone = "${var.zone}"
+}
+
 resource "google_container_cluster" "cluster" {
   name               = "consul-k8s-${random_id.suffix.dec}"
   project            = "${var.project}"
   enable_legacy_abac = true
   initial_node_count = 5
   zone               = "${var.zone}"
-  min_master_version = "${var.k8s_version}"
-  node_version       = "${var.k8s_version}"
+  min_master_version = "${data.google_container_engine_versions.main.latest_master_version}"
+  node_version       = "${data.google_container_engine_versions.main.latest_node_version}"
 }
 
 resource "null_resource" "kubectl" {
