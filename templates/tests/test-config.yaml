@@ -1,9 +1,0 @@
-apiVersion: v1
-kind: ConfigMap
-metadata:
-  name: {{ template "consul.fullname" . }}-tests
-data:
-  run.sh: |-
-    @test "Testing Consul cluster has quorum" {
-      [ `kubectl exec {{ template "consul.fullname" . }}-server-0 consul members --namespace={{ .Release.Namespace }} | grep server | wc -l` -ge "3" ]
-    }

@@ -152,7 +152,3 @@ connectInject:
     # defaults but can be customized if necessary.
     certName: tls.crt
     keyName: tls.key
-
-test:
-  image: lachlanevenson/k8s-kubectl
-  imageTag: v1.4.8-bash
