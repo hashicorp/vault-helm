@@ -1,0 +1,26 @@
+# Service for Consul DNS.
+{{- if (or (and (ne (.Values.dns.enabled | toString) "-") .Values.dns.enabled) (and (eq (.Values.dns.enabled | toString) "-") .Values.global.enabled)) }}
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ template "consul.fullname" . }}-dns
+  labels:
+    app: {{ template "consul.name" . }}
+    chart: {{ template "consul.chart" . }}
+    heritage: {{ .Release.Service }}
+    release: {{ .Release.Name }}
+spec:
+  ports:
+    - name: dns-tcp
+      port: 53
+      protocol: "TCP"
+      targetPort: dns
+    - name: dns-udp
+      port: 53
+      protocol: "UDP"
+      targetPort: dns
+  selector:
+    app: {{ template "consul.name" . }}
+    release: "{{ .Release.Name }}"
+    hasDNS: "true"
+{{- end }}

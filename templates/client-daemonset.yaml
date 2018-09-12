@@ -16,6 +16,7 @@ spec:
       chart: {{ template "consul.chart" . }}
       release: {{ .Release.Name }}
       component: client
+      hasDNS: "true"
   template:
     metadata:
       labels:
@@ -23,6 +24,7 @@ spec:
         chart: {{ template "consul.chart" . }}
         release: {{ .Release.Name }}
         component: client
+        hasDNS: "true"
       annotations:
         "consul.hashicorp.com/connect-inject": "false"
     spec:

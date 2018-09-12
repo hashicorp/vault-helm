@@ -94,6 +94,31 @@ client:
     #   name: my-secret
     #   load: false # if true, will add to `-config-dir` to load by Consul
 
+# Configuration for DNS configuration within the Kubernetes cluster.
+# This creates a service that routes to all agents (client or server)
+# for serving DNS requests. This DOES NOT automatically configure kube-dns
+# today, so you must still manually configure a `stubDomain` with kube-dns
+# for this to have any effect:
+# https://kubernetes.io/docs/tasks/administer-cluster/dns-custom-nameservers/#configure-stub-domain-and-upstream-dns-servers
+dns:
+  enabled: "-"
+
+ui:
+  # True if you want to enable the Consul UI. The UI will run only
+  # on the server nodes. This makes UI access via the service below (if
+  # enabled) predictable rather than "any node" if you're running Consul
+  # clients as well.
+  enabled: "-"
+
+  # True if you want to create a Service entry for the Consul UI.
+  #
+  # serviceType can be used to control the type of service created. For
+  # example, setting this to "LoadBalancer" will create an external load
+  # balancer (for supported K8S installations) to access the UI.
+  service:
+    enabled: true
+    type: null
+
 # ConnectInject will enable the automatic Connect sidecar injector.
 connectInject:
   enabled: false # "-" disable this by default for now until the image is public
@@ -127,22 +152,6 @@ connectInject:
     # defaults but can be customized if necessary.
     certName: tls.crt
     keyName: tls.key
-
-ui:
-  # True if you want to enable the Consul UI. The UI will run only
-  # on the server nodes. This makes UI access via the service below (if
-  # enabled) predictable rather than "any node" if you're running Consul
-  # clients as well.
-  enabled: "-"
-
-  # True if you want to create a Service entry for the Consul UI.
-  #
-  # serviceType can be used to control the type of service created. For
-  # example, setting this to "LoadBalancer" will create an external load
-  # balancer (for supported K8S installations) to access the UI.
-  service:
-    enabled: true
-    type: null
 
 test:
   image: lachlanevenson/k8s-kubectl
