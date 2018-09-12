@@ -17,8 +17,10 @@ of this README. Please refer to the Kubernetes and Helm documentation.
 ## Usage
 
 For now, we do not host a Chart repository. To use the charts, you must
-download this repository and unpack it into a directory. Assuming this
-repository was unpacked into the directory `consul-helm`, the chart can
+download this repository and unpack it into a directory. Either
+[download a tagged release](https://github.com/hashicorp/consul-helm/releases) or
+use `git checkout` to a tagged release.
+Assuming this repository was unpacked into the directory `consul-helm`, the chart can
 then be installed directly:
 
     helm install ./consul-helm
