@@ -14,11 +14,11 @@ spec:
     - name: dns-tcp
       port: 53
       protocol: "TCP"
-      targetPort: dns
+      targetPort: dns-tcp
     - name: dns-udp
       port: 53
       protocol: "UDP"
-      targetPort: dns
+      targetPort: dns-udp
   selector:
     app: {{ template "consul.name" . }}
     release: "{{ .Release.Name }}"

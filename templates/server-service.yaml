@@ -46,9 +46,14 @@ spec:
     - name: server
       port: 8300
       targetPort: 8300
-    - name: dns
+    - name: dns-tcp
+      protocol: "TCP"
       port: 8600
-      targetPort: 8600
+      targetPort: dns-tcp
+    - name: dns-udp
+      protocol: "UDP"
+      port: 8600
+      targetPort: dns-udp
   selector:
     app: {{ template "consul.name" . }}
     release: "{{ .Release.Name }}"

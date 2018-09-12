@@ -119,7 +119,11 @@ spec:
             - containerPort: 8300
               name: server
             - containerPort: 8600
-              name: dns
+              name: dns-tcp
+              protocol: "TCP"
+            - containerPort: 8600
+              name: dns-udp
+              protocol: "UDP"
           readinessProbe:
             # NOTE(mitchellh): when our HTTP status endpoints support the
             # proper status codes, we should switch to that. This is temporary.
