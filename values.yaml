@@ -16,7 +16,7 @@ global:
 
   # Image is the name (and tag) of the Consul Docker image for clients and
   # servers below. This can be overridden per component.
-  image: "consul:1.2.2"
+  image: "consul:1.2.3"
 
   # Datacenter is the name of the datacenter that the agents should register
   # as. This shouldn't be changed once the Consul cluster is up and running
