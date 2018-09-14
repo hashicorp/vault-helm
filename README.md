@@ -44,8 +44,9 @@ The Helm chart ships with both unit and acceptance tests.
 The unit tests don't require any active Kubernetes cluster and complete
 very quickly. These should be used for fast feedback during development.
 The acceptance tests require a Kubernetes cluster with a configured `kubectl`.
-Both require [Bats](https://github.com/bats-core/bats-core) and `helm` to
-be installed and available on the CLI.
+Both require [Bats](https://github.com/bats-core/bats-core) and `helm` to be
+installed and available on the CLI. The unit tests also require the correct
+version of [yq](https://pypi.org/project/yq/) if running locally.
 
 To run the unit tests:
 
