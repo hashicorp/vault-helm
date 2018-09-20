@@ -160,4 +160,7 @@ spec:
         resources:
           requests:
             storage: {{ .Values.server.storage }}
+        {{- if .Values.server.storageClass }}
+        storageClassName: {{ .Values.server.storageClass }}
+        {{- end }}
 {{- end }}
