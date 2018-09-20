@@ -30,6 +30,7 @@ server:
   replicas: 3
   bootstrapExpect: 3 # Should <= replicas count
   storage: 10Gi
+  #storageClass: default # <= name of the storage class to use
 
   # connect will enable Connect on all the servers, initializing a CA
   # for Connect-related connections. Other customizations can be done
