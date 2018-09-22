@@ -135,7 +135,7 @@ ui:
 # Consul agent.
 syncCatalog:
   # True if you want to enable the catalog sync. "-" for default.
-  enabled: "-"
+  enabled: false
   image: null
 
   # toConsul and toK8S control whether syncing is enabled to Consul or K8S
