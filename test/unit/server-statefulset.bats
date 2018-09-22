@@ -196,3 +196,27 @@ load _helpers
       yq -r '.spec.template.spec.containers[0].command | map(select(test("/consul/userconfig/foo"))) | length' | tee /dev/stderr)
   [ "${actual}" = "1" ]
 }
+
+#--------------------------------------------------------------------
+# updateStrategy
+
+@test "server/StatefulSet: no storageClass on claim by default" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      -x templates/server-statefulset.yaml  \
+      . | tee /dev/stderr |
+      yq -r '.spec.volumeClaimTemplates[0].spec.storageClassName' | tee /dev/stderr)
+  [ "${actual}" = "null" ]
+}
+
+
+@test "server/StatefulSet: can set storageClass" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      -x templates/server-statefulset.yaml  \
+      --set 'server.storageClass=foo' \
+      . | tee /dev/stderr |
+      yq -r '.spec.volumeClaimTemplates[0].spec.storageClassName' | tee /dev/stderr)
+  [ "${actual}" = "foo" ]
+}
+
