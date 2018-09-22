@@ -29,8 +29,13 @@ server:
   image: null
   replicas: 3
   bootstrapExpect: 3 # Should <= replicas count
+
+  # storage and storageClass are the settings for configuring stateful
+  # storage for the server pods. storage should be set to the disk size of
+  # the attached volume. storageClass is the class of storage which defaults
+  # to null (the Kube cluster will pick the default).
   storage: 10Gi
-  #storageClass: default # <= name of the storage class to use
+  storageClass: null
 
   # connect will enable Connect on all the servers, initializing a CA
   # for Connect-related connections. Other customizations can be done
