@@ -143,6 +143,11 @@ syncCatalog:
   toConsul: true
   toK8S: true
 
+  # k8sPrefix is the service prefix to prepend to services before registering
+  # with Kubernetes. For example "consul-" will register all services
+  # prepended with "consul-".
+  k8sPrefix: null
+
 # ConnectInject will enable the automatic Connect sidecar injector.
 connectInject:
   enabled: false # "-" disable this by default for now until the image is public
