@@ -18,6 +18,11 @@ global:
   # servers below. This can be overridden per component.
   image: "consul:1.2.3"
 
+  # imageK8S is the name (and tag) of the consul-k8s Docker image that
+  # is used for functionality such as the catalog sync. This can be overridden
+  # per component below.
+  imageK8S: "hashicorp/consul-k8s:0.1.0"
+
   # Datacenter is the name of the datacenter that the agents should register
   # as. This shouldn't be changed once the Consul cluster is up and running
   # since Consul doesn't support an automatic way to change this value

@@ -43,6 +43,32 @@ load _helpers
 }
 
 #--------------------------------------------------------------------
+# image
+
+@test "syncCatalog/Deployment: image defaults to global.imageK8S" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      -x templates/sync-catalog-deployment.yaml  \
+      --set 'global.imageK8S=bar' \
+      --set 'syncCatalog.enabled=true' \
+      . | tee /dev/stderr |
+      yq -r '.spec.template.spec.containers[0].image' | tee /dev/stderr)
+  [ "${actual}" = "bar" ]
+}
+
+@test "syncCatalog/Deployment: image can be overridden with server.image" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      -x templates/sync-catalog-deployment.yaml  \
+      --set 'global.imageK8S=foo' \
+      --set 'syncCatalog.enabled=true' \
+      --set 'syncCatalog.image=bar' \
+      . | tee /dev/stderr |
+      yq -r '.spec.template.spec.containers[0].image' | tee /dev/stderr)
+  [ "${actual}" = "bar" ]
+}
+
+#--------------------------------------------------------------------
 # toConsul and toK8S
 
 @test "syncCatalog/Deployment: bidirectional by default" {
