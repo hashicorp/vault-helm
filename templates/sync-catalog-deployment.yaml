@@ -27,7 +27,7 @@ spec:
     spec:
       containers:
         - name: consul-sync-catalog
-          image: "{{ .Values.syncCatalog.image }}"
+          image: "{{ default .Values.global.imageK8S .Values.syncCatalog.image }}"
           env:
             - name: HOST_IP
               valueFrom:
