@@ -50,5 +50,8 @@ spec:
                 -to-k8s=false \
                 {{- end }}
                 -consul-domain={{ .Values.global.domain }} \
+                {{- if .Values.syncCatalog.k8sPrefix }}
+                -k8s-service-prefix="{{ .Values.syncCatalog.k8sPrefix}}" \
+                {{- end }}
                 -k8s-write-namespace=${NAMESPACE}
 {{- end }}
