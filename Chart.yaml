@@ -1,9 +1,8 @@
 apiVersion: v1
-name: consul
+name: vault
 version: 0.1.0
-description: Install and configure Consul on Kubernetes.
-home: https://www.consul.io
+description: Install and configure Vault on Kubernetes.
+home: https://www.vaultproject.io
 sources:
-  - https://github.com/hashicorp/consul
-  - https://github.com/hashicorp/consul-helm
-  - https://github.com/hashicorp/consul-k8s
+  - https://github.com/hashicorp/vault
+  - https://github.com/hashicorp/vault-helm
