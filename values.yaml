@@ -1,7 +1,7 @@
-# Available parameters and their default values for the Consul chart.
+# Available parameters and their default values for the Vault chart.
 
 # Server, when enabled, configures a server cluster to run. This should
-# be disabled if you plan on connecting to a Consul cluster external to
+# be disabled if you plan on connecting to a Vault cluster external to
 # the Kube cluster.
 
 global:
@@ -11,29 +11,25 @@ global:
   # value.
   enabled: true
 
-  # Domain to register the Consul DNS server to listen for.
-  domain: consul
+  # Domain to register the Vault DNS server to listen for.
+  # TODO: verify for Vault
+  domain: vault
 
-  # Image is the name (and tag) of the Consul Docker image for clients and
+  # Image is the name (and tag) of the Vault Docker image for clients and
   # servers below. This can be overridden per component.
-  image: "consul:1.2.3"
-
-  # imageK8S is the name (and tag) of the consul-k8s Docker image that
-  # is used for functionality such as the catalog sync. This can be overridden
-  # per component below.
-  imageK8S: "hashicorp/consul-k8s:0.1.0"
+  image: "vault:0.11.1"
 
   # Datacenter is the name of the datacenter that the agents should register
-  # as. This shouldn't be changed once the Consul cluster is up and running
-  # since Consul doesn't support an automatic way to change this value
-  # currently: https://github.com/hashicorp/consul/issues/1858
+  # as. This shouldn't be changed once the Vault cluster is up and running
+  # since Vault doesn't support an automatic way to change this value
+  # currently: https://github.com/hashicorp/vault/issues/1858
+  # TODO: verify for Vault
   datacenter: dc1
 
 server:
   enabled: "-"
   image: null
   replicas: 3
-  bootstrapExpect: 3 # Should <= replicas count
 
   # storage and storageClass are the settings for configuring stateful
   # storage for the server pods. storage should be set to the disk size of
@@ -42,23 +38,19 @@ server:
   storage: 10Gi
   storageClass: null
 
-  # connect will enable Connect on all the servers, initializing a CA
-  # for Connect-related connections. Other customizations can be done
-  # via the extraConfig setting.
-  connect: true
-
   # Resource requests, limits, etc. for the server cluster placement. This
   # should map directly to the value of the resources field for a PodSpec.
   # By default no direct resource request is made.
   resources: {}
 
-  # updatePartition is used to control a careful rolling update of Consul
+  # updatePartition is used to control a careful rolling update of Vault
   # servers. This should be done particularly when changing the version
-  # of Consul. Please refer to the documentation for more information.
+  # of Vault. Please refer to the documentation for more information.
+  # TODO: verify for Vaultt 
   updatePartition: 0
 
   # disruptionBudget enables the creation of a PodDisruptionBudget to
-  # prevent voluntary degrading of the Consul server cluster.
+  # prevent voluntary degrading of the Vault server cluster.
   disruptionBudget:
     enabled: true
 
@@ -72,38 +64,12 @@ server:
     {}
 
   # extraVolumes is a list of extra volumes to mount. These will be exposed
-  # to Consul in the path `/consul/userconfig/<name>/`. The value below is
+  # to Vault in the path `/vault/userconfig/<name>/`. The value below is
   # an array of objects, examples are shown below.
   extraVolumes: []
     # - type: secret (or "configMap")
     #   name: my-secret
-    #   load: false # if true, will add to `-config-dir` to load by Consul
-
-# Client, when enabled, configures Consul clients to run on every node
-# within the Kube cluster. The current deployment model follows a traditional
-# DC where a single agent is deployed per node.
-client:
-  enabled: "-"
-  image: null
-  join: null
-
-  # Resource requests, limits, etc. for the client cluster placement. This
-  # should map directly to the value of the resources field for a PodSpec.
-  # By default no direct resource request is made.
-  resources: {}
-
-  # extraConfig is a raw string of extra configuration to set with the
-  # server. This should be JSON or HCL.
-  extraConfig: |
-    {}
-
-  # extraVolumes is a list of extra volumes to mount. These will be exposed
-  # to Consul in the path `/consul/userconfig/<name>/`. The value below is
-  # an array of objects, examples are shown below.
-  extraVolumes: []
-    # - type: secret (or "configMap")
-    #   name: my-secret
-    #   load: false # if true, will add to `-config-dir` to load by Consul
+    #   load: false # if true, will add to `-config-dir` to load by Vault
 
 # Configuration for DNS configuration within the Kubernetes cluster.
 # This creates a service that routes to all agents (client or server)
@@ -115,13 +81,13 @@ dns:
   enabled: "-"
 
 ui:
-  # True if you want to enable the Consul UI. The UI will run only
+  # True if you want to enable the Vault UI. The UI will run only
   # on the server nodes. This makes UI access via the service below (if
-  # enabled) predictable rather than "any node" if you're running Consul
+  # enabled) predictable rather than "any node" if you're running Vault
   # clients as well.
   enabled: "-"
 
-  # True if you want to create a Service entry for the Consul UI.
+  # True if you want to create a Service entry for the Vault UI.
   #
   # serviceType can be used to control the type of service created. For
   # example, setting this to "LoadBalancer" will create an external load
@@ -129,60 +95,3 @@ ui:
   service:
     enabled: true
     type: null
-
-# syncCatalog will run the catalog sync process to sync K8S with Consul
-# services. This can run bidirectional (default) or unidirectionally (Consul
-# to K8S or K8S to Consul only).
-#
-# This process assumes that a Consul agent is available on the host IP.
-# This is done automatically if clients are enabled. If clients are not
-# enabled then set the node selection so that it chooses a node with a
-# Consul agent.
-syncCatalog:
-  # True if you want to enable the catalog sync. "-" for default.
-  enabled: false
-  image: null
-
-  # toConsul and toK8S control whether syncing is enabled to Consul or K8S
-  # as a destination. If both of these are disabled, the sync will do nothing.
-  toConsul: true
-  toK8S: true
-
-  # k8sPrefix is the service prefix to prepend to services before registering
-  # with Kubernetes. For example "consul-" will register all services
-  # prepended with "consul-".
-  k8sPrefix: null
-
-# ConnectInject will enable the automatic Connect sidecar injector.
-connectInject:
-  enabled: false # "-" disable this by default for now until the image is public
-  image: "TODO"
-  default: false # true will inject by default, otherwise requires annotation
-  caBundle: "" # empty will auto generate the bundle
-
-  # namespaceSelector is the selector for restricting the webhook to only
-  # specific namespaces. This should be set to a multiline string.
-  namespaceSelector: null
-
-  # The certs section configures how the webhook TLS certs are configured.
-  # These are the TLS certs for the Kube apiserver communicating to the
-  # webhook. By default, the injector will generate and manage its own certs,
-  # but this requires the ability for the injector to update its own
-  # MutatingWebhookConfiguration. In a production environment, custom certs
-  # should probaly be used. Configure the values below to enable this.
-  certs:
-    # secretName is the name of the secret that has the TLS certificate and
-    # private key to serve the injector webhook. If this is null, then the
-    # injector will default to its automatic management mode.
-    secretName: null
-
-    # caBundle is a base64-encoded PEM-encoded certificate bundle for the
-    # CA that signed the TLS certificate that the webhook serves. This must
-    # be set if secretName is non-null.
-    caBundle: ""
-
-    # certName and keyName are the names of the files within the secret for
-    # the TLS cert and private key, respectively. These have reasonable
-    # defaults but can be customized if necessary.
-    certName: tls.crt
-    keyName: tls.key
