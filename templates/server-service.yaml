@@ -1,16 +1,17 @@
-# Headless service for Consul server DNS entries. This service should only
-# point to Consul servers. For access to an agent, one should assume that
+# Headless service for Vault server DNS entries. This service should only
+# point to Vault servers. For access to an agent, one should assume that
 # the agent is installed locally on the node and the NODE_IP should be used.
-# If the node can't run a Consul agent, then this service can be used to
+# If the node can't run a Vault agent, then this service can be used to
 # communicate directly to a server agent.
+# TODO: verify for Vault
 {{- if (or (and (ne (.Values.server.enabled | toString) "-") .Values.server.enabled) (and (eq (.Values.server.enabled | toString) "-") .Values.global.enabled)) }}
 apiVersion: v1
 kind: Service
 metadata:
-  name: {{ template "consul.fullname" . }}-server
+  name: {{ template "vault.fullname" . }}-server
   labels:
-    app: {{ template "consul.name" . }}
-    chart: {{ template "consul.chart" . }}
+    app: {{ template "vault.name" . }}
+    chart: {{ template "vault.chart" . }}
     heritage: {{ .Release.Service }}
     release: {{ .Release.Name }}
   annotations:
@@ -55,7 +56,7 @@ spec:
       port: 8600
       targetPort: dns-udp
   selector:
-    app: {{ template "consul.name" . }}
+    app: {{ template "vault.name" . }}
     release: "{{ .Release.Name }}"
     component: server
 {{- end }}
