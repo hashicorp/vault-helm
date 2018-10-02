@@ -1,12 +1,16 @@
-# Consul Helm Chart
+# Vault Helm Chart
+
+------
+## WIP - forked from vault-Helm and under heavy development
+------
 
 This repository contains the official HashiCorp Helm chart for installing
-and configuring Consul on Kubernetes. This chart supports multiple use
-cases of Consul on Kubernetes depending on the values provided.
+and configuring Vault on Kubernetes. This chart supports multiple use
+cases of Vault on Kubernetes depending on the values provided.
 
 For full documentation on this Helm chart along with all the ways you can
-use Consul with Kubernetes, please see the
-[Consul and Kubernetes documentation](https://www.consul.io/docs/platform/k8s/index.html).
+use Vault with Kubernetes, please see the
+[Vault and Kubernetes documentation](https://www.vault.io/docs/platform/k8s/index.html).
 
 ## Prerequisites
 
@@ -26,16 +30,16 @@ The versions required are:
 
 For now, we do not host a chart repository. To use the charts, you must
 download this repository and unpack it into a directory. Either
-[download a tagged release](https://github.com/hashicorp/consul-helm/releases) or
+[download a tagged release](https://github.com/hashicorp/vault-helm/releases) or
 use `git checkout` to a tagged release.
-Assuming this repository was unpacked into the directory `consul-helm`, the chart can
+Assuming this repository was unpacked into the directory `vault-helm`, the chart can
 then be installed directly:
 
-    helm install ./consul-helm
+    helm install ./vault-helm
 
 Please see the many options supported in the `values.yaml`
 file. These are also fully documented directly on the
-[Consul website](https://www.consul.io/docs/platform/k8s/helm.html).
+[Vault website](https://www.vault.io/docs/platform/k8s/helm.html).
 
 ## Testing
 
@@ -61,7 +65,7 @@ may not be properly cleaned up. We recommend recycling the Kubernetes cluster to
 start from a clean slate.
 
 **Note:** There is a Terraform configuration in the
-[test/terraform/ directory](https://github.com/hashicorp/consul-helm/tree/master/test/terraform)
+[test/terraform/ directory](https://github.com/hashicorp/vault-helm/tree/master/test/terraform)
 that can be used to quickly bring up a GKE cluster and configure
 `kubectl` and `helm` locally. This can be used to quickly spin up a test
 cluster for acceptance tests. Unit tests _do not_ require a running Kubernetes
