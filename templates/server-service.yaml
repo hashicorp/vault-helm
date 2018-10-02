@@ -26,35 +26,8 @@ spec:
   publishNotReadyAddresses: true
   ports:
     - name: http
-      port: 8500
-      targetPort: 8500
-    - name: serflan-tcp
-      protocol: "TCP"
-      port: 8301
-      targetPort: 8301
-    - name: serflan-udp
-      protocol: "UDP"
-      port: 8301
-      targetPort: 8301
-    - name: serfwan-tcp
-      protocol: "TCP"
-      port: 8302
-      targetPort: 8302
-    - name: serfwan-udp
-      protocol: "UDP"
-      port: 8302
-      targetPort: 8302
-    - name: server
-      port: 8300
-      targetPort: 8300
-    - name: dns-tcp
-      protocol: "TCP"
-      port: 8600
-      targetPort: dns-tcp
-    - name: dns-udp
-      protocol: "UDP"
-      port: 8600
-      targetPort: dns-udp
+      port: 8200
+      targetPort: 8200
   selector:
     app: {{ template "vault.name" . }}
     release: "{{ .Release.Name }}"

@@ -3,7 +3,9 @@ locals {
 }
 
 provider "google" {
-  project = "${var.project}"
+  project     = "${var.project}"
+  region      = "us-central1"
+  credentials = "${file("vault-helm-dev-creds.json")}"
 }
 
 resource "random_id" "suffix" {
@@ -15,7 +17,7 @@ data "google_container_engine_versions" "main" {
 }
 
 resource "google_container_cluster" "cluster" {
-  name               = "consul-k8s-${random_id.suffix.dec}"
+  name               = "vault-helm-dev-${random_id.suffix.dec}"
   project            = "${var.project}"
   enable_legacy_abac = true
   initial_node_count = 5
@@ -55,7 +57,7 @@ resource "null_resource" "kubectl" {
 }
 
 resource "null_resource" "helm" {
-  count = "${var.init_cli ? 1 : 0 }"
+  count      = "${var.init_cli ? 1 : 0 }"
   depends_on = ["null_resource.kubectl"]
 
   triggers {

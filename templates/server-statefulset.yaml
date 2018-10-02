@@ -13,6 +13,7 @@ spec:
   serviceName: {{ template "vault.fullname" . }}-server
   podManagementPolicy: Parallel
   replicas: {{ .Values.server.replicas }}
+# TODO: verify for Vault
   {{- if (gt (int .Values.server.updatePartition) 0) }}
   updateStrategy:
     type: RollingUpdate
@@ -25,7 +26,7 @@ spec:
       chart: {{ template "vault.chart" . }}
       release: {{ .Release.Name }}
       component: server
-      hasDNS: "true"
+      #hasDNS: "true"
   template:
     metadata:
       labels:
@@ -33,7 +34,7 @@ spec:
         chart: {{ template "vault.chart" . }}
         release: {{ .Release.Name }}
         component: server
-        hasDNS: "true"
+        #hasDNS: "true"
     spec:
       affinity:
         podAntiAffinity:
@@ -62,6 +63,9 @@ spec:
         {{- end }}
       containers:
         - name: vault
+          securityContext:
+            fsGroup: 1000
+            privileged: true
           image: "{{ default .Values.global.image .Values.server.image }}"
           env:
             - name: POD_IP
@@ -72,39 +76,13 @@ spec:
               valueFrom:
                 fieldRef:
                   fieldPath: metadata.namespace
+          env:
+            - name: VAULT_ADDR 
+              value: "http://localhost:8200"
           command:
-            - ""
-              # should give us dev server
-              #- "/bin/sh"
-              #- "-ec"
-              #- |
-              #vault_FULLNAME="{{template "vault.fullname" . }}"
-
-              #exec "hello vault"
-              #exec /bin/vault agent \
-              #  -advertise="${POD_IP}" \
-              #  -bind=0.0.0.0 \
-              #  -bootstrap-expect={{ .Values.server.bootstrapExpect }} \
-              #  -client=0.0.0.0 \
-              #  -config-dir=/vault/config \
-              #  {{- range .Values.server.extraVolumes }}
-              #  {{- if .load }}
-              #  -config-dir=/vault/userconfig/{{ .name }}
-              #  {{- end }}
-              #  {{- end }}
-              #  -datacenter={{ .Values.global.datacenter }} \
-              #  -data-dir=/vault/data \
-              #  -domain={{ .Values.global.domain }} \
-              #  {{- if .Values.server.connect }}
-              #  -hcl="connect { enabled = true }" \
-              #  {{- end }}
-              #  {{- if .Values.ui.enabled }}
-              #  -ui \
-              #  {{- end }}
-              #  {{- range $index := until (.Values.server.replicas | int) }}
-              #  -retry-join=${vault_FULLNAME}-server-{{ $index }}.${vault_FULLNAME}-server.${NAMESPACE}.svc \
-              #  {{- end }}
-              #  -server
+            - "vault"
+            - "server"
+            - "-config=/vault/config/"
           volumeMounts:
             - name: data
               mountPath: /vault/data
@@ -119,40 +97,26 @@ spec:
             preStop:
               exec:
                 command:
-                - /bin/sh
-                - -c
-                - vault leave
+                - vault step-down
           ports:
-            - containerPort: 8500
+            - containerPort: 8200
               name: http
-            - containerPort: 8301
-              name: serflan
-            - containerPort: 8302
-              name: serfwan
-            - containerPort: 8300
-              name: server
-            - containerPort: 8600
-              name: dns-tcp
-              protocol: "TCP"
-            - containerPort: 8600
-              name: dns-udp
-              protocol: "UDP"
-          readinessProbe:
-            # NOTE(mitchellh): when our HTTP status endpoints support the
-            # proper status codes, we should switch to that. This is temporary.
-            # TODO: verify for Vault
-            #exec:
-            #  command:
-            #    - "/bin/sh"
-            #    - "-ec"
-            #    - |
-            #      curl http://127.0.0.1:8500/v1/status/leader 2>/dev/null | \
-            #      grep -E '".+"'
-            failureThreshold: 2
-            initialDelaySeconds: 5
-            periodSeconds: 3
-            successThreshold: 1
-            timeoutSeconds: 5
+          #readinessProbe:
+          #  # NOTE(mitchellh): when our HTTP status endpoints support the
+          #  # proper status codes, we should switch to that. This is temporary.
+          #  # TODO: verify for Vault
+          #  #exec:
+          #  #  command:
+          #  #    - "/bin/sh"
+          #  #    - "-ec"
+          #  #    - |
+          #  #      curl http://127.0.0.1:8500/v1/status/leader 2>/dev/null | \
+          #  #      grep -E '".+"'
+          #  failureThreshold: 2
+          #  initialDelaySeconds: 5
+          #  periodSeconds: 3
+          #  successThreshold: 1
+          #  timeoutSeconds: 5
   volumeClaimTemplates:
     - metadata:
         name: data

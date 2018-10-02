@@ -1,4 +1,6 @@
 variable "project" {
+  default = "vault-helm-dev"
+
   description = <<EOF
 Google Cloud Project to launch resources in. This project must have GKE
 enabled and billing activated. We can't use the GOOGLE_PROJECT environment
@@ -12,6 +14,6 @@ variable "zone" {
 }
 
 variable "init_cli" {
-  default = false
+  default     = true
   description = "Whether to init the CLI tools kubectl, helm, etc. or not."
 }

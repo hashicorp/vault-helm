@@ -10,6 +10,6 @@ metadata:
     heritage: {{ .Release.Service }}
     release: {{ .Release.Name }}
 data:
-  extra-from-values.json: |-
+  extra-from-values.hcl: |-
 {{ tpl .Values.server.extraConfig . | indent 4 }}
 {{- end }}
