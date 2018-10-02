@@ -4,17 +4,17 @@
 apiVersion: policy/v1beta1
 kind: PodDisruptionBudget
 metadata:
-  name: {{ template "consul.fullname" . }}-server
+  name: {{ template "vault.fullname" . }}-server
   labels:
-    app: {{ template "consul.name" . }}
-    chart: {{ template "consul.chart" . }}
+    app: {{ template "vault.name" . }}
+    chart: {{ template "vault.chart" . }}
     heritage: {{ .Release.Service }}
     release: {{ .Release.Name }}
 spec:
-  maxUnavailable: {{ template "consul.pdb.maxUnavailable" . }}
+  maxUnavailable: {{ template "vault.pdb.maxUnavailable" . }}
   selector:
     matchLabels:
-      app: {{ template "consul.name" . }}
+      app: {{ template "vault.name" . }}
       release: "{{ .Release.Name }}"
       component: server
 {{- end }}

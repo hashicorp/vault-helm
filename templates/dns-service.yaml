@@ -1,27 +1,27 @@
 # Service for Vault DNS.
-# TODO: verify for Vault
-{{- if (or (and (ne (.Values.dns.enabled | toString) "-") .Values.dns.enabled) (and (eq (.Values.dns.enabled | toString) "-") .Values.global.enabled)) }}
-apiVersion: v1
-kind: Service
-metadata:
-  name: {{ template "vault.fullname" . }}-dns
-  labels:
-    app: {{ template "vault.name" . }}
-    chart: {{ template "vault.chart" . }}
-    heritage: {{ .Release.Service }}
-    release: {{ .Release.Name }}
-spec:
-  ports:
-    - name: dns-tcp
-      port: 53
-      protocol: "TCP"
-      targetPort: dns-tcp
-    - name: dns-udp
-      port: 53
-      protocol: "UDP"
-      targetPort: dns-udp
-  selector:
-    app: {{ template "vault.name" . }}
-    release: "{{ .Release.Name }}"
-    hasDNS: "true"
-{{- end }}
+## TODO: verify for Vault
+#{{- if (or (and (ne (.Values.dns.enabled | toString) "-") .Values.dns.enabled) (and (eq (.Values.dns.enabled | toString) "-") .Values.global.enabled)) }}
+#apiVersion: v1
+#kind: Service
+#metadata:
+#  name: {{ template "vault.fullname" . }}-dns
+#  labels:
+#    app: {{ template "vault.name" . }}
+#    chart: {{ template "vault.chart" . }}
+#    heritage: {{ .Release.Service }}
+#    release: {{ .Release.Name }}
+#spec:
+#  ports:
+#    - name: dns-tcp
+#      port: 53
+#      protocol: "TCP"
+#      targetPort: dns-tcp
+#    - name: dns-udp
+#      port: 53
+#      protocol: "UDP"
+#      targetPort: dns-udp
+#  selector:
+#    app: {{ template "vault.name" . }}
+#    release: "{{ .Release.Name }}"
+#    hasDNS: "true"
+#{{- end }}

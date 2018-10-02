@@ -21,7 +21,7 @@ spec:
   ports:
     - name: http
       port: 80
-      targetPort: 8500
+      targetPort: 8200
   {{- if .Values.ui.service.type }}
   type: {{ .Values.ui.service.type }}
   {{- end }}
