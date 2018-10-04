@@ -30,7 +30,7 @@ global:
 server:
   enabled: "-"
   image: null
-  replicas: 1
+  replicas: 3
 
   # storage and storageClass are the settings for configuring stateful
   # storage for the server pods. storage should be set to the disk size of
