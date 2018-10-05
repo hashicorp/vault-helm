@@ -13,20 +13,12 @@ spec:
   serviceName: {{ template "vault.fullname" . }}-server
   podManagementPolicy: Parallel
   replicas: {{ .Values.server.replicas }}
-# TODO: verify for Vault
-  {{- if (gt (int .Values.server.updatePartition) 0) }}
-  updateStrategy:
-    type: RollingUpdate
-    rollingUpdate:
-      partition: {{ .Values.server.updatePartition }}
-  {{- end }}
   selector:
     matchLabels:
       app: {{ template "vault.name" . }}
       chart: {{ template "vault.chart" . }}
       release: {{ .Release.Name }}
       component: server
-      #hasDNS: "true"
   template:
     metadata:
       labels:
@@ -34,7 +26,6 @@ spec:
         chart: {{ template "vault.chart" . }}
         release: {{ .Release.Name }}
         component: server
-        #hasDNS: "true"
     spec:
       affinity:
         podAntiAffinity:
@@ -65,6 +56,7 @@ spec:
         - name: vault
           securityContext:
             fsGroup: 1000
+            # TODO: confirm Vault needs this
             privileged: true
           image: "{{ default .Values.global.image .Values.server.image }}"
           env:
@@ -78,10 +70,6 @@ spec:
                   fieldPath: metadata.namespace
             - name: VAULT_ADDR 
               value: "http://localhost:8200"
-            - name: HOST_IP
-              valueFrom:
-                fieldRef:
-                  fieldPath: status.hostIP
           command:
             - "vault"
             - "server"
@@ -125,7 +113,6 @@ spec:
         name: data
       spec:
         accessModes:
-          #- ReadWriteMany
           - ReadWriteOnce
         resources:
           requests:

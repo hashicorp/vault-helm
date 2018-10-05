@@ -18,6 +18,7 @@ spec:
     app: {{ template "vault.name" . }}
     release: "{{ .Release.Name }}"
     component: server
+  type: LoadBalancer
   ports:
     - name: http
       port: 80
