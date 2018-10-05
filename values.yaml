@@ -17,20 +17,13 @@ global:
 
   # Image is the name (and tag) of the Vault Docker image for clients and
   # servers below. This can be overridden per component.
-  #image: "vault:0.11.1"
-  image: "vault"
-
-  # Datacenter is the name of the datacenter that the agents should register
-  # as. This shouldn't be changed once the Vault cluster is up and running
-  # since Vault doesn't support an automatic way to change this value
-  # currently: https://github.com/hashicorp/vault/issues/1858
-  # TODO: verify for Vault
-  datacenter: dc1
+  image: "vault:0.11.1"
+  #image: "vault"
 
 server:
   enabled: "-"
   image: null
-  replicas: 3
+  replicas: 1
 
   # storage and storageClass are the settings for configuring stateful
   # storage for the server pods. storage should be set to the disk size of
@@ -44,22 +37,6 @@ server:
   # By default no direct resource request is made.
   resources: {}
 
-  # updatePartition is used to control a careful rolling update of Vault
-  # servers. This should be done particularly when changing the version
-  # of Vault. Please refer to the documentation for more information.
-  # TODO: verify for Vault
-  updatePartition: 0
-
-  # disruptionBudget enables the creation of a PodDisruptionBudget to
-  # prevent voluntary degrading of the Vault server cluster.
-  disruptionBudget:
-    #enabled: true
-    enabled: false
-
-    # maxUnavailable will default to (n/2)-1 where n is the number of
-    # replicas. If you'd like a custom value, you can specify an override here.
-    maxUnavailable: null
-
   # extraConfig is a raw string of extra configuration to set with the
   # server. This should be JSON or HCL.
   extraConfig: |
@@ -69,7 +46,7 @@ server:
       address     = "0.0.0.0:8200"
     }
     storage "file" {
-      path = "/vault/data" 
+      path = "/vault/data"
     }
 
   # extraVolumes is a list of extra volumes to mount. These will be exposed
