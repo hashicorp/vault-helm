@@ -1,0 +1,15 @@
+# StatefulSet to run the actual vault server cluster.
+{{- if (or (and (ne (.Values.consulHA.enabled | toString) "-") .Values.consulHA.enabled) (and (eq (.Values.consulHA.enabled | toString) "-") .Values.global.enabled)) }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ template "vault.fullname" . }}-server-storage-config
+  labels:
+    app: {{ template "vault.name" . }}
+    chart: {{ template "vault.chart" . }}
+    heritage: {{ .Release.Service }}
+    release: {{ .Release.Name }}
+data:
+  storageconfig-from-values.hcl: |-
+{{ tpl .Values.consulHA.storageConfig . | indent 4 }}
+{{- end }}
