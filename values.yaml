@@ -37,9 +37,12 @@ server:
   # By default no direct resource request is made.
   resources: {}
 
-  # extraConfig is a raw string of extra configuration to set with the
-  # server. This should be JSON or HCL.
-  extraConfig: |
+  # statefulConfig is a raw string of default configuration when using a Stateful
+  # deployment. Default is to use a PersistentVolumeClaim mounted at /vault/data
+  # and store data there. This is only used when using a Replica count of 1, and
+  # using a stateful set
+  # This should be HCL
+  statefulConfig: |
     ui = true
     listener "tcp" {
       tls_disable = 1
@@ -56,6 +59,39 @@ server:
     # - type: secret (or "configMap")
     #   name: my-secret
     #   load: false # if true, will add to `-config-dir` to load by Vault
+
+consulHA:
+  enabled: false
+  image: null
+  replicas: 3
+
+  # storage and storageClass are the settings for configuring stateful
+  # storage for the server pods. storage should be set to the disk size of
+  # the attached volume. storageClass is the class of storage which defaults
+  # to null (the Kube cluster will pick the default).
+  storage: 2Gi
+  storageClass: null
+
+  # Resource requests, limits, etc. for the server cluster placement. This
+  # should map directly to the value of the resources field for a PodSpec.
+  # By default no direct resource request is made.
+  resources: {}
+
+  # statefulConfig is a raw string of default configuration when using a Stateful
+  # deployment. Default is to use a PersistentVolumeClaim mounted at /vault/data
+  # and store data there. This is only used when using a Replica count of 1, and
+  # using a stateful set
+  # This should be HCL
+  storageConfig: |
+    ui = true
+    listener "tcp" {
+      tls_disable = 1
+      address     = "0.0.0.0:8200"
+    }
+    storage "consul" {
+      address = "HOST_IP:8500"
+      path    = "vault"
+    }
 
 # Configuration for DNS configuration within the Kubernetes cluster.
 # This creates a service that routes to all agents (client or server)
