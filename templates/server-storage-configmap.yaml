@@ -3,7 +3,7 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: {{ template "vault.fullname" . }}-server-storage-config
+  name: {{ template "vault.fullname" . }}-ha-config
   labels:
     app: {{ template "vault.name" . }}
     chart: {{ template "vault.chart" . }}

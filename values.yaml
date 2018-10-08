@@ -21,7 +21,7 @@ global:
   #image: "vault"
 
 server:
-  enabled: "-"
+  enabled: false
   image: null
   replicas: 1
 
@@ -87,10 +87,12 @@ consulHA:
     listener "tcp" {
       tls_disable = 1
       address     = "0.0.0.0:8200"
+      cluster_address = "POD_IP:8201"
     }
+
     storage "consul" {
+      path = "vault"
       address = "HOST_IP:8500"
-      path    = "vault"
     }
 
 # Configuration for DNS configuration within the Kubernetes cluster.
