@@ -12,13 +12,12 @@ global:
   enabled: true
 
   # Domain to register the Vault DNS server to listen for.
-  # TODO: verify for Vault
+  # TODO: verify for vault (don't think it's needed)
   domain: vault
 
   # Image is the name (and tag) of the Vault Docker image for clients and
   # servers below. This can be overridden per component.
   image: "vault:0.11.1"
-  #image: "vault"
 
 server:
   enabled: false
@@ -101,6 +100,7 @@ consulHA:
 # today, so you must still manually configure a `stubDomain` with kube-dns
 # for this to have any effect:
 # https://kubernetes.io/docs/tasks/administer-cluster/dns-custom-nameservers/#configure-stub-domain-and-upstream-dns-servers
+# TODO: verify for vault (don't think it's needed)
 dns:
   enabled: "-"
 
@@ -118,4 +118,4 @@ ui:
   # balancer (for supported K8S installations) to access the UI.
   service:
     enabled: true
-    type: null
+    type: LoadBalancer
