@@ -16,6 +16,12 @@ data "google_container_engine_versions" "main" {
   zone = "${var.zone}"
 }
 
+#data "google_container_cluster" "cluster" {
+#  name    = "cluster-1"
+#  zone    = "${var.zone}"
+#  project = "${var.project}"
+#}
+
 resource "google_container_cluster" "cluster" {
   name               = "vault-helm-dev-${random_id.suffix.dec}"
   project            = "${var.project}"

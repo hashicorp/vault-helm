@@ -27,6 +27,11 @@ spec:
         release: {{ .Release.Name }}
         component: server
     spec:
+      strategy:
+        type: "RollingUpdate" #default
+        rollingUpdate: 
+          maxSurge: 1
+          maxUnavailable: 0
       #affinity:
       #  podAntiAffinity:
       #    requiredDuringSchedulingIgnoredDuringExecution:
@@ -75,6 +80,8 @@ spec:
                   fieldPath: metadata.namespace
             - name: VAULT_ADDR 
               value: "http://localhost:8200"
+              #- name: VAULT_TEST
+              #- value: "true"
           command:
             - "/bin/sh"
             - "-ec"
@@ -97,24 +104,23 @@ spec:
             preStop:
               exec:
                 command:
-                - vault step-down
+                - vault operator step-down
           ports:
             - containerPort: 8200
               name: http
-          #readinessProbe:
-          #  # NOTE(mitchellh): when our HTTP status endpoints support the
-          #  # proper status codes, we should switch to that. This is temporary.
-          #  # TODO: verify for Vault
-          #  #exec:
-          #  #  command:
-          #  #    - "/bin/sh"
-          #  #    - "-ec"
-          #  #    - |
-          #  #      curl http://127.0.0.1:8500/v1/status/leader 2>/dev/null | \
-          #  #      grep -E '".+"'
-          #  failureThreshold: 2
-          #  initialDelaySeconds: 5
-          #  periodSeconds: 3
-          #  successThreshold: 1
-          #  timeoutSeconds: 5
+          readinessProbe:
+            # NOTE(mitchellh): when our HTTP status endpoints support the
+            # proper status codes, we should switch to that. This is temporary.
+            # TODO: verify for Vault
+            exec:
+              command:
+                - "/bin/sh"
+                - "-ec"
+                - |
+                  vault status
+            failureThreshold: 2
+            initialDelaySeconds: 5
+            periodSeconds: 3
+            successThreshold: 1
+            timeoutSeconds: 5
 {{- end }}
