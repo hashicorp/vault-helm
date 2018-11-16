@@ -21,7 +21,7 @@ global:
   image: "vault:1.0.0-beta2"
 
 server:
-  enabled: "-"
+  enabled: false
   image: null
   replicas: 1
 
