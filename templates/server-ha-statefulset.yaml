@@ -36,10 +36,6 @@ spec:
     spec:
       #TODO: look at how Consul exposes affinity
       terminationGracePeriodSeconds: 10
-      securityContext:
-        fsGroup: 1000
-        # TODO: confirm Vault needs this
-        privileged: true
       volumes:
         - name: config
           configMap:
@@ -56,6 +52,10 @@ spec:
         {{- end }}
       containers:
         - name: vault
+          securityContext:
+            fsGroup: 1000
+            # TODO: confirm Vault needs this
+            privileged: true
           image: "{{ default .Values.global.image .Values.consulHA.image }}"
           env:
             - name: HOST_IP
