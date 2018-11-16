@@ -1,7 +1,7 @@
 # StatefulSet to run the actual vault server cluster.
 {{- if (or (and (ne (.Values.consulHA.enabled | toString) "-") .Values.consulHA.enabled) (and (eq (.Values.consulHA.enabled | toString) "-") .Values.global.enabled)) }}
 apiVersion: apps/v1
-kind: Deployment
+kind: StatefulSet
 metadata:
   name: {{ template "vault.fullname" . }}-ha-server
   labels:
@@ -13,6 +13,13 @@ spec:
   serviceName: {{ template "vault.fullname" . }}-ha-server
   podManagementPolicy: Parallel
   replicas: {{ .Values.consulHA.replicas }}
+  # TODO: add updatePartition option 
+  {{- if (gt (int .Values.consulHA.updatePartition) 0) }}
+  updateStrategy:
+    type: RollingUpdate
+    rollingUpdate:
+      partition: {{ .Values.consulHA.updatePartition }}
+  {{- end }}
   selector:
     matchLabels:
       app: {{ template "vault.name" . }}
@@ -27,23 +34,12 @@ spec:
         release: {{ .Release.Name }}
         component: server
     spec:
-      strategy:
-        type: "RollingUpdate" #default
-        rollingUpdate: 
-          maxSurge: 1
-          maxUnavailable: 0
-      #affinity:
-      #  podAntiAffinity:
-      #    requiredDuringSchedulingIgnoredDuringExecution:
-      #      - labelSelector:
-      #          matchLabels:
-      #            app: {{ template "vault.name" . }}
-      #            release: "{{ .Release.Name }}"
-      #            component: server
-      #        topologyKey: kubernetes.io/hostname
+      #TODO: look at how Consul exposes affinity
       terminationGracePeriodSeconds: 10
       securityContext:
         fsGroup: 1000
+        # TODO: confirm Vault needs this
+        privileged: true
       volumes:
         - name: config
           configMap:
@@ -60,10 +56,6 @@ spec:
         {{- end }}
       containers:
         - name: vault
-          securityContext:
-            fsGroup: 1000
-            # TODO: confirm Vault needs this
-            privileged: true
           image: "{{ default .Values.global.image .Values.consulHA.image }}"
           env:
             - name: HOST_IP
@@ -80,8 +72,7 @@ spec:
                   fieldPath: metadata.namespace
             - name: VAULT_ADDR 
               value: "http://localhost:8200"
-              #- name: VAULT_TEST
-              #- value: "true"
+          #TODO: review how swapping of POD_IP, HOST_IP values is done
           command:
             - "/bin/sh"
             - "-ec"
@@ -112,6 +103,7 @@ spec:
             # NOTE(mitchellh): when our HTTP status endpoints support the
             # proper status codes, we should switch to that. This is temporary.
             # TODO: verify for Vault
+            # Check status; unsealed vault servers return 0
             exec:
               command:
                 - "/bin/sh"
