@@ -37,12 +37,12 @@ server:
   # By default no direct resource request is made.
   resources: {}
 
-  # statefulConfig is a raw string of default configuration when using a Stateful
+  # config is a raw string of default configuration when using a Stateful
   # deployment. Default is to use a PersistentVolumeClaim mounted at /vault/data
   # and store data there. This is only used when using a Replica count of 1, and
   # using a stateful set
   # This should be HCL
-  statefulConfig: |
+  config: |
     ui = true
     listener "tcp" {
       tls_disable = 1
@@ -77,12 +77,12 @@ consulHA:
   # By default no direct resource request is made.
   resources: {}
 
-  # statefulConfig is a raw string of default configuration when using a Stateful
+  # config is a raw string of default configuration when using a Stateful
   # deployment. Default is to use a PersistentVolumeClaim mounted at /vault/data
   # and store data there. This is only used when using a Replica count of 1, and
   # using a stateful set
   # This should be HCL
-  storageConfig: |
+  config: |
     ui = true
     listener "tcp" {
       tls_disable = 1

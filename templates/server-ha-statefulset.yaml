@@ -39,7 +39,7 @@ spec:
       volumes:
         - name: config
           configMap:
-            name: {{ template "vault.fullname" . }}-ha-config
+            name: {{ template "vault.fullname" . }}-server-config
             defaultMode: 0755
         {{- range .Values.consulHA.extraVolumes }}
         - name: userconfig-{{ .name }}

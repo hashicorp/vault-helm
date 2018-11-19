@@ -11,5 +11,5 @@ metadata:
     release: {{ .Release.Name }}
 data:
   statefulconfig-from-values.hcl: |-
-{{ tpl .Values.server.statefulConfig . | indent 4 }}
+{{ tpl .Values.server.config . | indent 4 }}
 {{- end }}
