@@ -79,7 +79,7 @@ spec:
             - |
                 export VAULT_CLUSTER_ADDR=http://${POD_IP}:8201
 
-                sed -E "s/HOST_IP/${HOST_IP}/g" /vault/config/storageconfig-from-values.hcl > storageconfig.hcl
+                sed -E "s/HOST_IP/${HOST_IP}/g" /vault/config/statefulconfig-from-values.hcl > storageconfig.hcl
                 sed -Ei "s/POD_IP/${POD_IP}/g" storageconfig.hcl
 
                 vault server -config=storageconfig.hcl
