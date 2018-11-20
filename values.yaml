@@ -77,6 +77,11 @@ consulHA:
   # By default no direct resource request is made.
   resources: {}
 
+  # updatePartition is used to control a careful rolling update of Vault 
+  # servers. This should be done particularly when changing the version
+  # of Vault. Please refer to the documentation for more information.
+  updatePartition: 0
+
   # config is a raw string of default configuration when using a Stateful
   # deployment. Default is to use a PersistentVolumeClaim mounted at /vault/data
   # and store data there. This is only used when using a Replica count of 1, and
@@ -93,6 +98,14 @@ consulHA:
     storage "consul" {
       path = "vault"
       address = "HOST_IP:8500"
+    }
+
+    seal "gcpckms" {
+      #credentials = "/usr/vault/vault-project-user-creds.json"
+      project     = "vault-helm-dev"
+      region      = "global"
+      key_ring    = "vault-helm"
+      crypto_key  = "vault-init"
     }
 
 # Configuration for DNS configuration within the Kubernetes cluster.
