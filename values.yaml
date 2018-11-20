@@ -63,7 +63,7 @@ server:
 consulHA:
   enabled: false
   image: null
-  replicas: 3
+  replicas: 1
 
   # storage and storageClass are the settings for configuring stateful
   # storage for the server pods. storage should be set to the disk size of
