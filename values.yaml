@@ -72,7 +72,7 @@ server:
     #   name: my-secret
     #   load: false # if true, will add to `-config-dir` to load by Vault
 
-consulHA:
+serverHA:
   enabled: false
   image: null
   replicas: 1
@@ -136,7 +136,9 @@ ui:
   # on the server nodes. This makes UI access via the service below (if
   # enabled) predictable rather than "any node" if you're running Vault
   # clients as well.
-  enabled: "-"
+  #
+  # This value is used for both Single Server and HA mode setups
+  enabled: false
 
   # True if you want to create a Service entry for the Vault UI.
   #

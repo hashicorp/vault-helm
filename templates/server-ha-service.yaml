@@ -4,7 +4,7 @@
 # If the node can't run a Vault agent, then this service can be used to
 # communicate directly to a server agent.
 # TODO: verify for Vault
-{{- if (or (and (ne (.Values.consulHA.enabled | toString) "-") .Values.consulHA.enabled) (and (eq (.Values.consulHA.enabled | toString) "-") .Values.global.enabled)) }}
+{{- if (or (and (ne (.Values.serverHA.enabled | toString) "-") .Values.serverHA.enabled) (and (eq (.Values.serverHA.enabled | toString) "-") .Values.global.enabled)) }}
 apiVersion: v1
 kind: Service
 metadata:
