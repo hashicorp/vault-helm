@@ -146,3 +146,12 @@ ui:
   service:
     enabled: true
     type: LoadBalancer
+
+# Run Vault in "dev" mode. This requires no further setup, no state management,
+# and no initialization. This is useful for experimenting with Vault without
+# needing to unseal, store keys, et. al. All data is lost on restart - do not
+# use dev mode for anything other than experimenting.
+# See https://www.vaultproject.io/docs/concepts/dev-server.html to know more
+dev:
+  enabled: false
+  image: null
