@@ -92,22 +92,23 @@ spec:
           ports:
             - containerPort: 8200
               name: http
-          #readinessProbe:
-          #  # NOTE(mitchellh): when our HTTP status endpoints support the
-          #  # proper status codes, we should switch to that. This is temporary.
-          #  # TODO: verify for Vault
-          #  #exec:
-          #  #  command:
-          #  #    - "/bin/sh"
-          #  #    - "-ec"
-          #  #    - |
-          #  #      curl http://127.0.0.1:8500/v1/status/leader 2>/dev/null | \
-          #  #      grep -E '".+"'
-          #  failureThreshold: 2
-          #  initialDelaySeconds: 5
-          #  periodSeconds: 3
-          #  successThreshold: 1
-          #  timeoutSeconds: 5
+          readinessProbe:
+            # Check status; unsealed vault servers return 0
+            # The exit code reflects the seal status:
+            #   0 - unsealed
+            #   1 - error
+            #   2 - sealed
+            exec:
+              command:
+                - "/bin/sh"
+                - "-ec"
+                - |
+                  vault status
+            failureThreshold: 2
+            initialDelaySeconds: 5
+            periodSeconds: 3
+            successThreshold: 1
+            timeoutSeconds: 5
   volumeClaimTemplates:
     - metadata:
         name: data
