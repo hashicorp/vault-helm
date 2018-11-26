@@ -48,8 +48,20 @@ server:
       tls_disable = 1
       address     = "0.0.0.0:8200"
     }
+
+    #api_addr = "POD_IP:8201"
+
     storage "file" {
       path = "/vault/data"
+    }
+
+    # The GKMS keys must already exist, and the cluster must have a service
+    # account that is authorized to access GCP KMS, and ass
+    seal "gcpckms" {
+      project     = "vault-helm-dev"
+      region      = "global"
+      key_ring    = "vault-helm"
+      crypto_key  = "vault-init"
     }
 
   # extraVolumes is a list of extra volumes to mount. These will be exposed
@@ -100,8 +112,9 @@ consulHA:
       address = "HOST_IP:8500"
     }
 
+    # The GKMS keys must already exist, and the cluster must have a service
+    # account that is authorized to access GCP KMS, and ass
     seal "gcpckms" {
-      #credentials = "/usr/vault/vault-project-user-creds.json"
       project     = "vault-helm-dev"
       region      = "global"
       key_ring    = "vault-helm"
