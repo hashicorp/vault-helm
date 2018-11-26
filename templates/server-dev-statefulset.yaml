@@ -1,0 +1,84 @@
+# StatefulSet to run the actual vault server cluster.
+{{- if (or (and (ne (.Values.dev.enabled | toString) "-") .Values.dev.enabled) (and (eq (.Values.dev.enabled | toString) "-") .Values.global.enabled)) }}
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: {{ template "vault.fullname" . }}-dev-server
+  labels:
+    app: {{ template "vault.name" . }}
+    chart: {{ template "vault.chart" . }}
+    heritage: {{ .Release.Service }}
+    release: {{ .Release.Name }}
+spec:
+  serviceName: {{ template "vault.fullname" . }}-dev-server
+  podManagementPolicy: Parallel
+  replicas: 1
+  selector:
+    matchLabels:
+      app: {{ template "vault.name" . }}
+      chart: {{ template "vault.chart" . }}
+      release: {{ .Release.Name }}
+      component: server
+  template:
+    metadata:
+      labels:
+        app: {{ template "vault.name" . }}
+        chart: {{ template "vault.chart" . }}
+        release: {{ .Release.Name }}
+        component: server
+    spec:
+      terminationGracePeriodSeconds: 10
+      volumes:
+      containers:
+        - name: vault
+          securityContext:
+            fsGroup: 1000
+            privileged: true
+          image: "{{ default .Values.global.image .Values.dev.image }}"
+          env:
+            - name: POD_IP
+              valueFrom:
+                fieldRef:
+                  fieldPath: status.podIP
+            - name: NAMESPACE
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.namespace
+            - name: VAULT_ADDR 
+              value: "http://localhost:8200"
+          command:
+            - "vault"
+            - "server"
+            - "-dev"
+          volumeMounts:
+            {{- range .Values.dev.extraVolumes }}
+            - name: userconfig-{{ .name }}
+              readOnly: true
+              mountPath: /vault/userconfig/{{ .name }}
+            {{- end }}
+          lifecycle:
+            preStop:
+              exec:
+                command:
+                - vault step-down
+          ports:
+            - containerPort: 8200
+              name: http
+          readinessProbe:
+            # Check status; unsealed vault servers return 0
+            # The exit code reflects the seal status:
+            #   0 - unsealed
+            #   1 - error
+            #   2 - sealed
+            exec:
+              command:
+                - "/bin/sh"
+                - "-ec"
+                - |
+                  vault status
+            failureThreshold: 2
+            initialDelaySeconds: 5
+            periodSeconds: 3
+            successThreshold: 1
+            timeoutSeconds: 5
+{{- end }}
