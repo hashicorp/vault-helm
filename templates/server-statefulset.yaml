@@ -71,9 +71,16 @@ spec:
             - name: VAULT_ADDR 
               value: "http://localhost:8200"
           command:
-            - "vault"
-            - "server"
-            - "-config=/vault/config/"
+            - "/bin/sh"
+            - "-ec"
+            - |
+              vault server -config=/vault/config/ \
+                {{- range .Values.server.extraVolumes }}
+                {{- if .load }}
+                -config-dir=/vault/userconfig/{{ .name }} \
+                {{- end }}
+                {{- end }}
+
           volumeMounts:
             - name: data
               mountPath: /vault/data

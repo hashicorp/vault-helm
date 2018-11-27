@@ -70,7 +70,7 @@ server:
   extraVolumes: []
     # - type: secret (or "configMap")
     #   name: my-secret
-    #   load: false # if true, will add to `-config-dir` to load by Vault
+    #   load: false # if true, will add to `-config` to load by Vault
 
 serverHA:
   enabled: false
@@ -120,6 +120,14 @@ serverHA:
       key_ring    = "vault-helm"
       crypto_key  = "vault-init"
     }
+
+  # extraVolumes is a list of extra volumes to mount. These will be exposed
+  # to Vault in the path `/vault/userconfig/<name>/`. The value below is
+  # an array of objects, examples are shown below.
+  extraVolumes: []
+    # - type: secret (or "configMap")
+    #   name: my-secret
+    #   load: false # if true, will add to `-config` to load by Vault
 
 # Configuration for DNS configuration within the Kubernetes cluster.
 # This creates a service that routes to all agents (client or server)
