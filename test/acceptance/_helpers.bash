@@ -3,6 +3,10 @@ name_prefix() {
     printf "vault"
 }
 
+ha_name_prefix() {
+    printf "vault-ha"
+}
+
 # helm_install installs the vault chart. This will source overridable
 # values from the "values.yaml" file in this directory. This can be set
 # by CI or other environments to do test-specific overrides. Note that its
@@ -29,10 +33,41 @@ helm_install_ha() {
     fi
 
     helm install -f ${values} \
-        --name vault \
+        --name vault-ha \
         --set 'sever.enabled=false' \
         --set 'severHA.enabled=true' \
         ${BATS_TEST_DIRNAME}/../..
+}
+
+# wait for consul to be running
+wait_for_running_consul() {
+    POD_NAME=$1
+
+    check() {
+        # This requests the pod and checks whether the status is running
+        # and the ready state is true. If so, it outputs the name. Otherwise
+        # it outputs empty. Therefore, to check for success, check for nonzero
+        # string length.
+        kubectl get pods $1 -o json | \
+            jq -r 'select(
+                .status.phase == "Running" and
+                ([ .status.conditions[] | select(.type == "Ready" and .status == "True") ] | length) == 1
+            ) | .metadata.namespace + "/" + .metadata.name'
+    }
+
+    for i in $(seq 30); do
+        if [ -n "$(check ${POD_NAME})" ]; then
+            echo "${POD_NAME} is ready."
+            sleep 2
+            return
+        fi
+
+        echo "Waiting for ${POD_NAME} to be ready..."
+        sleep 2
+    done
+
+    echo "${POD_NAME} never became ready."
+    exit 1
 }
 
 # wait for a pod to be ready

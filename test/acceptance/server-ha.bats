@@ -3,7 +3,6 @@
 load _helpers
 
 @test "server-ha: default, comes up sealed, 1 replica" {
-  # helm_install_consul
   helm_install_ha
   wait_for_running $(name_prefix)-server-0
 
@@ -28,6 +27,8 @@ setup() {
     --name consul \
     --set 'ui.enabled=false' \
     --set 'client.enabled=false'
+
+  wait_for_running_consul consul-server-0
 }
 
 #cleanup
