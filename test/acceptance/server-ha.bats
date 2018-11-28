@@ -4,7 +4,7 @@ load _helpers
 
 @test "server-ha: default, comes up sealed, 1 replica" {
   helm_install_ha
-  wait_for_running $(name_prefix)-server-0
+  wait_for_running $(ha_name_prefix)-server-0
 
   # Verify installed, sealed, and 1 replica
   local sealed_status=$(kubectl exec "$(name_prefix)-server-0" -- vault status -format=json | 
@@ -38,6 +38,6 @@ teardown() {
   #if [[ "${#BATS_TEST_NAMES[@]}" -eq "$BATS_TEST_NUMBER" ]]; then
   #  
   #fi
-  helm delete --purge vault consul
+  helm delete --purge vault-ha consul
   kubectl delete --all pvc 
 }
