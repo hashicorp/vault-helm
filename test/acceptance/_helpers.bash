@@ -1,9 +1,9 @@
 # name_prefix returns the prefix of the resources within Kubernetes.
 name_prefix() {
-    printf "consul"
+    printf "vault"
 }
 
-# helm_install installs the Consul chart. This will source overridable
+# helm_install installs the vault chart. This will source overridable
 # values from the "values.yaml" file in this directory. This can be set
 # by CI or other environments to do test-specific overrides. Note that its
 # easily possible to break tests this way so be careful.
@@ -14,19 +14,18 @@ helm_install() {
     fi
 
     helm install -f ${values} \
-        --name consul \
-        --wait \
+        --name vault \
         ${BATS_TEST_DIRNAME}/../..
 }
 
-# helm_delete deletes the Consul chart and all resources.
+# helm_delete deletes the vault chart and all resources.
 helm_delete() {
-    helm delete --purge consul
+    helm delete --purge vault
     kubectl delete --all pvc
 }
 
 # wait for a pod to be ready
-wait_for_ready() {
+wait_for_running() {
     POD_NAME=$1
 
     check() {
@@ -37,7 +36,7 @@ wait_for_ready() {
         kubectl get pods $1 -o json | \
             jq -r 'select(
                 .status.phase == "Running" and
-                ([ .status.conditions[] | select(.type == "Ready" and .status == "True") ] | length) == 1
+                ([ .status.conditions[] | select(.type == "Ready" and .status == "False") ] | length) == 1
             ) | .metadata.namespace + "/" + .metadata.name'
     }
 
