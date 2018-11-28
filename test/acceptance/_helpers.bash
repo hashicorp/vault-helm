@@ -18,10 +18,21 @@ helm_install() {
         ${BATS_TEST_DIRNAME}/../..
 }
 
-# helm_delete deletes the vault chart and all resources.
-helm_delete() {
-    helm delete --purge vault
-    kubectl delete --all pvc
+# helm_install_ha installs the vault chart using HA mode. This will source
+# overridable values from the "values.yaml" file in this directory. This can be
+# set by CI or other environments to do test-specific overrides. Note that its
+# easily possible to break tests this way so be careful.
+helm_install_ha() {
+    local values="${BATS_TEST_DIRNAME}/values.yaml"
+    if [ ! -f "${values}" ]; then
+        touch $values
+    fi
+
+    helm install -f ${values} \
+        --name vault \
+        --set 'sever.enabled=false' \
+        --set 'severHA.enabled=true' \
+        ${BATS_TEST_DIRNAME}/../..
 }
 
 # wait for a pod to be ready
@@ -43,6 +54,7 @@ wait_for_running() {
     for i in $(seq 30); do
         if [ -n "$(check ${POD_NAME})" ]; then
             echo "${POD_NAME} is ready."
+            sleep 2
             return
         fi
 

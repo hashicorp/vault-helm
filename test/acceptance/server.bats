@@ -6,7 +6,7 @@ load _helpers
   helm_install
   wait_for_running $(name_prefix)-server-0
 
-  # Verify there are three servers
+  # Verify installed, sealed, and 1 replica
   local sealed_status=$(kubectl exec "$(name_prefix)-server-0" -- vault status -format=json | 
     jq .sealed )
   [ "${sealed_status}" == "true" ]
@@ -14,10 +14,13 @@ load _helpers
   local init_status=$(kubectl exec "$(name_prefix)-server-0" -- vault status -format=json | 
     jq .initialized)
   [ "${init_status}" == "false" ]
+
+  # TODO check pv, pvc
 }
 
 # Clean up
 teardown() {
   echo "helm/pvc teardown"
-  helm_delete
+  helm delete --purge vault
+  kubectl delete --all pvc 
 }
