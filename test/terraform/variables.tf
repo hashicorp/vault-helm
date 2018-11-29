@@ -17,3 +17,12 @@ variable "init_cli" {
   default     = true
   description = "Whether to init the CLI tools kubectl, helm, etc. or not."
 }
+
+variable "gcp_service_account" {
+  default = "vault-helm-dev"
+
+  description = <<EOF
+Service account used on the nodes to manage/use the API, specifically needed
+for using auto-unseal
+EOF
+}

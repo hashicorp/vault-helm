@@ -3,8 +3,9 @@ locals {
 }
 
 provider "google" {
-  project     = "${var.project}"
-  region      = "us-central1"
+  project = "${var.project}"
+  region  = "us-central1"
+
   credentials = "${file("vault-helm-dev-creds.json")}"
 }
 
@@ -16,11 +17,9 @@ data "google_container_engine_versions" "main" {
   zone = "${var.zone}"
 }
 
-#data "google_container_cluster" "cluster" {
-#  name    = "cluster-1"
-#  zone    = "${var.zone}"
-#  project = "${var.project}"
-#}
+data "google_service_account" "gcpapi" {
+  account_id = "${var.gcp_service_account}"
+}
 
 resource "google_container_cluster" "cluster" {
   name               = "vault-helm-dev-${random_id.suffix.dec}"
@@ -30,6 +29,22 @@ resource "google_container_cluster" "cluster" {
   zone               = "${var.zone}"
   min_master_version = "${data.google_container_engine_versions.main.latest_master_version}"
   node_version       = "${data.google_container_engine_versions.main.latest_node_version}"
+
+  node_config {
+    #service account for nodes to use
+    oauth_scopes = [
+      "https://www.googleapis.com/auth/cloud-platform",
+      "https://www.googleapis.com/auth/compute",
+      "https://www.googleapis.com/auth/devstorage.read_write",
+      "https://www.googleapis.com/auth/logging.write",
+      "https://www.googleapis.com/auth/monitoring",
+      "https://www.googleapis.com/auth/service.management.readonly",
+      "https://www.googleapis.com/auth/servicecontrol",
+      "https://www.googleapis.com/auth/trace.append",
+    ]
+
+    service_account = "${data.google_service_account.gcpapi.email}"
+  }
 }
 
 resource "null_resource" "kubectl" {
