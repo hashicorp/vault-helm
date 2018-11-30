@@ -128,6 +128,13 @@ serverHA:
     # - type: secret (or "configMap")
     #   name: my-secret
     #   load: false # if true, will add to `-config` to load by Vault
+   
+  disruptionBudget:
+    enabled: true
+
+    # maxUnavailable will default to (n/2)-1 where n is the number of
+    # replicas. If you'd like a custom value, you can specify an override here.
+    maxUnavailable: null
 
 # Configuration for DNS configuration within the Kubernetes cluster.
 # This creates a service that routes to all agents (client or server)

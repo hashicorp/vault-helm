@@ -6,6 +6,7 @@ load _helpers
   cd `chart_dir`
   local actual=$(helm template \
       -x templates/server-disruptionbudget.yaml  \
+      --set 'serverHA.enabled=true' \
       . | tee /dev/stderr |
       yq 'length > 0' | tee /dev/stderr)
   [ "${actual}" = "true" ]
@@ -16,7 +17,7 @@ load _helpers
   local actual=$(helm template \
       -x templates/server-disruptionbudget.yaml  \
       --set 'global.enabled=false' \
-      --set 'server.enabled=true' \
+      --set 'serverHA.enabled=true' \
       . | tee /dev/stderr |
       yq 'length > 0' | tee /dev/stderr)
   [ "${actual}" = "true" ]
@@ -26,7 +27,7 @@ load _helpers
   cd `chart_dir`
   local actual=$(helm template \
       -x templates/server-disruptionbudget.yaml  \
-      --set 'server.enabled=false' \
+      --set 'serverHA.enabled=false' \
       . | tee /dev/stderr |
       yq 'length > 0' | tee /dev/stderr)
   [ "${actual}" = "false" ]
@@ -56,7 +57,8 @@ load _helpers
   cd `chart_dir`
   local actual=$(helm template \
       -x templates/server-disruptionbudget.yaml  \
-      --set 'server.replicas=3' \
+      --set 'serverHA.enabled=true' \
+      --set 'serverHA.replicas=3' \
       . | tee /dev/stderr |
       yq '.spec.maxUnavailable' | tee /dev/stderr)
   [ "${actual}" = "0" ]
