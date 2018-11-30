@@ -49,6 +49,5 @@ load _helpers
       --set 'server.config="{\"hello\": \"world\"}"' \
       . | tee /dev/stderr |
       yq '.data["extraconfig-from-values.hcl"] | match("world") | length' | tee /dev/stderr)
-  echo "# --- actual: ${actual}" >&3
   [ ! -z "${actual}" ]
 }
