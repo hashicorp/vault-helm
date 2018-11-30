@@ -18,10 +18,6 @@ load _helpers
 
 # setup a consul env
 setup() {
-  set +e
-  #if [[ "$BATS_TEST_NUMBER" -eq 1]]; then
-  #  ...
-  #fi
   helm install https://github.com/hashicorp/consul-helm/archive/v0.3.0.tar.gz \
     --name consul \
     --set 'ui.enabled=false' \
@@ -31,9 +27,6 @@ setup() {
 
 #cleanup
 teardown() {
-  #if [[ "${#BATS_TEST_NAMES[@]}" -eq "$BATS_TEST_NUMBER" ]]; then
-  #  
-  #fi
   helm delete --purge vault 
   helm delete --purge consul
   kubectl delete --all pvc 
