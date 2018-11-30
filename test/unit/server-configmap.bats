@@ -46,8 +46,9 @@ load _helpers
   cd `chart_dir`
   local actual=$(helm template \
       -x templates/server-config-configmap.yaml  \
-      --set 'server.extraConfig="{\"hello\": \"world\"}"' \
+      --set 'server.config="{\"hello\": \"world\"}"' \
       . | tee /dev/stderr |
-      yq '.data["extra-from-values.json"] | match("world") | length' | tee /dev/stderr)
+      yq '.data["extraconfig-from-values.hcl"] | match("world") | length' | tee /dev/stderr)
+  echo "# --- actual: ${actual}" >&3
   [ ! -z "${actual}" ]
 }
