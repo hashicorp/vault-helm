@@ -10,6 +10,6 @@ metadata:
     heritage: {{ .Release.Service }}
     release: {{ .Release.Name }}
 data:
-  statefulconfig-from-values.hcl: |-
+  extraconfig-from-values.hcl: |-
 {{ tpl .Values.serverHA.config . | indent 4 }}
 {{- end }}
