@@ -2,13 +2,13 @@
 
 load _helpers
 
-@test "ui/Service: enabled by default" {
+@test "ui/Service: disabled by default" {
   cd `chart_dir`
   local actual=$(helm template \
       -x templates/ui-service.yaml  \
       . | tee /dev/stderr |
       yq 'length > 0' | tee /dev/stderr)
-  [ "${actual}" = "true" ]
+  [ "${actual}" = "false" ]
 }
 
 @test "ui/Service: enable with global.enabled false" {
@@ -88,6 +88,7 @@ load _helpers
   local actual=$(helm template \
       -x templates/ui-service.yaml  \
       --set 'ui.service.type=LoadBalancer' \
+      --set 'ui.enabled=true' \
       . | tee /dev/stderr |
       yq -r '.spec.type' | tee /dev/stderr)
   [ "${actual}" = "LoadBalancer" ]
