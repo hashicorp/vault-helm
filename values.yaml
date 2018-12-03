@@ -55,14 +55,15 @@ server:
       path = "/vault/data"
     }
 
-    # The GKMS keys must already exist, and the cluster must have a service
-    # account that is authorized to access GCP KMS, and ass
-    seal "gcpckms" {
-      project     = "vault-helm-dev"
-      region      = "global"
-      key_ring    = "vault-helm"
-      crypto_key  = "vault-init"
-    }
+    # Example configuration for using auto-unseal, using Google Cloud KMS. The
+    # GKMS keys must already exist, and the cluster must have a service account
+    # that is authorized to access GCP KMS.
+    # seal "gcpckms" {
+    #   project     = "vault-helm-dev"
+    #   region      = "global"
+    #   key_ring    = "vault-helm"
+    #   crypto_key  = "vault-init"
+    # }
 
   # extraVolumes is a list of extra volumes to mount. These will be exposed
   # to Vault in the path `/vault/userconfig/<name>/`. The value below is
@@ -112,14 +113,15 @@ serverHA:
       address = "HOST_IP:8500"
     }
 
-    # The GKMS keys must already exist, and the cluster must have a service
-    # account that is authorized to access GCP KMS, and ass
-    seal "gcpckms" {
-      project     = "vault-helm-dev"
-      region      = "global"
-      key_ring    = "vault-helm"
-      crypto_key  = "vault-init"
-    }
+    # Example configuration for using auto-unseal, using Google Cloud KMS. The
+    # GKMS keys must already exist, and the cluster must have a service account
+    # that is authorized to access GCP KMS.
+    # seal "gcpckms" {
+    #   project     = "vault-helm-dev"
+    #   region      = "global"
+    #   key_ring    = "vault-helm"
+    #   crypto_key  = "vault-init"
+    # }
 
   # extraVolumes is a list of extra volumes to mount. These will be exposed
   # to Vault in the path `/vault/userconfig/<name>/`. The value below is
