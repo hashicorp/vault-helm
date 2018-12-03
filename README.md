@@ -41,6 +41,14 @@ Please see the many options supported in the `values.yaml`
 file. These are also fully documented directly on the
 [Vault website](https://www.vault.io/docs/platform/k8s/helm.html).
 
+### Using auto-unseal
+
+Starting with Vault 1.0-beta, auto-unseal features are now included in the open source 
+version on Vault.  In order to use these features, users must ensure that 
+the Vault configuration is provided with the appropriate credentials and authorizations 
+to access the APIs needed for the given key provider, as well as the necessary keys 
+created before hand. 
+
 ## Testing
 
 The Helm chart ships with both unit and acceptance tests.
