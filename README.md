@@ -8,9 +8,10 @@ This repository contains the official HashiCorp Helm chart for installing
 and configuring Vault on Kubernetes. This chart supports multiple use
 cases of Vault on Kubernetes depending on the values provided.
 
-For full documentation on this Helm chart along with all the ways you can
-use Vault with Kubernetes, please see the
-[Vault and Kubernetes documentation](https://www.vault.io/docs/platform/k8s/index.html).
+[//]: # (These docs don't exist yet)
+[//]: # (For full documentation on this Helm chart along with all the ways you can)
+[//]: # (use Vault with Kubernetes, please see the)
+[//]: # ([Vault and Kubernetes documentation](https://www.vault.io/docs/platform/k8s/index.html).)
 
 ## Prerequisites
 
@@ -37,9 +38,10 @@ then be installed directly:
 
     helm install ./vault-helm
 
-Please see the many options supported in the `values.yaml`
-file. These are also fully documented directly on the
-[Vault website](https://www.vault.io/docs/platform/k8s/helm.html).
+[//]: # (These docs don't exist yet)
+[//]: # (Please see the many options supported in the `values.yaml`)
+[//]: # (file. These are also fully documented directly on the)
+[//]: # ([Vault website](https://www.vault.io/docs/platform/k8s/helm.html).)
 
 ### Using auto-unseal
 
