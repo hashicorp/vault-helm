@@ -128,13 +128,27 @@ serverHA:
     # - type: secret (or "configMap")
     #   name: my-secret
     #   load: false # if true, will add to `-config` to load by Vault
-   
+
   disruptionBudget:
     enabled: true
 
     # maxUnavailable will default to (n/2)-1 where n is the number of
     # replicas. If you'd like a custom value, you can specify an override here.
     maxUnavailable: null
+
+  # Affinity Settings
+  # Commenting out or setting as empty the affinity variable, will allow
+  # deployment to single node services such as Minikube
+  affinity: |
+    podAntiAffinity:
+      requiredDuringSchedulingIgnoredDuringExecution:
+        - labelSelector:
+            matchLabels:
+              app: {{ template "vault.name" . }}
+              release: "{{ .Release.Name }}"
+              component: server
+          topologyKey: kubernetes.io/hostname
+
 
 # Configuration for DNS configuration within the Kubernetes cluster.
 # This creates a service that routes to all agents (client or server)

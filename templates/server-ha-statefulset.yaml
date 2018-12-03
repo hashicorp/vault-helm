@@ -34,7 +34,10 @@ spec:
         release: {{ .Release.Name }}
         component: server
     spec:
-      #TODO: look at how Consul exposes affinity
+    {{- if .Values.server.affinity }}
+      affinity:
+        {{ tpl .Values.server.affinity . | nindent 8 | trim }}
+    {{- end }}
       terminationGracePeriodSeconds: 10
       volumes:
         - name: config
