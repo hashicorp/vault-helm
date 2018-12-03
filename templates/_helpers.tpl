@@ -34,9 +34,12 @@ Expand the name of the chart.
 {{/*
 Compute the maximum number of unavailable replicas for the PodDisruptionBudget.
 This defaults to (n/2)-1 where n is the number of members of the server cluster.
+Add a special case for replicas=1, where it should default to 0 as well.
 */}}
 {{- define "vault.pdb.maxUnavailable" -}}
-{{- if .Values.serverHA.disruptionBudget.maxUnavailable -}}
+{{- if eq (int .Values.serverHA.replicas) 1 -}}
+{{ 0 }}
+{{- else if .Values.serverHA.disruptionBudget.maxUnavailable -}}
 {{ .Values.serverHA.disruptionBudget.maxUnavailable -}}
 {{- else -}}
 {{- ceil (sub (div (int .Values.serverHA.replicas) 2) 1) -}}
