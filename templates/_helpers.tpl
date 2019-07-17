@@ -37,11 +37,218 @@ This defaults to (n/2)-1 where n is the number of members of the server cluster.
 Add a special case for replicas=1, where it should default to 0 as well.
 */}}
 {{- define "vault.pdb.maxUnavailable" -}}
-{{- if eq (int .Values.serverHA.replicas) 1 -}}
+{{- if eq (int .Values.server.ha.replicas) 1 -}}
 {{ 0 }}
-{{- else if .Values.serverHA.disruptionBudget.maxUnavailable -}}
-{{ .Values.serverHA.disruptionBudget.maxUnavailable -}}
+{{- else if .Values.server.ha.disruptionBudget.maxUnavailable -}}
+{{ .Values.server.ha.disruptionBudget.maxUnavailable -}}
 {{- else -}}
-{{- ceil (sub (div (int .Values.serverHA.replicas) 2) 1) -}}
+{{- ceil (sub (div (int .Values.server.ha.replicas) 2) 1) -}}
+{{- end -}}
+{{- end -}}
+
+{{/*
+Set the variable 'mode' to the server mode requested by the user to simplify 
+template logic.
+*/}}
+{{- define "vault.mode" -}}
+  {{- if eq (.Values.server.dev.enabled | toString) "true" -}}
+    {{- $_ := set . "mode" "dev" -}}
+  {{- else if eq (.Values.server.ha.enabled | toString) "true" -}}
+    {{- $_ := set . "mode" "ha" -}}
+  {{- else if or (eq (.Values.server.standalone.enabled | toString) "true") (eq (.Values.server.standalone.enabled | toString) "-") -}}
+    {{- $_ := set . "mode" "standalone" -}}
+  {{- else -}}
+    {{- $_ := set . "mode" "" -}}
+  {{- end -}}
+{{- end -}}
+
+{{/*
+Set's the replica count based on the different modes configured by user
+*/}}
+{{- define "vault.replicas" -}}
+  {{ if eq .mode "standalone" }}
+    {{- default 1 -}}
+  {{ else if eq .mode "ha" }}
+    {{- .Values.server.ha.replicas | default 5 -}}
+  {{ else }}
+    {{- default 1 -}}
+  {{ end }}
+{{- end -}}
+
+{{/*
+Set's fsGroup based on different modes.  Standalone is the only mode 
+that requires fsGroup at this time because it uses PVC for the file 
+storage backend.
+*/}}
+{{- define "vault.fsgroup" -}}
+  {{ if eq .mode "standalone" }}
+    {{- .Values.server.storageFsGroup | default 1000 -}}
+  {{ end }}
+{{- end -}}
+
+{{/*
+Set's up configmap mounts if this isn't a dev deployment and the user 
+defined a custom configuration.  Additionall iterates over any 
+extra volumes the user may have specified (such as a secret with TLS).
+*/}}
+{{- define "vault.volumes" -}}
+  {{- if and (ne .mode "dev") (or (ne .Values.server.standalone.config "")  (ne .Values.server.ha.config "")) }}
+       - name: config
+         configMap:
+           name: {{ template "vault.fullname" . }}-config
+  {{ end }}
+  {{- range .Values.server.extraVolumes }}
+       - name: userconfig-{{ .name }}
+         {{ .type }}:
+         {{- if (eq .type "configMap") }}
+           name: {{ .name }}
+         {{- else if (eq .type "secret") }}
+          secretName: {{ .name }}
+         {{- end }}
+  {{- end }}
+{{- end -}}
+
+{{/*
+Set's a command to override the entrypoint defined in the image 
+so we can make the user experience nicer.  This works in with 
+"vault.args" to specify what commands /bin/sh should run.
+*/}}
+{{- define "vault.command" -}}
+  {{ if or (eq .mode "standalone") (eq .mode "ha") }}
+          - "/bin/sh"
+          - "-ec"
+  {{ end }}
+{{- end -}}
+
+{{/*
+Set's the args for custom command to render the Vault configuration 
+file with IP addresses to make the out of box experience easier 
+for users looking to use this chart with Consul Helm.
+*/}}
+{{- define "vault.args" -}}
+  {{ if or (eq .mode "standalone") (eq .mode "ha") }}
+          - |
+            sed -E "s/HOST_IP/${HOST_IP?}/g" /vault/config/extraconfig-from-values.hcl > /tmp/storageconfig.hcl; 
+            sed -Ei "s/POD_IP/${POD_IP?}/g" /tmp/storageconfig.hcl;
+            chown vault:vault /tmp/storageconfig.hcl;
+            /usr/local/bin/docker-entrypoint.sh vault server -config=/tmp/storageconfig.hcl
+  {{ end }}
+{{- end -}}
+
+{{/*
+Set's additional environment variables based on the mode.
+*/}}
+{{- define "vault.envs" -}}
+  {{ if eq .mode "dev" }}
+            - name: VAULT_DEV_ROOT_TOKEN_ID
+              value: "root"
+  {{ end }}
+{{- end -}}
+
+{{/*
+Set's which additional volumes should be mounted to the container 
+based on the mode configured.
+*/}}
+{{- define "vault.mounts" -}}
+  {{ if eq .mode "standalone" }}
+    {{ if eq (.Values.server.auditStorage.enabled | toString) "true" }}
+            - name: audit
+              mountPath: /vault/audit
+    {{ end }}
+    {{ if eq (.Values.server.dataStorage.enabled | toString) "true" }}
+            - name: data
+              mountPath: /vault/data
+    {{ end }}
+  {{ end }}
+  {{ if and (ne .mode "dev") (or (ne .Values.server.standalone.config "")  (ne .Values.server.ha.config "")) }}
+            - name: config
+              mountPath: /vault/config
+  {{ end }}
+  {{- range .Values.server.extraVolumes }}
+            - name: userconfig-{{ .name }}
+              readOnly: true
+              mountPath: /vault/userconfig/{{ .name }}
+  {{- end }}
+{{- end -}}
+
+{{/*
+Set's up the volumeClaimTemplates when data or audit storage is required.  HA 
+might not use data storage since Consul is likely it's backend, however, audit 
+storage might be desired by the user.
+*/}}
+{{- define "vault.volumeclaims" -}}
+  {{- if and (ne .mode "dev") (or .Values.server.dataStorage.enabled .Values.server.auditStorage.enabled) }}
+  volumeClaimTemplates:
+      {{- if and (eq (.Values.server.dataStorage.enabled | toString) "true") (eq .mode "standalone") }}
+    - metadata:
+        name: data
+      spec:
+        accessModes:
+          - {{ .Values.server.dataStorage.accessMode | default "ReadWriteOnce" }}
+        resources:
+          requests:
+            storage: {{ .Values.server.dataStorage.size }}
+          {{- if .Values.server.dataStorage.storageClass }}
+        storageClassName: {{ .Values.server.dataStorage.storageClass }}
+          {{- end }}
+      {{ end }}
+      {{- if eq (.Values.server.auditStorage.enabled | toString) "true" }}
+    - metadata:
+        name: audit
+      spec:
+        accessModes:
+          - {{ .Values.server.auditStorage.accessMode | default "ReadWriteOnce" }}
+        resources:
+          requests:
+            storage: {{ .Values.server.auditStorage.size }}
+          {{- if .Values.server.auditStorage.storageClass }}
+        storageClassName: {{ .Values.server.auditStorage.storageClass }}
+          {{- end }}
+      {{ end }}
+  {{ end }}
+{{- end -}}
+
+{{/*
+Set's the update strategy when HA mode is enabled and updatePartition 
+has been configured by the user.
+*/}}
+{{- define "vault.updateStrategy" -}}
+  {{- if and (eq .mode "ha") (gt (int .Values.server.ha.updatePartition) 0) }}
+  updateStrategy:
+    type: RollingUpdate
+    rollingUpdate:
+      partition: {{ .Values.server.ha.updatePartition }}
+  {{- end }}
+{{- end -}}
+
+{{/*
+Set's the affinity for pod placement when running in standalone and HA modes.
+*/}}
+{{- define "vault.affinity" -}}
+  {{- if and (ne .mode "dev") (ne .Values.server.affinity "") }}
+      affinity:
+        {{ tpl .Values.server.affinity . | nindent 8 | trim }}
+  {{ end }}
+{{- end -}}
+
+{{/*
+Set's the container resources if the user has set any.
+*/}}
+{{- define "vault.resources" -}}
+  {{- if .Values.server.resources -}}
+          resources:
+{{ toYaml .Values.server.resources | indent 12}}
+  {{ end }}
+{{- end -}}
+
+{{/*
+Inject extra environment vars in the format key:value, if populated
+*/}}
+{{- define "vault.extraEnvironmentVars" -}}
+{{- if .extraEnvironmentVars -}}
+{{- range $key, $value := .extraEnvironmentVars }}
+- name: {{ $key }}
+  value: {{ $value | quote }}
+{{- end -}}
 {{- end -}}
 {{- end -}}

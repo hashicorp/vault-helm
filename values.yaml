@@ -1,65 +1,32 @@
 # Available parameters and their default values for the Vault chart.
 
-# Server, when enabled, configures a server cluster to run. This should
-# be disabled if you plan on connecting to a Vault cluster external to
-# the Kube cluster.
-
 global:
   # enabled is the master enabled switch. Setting this to true or false
   # will enable or disable all the components within this chart by default.
-  # Each component can be overridden using the component-specific "enabled"
-  # value.
   enabled: true
 
-  # Image is the name (and tag) of the Vault Docker image for clients and
-  # servers below. This can be overridden per component.
-  #image: "vault:0.11.1"
-  image: "vault:1.0.0-beta2"
+  # Image is the name (and tag) of the Vault Docker image.
+  image: "vault:1.2.0-beta2"
 
 server:
-  enabled: "-" 
-  image: null
-  replicas: 1
-
-  # storage and storageClass are the settings for configuring stateful
-  # storage for the server pods. storage should be set to the disk size of
-  # the attached volume. storageClass is the class of storage which defaults
-  # to null (the Kube cluster will pick the default).
-  storage: 10Gi
-  storageClass: null
-
   # Resource requests, limits, etc. for the server cluster placement. This
   # should map directly to the value of the resources field for a PodSpec.
   # By default no direct resource request is made.
-  resources: {}
+  resources:
+  # resources:
+  #   requests:
+  #     memory: 256Mi
+  #     cpu: 250m
+  #   limits:
+  #     memory: 256Mi
+  #     cpu: 250m
 
-  # config is a raw string of default configuration when using a Stateful
-  # deployment. Default is to use a PersistentVolumeClaim mounted at /vault/data
-  # and store data there. This is only used when using a Replica count of 1, and
-  # using a stateful set
-  # This should be HCL
-  config: |
-    ui = true
-    listener "tcp" {
-      tls_disable = 1
-      address     = "0.0.0.0:8200"
-    }
-
-    #api_addr = "POD_IP:8201"
-
-    storage "file" {
-      path = "/vault/data"
-    }
-
-    # Example configuration for using auto-unseal, using Google Cloud KMS. The
-    # GKMS keys must already exist, and the cluster must have a service account
-    # that is authorized to access GCP KMS.
-    # seal "gcpckms" {
-    #   project     = "vault-helm-dev"
-    #   region      = "global"
-    #   key_ring    = "vault-helm"
-    #   crypto_key  = "vault-init"
-    # }
+  # extraEnvVars is a list of extra enviroment variables to set with the stateful set. These could be
+  # used to include variables required for auto-unseal.
+  extraEnvironmentVars: {}
+    # GOOGLE_REGION: global,
+    # GOOGLE_PROJECT: myproject,
+    # GOOGLE_CREDENTIALS: /vault/userconfig/myproject/myproject-creds.json
 
   # extraVolumes is a list of extra volumes to mount. These will be exposed
   # to Vault in the path `/vault/userconfig/<name>/`. The value below is
@@ -68,75 +35,10 @@ server:
     # - type: secret (or "configMap")
     #   name: my-secret
     #   load: false # if true, will add to `-config` to load by Vault
-
-serverHA:
-  enabled: false
-  image: null
-  replicas: 1
-
-  # storage and storageClass are the settings for configuring stateful
-  # storage for the server pods. storage should be set to the disk size of
-  # the attached volume. storageClass is the class of storage which defaults
-  # to null (the Kube cluster will pick the default).
-  storage: 2Gi
-  storageClass: null
-
-  # Resource requests, limits, etc. for the server cluster placement. This
-  # should map directly to the value of the resources field for a PodSpec.
-  # By default no direct resource request is made.
-  resources: {}
-
-  # updatePartition is used to control a careful rolling update of Vault 
-  # servers. This should be done particularly when changing the version
-  # of Vault. Please refer to the documentation for more information.
-  updatePartition: 0
-
-  # config is a raw string of default configuration when using a Stateful
-  # deployment. Default is to use a PersistentVolumeClaim mounted at /vault/data
-  # and store data there. This is only used when using a Replica count of 1, and
-  # using a stateful set
-  # This should be HCL
-  config: |
-    ui = true
-    listener "tcp" {
-      tls_disable = 1
-      address     = "0.0.0.0:8200"
-      cluster_address = "POD_IP:8201"
-    }
-
-    storage "consul" {
-      path = "vault"
-      address = "HOST_IP:8500"
-    }
-
-    # Example configuration for using auto-unseal, using Google Cloud KMS. The
-    # GKMS keys must already exist, and the cluster must have a service account
-    # that is authorized to access GCP KMS.
-    # seal "gcpckms" {
-    #   project     = "vault-helm-dev"
-    #   region      = "global"
-    #   key_ring    = "vault-helm"
-    #   crypto_key  = "vault-init"
-    # }
-
-  # extraVolumes is a list of extra volumes to mount. These will be exposed
-  # to Vault in the path `/vault/userconfig/<name>/`. The value below is
-  # an array of objects, examples are shown below.
-  extraVolumes: []
-    # - type: secret (or "configMap")
-    #   name: my-secret
-    #   load: false # if true, will add to `-config` to load by Vault
-
-  disruptionBudget:
-    enabled: true
-
-    # maxUnavailable will default to (n/2)-1 where n is the number of
-    # replicas. If you'd like a custom value, you can specify an override here.
-    maxUnavailable: null
 
   # Affinity Settings
   # Commenting out or setting as empty the affinity variable, will allow
-  # deployment to single node services such as Minikube
+  # deployment to single node services such as Minikube  
   affinity: |
     podAntiAffinity:
       requiredDuringSchedulingIgnoredDuringExecution:
@@ -146,30 +48,135 @@ serverHA:
               release: "{{ .Release.Name }}"
               component: server
           topologyKey: kubernetes.io/hostname
+  
+  # Enables a headless service to be used by the Vault Statefulset
+  service:
+    enabled: true
 
+  # This configures the Vault Statefulset to create a PVC for data 
+  # storage when using the file backend.
+  # See https://www.vaultproject.io/docs/audit/index.html to know more 
+  dataStorage:
+    enabled: true
+    # Size of the PVC created
+    size: 10Gi
+    # Name of the storage class to use.  If null it will use the 
+    # configured default Storage Class.
+    storageClass: null
+    # Access Mode of the storage device being used for the PVC
+    accessMode: ReadWriteOnce
+
+  # This configures the Vault Statefulset to create a PVC for audit 
+  # logs.  Once Vault is deployed, initialized and unseal, Vault must 
+  # be configured to use this for audit logs.  This will be mounted to 
+  # /vault/audit
+  # See https://www.vaultproject.io/docs/audit/index.html to know more 
+
+  auditStorage:
+    enabled: false
+    # Size of the PVC created
+    size: 10Gi
+    # Name of the storage class to use.  If null it will use the 
+    # configured default Storage Class.
+    storageClass: null
+    # Access Mode of the storage device being used for the PVC
+    accessMode: ReadWriteOnce
+
+  # Run Vault in "dev" mode. This requires no further setup, no state management,
+  # and no initialization. This is useful for experimenting with Vault without
+  # needing to unseal, store keys, et. al. All data is lost on restart - do not
+  # use dev mode for anything other than experimenting.
+  # See https://www.vaultproject.io/docs/concepts/dev-server.html to know more
+  dev:
+    enabled: false
+
+  # Run Vault in "standalone" mode. This is the default mode that will deploy if 
+  # no arguments are given to helm. This requires a PVC for data storage to use 
+  # the "file" backend.  This mode is not highly available and should not be scaled 
+  # past a single replica.
+  standalone:
+    enabled: "-"
+
+    # config is a raw string of default configuration when using a Stateful
+    # deployment. Default is to use a PersistentVolumeClaim mounted at /vault/data
+    # and store data there. This is only used when using a Replica count of 1, and
+    # using a stateful set. This should be HCL.
+    config: |
+      ui = true
+      api_addr = "http://POD_IP:8201"
+      listener "tcp" {
+        tls_disable = 1
+        address     = "0.0.0.0:8200"
+      }
+      storage "file" {
+        path = "/vault/data"
+      }
+
+      # Example configuration for using auto-unseal, using Google Cloud KMS. The
+      # GKMS keys must already exist, and the cluster must have a service account
+      # that is authorized to access GCP KMS.
+      #seal "gcpckms" {
+      #   project     = "vault-helm-dev"
+      #   region      = "global"
+      #   key_ring    = "vault-helm-unseal-kr"
+      #   crypto_key  = "vault-helm-unseal-key"
+      #}
+
+  # Run Vault in "HA" mode. There are no storage requirements unless audit log 
+  # persistence is required.  In HA mode Vault will configure itself to use Consul 
+  # for its storage backend.  The default configuration provided will work the Consul 
+  # Helm project by default.  It is possible to manually configure Vault to use a 
+  # different HA backend.
+  ha:
+    enabled: false
+    replicas: 5
+
+    # updatePartition is used to control a careful rolling update of Vault 
+    # servers. This should be done particularly when changing the version
+    # of Vault. Please refer to the documentation for more information.
+    updatePartition: 0
+
+    # config is a raw string of default configuration when using a Stateful
+    # deployment. Default is to use a Consul for its HA storage backend.
+    # This should be HCL.
+    config: |
+      ui = true
+      api_addr = "http://POD_IP:8201"
+      listener "tcp" {
+        tls_disable = 1
+        address     = "0.0.0.0:8200"
+        cluster_address = "POD_IP:8201"
+      }
+      storage "consul" {
+        path = "vault"
+        address = "HOST_IP:8500"
+      }
+
+      # Example configuration for using auto-unseal, using Google Cloud KMS. The
+      # GKMS keys must already exist, and the cluster must have a service account
+      # that is authorized to access GCP KMS.
+      #seal "gcpckms" {
+      #   project     = "vault-helm-dev-246514"
+      #   region      = "global"
+      #   key_ring    = "vault-helm-unseal-kr"
+      #   crypto_key  = "vault-helm-unseal-key"
+      #}
+
+    # A disruption budget limits the number of pods of a replicated application 
+    # that are down simultaneously from voluntary disruptions
+    disruptionBudget:
+      enabled: true
+
+    # maxUnavailable will default to (n/2)-1 where n is the number of
+    # replicas. If you'd like a custom value, you can specify an override here.
+      maxUnavailable: null
+
+# Vault UI
 ui:
-  # True if you want to enable the Vault UI. The UI will run only
-  # on the server nodes. This makes UI access via the service below (if
-  # enabled) predictable rather than "any node" if you're running Vault
-  # clients as well.
-  #
-  # This value is used for both Single Server and HA mode setups
-  enabled: false
-
   # True if you want to create a Service entry for the Vault UI.
   #
   # serviceType can be used to control the type of service created. For
   # example, setting this to "LoadBalancer" will create an external load
   # balancer (for supported K8S installations) to access the UI.
-  service:
-    enabled: true
-    type: LoadBalancer
-
-# Run Vault in "dev" mode. This requires no further setup, no state management,
-# and no initialization. This is useful for experimenting with Vault without
-# needing to unseal, store keys, et. al. All data is lost on restart - do not
-# use dev mode for anything other than experimenting.
-# See https://www.vaultproject.io/docs/concepts/dev-server.html to know more
-dev:
   enabled: false
-  image: null
+  serviceType: "ClusterIP"
