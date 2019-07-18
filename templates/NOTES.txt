@@ -2,7 +2,7 @@
 Thank you for installing HashiCorp Vault!
 
 Now that you have deployed Vault, you should look over the docs on using 
-Consul with Kubernetes available here: 
+Vault with Kubernetes available here: 
 
 https://www.vaultproject.io/docs/
 
