@@ -1,65 +1,65 @@
 # StatefulSet to run the actual vault server cluster.
-{{- if (or (and (ne (.Values.serverHA.enabled | toString) "-") .Values.serverHA.enabled) (and (eq (.Values.serverHA.enabled | toString) "-") .Values.global.enabled)) }}
+{{- if (or (and (ne (.Values.serverHA.enabled | toString) "-") .Values.serverHA.enabled) (and (eq (.Values.serverHA.enabled | toString) "-") .Values.global.enabled))}}
 apiVersion: apps/v1
 kind: StatefulSet
 metadata:
-  name: {{ template "vault.fullname" . }}-ha-server
+  name: {{template "vault.fullname" .}}-ha-server
   labels:
-    app: {{ template "vault.name" . }}
-    chart: {{ template "vault.chart" . }}
-    heritage: {{ .Release.Service }}
-    release: {{ .Release.Name }}
+    app: {{template "vault.name" .}}
+    chart: {{template "vault.chart" .}}
+    heritage: {{.Release.Service}}
+    release: {{.Release.Name}}
 spec:
-  serviceName: {{ template "vault.fullname" . }}-ha-server
+  serviceName: {{template "vault.fullname" .}}-ha-server
   podManagementPolicy: Parallel
-  replicas: {{ .Values.serverHA.replicas }}
-  # TODO: add updatePartition option 
-  {{- if (gt (int .Values.serverHA.updatePartition) 0) }}
+  replicas: {{.Values.serverHA.replicas}}
+  # TODO: add updatePartition option
+  {{- if (gt (int .Values.serverHA.updatePartition) 0)}}
   updateStrategy:
     type: RollingUpdate
     rollingUpdate:
-      partition: {{ .Values.serverHA.updatePartition }}
-  {{- end }}
+      partition: {{.Values.serverHA.updatePartition}}
+  {{- end}}
   selector:
     matchLabels:
-      app: {{ template "vault.name" . }}
-      chart: {{ template "vault.chart" . }}
-      release: {{ .Release.Name }}
+      app: {{template "vault.name" .}}
+      chart: {{template "vault.chart" .}}
+      release: {{.Release.Name}}
       component: server
   template:
     metadata:
       labels:
-        app: {{ template "vault.name" . }}
-        chart: {{ template "vault.chart" . }}
-        release: {{ .Release.Name }}
+        app: {{template "vault.name" .}}
+        chart: {{template "vault.chart" .}}
+        release: {{.Release.Name}}
         component: server
     spec:
-    {{- if .Values.server.affinity }}
+    {{- if .Values.server.affinity}}
       affinity:
-        {{ tpl .Values.server.affinity . | nindent 8 | trim }}
-    {{- end }}
+        {{tpl .Values.server.affinity . | nindent 8 | trim}}
+    {{- end}}
       terminationGracePeriodSeconds: 10
       volumes:
         - name: config
           configMap:
-            name: {{ template "vault.fullname" . }}-server-ha-config
+            name: {{template "vault.fullname" .}}-server-ha-config
             defaultMode: 0755
-        {{- range .Values.serverHA.extraVolumes }}
-        - name: userconfig-{{ .name }}
-          {{ .type }}:
-            {{- if (eq .type "configMap") }}
-            name: {{ .name }}
-            {{- else if (eq .type "secret") }}
-            secretName: {{ .name }}
-            {{- end }}
-        {{- end }}
+        {{- range .Values.serverHA.extraVolumes}}
+        - name: userconfig-{{.name}}
+          {{.type}}:
+            {{- if (eq .type "configMap")}}
+            name: {{.name}}
+            {{- else if (eq .type "secret")}}
+            secretName: {{.name}}
+            {{- end}}
+        {{- end}}
       containers:
         - name: vault
           securityContext:
             fsGroup: 1000
             # TODO: confirm Vault needs this
             privileged: true
-          image: "{{ default .Values.global.image .Values.serverHA.image }}"
+          image: "{{default .Values.global.image .Values.serverHA.image}}"
           env:
             - name: HOST_IP
               valueFrom:
@@ -73,7 +73,7 @@ spec:
               valueFrom:
                 fieldRef:
                   fieldPath: metadata.namespace
-            - name: VAULT_ADDR 
+            - name: VAULT_ADDR
               value: "http://localhost:8200"
           #TODO: review how swapping of POD_IP, HOST_IP values is done
           command:
@@ -89,11 +89,11 @@ spec:
           volumeMounts:
             - name: config
               mountPath: /vault/config
-            {{- range .Values.serverHA.extraVolumes }}
-            - name: userconfig-{{ .name }}
+            {{- range .Values.serverHA.extraVolumes}}
+            - name: userconfig-{{.name}}
               readOnly: true
-              mountPath: /vault/userconfig/{{ .name }}
-            {{- end }}
+              mountPath: /vault/userconfig/{{.name}}
+            {{- end}}
           lifecycle:
             preStop:
               exec:
@@ -119,4 +119,4 @@ spec:
             periodSeconds: 3
             successThreshold: 1
             timeoutSeconds: 5
-{{- end }}
+{{- end}}

@@ -1,30 +1,30 @@
 # StatefulSet to run the actual vault server cluster.
-{{- if (or (and (ne (.Values.dev.enabled | toString) "-") .Values.dev.enabled) (and (eq (.Values.dev.enabled | toString) "-") .Values.global.enabled)) }}
+{{- if (or (and (ne (.Values.dev.enabled | toString) "-") .Values.dev.enabled) (and (eq (.Values.dev.enabled | toString) "-") .Values.global.enabled))}}
 apiVersion: apps/v1
 kind: StatefulSet
 metadata:
-  name: {{ template "vault.fullname" . }}-dev-server
+  name: {{template "vault.fullname" .}}-dev-server
   labels:
-    app: {{ template "vault.name" . }}
-    chart: {{ template "vault.chart" . }}
-    heritage: {{ .Release.Service }}
-    release: {{ .Release.Name }}
+    app: {{template "vault.name" .}}
+    chart: {{template "vault.chart" .}}
+    heritage: {{.Release.Service}}
+    release: {{.Release.Name}}
 spec:
-  serviceName: {{ template "vault.fullname" . }}-dev-server
+  serviceName: {{template "vault.fullname" .}}-dev-server
   podManagementPolicy: Parallel
   replicas: 1
   selector:
     matchLabels:
-      app: {{ template "vault.name" . }}
-      chart: {{ template "vault.chart" . }}
-      release: {{ .Release.Name }}
+      app: {{template "vault.name" .}}
+      chart: {{template "vault.chart" .}}
+      release: {{.Release.Name}}
       component: server
   template:
     metadata:
       labels:
-        app: {{ template "vault.name" . }}
-        chart: {{ template "vault.chart" . }}
-        release: {{ .Release.Name }}
+        app: {{template "vault.name" .}}
+        chart: {{template "vault.chart" .}}
+        release: {{.Release.Name}}
         component: server
     spec:
       terminationGracePeriodSeconds: 10
@@ -34,7 +34,7 @@ spec:
           securityContext:
             fsGroup: 1000
             privileged: true
-          image: "{{ default .Values.global.image .Values.dev.image }}"
+          image: "{{default .Values.global.image .Values.dev.image}}"
           env:
             - name: POD_IP
               valueFrom:
@@ -51,11 +51,11 @@ spec:
             - "server"
             - "-dev"
           volumeMounts:
-            {{- range .Values.dev.extraVolumes }}
-            - name: userconfig-{{ .name }}
+            {{- range .Values.dev.extraVolumes}}
+            - name: userconfig-{{.name}}
               readOnly: true
-              mountPath: /vault/userconfig/{{ .name }}
-            {{- end }}
+              mountPath: /vault/userconfig/{{.name}}
+            {{- end}}
           lifecycle:
             preStop:
               exec:
@@ -81,4 +81,4 @@ spec:
             periodSeconds: 3
             successThreshold: 1
             timeoutSeconds: 5
-{{- end }}
+{{- end}}

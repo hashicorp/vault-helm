@@ -1,3 +1,4 @@
+---
 # Available parameters and their default values for the Vault chart.
 
 # Server, when enabled, configures a server cluster to run. This should
@@ -13,11 +14,11 @@ global:
 
   # Image is the name (and tag) of the Vault Docker image for clients and
   # servers below. This can be overridden per component.
-  #image: "vault:0.11.1"
+  # image: "vault:0.11.1"
   image: "vault:1.0.0-beta2"
 
 server:
-  enabled: "-" 
+  enabled: "-"
   image: null
   replicas: 1
 
@@ -65,9 +66,9 @@ server:
   # to Vault in the path `/vault/userconfig/<name>/`. The value below is
   # an array of objects, examples are shown below.
   extraVolumes: []
-    # - type: secret (or "configMap")
-    #   name: my-secret
-    #   load: false # if true, will add to `-config` to load by Vault
+  # - type: secret (or "configMap")
+  #   name: my-secret
+  #   load: false # if true, will add to `-config` to load by Vault
 
 serverHA:
   enabled: false
@@ -86,7 +87,7 @@ serverHA:
   # By default no direct resource request is made.
   resources: {}
 
-  # updatePartition is used to control a careful rolling update of Vault 
+  # updatePartition is used to control a careful rolling update of Vault
   # servers. This should be done particularly when changing the version
   # of Vault. Please refer to the documentation for more information.
   updatePartition: 0
@@ -123,9 +124,9 @@ serverHA:
   # to Vault in the path `/vault/userconfig/<name>/`. The value below is
   # an array of objects, examples are shown below.
   extraVolumes: []
-    # - type: secret (or "configMap")
-    #   name: my-secret
-    #   load: false # if true, will add to `-config` to load by Vault
+  # - type: secret (or "configMap")
+  #   name: my-secret
+  #   load: false # if true, will add to `-config` to load by Vault
 
   disruptionBudget:
     enabled: true

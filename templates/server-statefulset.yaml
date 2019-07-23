@@ -1,30 +1,30 @@
 # StatefulSet to run the actual vault server cluster.
-{{- if (or (and (ne (.Values.server.enabled | toString) "-") .Values.server.enabled) (and (eq (.Values.server.enabled | toString) "-") .Values.global.enabled)) }}
+{{- if (or (and (ne (.Values.server.enabled | toString) "-") .Values.server.enabled) (and (eq (.Values.server.enabled | toString) "-") .Values.global.enabled))}}
 apiVersion: apps/v1
 kind: StatefulSet
 metadata:
-  name: {{ template "vault.fullname" . }}-server
+  name: {{template "vault.fullname" .}}-server
   labels:
-    app: {{ template "vault.name" . }}
-    chart: {{ template "vault.chart" . }}
-    heritage: {{ .Release.Service }}
-    release: {{ .Release.Name }}
+    app: {{template "vault.name" .}}
+    chart: {{template "vault.chart" .}}
+    heritage: {{.Release.Service}}
+    release: {{.Release.Name}}
 spec:
-  serviceName: {{ template "vault.fullname" . }}-server
+  serviceName: {{template "vault.fullname" .}}-server
   podManagementPolicy: Parallel
-  replicas: {{ .Values.server.replicas }}
+  replicas: {{.Values.server.replicas}}
   selector:
     matchLabels:
-      app: {{ template "vault.name" . }}
-      chart: {{ template "vault.chart" . }}
-      release: {{ .Release.Name }}
+      app: {{template "vault.name" .}}
+      chart: {{template "vault.chart" .}}
+      release: {{.Release.Name}}
       component: server
   template:
     metadata:
       labels:
-        app: {{ template "vault.name" . }}
-        chart: {{ template "vault.chart" . }}
-        release: {{ .Release.Name }}
+        app: {{template "vault.name" .}}
+        chart: {{template "vault.chart" .}}
+        release: {{.Release.Name}}
         component: server
     spec:
       affinity:
@@ -32,8 +32,8 @@ spec:
           requiredDuringSchedulingIgnoredDuringExecution:
             - labelSelector:
                 matchLabels:
-                  app: {{ template "vault.name" . }}
-                  release: "{{ .Release.Name }}"
+                  app: {{template "vault.name" .}}
+                  release: "{{.Release.Name}}"
                   component: server
               topologyKey: kubernetes.io/hostname
       terminationGracePeriodSeconds: 10
@@ -42,23 +42,23 @@ spec:
       volumes:
         - name: config
           configMap:
-            name: {{ template "vault.fullname" . }}-server-config
-        {{- range .Values.server.extraVolumes }}
-        - name: userconfig-{{ .name }}
-          {{ .type }}:
-            {{- if (eq .type "configMap") }}
-            name: {{ .name }}
-            {{- else if (eq .type "secret") }}
-            secretName: {{ .name }}
-            {{- end }}
-        {{- end }}
+            name: {{template "vault.fullname" .}}-server-config
+        {{- range .Values.server.extraVolumes}}
+        - name: userconfig-{{.name}}
+          {{.type}}:
+            {{- if (eq .type "configMap")}}
+            name: {{.name}}
+            {{- else if (eq .type "secret")}}
+            secretName: {{.name}}
+            {{- end}}
+        {{- end}}
       containers:
         - name: vault
           securityContext:
             fsGroup: 1000
             # TODO: confirm Vault needs this
             privileged: true
-          image: "{{ default .Values.global.image .Values.server.image }}"
+          image: "{{default .Values.global.image .Values.server.image}}"
           env:
             - name: POD_IP
               valueFrom:
@@ -75,22 +75,22 @@ spec:
             - "-ec"
             - |
               vault server -config=/vault/config/ \
-                {{- range .Values.server.extraVolumes }}
-                {{- if .load }}
-                -config-dir=/vault/userconfig/{{ .name }} \
-                {{- end }}
-                {{- end }}
+                {{- range .Values.server.extraVolumes}}
+                {{- if .load}}
+                -config-dir=/vault/userconfig/{{.name}} \
+                {{- end}}
+                {{- end}}
 
           volumeMounts:
             - name: data
               mountPath: /vault/data
             - name: config
               mountPath: /vault/config
-            {{- range .Values.server.extraVolumes }}
-            - name: userconfig-{{ .name }}
+            {{- range .Values.server.extraVolumes}}
+            - name: userconfig-{{.name}}
               readOnly: true
-              mountPath: /vault/userconfig/{{ .name }}
-            {{- end }}
+              mountPath: /vault/userconfig/{{.name}}
+            {{- end}}
           lifecycle:
             preStop:
               exec:
@@ -124,8 +124,8 @@ spec:
           - ReadWriteOnce
         resources:
           requests:
-            storage: {{ .Values.server.storage }}
-        {{- if .Values.server.storageClass }}
-        storageClassName: {{ .Values.server.storageClass }}
-        {{- end }}
-{{- end }}
+            storage: {{.Values.server.storage}}
+        {{- if .Values.server.storageClass}}
+        storageClassName: {{.Values.server.storageClass}}
+        {{- end}}
+{{- end}}
