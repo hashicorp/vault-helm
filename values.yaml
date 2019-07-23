@@ -71,7 +71,6 @@ server:
   # be configured to use this for audit logs.  This will be mounted to 
   # /vault/audit
   # See https://www.vaultproject.io/docs/audit/index.html to know more 
-
   auditStorage:
     enabled: false
     # Size of the PVC created
@@ -145,7 +144,7 @@ server:
       listener "tcp" {
         tls_disable = 1
         address     = "0.0.0.0:8200"
-        cluster_address = "POD_IP:8201"
+        cluster_address = "POD_IP:8202"
       }
       storage "consul" {
         path = "vault"

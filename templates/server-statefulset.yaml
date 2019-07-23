@@ -71,6 +71,8 @@ spec:
               name: http
             - containerPort: 8201
               name: internal
+            - containerPort: 8202
+              name: replication
           readinessProbe:
             # Check status; unsealed vault servers return 0
             # The exit code reflects the seal status:
