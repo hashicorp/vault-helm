@@ -14,7 +14,8 @@ spec:
   serviceName: {{ template "vault.fullname" . }}
   podManagementPolicy: Parallel
   replicas: {{ template "vault.replicas" . }}
-  {{ template "vault.updateStrategy" . }}
+  updateStrategy:
+    type: OnDelete
   selector:
     matchLabels:
       app: {{ template "vault.name" . }}

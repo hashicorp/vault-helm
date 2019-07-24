@@ -60,16 +60,15 @@ load _helpers
 
 #--------------------------------------------------------------------
 # updateStrategy
-# Single-Server does not include an update strategy 
 
-@test "server/dev-StatefulSet: no updateStrategy" {
+@test "server/dev-StatefulSet: updateStrategy" {
   cd `chart_dir`
   local actual=$(helm template \
       -x templates/server-statefulset.yaml  \
       --set 'server.dev.enabled=true' \
       . | tee /dev/stderr |
-      yq -r '.spec.updateStrategy' | tee /dev/stderr)
-  [ "${actual}" = "null" ]
+      yq -r '.spec.updateStrategy.type' | tee /dev/stderr)
+  [ "${actual}" = "OnDelete" ]
 }
 
 #--------------------------------------------------------------------

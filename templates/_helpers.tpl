@@ -209,19 +209,6 @@ storage might be desired by the user.
 {{- end -}}
 
 {{/*
-Set's the update strategy when HA mode is enabled and updatePartition 
-has been configured by the user.
-*/}}
-{{- define "vault.updateStrategy" -}}
-  {{- if and (eq .mode "ha") (gt (int .Values.server.ha.updatePartition) 0) }}
-  updateStrategy:
-    type: RollingUpdate
-    rollingUpdate:
-      partition: {{ .Values.server.ha.updatePartition }}
-  {{- end }}
-{{- end -}}
-
-{{/*
 Set's the affinity for pod placement when running in standalone and HA modes.
 */}}
 {{- define "vault.affinity" -}}

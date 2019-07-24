@@ -102,7 +102,7 @@ server:
     # using a stateful set. This should be HCL.
     config: |
       ui = true
-      api_addr = "http://POD_IP:8201"
+      api_addr = "http://POD_IP:8200"
       listener "tcp" {
         tls_disable = 1
         address     = "0.0.0.0:8200"
@@ -130,21 +130,16 @@ server:
     enabled: false
     replicas: 5
 
-    # updatePartition is used to control a careful rolling update of Vault 
-    # servers. This should be done particularly when changing the version
-    # of Vault. Please refer to the documentation for more information.
-    updatePartition: 0
-
     # config is a raw string of default configuration when using a Stateful
     # deployment. Default is to use a Consul for its HA storage backend.
     # This should be HCL.
     config: |
       ui = true
-      api_addr = "http://POD_IP:8201"
+      api_addr = "http://POD_IP:8200"
       listener "tcp" {
         tls_disable = 1
         address     = "0.0.0.0:8200"
-        cluster_address = "POD_IP:8202"
+        cluster_address = "POD_IP:8201"
       }
       storage "consul" {
         path = "vault"

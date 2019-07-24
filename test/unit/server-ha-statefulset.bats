@@ -44,22 +44,14 @@ load _helpers
 #--------------------------------------------------------------------
 # updateStrategy
 
-@test "server/ha-StatefulSet: no updateStrategy" {
+@test "server/ha-StatefulSet: OnDelete updateStrategy" {
   cd `chart_dir`
   local actual=$(helm template \
       -x templates/server-statefulset.yaml  \
       --set 'server.ha.enabled=true' \
       . | tee /dev/stderr |
-      yq -r '.spec.updateStrategy' | tee /dev/stderr)
-  [ "${actual}" = "null" ]
-
-  local actual=$(helm template \
-      -x templates/server-statefulset.yaml  \
-      --set 'server.ha.enabled=true' \
-      --set 'server.ha.updatePartition=1' \
-      . | tee /dev/stderr |
-      yq -r '.spec.updateStrategy.rollingUpdate.partition' | tee /dev/stderr)
-  [ "${actual}" = "1" ]
+      yq -r '.spec.updateStrategy.type' | tee /dev/stderr)
+  [ "${actual}" = "OnDelete" ]
 }
 
 #--------------------------------------------------------------------

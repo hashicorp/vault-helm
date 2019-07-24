@@ -52,37 +52,14 @@ load _helpers
 
 #--------------------------------------------------------------------
 # updateStrategy
-# Single-Server does not include an update strategy 
 
-@test "server/standalone-StatefulSet: no updateStrategy" {
+@test "server/standalone-StatefulSet: OnDelete updateStrategy" {
   cd `chart_dir`
   local actual=$(helm template \
       -x templates/server-statefulset.yaml  \
       . | tee /dev/stderr |
-      yq -r '.spec.updateStrategy' | tee /dev/stderr)
-  [ "${actual}" = "null" ]
-
-  local actual=$(helm template \
-      -x templates/server-statefulset.yaml  \
-      --set 'server.standalone.enabled=true' \
-      . | tee /dev/stderr |
-      yq -r '.spec.updateStrategy' | tee /dev/stderr)
-  [ "${actual}" = "null" ]
-
-  local actual=$(helm template \
-      -x templates/server-statefulset.yaml  \
-      --set 'server.ha.updatePartition=1' \
-      . | tee /dev/stderr |
-      yq -r '.spec.updateStrategy' | tee /dev/stderr)
-  [ "${actual}" = "null" ]
-
-  local actual=$(helm template \
-      -x templates/server-statefulset.yaml  \
-      --set 'server.standalone.enabled=true' \
-      --set 'server.ha.updatePartition=1' \
-      . | tee /dev/stderr |
-      yq -r '.spec.updateStrategy' | tee /dev/stderr)
-  [ "${actual}" = "null" ]
+      yq -r '.spec.updateStrategy.type' | tee /dev/stderr)
+  [ "${actual}" = "OnDelete" ]
 }
 
 #--------------------------------------------------------------------
