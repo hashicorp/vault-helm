@@ -69,7 +69,7 @@ Set's the replica count based on the different modes configured by user
   {{ if eq .mode "standalone" }}
     {{- default 1 -}}
   {{ else if eq .mode "ha" }}
-    {{- .Values.server.ha.replicas | default 5 -}}
+    {{- .Values.server.ha.replicas | default 3 -}}
   {{ else }}
     {{- default 1 -}}
   {{ end }}

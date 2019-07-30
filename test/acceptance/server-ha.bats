@@ -6,8 +6,7 @@ load _helpers
   cd `chart_dir`
   
   helm install --name="$(name_prefix)" \
-    --set='server.ha.enabled=true' \
-    --set='server.affinity=' .
+    --set='server.ha.enabled=true' .
   wait_for_running $(name_prefix)-0
 
   # Sealed, not initialized
@@ -22,7 +21,7 @@ load _helpers
   # Replicas
   local replicas=$(kubectl get statefulset "$(name_prefix)" --output json |
     jq -r '.spec.replicas')
-  [ "${replicas}" == "5" ]
+  [ "${replicas}" == "3" ]
 
   # Volume Mounts
   local volumeCount=$(kubectl get statefulset "$(name_prefix)" --output json |

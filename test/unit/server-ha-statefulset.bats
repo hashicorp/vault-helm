@@ -85,7 +85,7 @@ load _helpers
       --set 'server.ha.enabled=true' \
       . | tee /dev/stderr |
       yq -r '.spec.replicas' | tee /dev/stderr)
-  [ "${actual}" = "5" ]
+  [ "${actual}" = "3" ]
 }
 
 @test "server/ha-StatefulSet: custom replicas" {
