@@ -6,18 +6,7 @@ load _helpers
   cd `chart_dir`
   local actual=$(helm template \
       -x templates/server-disruptionbudget.yaml  \
-      --set 'serverHA.enabled=true' \
-      . | tee /dev/stderr |
-      yq 'length > 0' | tee /dev/stderr)
-  [ "${actual}" = "true" ]
-}
-
-@test "server/DisruptionBudget: enable with global.enabled false" {
-  cd `chart_dir`
-  local actual=$(helm template \
-      -x templates/server-disruptionbudget.yaml  \
-      --set 'global.enabled=false' \
-      --set 'serverHA.enabled=true' \
+      --set 'server.ha.enabled=true' \
       . | tee /dev/stderr |
       yq 'length > 0' | tee /dev/stderr)
   [ "${actual}" = "true" ]
@@ -27,7 +16,8 @@ load _helpers
   cd `chart_dir`
   local actual=$(helm template \
       -x templates/server-disruptionbudget.yaml  \
-      --set 'serverHA.enabled=false' \
+      --set 'globa.enabled=false' \
+      --set 'server.ha.enabled=false' \
       . | tee /dev/stderr |
       yq 'length > 0' | tee /dev/stderr)
   [ "${actual}" = "false" ]
@@ -37,7 +27,7 @@ load _helpers
   cd `chart_dir`
   local actual=$(helm template \
       -x templates/server-disruptionbudget.yaml  \
-      --set 'server.disruptionBudget.enabled=false' \
+      --set 'server.ha.disruptionBudget.enabled=false' \
       . | tee /dev/stderr |
       yq 'length > 0' | tee /dev/stderr)
   [ "${actual}" = "false" ]
@@ -57,8 +47,8 @@ load _helpers
   cd `chart_dir`
   local actual=$(helm template \
       -x templates/server-disruptionbudget.yaml  \
-      --set 'serverHA.enabled=true' \
-      --set 'serverHA.replicas=3' \
+      --set 'server.ha.enabled=true' \
+      --set 'server.ha.replicas=3' \
       . | tee /dev/stderr |
       yq '.spec.maxUnavailable' | tee /dev/stderr)
   [ "${actual}" = "0" ]

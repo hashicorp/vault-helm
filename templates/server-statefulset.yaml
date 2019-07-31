@@ -1,18 +1,21 @@
 # StatefulSet to run the actual vault server cluster.
-{{- if (or (and (ne (.Values.server.enabled | toString) "-") .Values.server.enabled) (and (eq (.Values.server.enabled | toString) "-") .Values.global.enabled)) }}
+{{ template "vault.mode" . }}
+{{- if and (ne .mode "") (eq (.Values.global.enabled | toString) "true") }}
 apiVersion: apps/v1
 kind: StatefulSet
 metadata:
-  name: {{ template "vault.fullname" . }}-server
+  name: {{ template "vault.fullname" . }}
   labels:
     app: {{ template "vault.name" . }}
     chart: {{ template "vault.chart" . }}
     heritage: {{ .Release.Service }}
     release: {{ .Release.Name }}
 spec:
-  serviceName: {{ template "vault.fullname" . }}-server
+  serviceName: {{ template "vault.fullname" . }}
   podManagementPolicy: Parallel
-  replicas: {{ .Values.server.replicas }}
+  replicas: {{ template "vault.replicas" . }}
+  updateStrategy:
+    type: OnDelete
   selector:
     matchLabels:
       app: {{ template "vault.name" . }}
@@ -27,78 +30,50 @@ spec:
         release: {{ .Release.Name }}
         component: server
     spec:
-      affinity:
-        podAntiAffinity:
-          requiredDuringSchedulingIgnoredDuringExecution:
-            - labelSelector:
-                matchLabels:
-                  app: {{ template "vault.name" . }}
-                  release: "{{ .Release.Name }}"
-                  component: server
-              topologyKey: kubernetes.io/hostname
+      {{ template "vault.affinity" . }}
       terminationGracePeriodSeconds: 10
+      serviceAccountName: {{ template "vault.fullname" . }}
       securityContext:
-        fsGroup: 1000
+        fsGroup: {{ template "vault.fsgroup" . }}
       volumes:
-        - name: config
-          configMap:
-            name: {{ template "vault.fullname" . }}-server-config
-        {{- range .Values.server.extraVolumes }}
-        - name: userconfig-{{ .name }}
-          {{ .type }}:
-            {{- if (eq .type "configMap") }}
-            name: {{ .name }}
-            {{- else if (eq .type "secret") }}
-            secretName: {{ .name }}
-            {{- end }}
-        {{- end }}
+        {{ template "vault.volumes" . }}
       containers:
         - name: vault
+          {{ template "vault.resources" . }}
           securityContext:
-            fsGroup: 1000
-            # TODO: confirm Vault needs this
+            fsGroup: {{ template "vault.fsgroup" . }}
             privileged: true
-          image: "{{ default .Values.global.image .Values.server.image }}"
+          image: "{{ .Values.global.image }}"
+          command: {{ template "vault.command" . }}
+          args: {{ template "vault.args" . }}
           env:
+            - name: HOST_IP
+              valueFrom:
+                fieldRef:
+                  fieldPath: status.hostIP
             - name: POD_IP
               valueFrom:
                 fieldRef:
                   fieldPath: status.podIP
-            - name: NAMESPACE
-              valueFrom:
-                fieldRef:
-                  fieldPath: metadata.namespace
-            - name: VAULT_ADDR 
+            - name: VAULT_ADDR
               value: "http://localhost:8200"
-          command:
-            - "/bin/sh"
-            - "-ec"
-            - |
-              vault server -config=/vault/config/ \
-                {{- range .Values.server.extraVolumes }}
-                {{- if .load }}
-                -config-dir=/vault/userconfig/{{ .name }} \
-                {{- end }}
-                {{- end }}
-
+            - name: SKIP_CHOWN
+              value: "true"
+            {{ template "vault.envs" . }}
+            {{- include "vault.extraEnvironmentVars" .Values.server | nindent 12 }}
           volumeMounts:
-            - name: data
-              mountPath: /vault/data
-            - name: config
-              mountPath: /vault/config
-            {{- range .Values.server.extraVolumes }}
-            - name: userconfig-{{ .name }}
-              readOnly: true
-              mountPath: /vault/userconfig/{{ .name }}
-            {{- end }}
+          {{ template "vault.mounts" . }}
           lifecycle:
             preStop:
               exec:
-                command:
-                - vault step-down
+                command: ["vault", "step-down"]
           ports:
             - containerPort: 8200
               name: http
+            - containerPort: 8201
+              name: internal
+            - containerPort: 8202
+              name: replication
           readinessProbe:
             # Check status; unsealed vault servers return 0
             # The exit code reflects the seal status:
@@ -106,26 +81,11 @@ spec:
             #   1 - error
             #   2 - sealed
             exec:
-              command:
-                - "/bin/sh"
-                - "-ec"
-                - |
-                  vault status
+              command: ["/bin/sh", "-ec", "vault status"]
             failureThreshold: 2
             initialDelaySeconds: 5
             periodSeconds: 3
             successThreshold: 1
             timeoutSeconds: 5
-  volumeClaimTemplates:
-    - metadata:
-        name: data
-      spec:
-        accessModes:
-          - ReadWriteOnce
-        resources:
-          requests:
-            storage: {{ .Values.server.storage }}
-        {{- if .Values.server.storageClass }}
-        storageClassName: {{ .Values.server.storageClass }}
-        {{- end }}
-{{- end }}
+  {{ template "vault.volumeclaims" . }}
+{{ end }}

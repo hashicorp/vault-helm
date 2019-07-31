@@ -14,11 +14,26 @@ resource "random_id" "suffix" {
 }
 
 data "google_container_engine_versions" "main" {
-  zone = "${var.zone}"
+  location = "${var.zone}"
+  version_prefix = "1.12."
 }
 
 data "google_service_account" "gcpapi" {
   account_id = "${var.gcp_service_account}"
+}
+
+resource "google_kms_key_ring" "keyring" {
+  name     = "vault-helm-unseal-kr"
+  location = "global"
+}
+
+resource "google_kms_crypto_key" "vault-helm-unseal-key" {
+  name            = "vault-helm-unseal-key"
+  key_ring        = "${google_kms_key_ring.keyring.self_link}"
+
+  lifecycle {
+    prevent_destroy = true
+  }
 }
 
 resource "google_container_cluster" "cluster" {
@@ -50,7 +65,7 @@ resource "google_container_cluster" "cluster" {
 resource "null_resource" "kubectl" {
   count = "${var.init_cli ? 1 : 0 }"
 
-  triggers {
+  triggers = {
     cluster = "${google_container_cluster.cluster.id}"
   }
 
@@ -81,7 +96,7 @@ resource "null_resource" "helm" {
   count      = "${var.init_cli ? 1 : 0 }"
   depends_on = ["null_resource.kubectl"]
 
-  triggers {
+  triggers = {
     cluster = "${google_container_cluster.cluster.id}"
   }
 

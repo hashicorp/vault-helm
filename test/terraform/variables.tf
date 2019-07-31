@@ -1,5 +1,5 @@
 variable "project" {
-  default = "vault-helm-dev"
+  default = "vault-helm-dev-246514"
 
   description = <<EOF
 Google Cloud Project to launch resources in. This project must have GKE
@@ -19,7 +19,7 @@ variable "init_cli" {
 }
 
 variable "gcp_service_account" {
-  default = "vault-helm-dev"
+  default = "vault-terraform-helm-test"
 
   description = <<EOF
 Service account used on the nodes to manage/use the API, specifically needed
