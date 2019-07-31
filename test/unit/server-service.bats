@@ -2,41 +2,113 @@
 
 load _helpers
 
-@test "server/Service: enabled by default" {
+@test "server/Service: service enabled by default" {
   cd `chart_dir`
   local actual=$(helm template \
-      -x templates/server-service.yaml  \
+      -x templates/server-service.yaml \
+      --set 'server.dev.enabled=true' \
+      . | tee /dev/stderr |
+      yq 'length > 0' | tee /dev/stderr)
+  [ "${actual}" = "true" ]
+
+  local actual=$(helm template \
+      -x templates/server-service.yaml \
+      --set 'server.ha.enabled=true' \
+      . | tee /dev/stderr |
+      yq 'length > 0' | tee /dev/stderr)
+  [ "${actual}" = "true" ]
+
+  local actual=$(helm template \
+      -x templates/server-service.yaml \
+      --set 'server.standalone.enabled=true' \
       . | tee /dev/stderr |
       yq 'length > 0' | tee /dev/stderr)
   [ "${actual}" = "true" ]
 }
 
-@test "server/Service: enable with global.enabled false" {
+
+@test "server/Service: disable with global.enabled false" {
   cd `chart_dir`
   local actual=$(helm template \
       -x templates/server-service.yaml  \
+      --set 'server.dev.enabled=true' \
       --set 'global.enabled=false' \
-      --set 'server.enabled=true' \
+      --set 'server.service.enabled=true' \
       . | tee /dev/stderr |
       yq 'length > 0' | tee /dev/stderr)
-  [ "${actual}" = "true" ]
-}
+  [ "${actual}" = "false" ]
 
-@test "server/Service: disable with server.enabled" {
-  cd `chart_dir`
   local actual=$(helm template \
       -x templates/server-service.yaml  \
-      --set 'server.enabled=false' \
+      --set 'server.ha.enabled=true' \
+      --set 'global.enabled=false' \
+      --set 'server.service.enabled=true' \
+      . | tee /dev/stderr |
+      yq 'length > 0' | tee /dev/stderr)
+  [ "${actual}" = "false" ]
+
+  local actual=$(helm template \
+      -x templates/server-service.yaml  \
+      --set 'server.standalone.enabled=true' \
+      --set 'global.enabled=false' \
+      --set 'server.service.enabled=true' \
       . | tee /dev/stderr |
       yq 'length > 0' | tee /dev/stderr)
   [ "${actual}" = "false" ]
 }
 
-@test "server/Service: disable with global.enabled" {
+@test "server/Service: disable with server.service.enabled false" {
   cd `chart_dir`
   local actual=$(helm template \
       -x templates/server-service.yaml  \
+      --set 'server.dev.enabled=true' \
+      --set 'server.service.enabled=false' \
+      . | tee /dev/stderr |
+      yq 'length > 0' | tee /dev/stderr)
+  [ "${actual}" = "false" ]
+
+  local actual=$(helm template \
+      -x templates/server-service.yaml  \
+      --set 'server.ha.enabled=true' \
+      --set 'server.service.enabled=false' \
+      . | tee /dev/stderr |
+      yq 'length > 0' | tee /dev/stderr)
+  [ "${actual}" = "false" ]
+
+  local actual=$(helm template \
+      -x templates/server-service.yaml  \
+      --set 'server.standalone.enabled=true' \
+      --set 'server.service.enabled=false' \
+      . | tee /dev/stderr |
+      yq 'length > 0' | tee /dev/stderr)
+  [ "${actual}" = "false" ]
+}
+
+@test "server/Service: disable with global.enabled false server.service.enabled false" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      -x templates/server-service.yaml  \
+      --set 'server.dev.enabled=true' \
       --set 'global.enabled=false' \
+      --set 'server.service.enabled=false' \
+      . | tee /dev/stderr |
+      yq 'length > 0' | tee /dev/stderr)
+  [ "${actual}" = "false" ]
+
+  local actual=$(helm template \
+      -x templates/server-service.yaml  \
+      --set 'server.ha.enabled=true' \
+      --set 'global.enabled=false' \
+      --set 'server.service.enabled=false' \
+      . | tee /dev/stderr |
+      yq 'length > 0' | tee /dev/stderr)
+  [ "${actual}" = "false" ]
+
+  local actual=$(helm template \
+      -x templates/server-service.yaml  \
+      --set 'server.standalone.enabled=true' \
+      --set 'global.enabled=false' \
+      --set 'server.service.enabled=false' \
       . | tee /dev/stderr |
       yq 'length > 0' | tee /dev/stderr)
   [ "${actual}" = "false" ]
@@ -47,13 +119,46 @@ load _helpers
 @test "server/Service: tolerates unready endpoints" {
   cd `chart_dir`
   local actual=$(helm template \
-      -x templates/server-service.yaml  \
+      -x templates/server-service.yaml \
+      --set 'server.dev.enabled=true' \
+      . | tee /dev/stderr | 
+      yq -r '.metadata.annotations["service.alpha.kubernetes.io/tolerate-unready-endpoints"]' | tee /dev/stderr)
+  [ "${actual}" = "true" ]
+
+  local actual=$(helm template \
+      -x templates/server-service.yaml \
+      --set 'server.ha.enabled=true' \
       . | tee /dev/stderr |
       yq -r '.metadata.annotations["service.alpha.kubernetes.io/tolerate-unready-endpoints"]' | tee /dev/stderr)
   [ "${actual}" = "true" ]
 
   local actual=$(helm template \
-      -x templates/server-service.yaml  \
+      -x templates/server-service.yaml \
+      --set 'server.standalone.enabled=true' \
+      . | tee /dev/stderr |
+      yq -r '.metadata.annotations["service.alpha.kubernetes.io/tolerate-unready-endpoints"]' | tee /dev/stderr)
+  [ "${actual}" = "true" ]
+}
+
+@test "server/Service: publish not ready" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      -x templates/server-service.yaml \
+      --set 'server.dev.enabled=true' \
+      . | tee /dev/stderr |
+      yq -r '.spec.publishNotReadyAddresses' | tee /dev/stderr)
+  [ "${actual}" = "true" ]
+
+  local actual=$(helm template \
+      -x templates/server-service.yaml \
+      --set 'server.ha.enabled=true' \
+      . | tee /dev/stderr |
+      yq -r '.spec.publishNotReadyAddresses' | tee /dev/stderr)
+  [ "${actual}" = "true" ]
+
+  local actual=$(helm template \
+      -x templates/server-service.yaml \
+      --set 'server.standalone.enabled=true' \
       . | tee /dev/stderr |
       yq -r '.spec.publishNotReadyAddresses' | tee /dev/stderr)
   [ "${actual}" = "true" ]

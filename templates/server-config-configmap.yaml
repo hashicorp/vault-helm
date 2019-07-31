@@ -1,9 +1,10 @@
-# StatefulSet to run the actual vault server cluster.
-{{- if (or (and (ne (.Values.server.enabled | toString) "-") .Values.server.enabled) (and (eq (.Values.server.enabled | toString) "-") .Values.global.enabled)) }}
+{{ template "vault.mode" . }}
+{{- if and (eq (.Values.global.enabled | toString) "true") (ne .mode "dev") -}}
+{{ if or (ne .Values.server.standalone.config "")  (ne .Values.server.ha.config "") -}}
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: {{ template "vault.fullname" . }}-server-config
+  name: {{ template "vault.fullname" . }}-config
   labels:
     app: {{ template "vault.name" . }}
     chart: {{ template "vault.chart" . }}
@@ -11,5 +12,10 @@ metadata:
     release: {{ .Release.Name }}
 data:
   extraconfig-from-values.hcl: |-
-{{ tpl .Values.server.config . | indent 4 }}
+  {{- if eq .mode "standalone" }}
+    {{ tpl .Values.server.standalone.config . | nindent 4 | trim }}
+  {{- else if eq .mode "ha" }}
+    {{ tpl .Values.server.ha.config . | nindent 4 | trim }}
+  {{ end }}
+{{- end }}
 {{- end }}
