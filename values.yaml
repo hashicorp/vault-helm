@@ -6,7 +6,7 @@ global:
   enabled: true
 
   # Image is the name (and tag) of the Vault Docker image.
-  image: "vault:1.2.0-beta2"
+  image: "vault:1.2.0"
 
 server:
   # Resource requests, limits, etc. for the server cluster placement. This
