@@ -212,10 +212,41 @@ storage might be desired by the user.
 Set's the affinity for pod placement when running in standalone and HA modes.
 */}}
 {{- define "vault.affinity" -}}
-  {{- if and (ne .mode "dev") (ne .Values.server.affinity "") }}
+  {{- if and (ne .mode "dev") .Values.server.affinity }}
       affinity:
         {{ tpl .Values.server.affinity . | nindent 8 | trim }}
   {{ end }}
+{{- end -}}
+
+{{/*
+Set's the toleration for pod placement when running in standalone and HA modes.
+*/}}
+{{- define "vault.tolerations" -}}
+  {{- if and (ne .mode "dev") .Values.server.tolerations }}
+      tolerations:
+        {{ tpl .Values.server.tolerations . | nindent 8 | trim }}
+  {{- end }}
+{{- end -}}
+
+{{/*
+Set's the node selector for pod placement when running in standalone and HA modes.
+*/}}
+{{- define "vault.nodeselector" -}}
+  {{- if and (ne .mode "dev") .Values.server.nodeSelector }}
+      nodeSelector:
+        {{ tpl .Values.server.nodeSelector . | indent 8 | trim }}
+  {{- end }}
+{{- end -}}
+
+
+{{/*
+Set's extra pod annotations
+*/}}
+{{- define "vault.annotations" -}}
+  {{- if and (ne .mode "dev") .Values.server.annotations }}
+      annotations:
+        {{- tpl .Values.server.annotations . | nindent 8 }}
+  {{- end }}
 {{- end -}}
 
 {{/*
