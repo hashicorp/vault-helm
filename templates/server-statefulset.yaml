@@ -29,8 +29,11 @@ spec:
         chart: {{ template "vault.chart" . }}
         release: {{ .Release.Name }}
         component: server
+      {{ template "vault.annotations" . }}
     spec:
       {{ template "vault.affinity" . }}
+      {{ template "vault.tolerations" . }}
+      {{ template "vault.nodeselector" . }}
       terminationGracePeriodSeconds: 10
       serviceAccountName: {{ template "vault.fullname" . }}
       securityContext:
