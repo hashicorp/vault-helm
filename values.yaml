@@ -48,6 +48,23 @@ server:
               release: "{{ .Release.Name }}"
               component: server
           topologyKey: kubernetes.io/hostname
+
+  # Toleration Settings for server pods
+  # This should be a multi-line string matching the Toleration array
+  # in a PodSpec.
+  tolerations: {}
+
+  # nodeSelector labels for server pod assignment, formatted as a muli-line string.
+  # ref: https://kubernetes.io/docs/concepts/configuration/assign-pod-node/#nodeselector
+  # Example:
+  # nodeSelector: |
+  #   beta.kubernetes.io/arch: amd64
+  nodeSelector: {}
+
+  # Extra annotations to attach to the server pods
+  # This should be a multi-line string mapping directly to the a map of
+  # the annotations to apply to the server pods
+  annotations: {}
   
   # Enables a headless service to be used by the Vault Statefulset
   service:
