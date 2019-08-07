@@ -44,7 +44,7 @@ load _helpers
   # Service
   local service=$(kubectl get service "$(name_prefix)" --output json |
     jq -r '.spec.clusterIP')
-  [ "${service}" == "None" ]
+  [ "${service}" != "None" ]
 
   local service=$(kubectl get service "$(name_prefix)" --output json |
     jq -r '.spec.type')
@@ -61,6 +61,15 @@ load _helpers
   local ports=$(kubectl get service "$(name_prefix)" --output json |
     jq -r '.spec.ports[1].port')
   [ "${ports}" == "8201" ]
+
+  # Cluster Role Binding
+  local name=$(kubectl get clusterrolebinding "$(name_prefix)-server-binding" --output json |
+    jq -r '.roleRef.name')
+  [ "${name}" == "system:auth-delegator" ]
+
+  local name=$(kubectl get clusterrolebinding "$(name_prefix)-server-binding" --output json |
+    jq -r '.subjects[0].name')
+  [ "${name}" == "vault" ]
 
   # Vault Init
   local token=$(kubectl exec -ti "$(name_prefix)-0" -- \
