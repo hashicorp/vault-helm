@@ -69,7 +69,7 @@ load _helpers
   [ "${token}" != "" ]
 
   # Vault Unseal
-  local pods=($(kubectl get pods --selector='app=vault' -o json | jq -r '.items[].metadata.name'))
+  local pods=($(kubectl get pods --selector='app.kubernetes.io/name=vault' -o json | jq -r '.items[].metadata.name'))
   for pod in "${pods[@]}"
   do  
       kubectl exec -ti ${pod} -- vault operator unseal ${token}
