@@ -6,10 +6,11 @@ kind: StatefulSet
 metadata:
   name: {{ template "vault.fullname" . }}
   labels:
-    app: {{ template "vault.name" . }}
-    chart: {{ template "vault.chart" . }}
-    heritage: {{ .Release.Service }}
-    release: {{ .Release.Name }}
+    helm.sh/chart: {{ include "vault.chart" . }}
+    app.kubernetes.io/name: {{ include "vault.name" . }}
+    app.kubernetes.io/instance: {{ .Release.Name }}
+    app.kubernetes.io/managed-by: {{ .Release.Service }}
+    app.kubernetes.io/version: {{ .Chart.Version | quote }}
 spec:
   serviceName: {{ template "vault.fullname" . }}
   podManagementPolicy: Parallel
@@ -18,16 +19,16 @@ spec:
     type: OnDelete
   selector:
     matchLabels:
-      app: {{ template "vault.name" . }}
-      chart: {{ template "vault.chart" . }}
-      release: {{ .Release.Name }}
+      helm.sh/chart: {{ template "vault.chart" . }}
+      app.kubernetes.io/name: {{ template "vault.name" . }}
+      app.kubernetes.io/instance: {{ .Release.Name }}
       component: server
   template:
     metadata:
       labels:
-        app: {{ template "vault.name" . }}
-        chart: {{ template "vault.chart" . }}
-        release: {{ .Release.Name }}
+        helm.sh/chart: {{ template "vault.chart" . }}
+        app.kubernetes.io/name: {{ template "vault.name" . }}
+        app.kubernetes.io/instance: {{ .Release.Name }}
         component: server
       {{ template "vault.annotations" . }}
     spec:

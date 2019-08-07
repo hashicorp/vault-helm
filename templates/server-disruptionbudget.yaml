@@ -7,10 +7,11 @@ kind: PodDisruptionBudget
 metadata:
   name: {{ template "vault.fullname" . }}
   labels:
-    app: {{ template "vault.name" . }}
-    chart: {{ template "vault.chart" . }}
-    heritage: {{ .Release.Service }}
-    release: {{ .Release.Name }}
+    helm.sh/chart: {{ include "vault.chart" . }}
+    app.kubernetes.io/name: {{ include "vault.name" . }}
+    app.kubernetes.io/instance: {{ .Release.Name }}
+    app.kubernetes.io/managed-by: {{ .Release.Service }}
+    app.kubernetes.io/version: {{ .Chart.Version | quote }}
 spec:
   maxUnavailable: {{ template "vault.pdb.maxUnavailable" . }}
   selector:
