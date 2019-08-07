@@ -45,7 +45,6 @@ spec:
         - name: vault
           {{ template "vault.resources" . }}
           securityContext:
-            fsGroup: {{ template "vault.fsgroup" . }}
             privileged: true
           image: "{{ .Values.global.image }}"
           command: {{ template "vault.command" . }}
