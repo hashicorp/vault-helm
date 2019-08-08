@@ -25,7 +25,7 @@ server:
   # account.  This cluster role binding can be used to setup Kubernetes auth 
   # method.  https://www.vaultproject.io/docs/auth/kubernetes.html
   authDelegator:
-    enabled: true
+    enabled: false
 
   # extraEnvVars is a list of extra enviroment variables to set with the stateful set. These could be
   # used to include variables required for auto-unseal.

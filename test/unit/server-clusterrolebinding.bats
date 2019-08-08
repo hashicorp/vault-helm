@@ -2,27 +2,27 @@
 
 load _helpers
 
-@test "server/ClusterRoleBinding: enabled by default" {
+@test "server/ClusterRoleBinding: disabled by default" {
   cd `chart_dir`
   local actual=$(helm template \
       -x templates/server-clusterrolebinding.yaml  \
       --set 'server.dev.enabled=true' \
       . | tee /dev/stderr |
       yq 'length > 0' | tee /dev/stderr)
-  [ "${actual}" = "true" ]
+  [ "${actual}" = "false" ]
 
   local actual=$(helm template \
       -x templates/server-clusterrolebinding.yaml  \
       --set 'server.ha.enabled=true' \
       . | tee /dev/stderr |
       yq 'length > 0' | tee /dev/stderr)
-  [ "${actual}" = "true" ]
+  [ "${actual}" = "false" ]
 
   local actual=$(helm template \
       -x templates/server-clusterrolebinding.yaml  \
       . | tee /dev/stderr |
       yq 'length > 0' | tee /dev/stderr)
-  [ "${actual}" = "true" ]
+  [ "${actual}" = "false" ]
 }
 
 @test "server/ClusterRoleBinding: disable with global.enabled" {
@@ -35,7 +35,7 @@ load _helpers
   [ "${actual}" = "false" ]
 }
 
-@test "server/ClusterRoleBinding: can disable with server.authDelegator" {
+@test "server/ClusterRoleBinding: can enable with server.authDelegator" {
   cd `chart_dir`
   local actual=$(helm template \
       -x templates/server-clusterrolebinding.yaml  \

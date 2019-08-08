@@ -38,15 +38,6 @@ load _helpers
     jq -r '.spec.ports[1].port')
   [ "${ports}" == "8201" ]
 
-  # Cluster Role Binding
-  local name=$(kubectl get clusterrolebinding "$(name_prefix)-server-binding" --output json |
-    jq -r '.roleRef.name')
-  [ "${name}" == "system:auth-delegator" ]
-
-  local name=$(kubectl get clusterrolebinding "$(name_prefix)-server-binding" --output json |
-    jq -r '.subjects[0].name')
-  [ "${name}" == "vault" ]
-
   # Sealed, not initialized
   local sealed_status=$(kubectl exec "$(name_prefix)-0" -- vault status -format=json |
     jq -r '.sealed' )
