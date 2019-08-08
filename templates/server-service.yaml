@@ -1,8 +1,4 @@
-# Headless service for Vault server DNS entries. This service should only
-# point to Vault servers. For access to an agent, one should assume that
-# the agent is installed locally on the node and the NODE_IP should be used.
-# If the node can't run a Vault agent, then this service can be used to
-# communicate directly to a server agent.
+# Service for Vault cluster
 {{- if and (eq (.Values.server.service.enabled | toString) "true" ) (eq (.Values.global.enabled | toString) "true") }}
 apiVersion: v1
 kind: Service
@@ -20,7 +16,7 @@ metadata:
     # https://github.com/kubernetes/kubernetes/issues/58662
     service.alpha.kubernetes.io/tolerate-unready-endpoints: "true"
 spec:
-  clusterIP: None
+  clusterIP: {{ .Values.server.service.clusterIP }}
   # We want the servers to become available even if they're not ready
   # since this DNS is also used for join operations.
   publishNotReadyAddresses: true
@@ -32,7 +28,7 @@ spec:
       port: 8201
       targetPort: 8201
   selector:
-    app: {{ template "vault.name" . }}
-    release: "{{ .Release.Name }}"
+    app.kubernetes.io/name: {{ include "vault.name" . }}
+    app.kubernetes.io/instance: {{ .Release.Name }}
     component: server
 {{- end }}

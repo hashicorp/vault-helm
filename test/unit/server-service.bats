@@ -163,3 +163,52 @@ load _helpers
       yq -r '.spec.publishNotReadyAddresses' | tee /dev/stderr)
   [ "${actual}" = "true" ]
 }
+
+@test "server/Service: clusterIP empty by default" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      -x templates/server-service.yaml \
+      --set 'server.dev.enabled=true' \
+      . | tee /dev/stderr |
+      yq -r '.spec.clusterIP' | tee /dev/stderr)
+  [ "${actual}" = "null" ]
+
+  local actual=$(helm template \
+      -x templates/server-service.yaml \
+      --set 'server.ha.enabled=true' \
+      . | tee /dev/stderr |
+      yq -r '.spec.clusterIP' | tee /dev/stderr)
+  [ "${actual}" = "null" ]
+
+  local actual=$(helm template \
+      -x templates/server-service.yaml \
+      . | tee /dev/stderr |
+      yq -r '.spec.clusterIP' | tee /dev/stderr)
+  [ "${actual}" = "null" ]
+}
+
+@test "server/Service: clusterIP can set" { 
+  cd `chart_dir`
+  local actual=$(helm template \
+      -x templates/server-service.yaml \
+      --set 'server.dev.enabled=true' \
+      --set 'server.service.clusterIP=None' \
+      . | tee /dev/stderr |
+      yq -r '.spec.clusterIP' | tee /dev/stderr)
+  [ "${actual}" = "None" ]
+
+  local actual=$(helm template \
+      -x templates/server-service.yaml \
+      --set 'server.ha.enabled=true' \
+      --set 'server.service.clusterIP=None' \
+      . | tee /dev/stderr |
+      yq -r '.spec.clusterIP' | tee /dev/stderr)
+  [ "${actual}" = "None" ]
+
+  local actual=$(helm template \
+      -x templates/server-service.yaml \
+      --set 'server.service.clusterIP=None' \
+      . | tee /dev/stderr |
+      yq -r '.spec.clusterIP' | tee /dev/stderr)
+  [ "${actual}" = "None" ]
+}
