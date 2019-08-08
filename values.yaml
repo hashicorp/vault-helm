@@ -28,6 +28,12 @@ server:
     # GOOGLE_PROJECT: myproject,
     # GOOGLE_CREDENTIALS: /vault/userconfig/myproject/myproject-creds.json
 
+  # AWS credentials. Provide the name and key of a Kubernetes secret that contains
+  # AWS_SECRET_ACCESS_KEY. Provide `AWS_ACCESS_KEY_ID` and `AWS_REGION` in `extraEnvironmentVars`.
+  aws:
+    secretName: null
+    secretKey: null
+
   # extraVolumes is a list of extra volumes to mount. These will be exposed
   # to Vault in the path `/vault/userconfig/<name>/`. The value below is
   # an array of objects, examples are shown below.

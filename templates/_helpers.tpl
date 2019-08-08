@@ -143,6 +143,13 @@ Set's additional environment variables based on the mode.
             - name: VAULT_DEV_ROOT_TOKEN_ID
               value: "root"
   {{ end }}
+  {{ if .Values.server.aws.secretName }}
+            - name: AWS_SECRET_ACCESS_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.server.aws.secretName }}
+                  key: {{ .Values.server.aws.secretKey }}
+  {{ end }}
 {{- end -}}
 
 {{/*

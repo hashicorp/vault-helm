@@ -258,6 +258,28 @@ load _helpers
 }
 
 #--------------------------------------------------------------------
+# aws
+
+@test "server/ha-StatefulSet: set aws" {
+  cd `chart_dir`
+  local object=$(helm template \
+      -x templates/server-statefulset.yaml  \
+      --set 'server.aws.secretName=foo-name' \
+      --set 'server.aws.secretKey=bar-key' \
+      . | tee /dev/stderr |
+      yq -r '.spec.template.spec.containers[0].env' | tee /dev/stderr)
+
+
+  local actual=$(echo $object |
+      yq -r '.[4].valueFrom.secretKeyRef.name' | tee /dev/stderr)
+  [ "${actual}" = "foo-name" ]
+
+  local actual=$(echo $object |
+      yq -r '.[4].valueFrom.secretKeyRef.key' | tee /dev/stderr)
+  [ "${actual}" = "bar-key" ]
+}
+
+#--------------------------------------------------------------------
 # storage class
 
 @test "server/ha-StatefulSet: no storage by default" {
