@@ -6,7 +6,7 @@ global:
   enabled: true
 
   # Image is the name (and tag) of the Vault Docker image.
-  image: "vault:1.2.0"
+  image: "vault:1.2.1"
 
 server:
   # Resource requests, limits, etc. for the server cluster placement. This
@@ -20,6 +20,12 @@ server:
   #   limits:
   #     memory: 256Mi
   #     cpu: 250m
+
+  # authDelegator enables a cluster role binding to be attached to the service 
+  # account.  This cluster role binding can be used to setup Kubernetes auth 
+  # method.  https://www.vaultproject.io/docs/auth/kubernetes.html
+  authDelegator:
+    enabled: false
 
   # extraEnvVars is a list of extra enviroment variables to set with the stateful set. These could be
   # used to include variables required for auto-unseal.
@@ -69,6 +75,13 @@ server:
   # Enables a headless service to be used by the Vault Statefulset
   service:
     enabled: true
+    # clusterIP controls whether a Cluster IP address is attached to the 
+    # Vault service within Kubernetes.  By default the Vault service will 
+    # be given a Cluster IP address, set to None to disable.  When disabled 
+    # Kubernetes will create a "headless" service.  Headless services can be 
+    # used to communicate with pods directly through DNS instead of a round robin
+    # load balancer.
+    clusterIP: ""
 
   # This configures the Vault Statefulset to create a PVC for data 
   # storage when using the file backend.
@@ -119,10 +132,11 @@ server:
     # using a stateful set. This should be HCL.
     config: |
       ui = true
-      api_addr = "http://POD_IP:8200"
+
       listener "tcp" {
         tls_disable = 1
-        address     = "0.0.0.0:8200"
+        address = "[::]:8200"
+        cluster_address = "[::]:8201"
       }
       storage "file" {
         path = "/vault/data"
@@ -152,10 +166,10 @@ server:
     # This should be HCL.
     config: |
       ui = true
-      api_addr = "http://POD_IP:8200"
       listener "tcp" {
         tls_disable = 1
-        address     = "0.0.0.0:8200"
+        address = "[::]:8200"
+        cluster_address = "[::]:8201"
       }
       storage "consul" {
         path = "vault"
