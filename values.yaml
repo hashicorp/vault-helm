@@ -75,8 +75,12 @@ server:
   # Enables a headless service to be used by the Vault Statefulset
   service:
     enabled: true
-    # clusterIP can be used to disable a cluster IP address from being 
-    # attached to the Vault service if set to "None". 
+    # clusterIP controls whether a Cluster IP address is attached to the 
+    # Vault service within Kubernetes.  By default the Vault service will 
+    # be given a Cluster IP address, set to None to disable.  When disabled 
+    # Kubernetes will create a "headless" service.  Headless services can be 
+    # used to communicate with pods directly through DNS instead of a round robin
+    # load balancer.
     clusterIP: ""
 
   # This configures the Vault Statefulset to create a PVC for data 
