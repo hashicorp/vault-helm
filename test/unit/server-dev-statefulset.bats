@@ -241,6 +241,43 @@ load _helpers
 }
 
 #--------------------------------------------------------------------
+# extraSecretEnvironmentVars
+
+@test "server/dev-StatefulSet: set extraSecretEnvironmentVars" {
+  cd `chart_dir`
+  local object=$(helm template \
+      -x templates/server-statefulset.yaml  \
+      --set 'server.extraSecretEnvironmentVars[0].envName=ENV_FOO_0' \
+      --set 'server.extraSecretEnvironmentVars[0].secretName=secret_name_0' \
+      --set 'server.extraSecretEnvironmentVars[0].secretKey=secret_key_0' \
+      --set 'server.extraSecretEnvironmentVars[1].envName=ENV_FOO_1' \
+      --set 'server.extraSecretEnvironmentVars[1].secretName=secret_name_1' \
+      --set 'server.extraSecretEnvironmentVars[1].secretKey=secret_key_1' \
+      . | tee /dev/stderr |
+      yq -r '.spec.template.spec.containers[0].env' | tee /dev/stderr)
+
+  local actual=$(echo $object |
+      yq -r '.[4].name' | tee /dev/stderr)
+  [ "${actual}" = "ENV_FOO_0" ]
+  local actual=$(echo $object |
+      yq -r '.[4].valueFrom.secretKeyRef.name' | tee /dev/stderr)
+  [ "${actual}" = "secret_name_0" ]
+  local actual=$(echo $object |
+      yq -r '.[4].valueFrom.secretKeyRef.key' | tee /dev/stderr)
+  [ "${actual}" = "secret_key_0" ]
+
+  local actual=$(echo $object |
+      yq -r '.[5].name' | tee /dev/stderr)
+  [ "${actual}" = "ENV_FOO_1" ]
+  local actual=$(echo $object |
+      yq -r '.[5].valueFrom.secretKeyRef.name' | tee /dev/stderr)
+  [ "${actual}" = "secret_name_1" ]
+  local actual=$(echo $object |
+      yq -r '.[5].valueFrom.secretKeyRef.key' | tee /dev/stderr)
+  [ "${actual}" = "secret_key_1" ]
+}
+
+#--------------------------------------------------------------------
 # storage class
 
 @test "server/dev-StatefulSet: can't set storageClass" {
