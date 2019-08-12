@@ -103,7 +103,7 @@ extra volumes the user may have specified (such as a secret with TLS).
          {{- if (eq .type "configMap") }}
            name: {{ .name }}
          {{- else if (eq .type "secret") }}
-          secretName: {{ .name }}
+           secretName: {{ .name }}
          {{- end }}
   {{- end }}
 {{- end -}}
@@ -167,7 +167,7 @@ based on the mode configured.
   {{- range .Values.server.extraVolumes }}
             - name: userconfig-{{ .name }}
               readOnly: true
-              mountPath: /vault/userconfig/{{ .name }}
+              mountPath: {{ .path | default "/vault/userconfig" }}/{{ .name }}
   {{- end }}
 {{- end -}}
 

@@ -48,6 +48,7 @@ server:
     # - type: secret (or "configMap")
     #   name: my-secret
     #   load: false # if true, will add to `-config` to load by Vault
+    #   path: null # default is `/vault/userconfig`
 
   # Affinity Settings
   # Commenting out or setting as empty the affinity variable, will allow
