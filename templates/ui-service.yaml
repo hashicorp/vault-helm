@@ -16,8 +16,8 @@ metadata:
     app.kubernetes.io/version: {{ .Chart.Version | quote }}
 spec:
   selector:
-    app: {{ template "vault.name" . }}
-    release: "{{ .Release.Name }}"
+    app.kubernetes.io/name: {{ include "vault.name" . }}
+    app.kubernetes.io/instance: {{ .Release.Name }}
     component: server
   ports:
     - name: http
