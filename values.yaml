@@ -81,7 +81,7 @@ server:
     # Kubernetes will create a "headless" service.  Headless services can be 
     # used to communicate with pods directly through DNS instead of a round robin
     # load balancer.
-    clusterIP: ""
+    # clusterIP: None
 
   # This configures the Vault Statefulset to create a PVC for data 
   # storage when using the file backend.
