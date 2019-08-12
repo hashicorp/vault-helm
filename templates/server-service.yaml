@@ -16,7 +16,9 @@ metadata:
     # https://github.com/kubernetes/kubernetes/issues/58662
     service.alpha.kubernetes.io/tolerate-unready-endpoints: "true"
 spec:
+  {{- if .Values.server.service.clusterIP }}
   clusterIP: {{ .Values.server.service.clusterIP }}
+  {{- end }}
   # We want the servers to become available even if they're not ready
   # since this DNS is also used for join operations.
   publishNotReadyAddresses: true
