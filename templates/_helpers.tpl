@@ -240,7 +240,7 @@ Set's the node selector for pod placement when running in standalone and HA mode
 
 
 {{/*
-Set's extra pod annotations
+Sets extra pod annotations
 */}}
 {{- define "vault.annotations" -}}
   {{- if and (ne .mode "dev") .Values.server.annotations }}
@@ -248,6 +248,17 @@ Set's extra pod annotations
         {{- tpl .Values.server.annotations . | nindent 8 }}
   {{- end }}
 {{- end -}}
+
+{{/*
+Sets extra ui service annotations
+*/}}
+{{- define "vault.ui.annotations" -}}
+  {{- if and (ne .mode "dev") .Values.ui.annotations }}
+    annotations:
+      {{- toYaml .Values.ui.annotations | nindent 6 }}
+  {{- end }}
+{{- end -}}
+
 
 {{/*
 Set's the container resources if the user has set any.
