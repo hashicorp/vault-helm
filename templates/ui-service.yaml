@@ -23,5 +23,14 @@ spec:
     - name: http
       port: 80
       targetPort: 8200
+      {{- if .Values.ui.serviceNodePortHttp }}
+      nodePort: {{ .Values.ui.serviceNodePortHttp }}
+      {{- end }}
+    - name: https
+      port: 443
+      targetPort: 8200
+      {{- if .Values.ui.serviceNodePortHttps }}
+      nodePort: {{ .Values.ui.serviceNodePortHttps }}
+      {{- end }}
   type: {{ .Values.ui.serviceType | default "ClusterIP" }}
 {{- end -}}
