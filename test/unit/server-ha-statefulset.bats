@@ -42,6 +42,42 @@ load _helpers
 }
 
 #--------------------------------------------------------------------
+# TLS
+
+@test "server/ha-StatefulSet: tls disabled" {
+  cd `chart_dir`
+  local object=$(helm template \
+      -x templates/server-statefulset.yaml  \
+      --set 'global.tls_disable=true' \
+      . | tee /dev/stderr |
+      yq -r '.spec.template.spec.containers[0].env' | tee /dev/stderr)
+
+  local actual=$(echo $object |
+     yq -r '.[2].name' | tee /dev/stderr)
+  [ "${actual}" = "VAULT_ADDR" ]
+
+  local actual=$(echo $object |
+     yq -r '.[2].value' | tee /dev/stderr)
+  [ "${actual}" = "http://127.0.0.1:8200" ]
+}
+@test "server/ha-StatefulSet: tls enabled" {
+  cd `chart_dir`
+  local object=$(helm template \
+      -x templates/server-statefulset.yaml  \
+      --set 'global.tls_disable=false' \
+      . | tee /dev/stderr |
+      yq -r '.spec.template.spec.containers[0].env' | tee /dev/stderr)
+
+  local actual=$(echo $object |
+     yq -r '.[2].name' | tee /dev/stderr)
+  [ "${actual}" = "VAULT_ADDR" ]
+
+  local actual=$(echo $object |
+     yq -r '.[2].value' | tee /dev/stderr)
+  [ "${actual}" = "https://127.0.0.1:8200" ]
+}
+
+#--------------------------------------------------------------------
 # updateStrategy
 
 @test "server/ha-StatefulSet: OnDelete updateStrategy" {
