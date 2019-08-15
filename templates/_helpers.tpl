@@ -254,8 +254,8 @@ Sets extra ui service annotations
 */}}
 {{- define "vault.ui.annotations" -}}
   {{- if and (ne .mode "dev") .Values.ui.annotations }}
-    annotations:
-      {{- toYaml .Values.ui.annotations | nindent 6 }}
+  annotations:
+    {{- toYaml .Values.ui.annotations | nindent 4 }}
   {{- end }}
 {{- end -}}
 
