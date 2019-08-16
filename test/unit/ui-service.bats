@@ -136,3 +136,35 @@ load _helpers
       yq -r '.spec.type' | tee /dev/stderr)
   [ "${actual}" = "LoadBalancer" ]
 }
+
+@test "ui/Service: specify annotations" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      -x templates/ui-service.yaml  \
+      --set 'server.dev.enabled=true' \
+      --set 'ui.serviceType=LoadBalancer' \
+      --set 'ui.enabled=true' \
+      --set 'ui.annotations.foo=bar' \
+      . | tee /dev/stderr |
+      yq -r '.metadata.annotations["foo"]' | tee /dev/stderr)
+  [ "${actual}" = "null" ]
+
+  local actual=$(helm template \
+      -x templates/ui-service.yaml  \
+      --set 'server.ha.enabled=true' \
+      --set 'ui.serviceType=LoadBalancer' \
+      --set 'ui.enabled=true' \
+      --set 'ui.annotations.foo=bar' \
+      . | tee /dev/stderr |
+      yq -r '.metadata.annotations["foo"]' | tee /dev/stderr)
+  [ "${actual}" = "bar" ]
+
+  local actual=$(helm template \
+      -x templates/ui-service.yaml  \
+      --set 'server.ha.enabled=true' \
+      --set 'ui.serviceType=LoadBalancer' \
+      --set 'ui.enabled=true' \
+      . | tee /dev/stderr |
+      yq -r '.metadata.annotations["foo"]' | tee /dev/stderr)
+  [ "${actual}" = "null" ]
+}

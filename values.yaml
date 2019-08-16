@@ -212,3 +212,8 @@ ui:
   # balancer (for supported K8S installations) to access the UI.
   enabled: false
   serviceType: "ClusterIP"
+
+  # Extra annotations to attach to the ui service
+  # This should be a multi-line string mapping directly to the a map of
+  # the annotations to apply to the ui service
+  annotations: {}
