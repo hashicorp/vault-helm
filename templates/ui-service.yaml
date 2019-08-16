@@ -21,7 +21,7 @@ spec:
     component: server
   ports:
     - name: http
-      port: 80
+      port: 8200
       targetPort: 8200
   type: {{ .Values.ui.serviceType | default "ClusterIP" }}
 {{- end -}}
