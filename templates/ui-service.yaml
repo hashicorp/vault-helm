@@ -1,3 +1,5 @@
+{{ template "vault.mode" . }}
+{{- if and (ne .mode "") (eq (.Values.global.enabled | toString) "true") }}
 # Headless service for Vault server DNS entries. This service should only
 # point to Vault servers. For access to an agent, one should assume that
 # the agent is installed locally on the node and the NODE_IP should be used.
@@ -14,6 +16,7 @@ metadata:
     app.kubernetes.io/instance: {{ .Release.Name }}
     app.kubernetes.io/managed-by: {{ .Release.Service }}
     app.kubernetes.io/version: {{ .Chart.Version | quote }}
+  {{- template "vault.ui.annotations" . }}
 spec:
   selector:
     app.kubernetes.io/name: {{ include "vault.name" . }}
@@ -21,7 +24,7 @@ spec:
     component: server
   ports:
     - name: http
-      port: 80
+      port: 8200
       targetPort: 8200
       {{- if .Values.ui.serviceNodePortHttp }}
       nodePort: {{ .Values.ui.serviceNodePortHttp }}
@@ -34,3 +37,5 @@ spec:
       {{- end }}
   type: {{ .Values.ui.serviceType | default "ClusterIP" }}
 {{- end -}}
+
+{{ end }}
