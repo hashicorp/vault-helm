@@ -6,7 +6,7 @@ global:
   enabled: true
 
   # Image is the name (and tag) of the Vault Docker image.
-  image: "vault:1.2.1"
+  image: "vault:1.2.2"
   # TLS for end-to-end encrypted transport
   tlsDisable: true
 
@@ -176,6 +176,7 @@ server:
     # This should be HCL.
     config: |
       ui = true
+
       listener "tcp" {
         tls_disable = 1
         address = "[::]:8200"
