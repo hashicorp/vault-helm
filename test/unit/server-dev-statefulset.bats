@@ -211,7 +211,7 @@ load _helpers
 }
 
 #--------------------------------------------------------------------
-# extraEnvironmentVars 
+# extraEnvironmentVars
 
 @test "server/dev-StatefulSet: set extraEnvironmentVars" {
   cd `chart_dir`

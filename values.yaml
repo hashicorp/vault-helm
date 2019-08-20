@@ -21,8 +21,8 @@ server:
   #     memory: 256Mi
   #     cpu: 250m
 
-  # authDelegator enables a cluster role binding to be attached to the service 
-  # account.  This cluster role binding can be used to setup Kubernetes auth 
+  # authDelegator enables a cluster role binding to be attached to the service
+  # account.  This cluster role binding can be used to setup Kubernetes auth
   # method.  https://www.vaultproject.io/docs/auth/kubernetes.html
   authDelegator:
     enabled: false
@@ -52,7 +52,7 @@ server:
 
   # Affinity Settings
   # Commenting out or setting as empty the affinity variable, will allow
-  # deployment to single node services such as Minikube  
+  # deployment to single node services such as Minikube
   affinity: |
     podAntiAffinity:
       requiredDuringSchedulingIgnoredDuringExecution:
@@ -79,41 +79,41 @@ server:
   # This should be a multi-line string mapping directly to the a map of
   # the annotations to apply to the server pods
   annotations: {}
-  
+
   # Enables a headless service to be used by the Vault Statefulset
   service:
     enabled: true
-    # clusterIP controls whether a Cluster IP address is attached to the 
-    # Vault service within Kubernetes.  By default the Vault service will 
-    # be given a Cluster IP address, set to None to disable.  When disabled 
-    # Kubernetes will create a "headless" service.  Headless services can be 
+    # clusterIP controls whether a Cluster IP address is attached to the
+    # Vault service within Kubernetes.  By default the Vault service will
+    # be given a Cluster IP address, set to None to disable.  When disabled
+    # Kubernetes will create a "headless" service.  Headless services can be
     # used to communicate with pods directly through DNS instead of a round robin
     # load balancer.
     # clusterIP: None
 
-  # This configures the Vault Statefulset to create a PVC for data 
+  # This configures the Vault Statefulset to create a PVC for data
   # storage when using the file backend.
-  # See https://www.vaultproject.io/docs/audit/index.html to know more 
+  # See https://www.vaultproject.io/docs/audit/index.html to know more
   dataStorage:
     enabled: true
     # Size of the PVC created
     size: 10Gi
-    # Name of the storage class to use.  If null it will use the 
+    # Name of the storage class to use.  If null it will use the
     # configured default Storage Class.
     storageClass: null
     # Access Mode of the storage device being used for the PVC
     accessMode: ReadWriteOnce
 
-  # This configures the Vault Statefulset to create a PVC for audit 
-  # logs.  Once Vault is deployed, initialized and unseal, Vault must 
-  # be configured to use this for audit logs.  This will be mounted to 
+  # This configures the Vault Statefulset to create a PVC for audit
+  # logs.  Once Vault is deployed, initialized and unseal, Vault must
+  # be configured to use this for audit logs.  This will be mounted to
   # /vault/audit
-  # See https://www.vaultproject.io/docs/audit/index.html to know more 
+  # See https://www.vaultproject.io/docs/audit/index.html to know more
   auditStorage:
     enabled: false
     # Size of the PVC created
     size: 10Gi
-    # Name of the storage class to use.  If null it will use the 
+    # Name of the storage class to use.  If null it will use the
     # configured default Storage Class.
     storageClass: null
     # Access Mode of the storage device being used for the PVC
@@ -127,9 +127,9 @@ server:
   dev:
     enabled: false
 
-  # Run Vault in "standalone" mode. This is the default mode that will deploy if 
-  # no arguments are given to helm. This requires a PVC for data storage to use 
-  # the "file" backend.  This mode is not highly available and should not be scaled 
+  # Run Vault in "standalone" mode. This is the default mode that will deploy if
+  # no arguments are given to helm. This requires a PVC for data storage to use
+  # the "file" backend.  This mode is not highly available and should not be scaled
   # past a single replica.
   standalone:
     enabled: "-"
@@ -160,10 +160,10 @@ server:
       #   crypto_key  = "vault-helm-unseal-key"
       #}
 
-  # Run Vault in "HA" mode. There are no storage requirements unless audit log 
-  # persistence is required.  In HA mode Vault will configure itself to use Consul 
-  # for its storage backend.  The default configuration provided will work the Consul 
-  # Helm project by default.  It is possible to manually configure Vault to use a 
+  # Run Vault in "HA" mode. There are no storage requirements unless audit log
+  # persistence is required.  In HA mode Vault will configure itself to use Consul
+  # for its storage backend.  The default configuration provided will work the Consul
+  # Helm project by default.  It is possible to manually configure Vault to use a
   # different HA backend.
   ha:
     enabled: false
@@ -194,7 +194,7 @@ server:
       #   crypto_key  = "vault-helm-unseal-key"
       #}
 
-    # A disruption budget limits the number of pods of a replicated application 
+    # A disruption budget limits the number of pods of a replicated application
     # that are down simultaneously from voluntary disruptions
     disruptionBudget:
       enabled: true

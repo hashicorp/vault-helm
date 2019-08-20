@@ -55,7 +55,7 @@ load _helpers
 }
 
 #--------------------------------------------------------------------
-# affinity 
+# affinity
 
 @test "server/ha-StatefulSet: default affinity" {
   cd `chart_dir`
@@ -100,7 +100,7 @@ load _helpers
 }
 
 #--------------------------------------------------------------------
-# resources 
+# resources
 
 @test "server/ha-StatefulSet: default resources" {
   cd `chart_dir`

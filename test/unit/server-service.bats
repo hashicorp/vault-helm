@@ -121,7 +121,7 @@ load _helpers
   local actual=$(helm template \
       -x templates/server-service.yaml \
       --set 'server.dev.enabled=true' \
-      . | tee /dev/stderr | 
+      . | tee /dev/stderr |
       yq -r '.metadata.annotations["service.alpha.kubernetes.io/tolerate-unready-endpoints"]' | tee /dev/stderr)
   [ "${actual}" = "true" ]
 
@@ -187,7 +187,7 @@ load _helpers
   [ "${actual}" = "null" ]
 }
 
-@test "server/Service: clusterIP can set" { 
+@test "server/Service: clusterIP can set" {
   cd `chart_dir`
   local actual=$(helm template \
       -x templates/server-service.yaml \

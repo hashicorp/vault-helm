@@ -4,7 +4,7 @@ load _helpers
 
 @test "server/ha: testing deployment" {
   cd `chart_dir`
-  
+
   helm install --name="$(name_prefix)" \
     --set='server.ha.enabled=true' .
   wait_for_running $(name_prefix)-0
@@ -71,7 +71,7 @@ load _helpers
   # Vault Unseal
   local pods=($(kubectl get pods --selector='app.kubernetes.io/name=vault' -o json | jq -r '.items[].metadata.name'))
   for pod in "${pods[@]}"
-  do  
+  do
       kubectl exec -ti ${pod} -- vault operator unseal ${token}
   done
 
@@ -95,12 +95,12 @@ setup() {
     --name consul \
     --set 'ui.enabled=false' \
 
-  wait_for_running_consul 
+  wait_for_running_consul
 }
 
 #cleanup
 teardown() {
-  helm delete --purge vault 
+  helm delete --purge vault
   helm delete --purge consul
-  kubectl delete --all pvc 
+  kubectl delete --all pvc
 }
