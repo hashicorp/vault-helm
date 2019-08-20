@@ -11,7 +11,6 @@ metadata:
     app.kubernetes.io/name: {{ include "vault.name" . }}
     app.kubernetes.io/instance: {{ .Release.Name }}
     app.kubernetes.io/managed-by: {{ .Release.Service }}
-    app.kubernetes.io/version: {{ .Chart.Version | quote }}
 spec:
   maxUnavailable: {{ template "vault.pdb.maxUnavailable" . }}
   selector:
