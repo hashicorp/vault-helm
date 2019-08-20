@@ -26,6 +26,9 @@ spec:
     - name: http
       port: 8200
       targetPort: 8200
+      {{- if .Values.ui.serviceNodePort }}
+      nodePort: {{ .Values.ui.serviceNodePort }}
+      {{- end }}
   type: {{ .Values.ui.serviceType | default "ClusterIP" }}
 {{- end -}}
 

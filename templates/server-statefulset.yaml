@@ -59,7 +59,7 @@ spec:
                 fieldRef:
                   fieldPath: status.podIP
             - name: VAULT_ADDR
-              value: "http://localhost:8200"
+              value: "{{ include "vault.scheme" . }}://127.0.0.1:8200"
             - name: SKIP_CHOWN
               value: "true"
             {{ template "vault.envs" . }}
@@ -85,7 +85,7 @@ spec:
             #   1 - error
             #   2 - sealed
             exec:
-              command: ["/bin/sh", "-ec", "vault status"]
+              command: ["/bin/sh", "-ec", "vault status -tls-skip-verify"]
             failureThreshold: 2
             initialDelaySeconds: 5
             periodSeconds: 3
