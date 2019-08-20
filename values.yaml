@@ -8,7 +8,7 @@ global:
   # Image is the name (and tag) of the Vault Docker image.
   image: "vault:1.2.1"
   # TLS for end-to-end encrypted transport
-  tls_disable: false
+  tls_disable: true
 
 server:
   # Resource requests, limits, etc. for the server cluster placement. This
