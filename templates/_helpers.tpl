@@ -299,7 +299,7 @@ Inject extra environment populated by secrets, if populated
 
 {{/* Scheme for health check and local endpoint */}}
 {{- define "vault.scheme" -}}
-{{- if .Values.global.tls_disable -}}
+{{- if .Values.global.tlsDisable -}}
 {{ "http" }}
 {{- else -}}
 {{ "https" }}
