@@ -60,6 +60,8 @@ spec:
                   fieldPath: status.podIP
             - name: VAULT_ADDR
               value: "{{ include "vault.scheme" . }}://127.0.0.1:8200"
+            - name: VAULT_API_ADDR
+              value: "{{ include "vault.scheme" . }}://$(POD_IP):8200"
             - name: SKIP_CHOWN
               value: "true"
             {{ template "vault.envs" . }}
