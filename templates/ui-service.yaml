@@ -12,7 +12,7 @@ metadata:
   name: {{ template "vault.fullname" . }}-ui
   labels:
     helm.sh/chart: {{ include "vault.chart" . }}
-    app.kubernetes.io/name: {{ include "vault.name" . }}
+    app.kubernetes.io/name: {{ include "vault.name" . }}-ui
     app.kubernetes.io/instance: {{ .Release.Name }}
     app.kubernetes.io/managed-by: {{ .Release.Service }}
   {{- template "vault.ui.annotations" . }}
