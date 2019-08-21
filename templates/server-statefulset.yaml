@@ -68,10 +68,6 @@ spec:
             {{- include "vault.extraSecretEnvironmentVars" .Values.server | nindent 12 }}
           volumeMounts:
           {{ template "vault.mounts" . }}
-          lifecycle:
-            preStop:
-              exec:
-                command: ["vault", "step-down"]
           ports:
             - containerPort: 8200
               name: http
