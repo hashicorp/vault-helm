@@ -93,18 +93,18 @@ extra volumes the user may have specified (such as a secret with TLS).
 */}}
 {{- define "vault.volumes" -}}
   {{- if and (ne .mode "dev") (or (ne .Values.server.standalone.config "")  (ne .Values.server.ha.config "")) }}
-       - name: config
-         configMap:
-           name: {{ template "vault.fullname" . }}-config
+        - name: config
+          configMap:
+            name: {{ template "vault.fullname" . }}-config
   {{ end }}
   {{- range .Values.server.extraVolumes }}
-       - name: userconfig-{{ .name }}
-         {{ .type }}:
-         {{- if (eq .type "configMap") }}
-           name: {{ .name }}
-         {{- else if (eq .type "secret") }}
-           secretName: {{ .name }}
-         {{- end }}
+        - name: userconfig-{{ .name }}
+          {{ .type }}:
+          {{- if (eq .type "configMap") }}
+            name: {{ .name }}
+          {{- else if (eq .type "secret") }}
+            secretName: {{ .name }}
+          {{- end }}
   {{- end }}
 {{- end -}}
 
