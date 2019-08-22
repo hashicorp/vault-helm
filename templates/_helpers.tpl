@@ -47,7 +47,7 @@ Add a special case for replicas=1, where it should default to 0 as well.
 {{- end -}}
 
 {{/*
-Set the variable 'mode' to the server mode requested by the user to simplify 
+Set the variable 'mode' to the server mode requested by the user to simplify
 template logic.
 */}}
 {{- define "vault.mode" -}}
@@ -76,8 +76,8 @@ Set's the replica count based on the different modes configured by user
 {{- end -}}
 
 {{/*
-Set's fsGroup based on different modes.  Standalone is the only mode 
-that requires fsGroup at this time because it uses PVC for the file 
+Set's fsGroup based on different modes.  Standalone is the only mode
+that requires fsGroup at this time because it uses PVC for the file
 storage backend.
 */}}
 {{- define "vault.fsgroup" -}}
@@ -87,8 +87,8 @@ storage backend.
 {{- end -}}
 
 {{/*
-Set's up configmap mounts if this isn't a dev deployment and the user 
-defined a custom configuration.  Additionally iterates over any 
+Set's up configmap mounts if this isn't a dev deployment and the user
+defined a custom configuration.  Additionally iterates over any
 extra volumes the user may have specified (such as a secret with TLS).
 */}}
 {{- define "vault.volumes" -}}
@@ -109,8 +109,8 @@ extra volumes the user may have specified (such as a secret with TLS).
 {{- end -}}
 
 {{/*
-Set's a command to override the entrypoint defined in the image 
-so we can make the user experience nicer.  This works in with 
+Set's a command to override the entrypoint defined in the image
+so we can make the user experience nicer.  This works in with
 "vault.args" to specify what commands /bin/sh should run.
 */}}
 {{- define "vault.command" -}}
@@ -121,14 +121,14 @@ so we can make the user experience nicer.  This works in with
 {{- end -}}
 
 {{/*
-Set's the args for custom command to render the Vault configuration 
-file with IP addresses to make the out of box experience easier 
+Set's the args for custom command to render the Vault configuration
+file with IP addresses to make the out of box experience easier
 for users looking to use this chart with Consul Helm.
 */}}
 {{- define "vault.args" -}}
   {{ if or (eq .mode "standalone") (eq .mode "ha") }}
           - |
-            sed -E "s/HOST_IP/${HOST_IP?}/g" /vault/config/extraconfig-from-values.hcl > /tmp/storageconfig.hcl; 
+            sed -E "s/HOST_IP/${HOST_IP?}/g" /vault/config/extraconfig-from-values.hcl > /tmp/storageconfig.hcl;
             sed -Ei "s/POD_IP/${POD_IP?}/g" /tmp/storageconfig.hcl;
             chown vault:vault /tmp/storageconfig.hcl;
             /usr/local/bin/docker-entrypoint.sh vault server -config=/tmp/storageconfig.hcl
@@ -146,7 +146,7 @@ Set's additional environment variables based on the mode.
 {{- end -}}
 
 {{/*
-Set's which additional volumes should be mounted to the container 
+Set's which additional volumes should be mounted to the container
 based on the mode configured.
 */}}
 {{- define "vault.mounts" -}}
@@ -172,8 +172,8 @@ based on the mode configured.
 {{- end -}}
 
 {{/*
-Set's up the volumeClaimTemplates when data or audit storage is required.  HA 
-might not use data storage since Consul is likely it's backend, however, audit 
+Set's up the volumeClaimTemplates when data or audit storage is required.  HA
+might not use data storage since Consul is likely it's backend, however, audit
 storage might be desired by the user.
 */}}
 {{- define "vault.volumeclaims" -}}

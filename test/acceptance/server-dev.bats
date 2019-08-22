@@ -52,5 +52,5 @@ load _helpers
 teardown() {
   echo "helm/pvc teardown"
   helm delete --purge vault
-  kubectl delete --all pvc 
+  kubectl delete --all pvc
 }

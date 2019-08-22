@@ -8,7 +8,7 @@ disclose by contacting us at security@hashicorp.com.
 issue or pull request anyways. You won't be yelled at for giving it your best
 effort. The worst that can happen is that you'll be politely asked to change
 something. We appreciate any sort of contributions, and don't want a wall of
-rules to get in the way of that. 
+rules to get in the way of that.
 
 That said, if you want to ensure that a pull request is likely to be merged,
 talk to us! You can find out our thoughts and ensure that your contribution
@@ -29,7 +29,7 @@ quickly merge or address your contributions.
   against `master`, as bugs are fixed regularly but new versions are only
   released every few months.
 
-* Provide steps to reproduce the issue, and if possible include the expected 
+* Provide steps to reproduce the issue, and if possible include the expected
   results as well as the actual results. Please provide text, not screen shots!
 
 * Respond as promptly as possible to any questions made by the Vault
