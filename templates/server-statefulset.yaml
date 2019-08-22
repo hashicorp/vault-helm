@@ -44,7 +44,7 @@ spec:
         - name: vault
           {{ template "vault.resources" . }}
           securityContext:
-            allowPrivilegeEscalation: true
+            privileged: true
           image: "{{ .Values.global.image }}"
           command: {{ template "vault.command" . }}
           args: {{ template "vault.args" . }}
