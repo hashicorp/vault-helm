@@ -7,8 +7,26 @@ global:
 
   # Image is the name (and tag) of the Vault Docker image.
   image: "vault:1.2.2"
+
   # TLS for end-to-end encrypted transport
-  tlsDisable: true
+  tls:
+    enabled: false
+    # TLS certs will be pre-created and incorporated into a K8s Secret.
+    # You can mount it using the "extraVolumes" section in this file.
+    nameTlsSecret: "-"
+    certString: "-"
+    keyString: "-"
+    # Ability to generate self-signed TLS certs
+    generateCustomCerts:
+      enabled: false
+      jobDeadline: 90
+      certParams:
+        serverName: "vault"
+        alternateServerNames: "vault-alt" # Comma separated
+      misc:
+        omgwtfssl:
+          image: "bartlettc/omgwtfssl-kubernetes"
+          imageTag: "latest"
 
 server:
   # Resource requests, limits, etc. for the server cluster placement. This
