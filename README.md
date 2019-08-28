@@ -22,6 +22,15 @@ The versions required are:
     It is possible that this chart works with earlier versions but it is
     untested. Other versions verified are Kubernetes 1.10, 1.11.
 
+If you decide to use the auto-generation of custom TLS certificates for end-to-end
+encrypted transport - please note that the `default` Kubernetes Service Account in the
+namespace, where Vault is going to be deployed into, needs to have `admin` permissions.
+That can be achieved by:
+
+```bash
+K8S_NAMESPACE=[vault_k8s_namespace] kubectl create clusterrolebinding vault-ns-admin --clusterrole=admin --serviceaccount=${K8S_NAMESPACE}:default
+```
+
 ## Usage
 
 For now, we do not host a chart repository. To use the charts, you must
