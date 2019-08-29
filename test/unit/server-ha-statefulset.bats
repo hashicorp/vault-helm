@@ -48,7 +48,7 @@ load _helpers
   cd `chart_dir`
   local object=$(helm template \
       -x templates/server-statefulset.yaml  \
-      --set 'global.tlsDisable=true' \
+      --set 'global.tls.enabled=false' \
       . | tee /dev/stderr |
       yq -r '.spec.template.spec.containers[0].env' | tee /dev/stderr)
 
@@ -64,7 +64,7 @@ load _helpers
   cd `chart_dir`
   local object=$(helm template \
       -x templates/server-statefulset.yaml  \
-      --set 'global.tlsDisable=false' \
+      --set 'global.tls.enabled=true' \
       . | tee /dev/stderr |
       yq -r '.spec.template.spec.containers[0].env' | tee /dev/stderr)
 
