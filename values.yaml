@@ -14,6 +14,7 @@ global:
     # TLS certs will be pre-created and incorporated into a K8s Secret.
     # You can mount it using the "extraVolumes" section in this file.
     nameTlsSecret: "-"
+    caString: "-"   # if self-signed
     certString: "-"
     keyString: "-"
     # Ability to generate self-signed TLS certs
@@ -22,7 +23,7 @@ global:
       jobDeadline: 90
       certParams:
         serverName: "vault"
-        alternateServerNames: "vault-alt" # Comma separated
+        alternateServerNames: "vault-alt" # comma-separated
       misc:
         omgwtfssl:
           image: "bartlettc/omgwtfssl-kubernetes"
