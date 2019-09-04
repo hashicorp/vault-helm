@@ -53,33 +53,6 @@ load _helpers
   [ "${actual}" = "false" ]
 }
 
-@test "ui/Service: disable with ui.service.enabled" {
-  cd `chart_dir`
-  local actual=$(helm template \
-      -x templates/ui-service.yaml  \
-      --set 'server.dev.enabled=true' \
-      --set 'ui.service.enabled=false' \
-      . | tee /dev/stderr |
-      yq 'length > 0' | tee /dev/stderr)
-  [ "${actual}" = "false" ]
-
-  local actual=$(helm template \
-      -x templates/ui-service.yaml  \
-      --set 'server.ha.enabled=true' \
-      --set 'ui.service.enabled=false' \
-      . | tee /dev/stderr |
-      yq 'length > 0' | tee /dev/stderr)
-  [ "${actual}" = "false" ]
-
-  local actual=$(helm template \
-      -x templates/ui-service.yaml  \
-      --set 'server.standalone.enabled=true' \
-      --set 'ui.service.enabled=false' \
-      . | tee /dev/stderr |
-      yq 'length > 0' | tee /dev/stderr)
-  [ "${actual}" = "false" ]
-}
-
 @test "ui/Service: ClusterIP type by default" {
   cd `chart_dir`
   local actual=$(helm template \
