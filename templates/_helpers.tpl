@@ -259,6 +259,15 @@ Sets extra ui service annotations
   {{- end }}
 {{- end -}}
 
+{{/*
+Sets extra service account annotations
+*/}}
+{{- define "vault.serviceaccount.annotations" -}}
+  {{- if and (ne .mode "dev") .Values.server.serviceaccount.annotations }}
+  annotations:
+    {{- toYaml .Values.server.serviceaccount.annotations | nindent 4 }}
+  {{- end }}
+{{- end -}}
 
 {{/*
 Set's the container resources if the user has set any.
