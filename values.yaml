@@ -93,6 +93,11 @@ server:
     # load balancer.
     # clusterIP: None
 
+    # Port on which Vault server is listening
+    port: 8200
+    # Target port to which the service should be mapped to
+    targetPort: 8200
+
   # This configures the Vault Statefulset to create a PVC for data
   # storage when using the file backend.
   # See https://www.vaultproject.io/docs/audit/index.html to know more

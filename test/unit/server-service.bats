@@ -212,3 +212,35 @@ load _helpers
       yq -r '.spec.clusterIP' | tee /dev/stderr)
   [ "${actual}" = "None" ]
 }
+
+@test "server/Service: port and targetPort will be 8200 by default" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      -x templates/server-service.yaml \
+      . | tee /dev/stderr |
+      yq -r '.spec.ports[0].port' | tee /dev/stderr)
+  [ "${actual}" = "8200" ]
+
+  local actual=$(helm template \
+      -x templates/server-service.yaml \
+      . | tee /dev/stderr |
+      yq -r '.spec.ports[0].targetPort' | tee /dev/stderr)
+  [ "${actual}" = "8200" ]
+}
+
+@test "server/Service: port and targetPort can be set" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      -x templates/server-service.yaml \
+      --set 'server.service.port=8000' \
+      . | tee /dev/stderr |
+      yq -r '.spec.ports[0].port' | tee /dev/stderr)
+  [ "${actual}" = "8000" ]
+
+  local actual=$(helm template \
+      -x templates/server-service.yaml \
+      --set 'server.service.targetPort=80' \
+      . | tee /dev/stderr |
+      yq -r '.spec.ports[0].targetPort' | tee /dev/stderr)
+  [ "${actual}" = "80" ]
+}

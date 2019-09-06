@@ -24,8 +24,8 @@ spec:
   publishNotReadyAddresses: true
   ports:
     - name: http
-      port: 8200
-      targetPort: 8200
+      port: {{ .Values.server.service.port }}
+      targetPort: {{ .Values.server.service.targetPort }}
     - name: internal
       port: 8201
       targetPort: 8201
