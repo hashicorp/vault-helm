@@ -216,6 +216,8 @@ ui:
   enabled: false
   serviceType: "ClusterIP"
   serviceNodePort: null
+  externalPort: 8200
+  # loadBalancerIP:
 
   # Extra annotations to attach to the ui service
   # This should be a multi-line string mapping directly to the a map of
