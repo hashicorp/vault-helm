@@ -11,11 +11,6 @@ global:
   tlsDisable: true
 
 server:
-  # Port on which Vault server is listening
-  port: 8200
-  # Target port to which the service should be mapped to
-  targetPort: 8200
-
   # Resource requests, limits, etc. for the server cluster placement. This
   # should map directly to the value of the resources field for a PodSpec.
   # By default no direct resource request is made.
@@ -97,6 +92,11 @@ server:
     # used to communicate with pods directly through DNS instead of a round robin
     # load balancer.
     # clusterIP: None
+
+    # Port on which Vault server is listening
+    port: 8200
+    # Target port to which the service should be mapped to
+    targetPort: 8200
 
   # This configures the Vault Statefulset to create a PVC for data
   # storage when using the file backend.

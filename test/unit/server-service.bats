@@ -232,14 +232,14 @@ load _helpers
   cd `chart_dir`
   local actual=$(helm template \
       -x templates/server-service.yaml \
-      --set 'server.port=8000' \
+      --set 'server.service.port=8000' \
       . | tee /dev/stderr |
       yq -r '.spec.ports[0].port' | tee /dev/stderr)
   [ "${actual}" = "8000" ]
 
   local actual=$(helm template \
       -x templates/server-service.yaml \
-      --set 'server.targetPort=80' \
+      --set 'server.service.targetPort=80' \
       . | tee /dev/stderr |
       yq -r '.spec.ports[0].targetPort' | tee /dev/stderr)
   [ "${actual}" = "80" ]
