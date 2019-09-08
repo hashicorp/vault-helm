@@ -23,6 +23,9 @@ server:
   #     memory: 256Mi
   #     cpu: 250m
 
+  # Ingress settings
+  # Enabling it a ingress will be created which will manage external access to the
+  # cluster, very useful if you want to expose the Vault UI
   ingress:
     enabled: false
     annotations: {}
