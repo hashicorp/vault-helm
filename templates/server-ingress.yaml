@@ -1,0 +1,52 @@
+# Ingress for Vault cluster
+{{- if and (eq (.Values.server.ingress.enabled | toString) "true" ) (eq (.Values.global.enabled | toString) "true") }}
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: {{ template "vault.fullname" . }}
+  labels:
+    helm.sh/chart: {{ include "vault.chart" . }}
+    app.kubernetes.io/name: {{ include "vault.name" . }}
+    app.kubernetes.io/instance: {{ .Release.Name }}
+    app.kubernetes.io/managed-by: {{ .Release.Service }}
+  annotations:
+    kubernetes.io/ingress.class: "nginx"
+    {{- if and (.Values.server.ingress.sslPassthrough) (.Values.global.tls.enabled) }}
+    nginx.ingress.kubernetes.io/ssl-passthrough: "true"
+    {{- end }}
+spec:
+  {{- if .Values.global.tls.enabled }}
+  tls:
+  - hosts:
+    - {{.Values.global.fqdns.serverName}}
+    {{- if and (ne (.Values.global.fqdns.alternateServerNames | toString) "-") (.Values.server.ingress.useWildcardTlsCerts) }}
+    {{- $root := . -}}
+    {{- range .Values.global.fqdns.alternateServerNames | split "," }}
+    - {{ . | quote }}
+    {{- end }}
+    {{- end }}
+    {{- if not .Values.server.ingress.useWildcardTlsCerts }}
+    secretName: {{ .Values.global.tls.nameTlsSecret }}
+    {{- end }}
+  {{- end }}
+  rules:
+    - host: {{.Values.global.fqdns.serverName}}
+      http:
+        paths:
+        - path: /
+          backend:
+            serviceName: {{ template "vault.fullname" . }}
+            servicePort: 8200
+    {{- if ne (.Values.global.fqdns.alternateServerNames | toString) "-" }}
+    {{- $root := . -}}
+    {{- range .Values.global.fqdns.alternateServerNames | split "," }}
+    - host: {{ . | quote }}
+      http:
+        paths:
+        - path: /
+          backend:
+            serviceName: "{{ template "vault.fullname" $root }}"
+            servicePort: 8200
+    {{- end }}
+    {{- end }}
+{{- end }}

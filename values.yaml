@@ -6,7 +6,7 @@ global:
   enabled: true
 
   # Fully qualified domain names (FQDN's) to optionally register
-  # the Vault server to be reachable on via Ingress.
+  # the Vault cluster to be reachable via Ingress.
   # serverName is also a mandatory part of the TLS cert parameters.
   # alternateServerNames is optional.
   fqdns:
@@ -123,12 +123,12 @@ server:
   # Enables NGINX Ingress to be used by the Vault Statefulset.
   ingress:
     enabled: false
-    # If the NGINX Ingress Controller is preconfigured
-    # with "ssl-passthrough" on. Using that, TLS is terminated
-    # by the Vault server itself which improves security.
+    # If the NGINX Ingress Controller is preconfigured upon starting
+    # with "ssl-passthrough" option turned on. Using that, TLS is terminated
+    # by the Vault cluster itself which improves security.
     sslPassthrough: false
-    # If the NGINX Ingress Controller is preconfigured
-    # to use a TLS secret with a wildcard cert/key.
+    # If the NGINX Ingress Controller is preconfigured to use a TLS secret
+    # with a wildcard cert/key upon starting.
     useWildcardTlsCerts: false
 
   # This configures the Vault Statefulset to create a PVC for data

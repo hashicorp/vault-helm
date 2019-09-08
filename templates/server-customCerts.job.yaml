@@ -1,7 +1,7 @@
 {{ template "vault.mode" . }}
 {{- if and (eq (.Values.global.enabled | toString) "true") (ne .mode "dev") -}}
 {{ if or (ne .Values.server.standalone.config "")  (ne .Values.server.ha.config "") -}}
-{{- if and (eq (.Values.global.tls.enabled | toString) "true") (eq (.Values.global.tls.generateCustomCerts.enabled | toString) "true") (eq (.Values.global.tls.certString | toString) "-") (eq (.Values.global.tls.keyString | toString) "-") (ne (.Values.global.tls.nameTlsSecret | toString) "-") -}}
+{{- if and (eq (.Values.global.tls.enabled | toString) "true") (eq (.Values.global.tls.certParams.generateCustomCerts.enabled | toString) "true") (eq (.Values.global.tls.certParams.certString | toString) "-") (eq (.Values.global.tls.certParams.keyString | toString) "-") (ne (.Values.global.tls.nameTlsSecret | toString) "-") -}}
 apiVersion: batch/v1
 kind: Job
 metadata:
@@ -15,7 +15,7 @@ metadata:
     helm.sh/hook: pre-install
     helm.sh/hook-weight: "100"
 spec:
-  activeDeadlineSeconds: {{.Values.global.tls.generateCustomCerts.jobDeadline}}
+  activeDeadlineSeconds: {{.Values.global.tls.certParams.generateCustomCerts.jobDeadline}}
   template:
     metadata:
       name: {{ template "vault.fullname" . }}-preinstall
@@ -28,7 +28,7 @@ spec:
       restartPolicy: Never
       containers:
       - name: {{ template "vault.fullname" . }}-preinstall-job
-        image: "{{.Values.global.tls.generateCustomCerts.misc.omgwtfssl.image}}:{{.Values.global.tls.generateCustomCerts.misc.omgwtfssl.imageTag}}"
+        image: "{{.Values.global.tls.certParams.generateCustomCerts.misc.omgwtfssl.image}}:{{.Values.global.tls.certParams.generateCustomCerts.misc.omgwtfssl.imageTag}}"
         imagePullPolicy: "Always"
         env:
           - name: CA_EXPIRE
@@ -38,9 +38,9 @@ spec:
           - name: SSL_IP
             value: "127.0.0.1"
           - name: SSL_SUBJECT
-            value: "{{.Values.global.tls.generateCustomCerts.certParams.serverName}}"
+            value: "{{.Values.global.fqdns.serverName}}"
           - name: SSL_DNS
-            value: "{{.Values.global.tls.generateCustomCerts.certParams.alternateServerNames}},{{- .Release.Name -}}.{{- .Release.Namespace -}}.svc.cluster.local"
+            value: "{{- if ne (.Values.global.fqdns.alternateServerNames | toString) "-" -}}{{.Values.global.fqdns.alternateServerNames}},{{- end -}}{{- .Release.Name -}}.{{- .Release.Namespace -}}.svc.cluster.local"
           - name: SILENT
             value: "true"
           - name: K8S_SECRET_NAME
