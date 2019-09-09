@@ -120,16 +120,31 @@ server:
     # load balancer.
     # clusterIP: None
 
-  # Enables NGINX Ingress to be used by the Vault Statefulset.
+  # Enables the Vault cluster to be reachable via Ingress.
   ingress:
+  # Custom annotations must be specified or the pre-set NGINX configurations enabled.
     enabled: false
-    # If the NGINX Ingress Controller is preconfigured upon starting
-    # with "ssl-passthrough" option turned on. Using that, TLS is terminated
-    # by the Vault cluster itself which improves security.
-    sslPassthrough: false
-    # If the NGINX Ingress Controller is preconfigured to use a TLS secret
-    # with a wildcard cert/key upon starting.
+    # If the Ingress Controller is preconfigured upon starting
+    # to use a TLS secret with a wildcard cert/key.
     useWildcardTlsCerts: false
+
+    # Configures which Ingress Controller to be used.
+    # Sets other Ingress annotations.
+    annotations: {}
+      # kubernetes.io/ingress.class: ""
+      # kubernetes.io/tls-acme: "true"
+      # kubernetes.io/ingress.allow-http: "false"
+
+    # Enables the pre-configured NGINX Ingress Controller resources.
+    useNginx:
+      enabled: false
+      # Use this option when NGINX is preconfigured upon starting
+      # with "ssl-passthrough" option turned on. That allows TLS
+      # to be terminated by the Vault cluster itself which improves security.
+      sslPassthrough: false
+      # Use this option when NGINX is behind another L7 proxy / load balancer
+      # that is setting these headers.
+      useForwardedHeaders: false
 
   # This configures the Vault Statefulset to create a PVC for data
   # storage when using the file backend.

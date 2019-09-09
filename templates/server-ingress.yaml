@@ -10,9 +10,16 @@ metadata:
     app.kubernetes.io/instance: {{ .Release.Name }}
     app.kubernetes.io/managed-by: {{ .Release.Service }}
   annotations:
+    {{- if .Values.server.ingress.useNginx.enabled }}
     kubernetes.io/ingress.class: "nginx"
-    {{- if and (.Values.server.ingress.sslPassthrough) (.Values.global.tls.enabled) }}
+    {{- if .Values.server.ingress.useNginx.useForwardedHeaders }}
+    nginx.ingress.kubernetes.io/use-forwarded-headers: "true"
+    {{- end }}
+    {{- if and (.Values.server.ingress.useNginx.sslPassthrough) (.Values.global.tls.enabled) }}
     nginx.ingress.kubernetes.io/ssl-passthrough: "true"
+    {{- end }}{{- end }}
+    {{- with .Values.server.ingress.annotations }}
+    {{- toYaml . | nindent 4 }}
     {{- end }}
 spec:
   {{- if .Values.global.tls.enabled }}
@@ -23,8 +30,7 @@ spec:
     {{- $root := . -}}
     {{- range .Values.global.fqdns.alternateServerNames | split "," }}
     - {{ . | quote }}
-    {{- end }}
-    {{- end }}
+    {{- end }}{{- end }}
     {{- if not .Values.server.ingress.useWildcardTlsCerts }}
     secretName: {{ .Values.global.tls.nameTlsSecret }}
     {{- end }}
