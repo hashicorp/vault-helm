@@ -124,7 +124,8 @@ server:
   ingress:
   # Custom annotations must be specified or the pre-set NGINX configurations enabled.
     enabled: false
-    # If the Ingress Controller is preconfigured upon starting
+    # If multiple FQDN's must be reachable over TLS and a single pair of cert/key
+    # must be used. The Ingress Controller needs to be preconfigured upon starting
     # to use a TLS secret with a wildcard cert/key.
     useWildcardTlsCerts: false
 
