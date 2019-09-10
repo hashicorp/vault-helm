@@ -10,6 +10,7 @@ apiVersion: v1
 kind: Service
 metadata:
   name: {{ template "vault.fullname" . }}-ui
+  namespace: {{ .Release.Namespace }}
   labels:
     helm.sh/chart: {{ include "vault.chart" . }}
     app.kubernetes.io/name: {{ include "vault.name" . }}-ui
@@ -23,12 +24,15 @@ spec:
     component: server
   ports:
     - name: http
-      port: 8200
+      port: {{ .Values.ui.externalPort }}
       targetPort: 8200
       {{- if .Values.ui.serviceNodePort }}
       nodePort: {{ .Values.ui.serviceNodePort }}
       {{- end }}
-  type: {{ .Values.ui.serviceType | default "ClusterIP" }}
+  type: {{ .Values.ui.serviceType }}
+  {{- if and (eq (.Values.ui.serviceType | toString) "LoadBalancer") (.Values.ui.loadBalancerIP) }}
+  loadBalancerIP: {{ .Values.ui.loadBalancerIP }}
+  {{- end }}
 {{- end -}}
 
 {{ end }}

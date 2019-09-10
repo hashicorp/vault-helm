@@ -120,6 +120,11 @@ server:
     # load balancer.
     # clusterIP: None
 
+    # Port on which Vault server is listening
+    port: 8200
+    # Target port to which the service should be mapped to
+    targetPort: 8200
+
   # Enables the Vault cluster to be reachable via Ingress.
   ingress:
   # Custom annotations must be specified or the pre-set NGINX configurations enabled.
@@ -264,6 +269,10 @@ server:
     # replicas. If you'd like a custom value, you can specify an override here.
       maxUnavailable: null
 
+  # Definition of the serviceaccount used to run Vault.
+  serviceaccount:
+    annotations: {}
+
 # Vault UI
 ui:
   # True if you want to create a Service entry for the Vault UI.
@@ -274,6 +283,8 @@ ui:
   enabled: false
   serviceType: "ClusterIP"
   serviceNodePort: null
+  externalPort: 8200
+  # loadBalancerIP:
 
   # Extra annotations to attach to the ui service
   # This should be a multi-line string mapping directly to the a map of
