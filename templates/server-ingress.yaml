@@ -45,7 +45,7 @@ spec:
         - path: /
           backend:
             serviceName: {{ template "vault.fullname" . }}
-            servicePort: 8200
+            servicePort: {{.Values.server.service.port}}
     {{- if ne (.Values.global.fqdns.alternateServerNames | toString) "-" }}
     {{- $root := . -}}
     {{- range .Values.global.fqdns.alternateServerNames | split "," }}
@@ -55,7 +55,7 @@ spec:
         - path: /
           backend:
             serviceName: "{{ template "vault.fullname" $root }}"
-            servicePort: 8200
+            servicePort: {{.Values.server.service.port}}
     {{- end }}
     {{- end }}
 {{- end }}
