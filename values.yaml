@@ -143,6 +143,10 @@ server:
       # with "ssl-passthrough" option turned on. That allows TLS
       # to be terminated by the Vault cluster itself which improves security.
       sslPassthrough: false
+      # By default the NGINX redirects (308) to HTTPS if TLS is enabled for that ingress.
+      # However, when using SSL offloading outside of cluster (e.g. AWS ELB), it may be useful
+      # to enforce a redirect to HTTPS even when there is no TLS certificate available.
+      useSslRedirect: false
       # Use this option when NGINX is behind another L7 proxy / load balancer
       # that is setting these headers.
       useForwardedHeaders: false

@@ -15,6 +15,9 @@ metadata:
     {{- if .Values.server.ingress.useNginx.useForwardedHeaders }}
     nginx.ingress.kubernetes.io/use-forwarded-headers: "true"
     {{- end }}
+    {{- if .Values.server.ingress.useNginx.useSslRedirect }}
+    nginx.ingress.kubernetes.io/ssl-redirect: "true"
+    {{- end }}
     {{- if and (.Values.server.ingress.useNginx.sslPassthrough) (.Values.global.tls.enabled) }}
     nginx.ingress.kubernetes.io/ssl-passthrough: "true"
     {{- end }}{{- end }}
