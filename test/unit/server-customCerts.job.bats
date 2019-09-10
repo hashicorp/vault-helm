@@ -11,7 +11,7 @@ load _helpers
       -x templates/server-customCerts.job.yaml  \
       --set 'global.tls.enabled=true' \
       --set 'global.tls.nameTlsSecret=vault-tls-secret' \
-      --set 'global.tls.generateCustomCerts.enabled=true' \
+      --set 'global.tls.certParams.generateCustomCerts.enabled=true' \
       . | tee /dev/stderr |
       yq -r '.spec.template.spec.containers[0].env' | tee /dev/stderr)
 
