@@ -147,6 +147,7 @@ server:
     # using a stateful set. This should be HCL.
     config: |
       ui = true
+      cluster_addr = https://$POD_IP:8201
 
       listener "tcp" {
         tls_disable = 1
@@ -176,20 +177,23 @@ server:
     enabled: false
     replicas: 3
 
+    raft:
+      enabled: true
+
     # config is a raw string of default configuration when using a Stateful
     # deployment. Default is to use a Consul for its HA storage backend.
     # This should be HCL.
     config: |
       ui = true
+      cluster_addr = "https://POD_IP:8201"
 
       listener "tcp" {
         tls_disable = 1
         address = "[::]:8200"
         cluster_address = "[::]:8201"
       }
-      storage "consul" {
-        path = "vault"
-        address = "HOST_IP:8500"
+      storage "raft" {
+        path = "/vault/data"
       }
 
       # Example configuration for using auto-unseal, using Google Cloud KMS. The

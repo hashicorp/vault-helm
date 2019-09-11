@@ -81,7 +81,7 @@ that requires fsGroup at this time because it uses PVC for the file
 storage backend.
 */}}
 {{- define "vault.fsgroup" -}}
-  {{ if eq .mode "standalone" }}
+  {{ if or (eq .mode "standalone") (and (eq .mode "ha") (eq (.Values.server.ha.raft.enabled | toString) "true")) }}
     {{- .Values.server.storageFsGroup | default 1000 -}}
   {{ end }}
 {{- end -}}
@@ -150,11 +150,13 @@ Set's which additional volumes should be mounted to the container
 based on the mode configured.
 */}}
 {{- define "vault.mounts" -}}
-  {{ if eq .mode "standalone" }}
+  {{ if or (eq .mode "standalone") (eq .mode "ha") }}
     {{ if eq (.Values.server.auditStorage.enabled | toString) "true" }}
             - name: audit
               mountPath: /vault/audit
     {{ end }}
+  {{ end }}
+  {{ if or (eq .mode "standalone") (and (eq .mode "ha") (eq (.Values.server.ha.raft.enabled | toString) "true"))  }}
     {{ if eq (.Values.server.dataStorage.enabled | toString) "true" }}
             - name: data
               mountPath: /vault/data
@@ -179,7 +181,7 @@ storage might be desired by the user.
 {{- define "vault.volumeclaims" -}}
   {{- if and (ne .mode "dev") (or .Values.server.dataStorage.enabled .Values.server.auditStorage.enabled) }}
   volumeClaimTemplates:
-      {{- if and (eq (.Values.server.dataStorage.enabled | toString) "true") (eq .mode "standalone") }}
+      {{- if and (eq (.Values.server.dataStorage.enabled | toString) "true") (or (eq .mode "standalone") (and ((eq .mode "ha") (eq (.Values.server.ha.raft.enabled | toString) "true")))) }}
     - metadata:
         name: data
       spec:
