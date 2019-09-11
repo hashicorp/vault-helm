@@ -232,7 +232,7 @@ Set's the toleration for pod placement when running in standalone and HA modes.
 Set's the node selector for pod placement when running in standalone and HA modes.
 */}}
 {{- define "vault.nodeselector" -}}
-  {{- if and (ne .mode "dev") .Values.server.nodeSelector }}
+  {{- if .Values.server.nodeSelector }}
       nodeSelector:
         {{ tpl .Values.server.nodeSelector . | indent 8 | trim }}
   {{- end }}
@@ -243,7 +243,7 @@ Set's the node selector for pod placement when running in standalone and HA mode
 Sets extra pod annotations
 */}}
 {{- define "vault.annotations" -}}
-  {{- if and (ne .mode "dev") .Values.server.annotations }}
+  {{- if .Values.server.annotations }}
       annotations:
         {{- tpl .Values.server.annotations . | nindent 8 }}
   {{- end }}
@@ -253,7 +253,7 @@ Sets extra pod annotations
 Sets extra ui service annotations
 */}}
 {{- define "vault.ui.annotations" -}}
-  {{- if and (ne .mode "dev") .Values.ui.annotations }}
+  {{- if .Values.ui.annotations }}
   annotations:
     {{- toYaml .Values.ui.annotations | nindent 4 }}
   {{- end }}
@@ -263,7 +263,7 @@ Sets extra ui service annotations
 Sets extra service account annotations
 */}}
 {{- define "vault.serviceaccount.annotations" -}}
-  {{- if and (ne .mode "dev") .Values.server.serviceaccount.annotations }}
+  {{- if .Values.server.serviceaccount.annotations }}
   annotations:
     {{- toYaml .Values.server.serviceaccount.annotations | nindent 4 }}
   {{- end }}
