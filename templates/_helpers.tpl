@@ -212,7 +212,7 @@ storage might be desired by the user.
 Set's the affinity for pod placement when running in standalone and HA modes.
 */}}
 {{- define "vault.affinity" -}}
-  {{- if and (ne .mode "dev") .Values.server.affinity }}
+  {{- if .Values.server.affinity }}
       affinity:
         {{ tpl .Values.server.affinity . | nindent 8 | trim }}
   {{ end }}
