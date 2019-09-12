@@ -2,7 +2,7 @@
 
 load _helpers
 
-@test "server/ha: testing deployment" {
+@test "server/ha-consul: testing deployment" {
   cd `chart_dir`
 
   helm install --name="$(name_prefix)" \

@@ -85,13 +85,12 @@ server:
   # Enables a headless service to be used by the Vault Statefulset
   service:
     enabled: true
-    # clusterIP controls whether a Cluster IP address is attached to the
-    # Vault service within Kubernetes.  By default the Vault service will
-    # be given a Cluster IP address, set to None to disable.  When disabled
-    # Kubernetes will create a "headless" service.  Headless services can be
-    # used to communicate with pods directly through DNS instead of a round robin
-    # load balancer.
-    # clusterIP: None
+
+    # Headless service allows pods within the statefulset to find and communicate 
+    # with each other.  This is important for replication architectures (HA deployment 
+    # and Raft). 
+    headless:
+      enabled: true
 
     # Port on which Vault server is listening
     port: 8200
@@ -147,7 +146,6 @@ server:
     # using a stateful set. This should be HCL.
     config: |
       ui = true
-      cluster_addr = https://$POD_IP:8201
 
       listener "tcp" {
         tls_disable = 1
@@ -176,9 +174,10 @@ server:
   ha:
     enabled: false
     replicas: 3
-
+    
+    # Enables the tech preview of Raft storage
     raft:
-      enabled: true
+      enabled: false
 
     # config is a raw string of default configuration when using a Stateful
     # deployment. Default is to use a Consul for its HA storage backend.
@@ -192,8 +191,10 @@ server:
         address = "[::]:8200"
         cluster_address = "[::]:8201"
       }
-      storage "raft" {
-        path = "/vault/data"
+
+      storage "consul" {
+        path = "vault"
+        address = "HOST_IP:8500"
       }
 
       # Example configuration for using auto-unseal, using Google Cloud KMS. The

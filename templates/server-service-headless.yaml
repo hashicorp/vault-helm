@@ -1,9 +1,9 @@
 # Service for Vault cluster
-{{- if and (eq (.Values.server.service.enabled | toString) "true" ) (eq (.Values.global.enabled | toString) "true") }}
+{{- if and (eq (.Values.server.service.headless.enabled | toString) "true" ) (eq (.Values.global.enabled | toString) "true") }}
 apiVersion: v1
 kind: Service
 metadata:
-  name: {{ template "vault.fullname" . }}
+  name: {{ template "vault.fullname" . }}-headless
   namespace: {{ .Release.Namespace }}
   labels:
     helm.sh/chart: {{ include "vault.chart" . }}
@@ -16,7 +16,7 @@ metadata:
     # https://github.com/kubernetes/kubernetes/issues/58662
     service.alpha.kubernetes.io/tolerate-unready-endpoints: "true"
 spec:
-  clusterIP: 
+  clusterIP: None
   # We want the servers to become available even if they're not ready
   # since this DNS is also used for join operations.
   publishNotReadyAddresses: true

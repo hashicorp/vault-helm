@@ -181,7 +181,7 @@ storage might be desired by the user.
 {{- define "vault.volumeclaims" -}}
   {{- if and (ne .mode "dev") (or .Values.server.dataStorage.enabled .Values.server.auditStorage.enabled) }}
   volumeClaimTemplates:
-      {{- if and (eq (.Values.server.dataStorage.enabled | toString) "true") (or (eq .mode "standalone") (and ((eq .mode "ha") (eq (.Values.server.ha.raft.enabled | toString) "true")))) }}
+      {{- if and (eq (.Values.server.dataStorage.enabled | toString) "true") (or (eq .mode "standalone") (and (eq .mode "ha") (eq (.Values.server.ha.raft.enabled | toString) "true"))) }}
     - metadata:
         name: data
       spec:
@@ -314,5 +314,16 @@ Inject extra environment populated by secrets, if populated
 {{ "http" }}
 {{- else -}}
 {{ "https" }}
+{{- end -}}
+{{- end -}}
+
+{{/*
+Create serviceName for statefulsets.
+*/}}
+{{- define "vault.serviceName" -}}
+{{- if eq (.Values.server.service.headless.enabled | toString) "true" -}}
+{{ template "vault.fullname" . }}-headless
+{{- else -}}
+{{ template "vault.fullname" . }}
 {{- end -}}
 {{- end -}}

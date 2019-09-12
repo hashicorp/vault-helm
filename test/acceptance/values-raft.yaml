@@ -1,0 +1,20 @@
+server:
+  ha:
+    enabled: true
+
+    raft:
+      enabled: true
+
+    config: |
+      ui = true
+      cluster_addr = "https://POD_IP:8201"
+
+      listener "tcp" {
+        tls_disable = 1
+        address = "[::]:8200"
+        cluster_address = "[::]:8201"
+      }
+
+      storage "raft" {
+        path = "/vault/data"
+      }

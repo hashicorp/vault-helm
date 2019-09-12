@@ -400,6 +400,19 @@ load _helpers
   [ "${actual}" = "null" ]
 }
 
+@test "server/ha-StatefulSet: can set data storage for raft" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      -x templates/server-statefulset.yaml  \
+      --set 'server.ha.enabled=true' \
+      --set 'server.ha.raft.enabled=true' \
+      --set 'server.dataStorage.enabled=true' \
+      --set 'server.dataStorage.storageClass=foo' \
+      . | tee /dev/stderr |
+      yq -r '.spec.volumeClaimTemplates' | tee /dev/stderr)
+  [ "${actual}" != "null" ]
+}
+
 @test "server/ha-StatefulSet: can set storageClass" {
   cd `chart_dir`
   local actual=$(helm template \
