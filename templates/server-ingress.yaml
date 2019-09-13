@@ -18,14 +18,13 @@ metadata:
     {{- if .Values.server.ingress.useNginx.useSslRedirect }}
     nginx.ingress.kubernetes.io/ssl-redirect: "true"
     {{- end }}
-    {{- if and (.Values.server.ingress.useNginx.sslPassthrough) (not .Values.global.tlsDisable) }}
+    {{- if and (not .Values.global.tlsDisable) (.Values.server.ingress.useNginx.sslPassthrough) }}
     nginx.ingress.kubernetes.io/ssl-passthrough: "true"
     {{- end }}{{- end }}
     {{- with .Values.server.ingress.annotations }}
     {{- toYaml . | nindent 4 }}
     {{- end }}
 spec:
-  {{- if not .Values.global.tlsDisable }}
   tls:
   - hosts:
     - {{.Values.global.fqdns.serverName}}
@@ -37,7 +36,6 @@ spec:
     {{- if not .Values.server.ingress.useWildcardTlsCerts }}
     secretName: {{ .Values.server.ingress.nameTlsSecret }}
     {{- end }}
-  {{- end }}
   rules:
     - host: {{.Values.global.fqdns.serverName}}
       http:
