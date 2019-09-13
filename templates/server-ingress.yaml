@@ -1,0 +1,61 @@
+# Ingress for Vault cluster
+{{- if and (eq (.Values.server.ingress.enabled | toString) "true" ) (eq (.Values.global.enabled | toString) "true") }}
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: {{ template "vault.fullname" . }}
+  labels:
+    helm.sh/chart: {{ include "vault.chart" . }}
+    app.kubernetes.io/name: {{ include "vault.name" . }}
+    app.kubernetes.io/instance: {{ .Release.Name }}
+    app.kubernetes.io/managed-by: {{ .Release.Service }}
+  annotations:
+    {{- if .Values.server.ingress.useNginx.enabled }}
+    kubernetes.io/ingress.class: "nginx"
+    {{- if .Values.server.ingress.useNginx.useForwardedHeaders }}
+    nginx.ingress.kubernetes.io/use-forwarded-headers: "true"
+    {{- end }}
+    {{- if .Values.server.ingress.useNginx.useSslRedirect }}
+    nginx.ingress.kubernetes.io/ssl-redirect: "true"
+    {{- end }}
+    {{- if and (.Values.server.ingress.useNginx.sslPassthrough) (not .Values.global.tlsDisable) }}
+    nginx.ingress.kubernetes.io/ssl-passthrough: "true"
+    {{- end }}{{- end }}
+    {{- with .Values.server.ingress.annotations }}
+    {{- toYaml . | nindent 4 }}
+    {{- end }}
+spec:
+  {{- if not .Values.global.tlsDisable }}
+  tls:
+  - hosts:
+    - {{.Values.global.fqdns.serverName}}
+    {{- if and (ne (.Values.global.fqdns.alternateServerNames | toString) "-") (.Values.server.ingress.useWildcardTlsCerts) }}
+    {{- $root := . -}}
+    {{- range .Values.global.fqdns.alternateServerNames | split "," }}
+    - {{ . | quote }}
+    {{- end }}{{- end }}
+    {{- if not .Values.server.ingress.useWildcardTlsCerts }}
+    secretName: {{ .Values.server.ingress.nameTlsSecret }}
+    {{- end }}
+  {{- end }}
+  rules:
+    - host: {{.Values.global.fqdns.serverName}}
+      http:
+        paths:
+        - path: /
+          backend:
+            serviceName: {{ template "vault.fullname" . }}
+            servicePort: {{.Values.server.service.port}}
+    {{- if ne (.Values.global.fqdns.alternateServerNames | toString) "-" }}
+    {{- $root := . -}}
+    {{- range .Values.global.fqdns.alternateServerNames | split "," }}
+    - host: {{ . | quote }}
+      http:
+        paths:
+        - path: /
+          backend:
+            serviceName: "{{ template "vault.fullname" $root }}"
+            servicePort: {{.Values.server.service.port}}
+    {{- end }}
+    {{- end }}
+{{- end }}
