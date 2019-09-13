@@ -12,7 +12,7 @@ global:
   fqdns:
     # Must match any respective values in pre-existing TLS certs.
     serverName: "vault"
-    alternateServerNames: "-"
+    alternateServerNames: "-" # Comma-separated
 
   # Image is the name (and tag) of the Vault Docker image.
   image: "vault:1.2.2"
