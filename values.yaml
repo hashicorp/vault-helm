@@ -233,6 +233,11 @@ server:
 
   # Definition of the serviceaccount used to run Vault.
   serviceaccount:
+    # Specifies whether a service account should be created
+    enabled: true
+    # The name of the service account to use.
+    # If not set and create is true, a name is generated using the fullname template
+    name:
     annotations: {}
   
   # mlock prevents memory from being swapped to disk.  If swap is enabled this should 

@@ -36,7 +36,7 @@ spec:
       {{ template "vault.tolerations" . }}
       {{ template "vault.nodeselector" . }}
       terminationGracePeriodSeconds: 10
-      serviceAccountName: {{ template "vault.fullname" . }}
+      serviceAccountName: {{ template "vault.serviceAccountName" . }}
       securityContext:
         fsGroup: {{ template "vault.fsgroup" . }}
       volumes:
