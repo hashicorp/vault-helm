@@ -451,6 +451,11 @@ server:
 
   # Definition of the serviceAccount used to run Vault.
   serviceAccount:
+    # Specifies whether a service account should be created
+    enabled: true
+    # The name of the service account to use.
+    # If not set and create is true, a name is generated using the fullname template
+    name: ""
     # Extra annotations for the serviceAccount definition. This can either be
     # YAML or a YAML-formatted multi-line templated string map of the
     # annotations to apply to the serviceAccount.

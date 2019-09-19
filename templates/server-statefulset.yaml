@@ -41,7 +41,7 @@ spec:
       priorityClassName: {{ .Values.server.priorityClassName }}
       {{- end }}
       terminationGracePeriodSeconds: 10
-      serviceAccountName: {{ template "vault.fullname" . }}
+      serviceAccountName: {{ template "vault.serviceAccountName" . }}
       {{ if  .Values.server.shareProcessNamespace }}
       shareProcessNamespace: true
       {{ end }}
