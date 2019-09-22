@@ -112,8 +112,7 @@ server:
   ingress:
   # Custom annotations must be specified or the pre-set NGINX configurations enabled.
     enabled: false
-    # TLS certs should be incorporated into a manually created K8s Secret.
-    # You can mount it using the "extraVolumes" section in this file.
+    # K8s secret with the TLS certs to be used in the Ingress TLS config section.
     nameTlsSecret: "-"
     # If multiple FQDN's must be reachable over TLS and a single pair of cert/key
     # must be used. The Ingress Controller needs to be preconfigured upon starting
