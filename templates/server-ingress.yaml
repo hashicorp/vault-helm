@@ -1,4 +1,5 @@
-# Ingress for Vault cluster
+## Ingress for Vault cluster
+##
 {{- if and (eq (.Values.server.ingress.enabled | toString) "true" ) (eq (.Values.global.enabled | toString) "true") }}
 apiVersion: extensions/v1beta1
 kind: Ingress
@@ -9,33 +10,23 @@ metadata:
     app.kubernetes.io/name: {{ include "vault.name" . }}
     app.kubernetes.io/instance: {{ .Release.Name }}
     app.kubernetes.io/managed-by: {{ .Release.Service }}
+  {{- with .Values.server.ingress.annotations }}
   annotations:
-    {{- if .Values.server.ingress.useNginx.enabled }}
-    kubernetes.io/ingress.class: "nginx"
-    {{- if .Values.server.ingress.useNginx.useForwardedHeaders }}
-    nginx.ingress.kubernetes.io/use-forwarded-headers: "true"
-    {{- end }}
-    {{- if .Values.server.ingress.useNginx.useSslRedirect }}
-    nginx.ingress.kubernetes.io/ssl-redirect: "true"
-    {{- end }}
-    {{- if and (not .Values.global.tlsDisable) (.Values.server.ingress.useNginx.sslPassthrough) }}
-    nginx.ingress.kubernetes.io/ssl-passthrough: "true"
-    {{- end }}{{- end }}
-    {{- with .Values.server.ingress.annotations }}
     {{- toYaml . | nindent 4 }}
-    {{- end }}
+  {{- end }}
 spec:
+  {{- if or ((.Values.server.ingress.wildcardTlsCerts)) (ne (.Values.server.ingress.nameTlsSecret | toString) "-") }}
   tls:
   - hosts:
     - {{.Values.global.fqdns.serverName}}
-    {{- if and (ne (.Values.global.fqdns.alternateServerNames | toString) "-") (.Values.server.ingress.useWildcardTlsCerts) }}
+    {{- if and (ne (.Values.global.fqdns.alternateServerNames | toString) "-") (.Values.server.ingress.wildcardTlsCerts) }}
     {{- $root := . -}}
     {{- range .Values.global.fqdns.alternateServerNames | split "," }}
     - {{ . | quote }}
     {{- end }}{{- end }}
-    {{- if not .Values.server.ingress.useWildcardTlsCerts }}
+    {{- if not (.Values.server.ingress.wildcardTlsCerts) }}
     secretName: {{ .Values.server.ingress.nameTlsSecret }}
-    {{- end }}
+    {{- end }}{{- end }}
   rules:
     - host: {{.Values.global.fqdns.serverName}}
       http:

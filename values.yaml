@@ -108,38 +108,40 @@ server:
     # Target port to which the service should be mapped to
     targetPort: 8200
 
-  # Enables the Vault cluster to be reachable via Ingress.
+  ## Enables the Vault cluster to be reachable via Ingress.
+  ##
   ingress:
-  # Custom annotations must be specified or the pre-set NGINX configurations enabled.
     enabled: false
-    # K8s secret with the TLS certs to be used in the Ingress TLS config section.
+    ## K8s secret with the TLS certs to be used in the Ingress TLS config section.
     nameTlsSecret: "-"
-    # If multiple FQDN's must be reachable over TLS and a single pair of cert/key
-    # must be used. The Ingress Controller needs to be preconfigured upon starting
-    # to use a TLS secret with a wildcard cert/key.
-    useWildcardTlsCerts: false
+    ## If multiple FQDN's must be reachable over TLS and a single pair of cert/key
+    ## must be used. The Ingress Controller needs to be preconfigured upon starting
+    ## to use a TLS secret with a wildcard cert/key.
+    wildcardTlsCerts: false
 
-    # Configures which Ingress Controller to be used.
-    # Sets other Ingress annotations.
+    ## Configures which Ingress Controller to be used.
+    ## Sets other Ingress annotations.
     annotations: {}
-      # kubernetes.io/ingress.class: ""
-      # kubernetes.io/tls-acme: "true"
-      # kubernetes.io/ingress.allow-http: "false"
+    #  kubernetes.io/ingress.class: ""
+    #  kubernetes.io/tls-acme: "true"
+    #  kubernetes.io/ingress.allow-http: "false"
 
-    # Enables the pre-configured NGINX Ingress Controller resources.
-    useNginx:
-      enabled: false
-      # Use this option when NGINX is preconfigured upon starting
-      # with "ssl-passthrough" option turned on. That allows TLS
-      # to be terminated by the Vault cluster itself which improves security.
-      sslPassthrough: false
-      # By default the NGINX redirects (308) to HTTPS if TLS is enabled for that ingress.
-      # However, when using SSL offloading outside of cluster (e.g. AWS ELB), it may be useful
-      # to enforce a redirect to HTTPS even when there is no TLS certificate available.
-      useSslRedirect: false
-      # Use this option when NGINX is behind another L7 proxy / load balancer
-      # that is setting these headers.
-      useForwardedHeaders: false
+    ## Utilize the NGINX Ingress Controller
+    #  kubernetes.io/ingress.class: "nginx"
+    #
+    ## Use this option when NGINX is preconfigured upon starting
+    ## with "ssl-passthrough" option turned on. That allows TLS
+    ## to be terminated by the Vault cluster itself which improves security.
+    #  nginx.ingress.kubernetes.io/ssl-passthrough: "true"
+    #
+    ## By default the NGINX redirects (308) to HTTPS if TLS is enabled for that ingress.
+    ## However, when using SSL offloading outside of cluster (e.g. AWS ELB), it may be useful
+    ## to enforce a redirect to HTTPS even when there is no TLS certificate available.
+    #  nginx.ingress.kubernetes.io/ssl-redirect: "true"
+    #
+    ## Use this option when NGINX is behind another L7 proxy / load balancer
+    ## that is setting these headers.
+    #  nginx.ingress.kubernetes.io/use-forwarded-headers: "true"
 
   # This configures the Vault Statefulset to create a PVC for data
   # storage when using the file backend.
