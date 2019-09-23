@@ -239,7 +239,7 @@ server:
     # If not set and create is true, a name is generated using the fullname template
     name:
     annotations: {}
-  
+
   # mlock prevents memory from being swapped to disk.  If swap is enabled this should 
   # be true.
   mlock:

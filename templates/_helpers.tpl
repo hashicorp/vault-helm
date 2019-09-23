@@ -263,20 +263,20 @@ Sets extra ui service annotations
 Create the name of the service account to use
 */}}
 {{- define "vault.serviceAccountName" -}}
-{{- if .Values.serviceAccount.enabled -}}
-    {{ default (include "vault.fullname" .) .Values.serviceAccount.name }}
+{{- if .Values.server.serviceaccount.enabled -}}
+    {{ default (include "vault.fullname" .) .Values.server.serviceaccount.name }}
 {{- else -}}
-    {{ default "default" .Values.serviceAccount.name }}
+    {{ default "default" .Values.server.serviceaccount.name }}
 {{- end -}}
 {{- end -}}
 
 {{/*
 Sets extra service account annotations
 */}}
-{{- define "vault.serviceAccount.annotations" -}}
-  {{- if and (ne .mode "dev") .Values.serviceAccount.annotations }}
+{{- define "vault.serviceaccount.annotations" -}}
+  {{- if and (ne .mode "dev") .Values.server.serviceaccount.annotations }}
   annotations:
-    {{- toYaml .Values.serviceAccount.annotations | nindent 4 }}
+    {{- toYaml .Values.server.serviceaccount.annotations | nindent 4 }}
   {{- end }}
 {{- end -}}
 
