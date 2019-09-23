@@ -44,8 +44,11 @@ spec:
       containers:
         - name: vault
           {{ template "vault.resources" . }}
+          {{- if eq (.Values.server.mlock.enabled | toString) "true" }}
           securityContext:
-            privileged: true
+            capabilities:
+              add: ["IPC_LOCK"]
+          {{- end }}
           image: "{{ .Values.global.image }}"
           command: {{ template "vault.command" . }}
           args: {{ template "vault.args" . }}
@@ -64,6 +67,10 @@ spec:
               value: "{{ include "vault.scheme" . }}://$(POD_IP):8200"
             - name: SKIP_CHOWN
               value: "true"
+            {{- if eq (.Values.server.mlock.enabled | toString) "false" }}
+            - name: SKIP_SETCAP
+              value: "true"
+            {{- end }}
             {{ template "vault.envs" . }}
             {{- include "vault.extraEnvironmentVars" .Values.server | nindent 12 }}
             {{- include "vault.extraSecretEnvironmentVars" .Values.server | nindent 12 }}

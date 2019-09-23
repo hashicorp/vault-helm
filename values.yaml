@@ -214,6 +214,11 @@ server:
   # Definition of the serviceaccount used to run Vault.
   serviceaccount:
     annotations: {}
+  
+  # mlock prevents memory from being swapped to disk.  If swap is enabled this should 
+  # be true.
+  mlock:
+    enabled: true
 
 # Vault UI
 ui:
