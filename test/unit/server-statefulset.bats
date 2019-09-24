@@ -510,3 +510,16 @@ load _helpers
       yq -r '.spec.template.spec.nodeSelector' | tee /dev/stderr)
   [ "${actual}" = "testing" ]
 }
+
+#--------------------------------------------------------------------
+# extra labels
+
+@test "server/standalone-StatefulSet: specify extraLabels" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      -x templates/server-statefulset.yaml \
+      --set 'server.extraLabels.foo=bar' \
+      . | tee /dev/stderr |
+      yq -r '.spec.template.metadata.labels.foo' | tee /dev/stderr)
+  [ "${actual}" = "bar" ]
+}

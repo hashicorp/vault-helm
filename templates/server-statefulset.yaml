@@ -30,6 +30,9 @@ spec:
         app.kubernetes.io/name: {{ template "vault.name" . }}
         app.kubernetes.io/instance: {{ .Release.Name }}
         component: server
+        {{- if  .Values.server.extraLabels -}}
+          {{- toYaml .Values.server.extraLabels | nindent 8 -}}
+        {{- end -}}
       {{ template "vault.annotations" . }}
     spec:
       {{ template "vault.affinity" . }}
