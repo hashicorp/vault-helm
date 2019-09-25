@@ -33,6 +33,11 @@ spec:
   {{- if and (eq (.Values.ui.serviceType | toString) "LoadBalancer") (.Values.ui.loadBalancerIP) }}
   loadBalancerIP: {{ .Values.ui.loadBalancerIP }}
   {{- end }}
+  {{- if and (eq (.Values.ui.serviceType | toString) "LoadBalancer") (.Values.ui.loadBalancerSourceRanges) }}
+  loadBalancerSourceRanges:
+    {{- range .Values.ui.loadBalancerSourceRanges | default "[]" }}
+    - {{ . | toString }}
+    {{- end }}
+  {{- end }}
 {{- end -}}
-
 {{ end }}
