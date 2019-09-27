@@ -1,0 +1,13 @@
+version: 2
+jobs:
+  bats-unit-test:
+    machine: true
+    steps:
+      - checkout
+      - run: make test-image
+      - run: make test-unit
+workflows:
+  version: 2
+  build_and_test:
+    jobs:
+      - bats-unit-test 
