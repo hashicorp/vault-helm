@@ -97,7 +97,9 @@ server:
     port: 8200
     # Target port to which the service should be mapped to
     targetPort: 8200
-
+    # Extra annotations for the service definition
+    annotations: {}
+    
   # This configures the Vault Statefulset to create a PVC for data
   # storage when using the file backend.
   # See https://www.vaultproject.io/docs/audit/index.html to know more
@@ -214,6 +216,11 @@ server:
   # Definition of the serviceaccount used to run Vault.
   serviceaccount:
     annotations: {}
+  
+  # mlock prevents memory from being swapped to disk.  If swap is enabled this should 
+  # be true.
+  mlock:
+    enabled: true
 
 # Vault UI
 ui:

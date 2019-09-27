@@ -143,7 +143,7 @@ load _helpers
       --set 'ui.annotations.foo=bar' \
       . | tee /dev/stderr |
       yq -r '.metadata.annotations["foo"]' | tee /dev/stderr)
-  [ "${actual}" = "null" ]
+  [ "${actual}" = "bar" ]
 
   local actual=$(helm template \
       -x templates/ui-service.yaml  \
