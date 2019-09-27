@@ -140,6 +140,16 @@ load _helpers
   [ "${actual}" = "true" ]
 }
 
+@test "server/Service: generic annotations" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      -x templates/server-service.yaml \
+      --set 'server.service.annotations.vaultIsAwesome=true' \
+      . | tee /dev/stderr |
+      yq -r '.metadata.annotations["vaultIsAwesome"]' | tee /dev/stderr)
+  [ "${actual}" = "true" ]
+}
+
 @test "server/Service: publish not ready" {
   cd `chart_dir`
   local actual=$(helm template \
