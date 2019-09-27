@@ -164,6 +164,55 @@ load _helpers
   [ "${actual}" = "true" ]
 }
 
+@test "server/Service: type empty by default" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      -x templates/server-service.yaml \
+      --set 'server.dev.enabled=true' \
+      . | tee /dev/stderr |
+      yq -r '.spec.type' | tee /dev/stderr)
+  [ "${actual}" = "null" ]
+
+    local actual=$(helm template \
+      -x templates/server-service.yaml \
+      --set 'server.ha.enabled=true' \
+      . | tee /dev/stderr |
+      yq -r '.spec.type' | tee /dev/stderr)
+  [ "${actual}" = "null" ]
+
+  local actual=$(helm template \
+      -x templates/server-service.yaml \
+      . | tee /dev/stderr |
+      yq -r '.spec.type' | tee /dev/stderr)
+  [ "${actual}" = "null" ]
+}
+
+@test "server/Service: type can set" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      -x templates/server-service.yaml \
+      --set 'server.dev.enabled=true' \
+      --set 'server.service.type=NodePort' \
+      . | tee /dev/stderr |
+      yq -r '.spec.type' | tee /dev/stderr)
+  [ "${actual}" = "NodePort" ]
+
+  local actual=$(helm template \
+      -x templates/server-service.yaml \
+      --set 'server.ha.enabled=true' \
+      --set 'server.service.type=NodePort' \
+      . | tee /dev/stderr |
+      yq -r '.spec.type' | tee /dev/stderr)
+  [ "${actual}" = "NodePort" ]
+
+  local actual=$(helm template \
+      -x templates/server-service.yaml \
+      --set 'server.service.type=NodePort' \
+      . | tee /dev/stderr |
+      yq -r '.spec.type' | tee /dev/stderr)
+  [ "${actual}" = "NodePort" ]
+}
+
 @test "server/Service: clusterIP empty by default" {
   cd `chart_dir`
   local actual=$(helm template \
