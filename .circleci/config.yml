@@ -6,8 +6,36 @@ jobs:
       - checkout
       - run: make test-image
       - run: make test-unit
+  publish:
+    docker:
+      - image: $DOCKER_REGISTRY_URL/circleci-kubernetes:3
+        auth:
+          username: $DOCKER_REGISTRY_USERNAME
+          password: $DOCKER_REGISTRY_PASSWORD
+    steps:
+      - checkout
+      - run: 
+          name: Install and initialize helm
+          command: |
+            curl https://storage.googleapis.com/kubernetes-helm/helm-v2.14.0-linux-386.tar.gz | tar xvz
+            curl -fL https://getcli.jfrog.io | sh
+            ./linux-386/helm init --client-only
+      - run: 
+          name: Upload helm-vault to helm repo
+          command: |
+            ./linux-386/helm package .
+            ./jfrog rt upload *.tgz / --url https://takescoop.jfrog.io/takescoop/helm-local --user $DOCKER_REGISTRY_USERNAME --apikey $DOCKER_REGISTRY_PASSWORD
+          environment:
+            JFROG_CLI_OFFER_CONFIG: false
 workflows:
   version: 2
   build_and_test:
     jobs:
-      - bats-unit-test 
+      - bats-unit-test
+      - publish:
+          requires:
+            - bats-unit-test
+          context: publish
+          # filters:
+          #   branches:
+          #     only: master
