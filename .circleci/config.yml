@@ -12,6 +12,7 @@ jobs:
         auth:
           username: $DOCKER_REGISTRY_USERNAME
           password: $DOCKER_REGISTRY_PASSWORD
+    working_directory: /vault
     steps:
       - checkout
       - run: 
