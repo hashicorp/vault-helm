@@ -37,6 +37,6 @@ workflows:
           requires:
             - bats-unit-test
           context: publish
-          # filters:
-          #   branches:
-          #     only: master
+          filters:
+            branches:
+              only: master
