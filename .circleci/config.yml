@@ -21,7 +21,7 @@ jobs:
             curl -fL https://getcli.jfrog.io | sh
             ./linux-386/helm init --client-only
       - run: 
-          name: Upload helm-vault to helm repo
+          name: Upload vault-helm to helm repo
           command: |
             ./linux-386/helm package .
             ./jfrog rt upload *.tgz / --url https://takescoop.jfrog.io/takescoop/helm-local --user $DOCKER_REGISTRY_USERNAME --apikey $DOCKER_REGISTRY_PASSWORD
