@@ -40,7 +40,6 @@ server:
     #    hosts:
     #      - chart-example.local
 
-
   # authDelegator enables a cluster role binding to be attached to the service
   # account.  This cluster role binding can be used to setup Kubernetes auth
   # method.  https://www.vaultproject.io/docs/auth/kubernetes.html
@@ -117,7 +116,7 @@ server:
     targetPort: 8200
     # Extra annotations for the service definition
     annotations: {}
-    
+
   # This configures the Vault Statefulset to create a PVC for data
   # storage when using the file backend.
   # See https://www.vaultproject.io/docs/audit/index.html to know more
@@ -234,8 +233,8 @@ server:
   # Definition of the serviceaccount used to run Vault.
   serviceaccount:
     annotations: {}
-  
-  # mlock prevents memory from being swapped to disk.  If swap is enabled this should 
+
+  # mlock prevents memory from being swapped to disk.  If swap is enabled this should
   # be true.
   mlock:
     enabled: true
@@ -251,9 +250,24 @@ ui:
   serviceType: "ClusterIP"
   serviceNodePort: null
   externalPort: 8200
+  externalTrafficPolicy: Cluster
   # loadBalancerIP:
 
   # Extra annotations to attach to the ui service
   # This should be a multi-line string mapping directly to the a map of
   # the annotations to apply to the ui service
   annotations: {}
+
+# Vault-init for Google Cloud Platform
+vault_init:
+  # The vault-init service automates the process of initializing and unsealing HashiCorp Vault
+  # instances running on Google Cloud Platform.
+  # After vault-init initializes a Vault server it stores master keys and root tokens
+  # encrypted using Google Cloud KMS, to a user defined Google Cloud Storage bucket.
+  enabled: false
+  image: "vault-init:latest"
+  resources:
+    requests:
+      cpu: "100m"
+      memory: "64Mi"
+  EnvironmentVars: []

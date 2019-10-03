@@ -42,6 +42,9 @@ spec:
       volumes:
         {{ template "vault.volumes" . }}
       containers:
+        {{- if eq (.Values.vault_init.enabled | toString) "true" }}
+        {{ template "vault.vault_init" . }}
+        {{- end }}
         - name: vault
           {{ template "vault.resources" . }}
           {{- if eq (.Values.server.mlock.enabled | toString) "true" }}
