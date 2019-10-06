@@ -95,6 +95,11 @@ server:
   #   beta.kubernetes.io/arch: amd64
   nodeSelector: {}
 
+  # Extra labels to attach to the server pods
+  # This should be a multi-line string mapping directly to the a map of
+  # the labels to apply to the server pods
+  extraLabels: {}
+
   # Extra annotations to attach to the server pods
   # This should be a multi-line string mapping directly to the a map of
   # the annotations to apply to the server pods
