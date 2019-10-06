@@ -19,6 +19,9 @@ metadata:
 {{ toYaml .Values.server.service.annotations | indent 4 }}
 {{- end }}
 spec:
+  {{- if .Values.server.service.type}}
+  type: {{ .Values.server.service.type }}
+  {{- end}}
   {{- if .Values.server.service.clusterIP }}
   clusterIP: {{ .Values.server.service.clusterIP }}
   {{- end }}
