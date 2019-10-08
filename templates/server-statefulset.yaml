@@ -42,6 +42,8 @@ spec:
       serviceAccountName: {{ template "vault.fullname" . }}
       securityContext:
         fsGroup: {{ template "vault.fsgroup" . }}
+        runAsGroup: 1000
+        runAsUser: 100
       volumes:
         {{ template "vault.volumes" . }}
       containers:

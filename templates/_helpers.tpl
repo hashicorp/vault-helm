@@ -130,7 +130,6 @@ for users looking to use this chart with Consul Helm.
           - |
             sed -E "s/HOST_IP/${HOST_IP?}/g" /vault/config/extraconfig-from-values.hcl > /tmp/storageconfig.hcl;
             sed -Ei "s/POD_IP/${POD_IP?}/g" /tmp/storageconfig.hcl;
-            chown vault:vault /tmp/storageconfig.hcl;
             /usr/local/bin/docker-entrypoint.sh vault server -config=/tmp/storageconfig.hcl
   {{ end }}
 {{- end -}}
