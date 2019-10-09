@@ -150,11 +150,11 @@ Set's which additional volumes should be mounted to the container
 based on the mode configured.
 */}}
 {{- define "vault.mounts" -}}
-  {{ if eq .mode "standalone" }}
-    {{ if eq (.Values.server.auditStorage.enabled | toString) "true" }}
+  {{ if eq (.Values.server.auditStorage.enabled | toString) "true" }}
             - name: audit
               mountPath: /vault/audit
-    {{ end }}
+  {{ end }}
+  {{ if eq .mode "standalone" }}
     {{ if eq (.Values.server.dataStorage.enabled | toString) "true" }}
             - name: data
               mountPath: /vault/data

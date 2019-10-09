@@ -282,6 +282,15 @@ load _helpers
   [ "${actual}" = "/vault/userconfig/foo" ]
 }
 
+@test "server/standalone-StatefulSet: can mount audit" {
+  cd `chart_dir`
+  local object=$(helm template \
+      -x templates/server-statefulset.yaml  \
+      --set 'server.auditStorage.enabled=true' \
+      . | tee /dev/stderr |
+      yq -r '.spec.template.spec.containers[0].volumeMounts[] | select(.name == "audit")' | tee /dev/stderr)
+}
+
 #--------------------------------------------------------------------
 # extraEnvironmentVars
 
