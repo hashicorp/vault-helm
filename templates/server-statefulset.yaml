@@ -41,7 +41,7 @@ spec:
       terminationGracePeriodSeconds: 10
       serviceAccountName: {{ template "vault.fullname" . }}
       securityContext:
-        fsGroup: {{ template "vault.fsgroup" . }}
+        fsGroup: 1000
       volumes:
         {{ template "vault.volumes" . }}
       containers:
