@@ -6,5 +6,7 @@ terraform.tfvars
 values.dev.yaml
 vaul-helm-dev-creds.json
 ./test/acceptance/vaul-helm-dev-creds.json
+./test/terraform/vaul-helm-dev-creds.json
+./test/unit/vaul-helm-dev-creds.json
 ./test/acceptance/values.yaml
 ./test/acceptance/values.yml

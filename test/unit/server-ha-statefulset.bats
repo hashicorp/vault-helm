@@ -434,6 +434,16 @@ load _helpers
   [ "${actual}" = "1" ]
 }
 
+@test "server/ha-StatefulSet: can mount audit" {
+  cd `chart_dir`
+  local object=$(helm template \
+      -x templates/server-statefulset.yaml  \
+      --set 'server.ha.enabled=true' \
+      --set 'server.auditStorage.enabled=true' \
+      . | tee /dev/stderr |
+      yq -r '.spec.template.spec.containers[0].volumeMounts[] | select(.name == "audit")' | tee /dev/stderr)
+}
+
 @test "server/ha-StatefulSet: no data storage" {
   cd `chart_dir`
   local actual=$(helm template \
