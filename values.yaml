@@ -240,11 +240,6 @@ server:
   serviceaccount:
     annotations: {}
   
-  # mlock prevents memory from being swapped to disk.  If swap is enabled this should 
-  # be true.
-  mlock:
-    enabled: true
-
 # Vault UI
 ui:
   # True if you want to create a Service entry for the Vault UI.
