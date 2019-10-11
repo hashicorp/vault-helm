@@ -34,23 +34,23 @@ load _helpers
   # Volume Mounts
   local volumeCount=$(kubectl get statefulset "$(name_prefix)" --output json |
     jq -r '.spec.template.spec.containers[0].volumeMounts | length')
-  [ "${volumeCount}" == "3" ]
+  [ "${volumeCount}" == "2" ]
 
   local mountName=$(kubectl get statefulset "$(name_prefix)" --output json |
-    jq -r '.spec.template.spec.containers[0].volumeMounts[1].name')
+    jq -r '.spec.template.spec.containers[0].volumeMounts[0].name')
   [ "${mountName}" == "data" ]
 
   local mountPath=$(kubectl get statefulset "$(name_prefix)" --output json |
-    jq -r '.spec.template.spec.containers[0].volumeMounts[1].mountPath')
+    jq -r '.spec.template.spec.containers[0].volumeMounts[0].mountPath')
   [ "${mountPath}" == "/vault/data" ]
 
   # Volumes
   local volumeCount=$(kubectl get statefulset "$(name_prefix)" --output json |
     jq -r '.spec.template.spec.volumes | length')
-  [ "${volumeCount}" == "2" ]
+  [ "${volumeCount}" == "1" ]
 
   local volume=$(kubectl get statefulset "$(name_prefix)" --output json |
-    jq -r '.spec.template.spec.volumes[1].configMap.name')
+    jq -r '.spec.template.spec.volumes[0].configMap.name')
   [ "${volume}" == "$(name_prefix)-config" ]
 
   # Security Context

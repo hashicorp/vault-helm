@@ -43,12 +43,10 @@ spec:
       securityContext:
         readOnlyRootFilesystem: true
         runAsNonRoot: true
-        runAsGroup: 1000
-        runAsUser: 100
-        fsGroup: 1000
+        runAsGroup: {{ .Values.server.gid | default 1000 }}
+        runAsUser: {{ .Values.server.uid | default 100 }}
+        fsGroup: {{ .Values.server.gid | default 1000 }}
       volumes:
-        - name: home
-          emptyDir: {}
         {{ template "vault.volumes" . }}
       containers:
         - name: vault
@@ -80,8 +78,6 @@ spec:
             {{- include "vault.extraEnvironmentVars" .Values.server | nindent 12 }}
             {{- include "vault.extraSecretEnvironmentVars" .Values.server | nindent 12 }}
           volumeMounts:
-            - name: home
-              mountPath: "/home/vault"
           {{ template "vault.mounts" . }}
           ports:
             - containerPort: 8200

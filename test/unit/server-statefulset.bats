@@ -532,3 +532,63 @@ load _helpers
       yq -r '.spec.template.metadata.labels.foo' | tee /dev/stderr)
   [ "${actual}" = "bar" ]
 }
+
+
+#--------------------------------------------------------------------
+# Security Contexts
+@test "server/standalone-StatefulSet: uid default" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      -x templates/server-statefulset.yaml \
+      . | tee /dev/stderr |
+      yq -r '.spec.template.spec.securityContext.runAsUser' | tee /dev/stderr)
+  [ "${actual}" = "100" ]
+}
+
+@test "server/standalone-StatefulSet: uid configurable" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      -x templates/server-statefulset.yaml \
+      --set 'server.uid=2000' \
+      . | tee /dev/stderr |
+      yq -r '.spec.template.spec.securityContext.runAsUser' | tee /dev/stderr)
+  [ "${actual}" = "2000" ]
+}
+
+@test "server/standalone-StatefulSet: gid default" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      -x templates/server-statefulset.yaml \
+      . | tee /dev/stderr |
+      yq -r '.spec.template.spec.securityContext.runAsGroup' | tee /dev/stderr)
+  [ "${actual}" = "1000" ]
+}
+
+@test "server/standalone-StatefulSet: gid configurable" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      -x templates/server-statefulset.yaml \
+      --set 'server.gid=2000' \
+      . | tee /dev/stderr |
+      yq -r '.spec.template.spec.securityContext.runAsGroup' | tee /dev/stderr)
+  [ "${actual}" = "2000" ]
+}
+
+@test "server/standalone-StatefulSet: fsgroup default" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      -x templates/server-statefulset.yaml \
+      . | tee /dev/stderr |
+      yq -r '.spec.template.spec.securityContext.fsGroup' | tee /dev/stderr)
+  [ "${actual}" = "1000" ]
+}
+
+@test "server/standalone-StatefulSet: fsgroup configurable" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      -x templates/server-statefulset.yaml \
+      --set 'server.gid=2000' \
+      . | tee /dev/stderr |
+      yq -r '.spec.template.spec.securityContext.fsGroup' | tee /dev/stderr)
+  [ "${actual}" = "2000" ]
+}
