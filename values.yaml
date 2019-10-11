@@ -245,6 +245,9 @@ server:
   mlock:
     enabled: true
 
+  # update strategy for updates to the vault statefulset, RollingUpdate or OnDelete
+  updatestrategy: OnDelete
+
 # Vault UI
 ui:
   # True if you want to create a Service entry for the Vault UI.

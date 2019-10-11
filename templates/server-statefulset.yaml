@@ -16,7 +16,7 @@ spec:
   podManagementPolicy: Parallel
   replicas: {{ template "vault.replicas" . }}
   updateStrategy:
-    type: OnDelete
+    type:  "{{ .Values.server.updatestrategy }}"
   selector:
     matchLabels:
       helm.sh/chart: {{ template "vault.chart" . }}
