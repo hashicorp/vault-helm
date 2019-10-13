@@ -30,6 +30,7 @@ spec:
       nodePort: {{ .Values.ui.serviceNodePort }}
       {{- end }}
   type: {{ .Values.ui.serviceType }}
+  {{- if and (eq (.Values.ui.serviceType | toString) "LoadBalancer") (.Values.ui.loadBalancerSourceRanges) }}
   loadBalancerSourceRanges:
     {{- range $cidr := .Values.ui.loadBalancerSourceRanges }}
       - {{ $cidr }}
