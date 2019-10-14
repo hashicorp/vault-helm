@@ -3,10 +3,6 @@ name_prefix() {
     printf "vault"
 }
 
-status_conditions() {
-    printf "range .items[*]}{@.metadata.name}:{range @.status.conditions[*]}{@.type}={@.status};{end}{end}"
-}
-
 # chart_dir returns the directory for the chart
 chart_dir() {
     echo ${BATS_TEST_DIRNAME}/../..
@@ -62,4 +58,14 @@ wait_for_not_ready() {
         echo "pod/${NAME?} never became unready."
         exit 1
 	fi
+}
+
+wait_for_bound() {
+    NAME=$1
+    kubectl wait --for condition=bound pvc/${NAME?} --timeout=60s
+    if [[ $? != 0 ]]
+    then
+        echo "pod/${NAME?} never became ready."
+        exit 1
+    fi
 }

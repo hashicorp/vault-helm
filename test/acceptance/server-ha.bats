@@ -7,7 +7,10 @@ load _helpers
 
   helm install --name="$(name_prefix)" \
     --set='server.ha.enabled=true' .
-  wait_for_running $(name_prefix)-0
+  
+  # Breathing room
+  sleep 5
+  wait_for_not_ready "$(name_prefix)-0"
 
   # Sealed, not initialized
   local sealed_status=$(kubectl exec "$(name_prefix)-0" -- vault status -format=json |
@@ -95,8 +98,7 @@ setup() {
   helm install https://github.com/hashicorp/consul-helm/archive/v0.8.1.tar.gz \
     --name consul \
     --set 'ui.enabled=false' \
-
-  wait_for_running_consul
+    --wait 
 }
 
 #cleanup

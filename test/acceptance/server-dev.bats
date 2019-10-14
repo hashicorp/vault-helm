@@ -5,7 +5,7 @@ load _helpers
 @test "server/dev: testing deployment" {
   cd `chart_dir`
   helm install --name="$(name_prefix)" --set='server.dev.enabled=true' .
-  wait_for_running $(name_prefix)-0
+  wait_for_ready "$(name_prefix)-0"
 
   # Replicas
   local replicas=$(kubectl get statefulset "$(name_prefix)" --output json |

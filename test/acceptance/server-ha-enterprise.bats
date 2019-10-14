@@ -2,7 +2,7 @@
 
 load _helpers
 
-@test "server/ha: testing enterprise deployment: performance replica" {
+@test "server/ha enterprise: testing enterprise deployment: performance replica" {
   cd `chart_dir`
 
   helm install --name="$(name_prefix)-us-east" \
@@ -10,10 +10,9 @@ load _helpers
     --set='server.ha.enabled=true' \
     -f $(chart_dir)/test/acceptance/values-us-east.yaml .
 
-  wait_for_not_ready "$(name_prefix)-us-east-0"
-
-  # Give the image some breathing room to start Vault
+  # Breathing room
   sleep 5
+  wait_for_not_ready "$(name_prefix)-us-east-0"
 
   # Sealed, not initialized
   local sealed_status=$(kubectl exec "$(name_prefix)-us-east-0" -- vault status -format=json |
@@ -32,9 +31,6 @@ load _helpers
 
   local root_primary=$(echo ${init?} | jq -r '.root_token')
   [ "${root_primary}" != "" ]
-
-  echo ${token_primary} > /tmp/keys
-  echo ${root_primary} >> /tmp/keys
 
   # Vault Unseal
   local pods=($(kubectl get pods --selector="app.kubernetes.io/instance=$(name_prefix)-us-east" -o json | jq -r '.items[].metadata.name'))
@@ -71,11 +67,10 @@ load _helpers
     --set='server.ha.enabled=true' \
     -f $(chart_dir)/test/acceptance/values-us-west.yaml .
 
+  # Breathing room
+  sleep 5
   wait_for_not_ready "$(name_prefix)-us-west-0"
   
-  # Give the container some breathing room to start Vault
-  sleep 5
-
   # Sealed, not initialized
   local sealed_status=$(kubectl exec "$(name_prefix)-us-west-0" -- vault status -format=json |
     jq -r '.sealed' )
@@ -93,9 +88,6 @@ load _helpers
 
   local root_secondary=$(echo ${init?} | jq -r '.root_token')
   [ "${root_secondary}" != "" ]
-
-  echo ${token_secondary} > /tmp/keys-replica
-  echo ${root_secondary} >> /tmp/keys-replica
 
   # Vault Unseal
   local pods=($(kubectl get pods --selector="app.kubernetes.io/instance=$(name_prefix)-us-west" -o json | jq -r '.items[].metadata.name'))
@@ -140,12 +132,7 @@ setup() {
   helm install https://github.com/hashicorp/consul-helm/archive/v0.8.1.tar.gz \
     --name consul \
     --set 'ui.enabled=false' \
-
-  local pods=($(kubectl get pods --selector="app=consul" -o json | jq -r '.items[].metadata.name'))
-  for pod in "${pods[@]}"
-  do
-      wait_for_ready "${pod?}"
-  done
+    --wait
 }
 
 #cleanup
