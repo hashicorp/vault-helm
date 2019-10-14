@@ -3,6 +3,10 @@ name_prefix() {
     printf "vault"
 }
 
+status_conditions() {
+    printf "range .items[*]}{@.metadata.name}:{range @.status.conditions[*]}{@.type}={@.status};{end}{end}"
+}
+
 # chart_dir returns the directory for the chart
 chart_dir() {
     echo ${BATS_TEST_DIRNAME}/../..
@@ -40,91 +44,22 @@ helm_install_ha() {
         ${BATS_TEST_DIRNAME}/../..
 }
 
-# wait for consul to be running
-wait_for_running_consul() {
-    check() {
-        # This requests the pod and checks whether the status is running
-        # and the ready state is true. If so, it outputs the name. Otherwise
-        # it outputs empty. Therefore, to check for success, check for nonzero
-        # string length.
-        kubectl get pods -l component=client -o json | \
-            jq -r '.items[0] | select(
-                .status.phase == "Running" and
-                ([ .status.conditions[] | select(.type == "Ready" and .status == "True") ] | length) == 1
-            ) | .metadata.name'
-    }
-
-    for i in $(seq 60); do
-        if [ -n "$(check ${POD_NAME})" ]; then
-            echo "consul clients are ready."
-            return
-        fi
-
-        echo "Waiting for ${POD_NAME} to be ready..."
-        sleep 2
-    done
-
-    echo "consul clients never became ready."
-    exit 1
-}
-
-# wait for a pod to be ready
-wait_for_running() {
-    POD_NAME=$1
-
-    check() {
-        # This requests the pod and checks whether the status is running
-        # and the ready state is true. If so, it outputs the name. Otherwise
-        # it outputs empty. Therefore, to check for success, check for nonzero
-        # string length.
-        kubectl get pods $1 -o json | \
-            jq -r 'select(
-                .status.phase == "Running" and
-                ([ .status.conditions[] | select(.type == "Ready" and .status == "False") ] | length) == 1
-            ) | .metadata.namespace + "/" + .metadata.name'
-    }
-
-    for i in $(seq 60); do
-        if [ -n "$(check ${POD_NAME})" ]; then
-            echo "${POD_NAME} is ready."
-            sleep 10
-            return
-        fi
-
-        echo "Waiting for ${POD_NAME} to be ready..."
-        sleep 2
-    done
-
-    echo "${POD_NAME} never became ready."
-    exit 1
-}
-
 wait_for_ready() {
-    POD_NAME=$1
+    NAME=$1
+    kubectl wait --for condition=ready=true pod/${NAME?} --timeout=60s
+    if [[ $? != 0 ]]
+    then
+        echo "pod/${NAME?} never became ready."
+        exit 1
+	fi
+}
 
-    check() {
-        # This requests the pod and checks whether the status is running
-        # and the ready state is true. If so, it outputs the name. Otherwise
-        # it outputs empty. Therefore, to check for success, check for nonzero
-        # string length.
-        kubectl get pods $1 -o json | \
-            jq -r 'select(
-                .status.phase == "Running" and
-                ([ .status.conditions[] | select(.type == "Ready" and .status == "True") ] | length) == 1
-            ) | .metadata.namespace + "/" + .metadata.name'
-    }
-
-    for i in $(seq 60); do
-        if [ -n "$(check ${POD_NAME})" ]; then
-            echo "${POD_NAME} is ready."
-            sleep 10
-            return
-        fi
-
-        echo "Waiting for ${POD_NAME} to be ready..."
-        sleep 2
-    done
-
-    echo "${POD_NAME} never became ready."
-    exit 1
+wait_for_not_ready() {
+    NAME=$1
+    kubectl wait --for condition=ready=false pod/${NAME?} --timeout=60s
+    if [[ $? != 0 ]]
+    then
+        echo "pod/${NAME?} never became unready."
+        exit 1
+	fi
 }

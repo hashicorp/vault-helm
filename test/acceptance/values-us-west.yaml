@@ -13,6 +13,6 @@ server:
       }
 
       storage "consul" {
-        path = "vault-replica"
+        path = "vault-us-west"
         address = "HOST_IP:8500"
       }
