@@ -60,12 +60,33 @@ wait_for_not_ready() {
 	fi
 }
 
-wait_for_bound() {
-    NAME=$1
-    kubectl wait --for condition=bound pvc/${NAME?} --timeout=60s
-    if [[ $? != 0 ]]
-    then
-        echo "pod/${NAME?} never became ready."
-        exit 1
-    fi
+# wait for a pod to be ready
+wait_for_running() {
+    POD_NAME=$1
+
+    check() {
+        # This requests the pod and checks whether the status is running
+        # and the ready state is true. If so, it outputs the name. Otherwise
+        # it outputs empty. Therefore, to check for success, check for nonzero
+        # string length.
+        kubectl get pods $1 -o json | \
+            jq -r 'select(
+                .status.phase == "Running" and
+                ([ .status.conditions[] | select(.type == "Ready" and .status == "False") ] | length) == 1
+            ) | .metadata.namespace + "/" + .metadata.name'
+    }
+
+    for i in $(seq 60); do
+        if [ -n "$(check ${POD_NAME})" ]; then
+            echo "${POD_NAME} is ready."
+            sleep 10
+            return
+        fi
+
+        echo "Waiting for ${POD_NAME} to be ready..."
+        sleep 2
+    done
+
+    echo "${POD_NAME} never became ready."
+    exit 1
 }

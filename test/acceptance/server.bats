@@ -6,11 +6,9 @@ load _helpers
   cd `chart_dir`
   helm install --name="$(name_prefix)" .
 
-  wait_for_bound_pvc "data-$(name_prefix)-0"
-
-  # Breathing room
-  sleep 5
-  wait_for_not_ready "$(name_prefix)-0"
+  # Due to PVC overhead, we need to use this function because kubectl wait
+  # will error out if the pod is creating.
+  wait_for_running "$(name_prefix)-0"
 
   # Sealed, not initialized
   local sealed_status=$(kubectl exec -ti "$(name_prefix)-0" -- vault status -format=json |
