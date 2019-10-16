@@ -133,7 +133,7 @@ load _helpers
   [ "${actual}" = "null" ]
 }
 
-@test "ui/Service: set loadBalancerSourceRanges when LoadBalancer is configured as serviceType == " {
+@test "ui/Service: set loadBalancerSourceRanges when LoadBalancer is configured as serviceType" {
   cd `chart_dir`
   local actual=$(helm template \
       -x templates/ui-service.yaml  \
