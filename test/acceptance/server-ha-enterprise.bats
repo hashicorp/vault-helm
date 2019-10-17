@@ -32,6 +32,9 @@ load _helpers
   local root_primary=$(echo ${init?} | jq -r '.root_token')
   [ "${root_primary}" != "" ]
 
+  echo ${token_primary} > /tmp/init
+  echo ${root_primary} >> /tmp/init
+
   # Vault Unseal
   local pods=($(kubectl get pods --selector="app.kubernetes.io/instance=$(name_prefix)-us-east" -o json | jq -r '.items[].metadata.name'))
   for pod in "${pods[@]}"
@@ -51,7 +54,7 @@ load _helpers
   [ "${init_status}" == "true" ]
 
   kubectl exec -ti $(name_prefix)-us-east-0 -- vault login ${root_primary}
-  kubectl exec -ti $(name_prefix)-us-east-0 -- vault write -f sys/replication/performance/primary/enable -primary_cluster_addr=https://$(name_prefix):8201
+  kubectl exec -ti $(name_prefix)-us-east-0 -- vault write -f sys/replication/performance/primary/enable primary_cluster_addr=https://$(name_prefix)-us-east:8201
 
   local secondary=$(kubectl exec -ti "$(name_prefix)-us-east-0" -- vault write sys/replication/performance/primary/secondary-token id=secondary -format=json)
   [ "${secondary}" != "" ]
@@ -137,6 +140,7 @@ setup() {
 
 #cleanup
 teardown() {
+  exit 0
   helm delete --purge consul
   helm delete --purge vault-us-east
   helm delete --purge vault-us-west
