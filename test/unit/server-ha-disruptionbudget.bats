@@ -43,6 +43,17 @@ load _helpers
   [ "${actual}" = "false" ]
 }
 
+@test "server/DisruptionBudget: correct maxUnavailable with n=1" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      -x templates/server-disruptionbudget.yaml  \
+      --set 'server.ha.enabled=true' \
+      --set 'server.ha.replicas=1' \
+      . | tee /dev/stderr |
+      yq '.spec.maxUnavailable' | tee /dev/stderr)
+  [ "${actual}" = "0" ]
+}
+
 @test "server/DisruptionBudget: correct maxUnavailable with n=3" {
   cd `chart_dir`
   local actual=$(helm template \
@@ -51,5 +62,16 @@ load _helpers
       --set 'server.ha.replicas=3' \
       . | tee /dev/stderr |
       yq '.spec.maxUnavailable' | tee /dev/stderr)
-  [ "${actual}" = "0" ]
+  [ "${actual}" = "1" ]
+}
+
+@test "server/DisruptionBudget: correct maxUnavailable with n=5" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      -x templates/server-disruptionbudget.yaml  \
+      --set 'server.ha.enabled=true' \
+      --set 'server.ha.replicas=5' \
+      . | tee /dev/stderr |
+      yq '.spec.maxUnavailable' | tee /dev/stderr)
+  [ "${actual}" = "2" ]
 }
