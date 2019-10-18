@@ -256,6 +256,11 @@ ui:
   serviceType: "ClusterIP"
   serviceNodePort: null
   externalPort: 8200
+
+  # loadBalancerSourceRanges:
+  #   - 10.0.0.0/16
+  #   - 1.78.23.3/32
+
   # loadBalancerIP:
 
   # Extra annotations to attach to the ui service

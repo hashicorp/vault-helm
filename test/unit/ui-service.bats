@@ -133,6 +133,29 @@ load _helpers
   [ "${actual}" = "null" ]
 }
 
+@test "ui/Service: set loadBalancerSourceRanges when LoadBalancer is configured as serviceType" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      -x templates/ui-service.yaml  \
+      --set 'server.dev.enabled=true' \
+      --set 'ui.serviceType=LoadBalancer' \
+      --set 'ui.enabled=true' \
+      --set 'ui.loadBalancerSourceRanges={"123.123.123.123"}' \
+      . | tee /dev/stderr |
+      yq -r '.spec.loadBalancerSourceRanges[0]' | tee /dev/stderr)
+  [ "${actual}" = "123.123.123.123" ]
+
+  local actual=$(helm template \
+      -x templates/ui-service.yaml  \
+      --set 'server.dev.enabled=true' \
+      --set 'ui.serviceType=ClusterIP' \
+      --set 'ui.enabled=true' \
+      --set 'ui.loadBalancerSourceRanges={"123.123.123.123"}' \
+      . | tee /dev/stderr |
+      yq -r '.spec.loadBalancerSourceRanges[0]' | tee /dev/stderr)
+  [ "${actual}" = "null" ]
+}
+
 @test "ui/Service: specify annotations" {
   cd `chart_dir`
   local actual=$(helm template \
