@@ -55,6 +55,7 @@ spec:
             capabilities:
               add: ["IPC_LOCK"]
           image: "{{ .Values.global.image }}"
+          imagePullPolicy: {{ .Values.global.imagePullPolicy }}
           command: {{ template "vault.command" . }}
           args: {{ template "vault.args" . }}
           env:
@@ -99,5 +100,9 @@ spec:
             periodSeconds: 3
             successThreshold: 1
             timeoutSeconds: 5
+      {{- if .Values.global.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml .Values.global.imagePullSecrets | nindent 8 }}
+      {{- end }}
   {{ template "vault.volumeclaims" . }}
 {{ end }}
