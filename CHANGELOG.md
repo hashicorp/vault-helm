@@ -1,3 +1,26 @@
+## 0.1.3 (Unreleased)
+
+Features:
+
+* Added load balancer support
+* Added ingress support
+* Added configurable for service types (ClusterIP, NodePort, LoadBalancer, etc)
+* Removed root requirements, now runs as Vault user
+
+Improvements:
+
+* Added namespace value to all rendered objects
+* Made ports configurable in services
+* Added the ability to add custom annotations to services
+* Added docker image for running bats test in CircleCI
+* Removed restrictions around `dev` mode such as annotations
+
+Bugs:
+
+* Fixed selector bugs related to Helm label updates (services, affinities, and pod disruption)
+* Fixed bug where audit storage was not being mounted in HA mode
+
+
 ## 0.1.2 (August 22nd, 2019)
 
 Features:
