@@ -42,7 +42,7 @@ Add a special case for replicas=1, where it should default to 0 as well.
 {{- else if .Values.server.ha.disruptionBudget.maxUnavailable -}}
 {{ .Values.server.ha.disruptionBudget.maxUnavailable -}}
 {{- else -}}
-{{- ceil (sub (div (int .Values.server.ha.replicas) 2) 1) -}}
+{{- div (sub (div (mul (int .Values.server.ha.replicas) 10) 2) 1) 10 -}}
 {{- end -}}
 {{- end -}}
 
