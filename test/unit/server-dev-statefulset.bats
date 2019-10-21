@@ -314,7 +314,7 @@ load _helpers
 
 #--------------------------------------------------------------------
 # Security Contexts
-@test "server/standalone-StatefulSet: uid default" {
+@test "server/dev-StatefulSet: uid default" {
   cd `chart_dir`
   local actual=$(helm template \
       -x templates/server-statefulset.yaml \
@@ -324,7 +324,7 @@ load _helpers
   [ "${actual}" = "100" ]
 }
 
-@test "server/standalone-StatefulSet: uid configurable" {
+@test "server/dev-StatefulSet: uid configurable" {
   cd `chart_dir`
   local actual=$(helm template \
       -x templates/server-statefulset.yaml \
@@ -335,7 +335,7 @@ load _helpers
   [ "${actual}" = "2000" ]
 }
 
-@test "server/standalone-StatefulSet: gid default" {
+@test "server/dev-StatefulSet: gid default" {
   cd `chart_dir`
   local actual=$(helm template \
       -x templates/server-statefulset.yaml \
@@ -345,7 +345,7 @@ load _helpers
   [ "${actual}" = "1000" ]
 }
 
-@test "server/standalone-StatefulSet: gid configurable" {
+@test "server/dev-StatefulSet: gid configurable" {
   cd `chart_dir`
   local actual=$(helm template \
       -x templates/server-statefulset.yaml \
@@ -356,7 +356,7 @@ load _helpers
   [ "${actual}" = "2000" ]
 }
 
-@test "server/standalone-StatefulSet: fsgroup default" {
+@test "server/dev-StatefulSet: fsgroup default" {
   cd `chart_dir`
   local actual=$(helm template \
       -x templates/server-statefulset.yaml \
@@ -366,7 +366,7 @@ load _helpers
   [ "${actual}" = "1000" ]
 }
 
-@test "server/standalone-StatefulSet: fsgroup configurable" {
+@test "server/dev-StatefulSet: fsgroup configurable" {
   cd `chart_dir`
   local actual=$(helm template \
       -x templates/server-statefulset.yaml \
@@ -375,4 +375,25 @@ load _helpers
       . | tee /dev/stderr |
       yq -r '.spec.template.spec.securityContext.fsGroup' | tee /dev/stderr)
   [ "${actual}" = "2000" ]
+}
+
+@test "server/dev-StatefulSet: readOnlyRootFilesystem default" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      -x templates/server-statefulset.yaml \
+      --set 'server.dev.enabled=true' \
+      . | tee /dev/stderr |
+      yq -r '.spec.template.spec.securityContext.readOnlyRootFilesystem' | tee /dev/stderr)
+  [ "${actual}" = "true" ]
+}
+
+@test "server/dev-StatefulSet: readOnlyRootFilesystem configurable" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      -x templates/server-statefulset.yaml \
+      --set 'server.dev.enabled=true' \
+      --set 'server.securityContext.readOnlyRootFilesystem=false' \
+      . | tee /dev/stderr |
+      yq -r '.spec.template.spec.securityContext.readOnlyRootFilesystem' | tee /dev/stderr)
+  [ "${actual}" = "null" ]
 }
