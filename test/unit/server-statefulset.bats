@@ -50,6 +50,53 @@ load _helpers
   [ "${actual}" = "foo" ]
 }
 
+@test "server/standalone-StatefulSet: default imagePullPolicy" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      -x templates/server-statefulset.yaml  \
+      --set 'global.image=foo' \
+      . | tee /dev/stderr |
+      yq -r '.spec.template.spec.containers[0].imagePullPolicy' | tee /dev/stderr)
+  [ "${actual}" = "IfNotPresent" ]
+}
+
+@test "server/standalone-StatefulSet: Custom imagePullPolicy" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      -x templates/server-statefulset.yaml  \
+      --set 'global.imagePullPolicy=foo' \
+      . | tee /dev/stderr |
+      yq -r '.spec.template.spec.containers[0].imagePullPolicy' | tee /dev/stderr)
+  [ "${actual}" = "foo" ]
+}
+
+@test "server/standalone-StatefulSet: Custom imagePullSecrets" {
+  cd `chart_dir`
+  local object=$(helm template \
+      -x templates/server-statefulset.yaml  \
+      --set 'global.imagePullSecrets[0].name=foo' \
+      --set 'global.imagePullSecrets[1].name=bar' \
+      . | tee /dev/stderr |
+      yq -r '.spec.template.spec.imagePullSecrets' | tee /dev/stderr)
+
+  local actual=$(echo $object |
+     yq -r '.[0].name' | tee /dev/stderr)
+  [ "${actual}" = "foo" ]
+
+  local actual=$(echo $object |
+      yq -r '.[1].name' | tee /dev/stderr)
+  [ "${actual}" = "bar" ]
+}
+
+@test "server/standalone-StatefulSet: default imagePullSecrets" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      -x templates/server-statefulset.yaml  \
+      . | tee /dev/stderr |
+      yq -r '.spec.template.spec.imagePullSecrets' | tee /dev/stderr)
+  [ "${actual}" = "null" ]
+}
+
 #--------------------------------------------------------------------
 # updateStrategy
 
