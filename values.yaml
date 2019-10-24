@@ -7,6 +7,12 @@ global:
 
   # Image is the name (and tag) of the Vault Docker image.
   image: "vault:1.2.2"
+  # Overrides the default Image Pull Policy
+  imagePullPolicy: IfNotPresent
+  # Image pull secret to use for registry authentication.
+  imagePullSecrets: []
+  # imagePullSecrets:
+  #   - name: image-pull-secret
   # TLS for end-to-end encrypted transport
   tlsDisable: true
 
