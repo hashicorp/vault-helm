@@ -1,4 +1,5 @@
 # StatefulSet to run the actual vault server cluster.
+# StatefulSet to run the actual vault server cluster.
 {{ template "vault.mode" . }}
 {{- if and (ne .mode "") (eq (.Values.global.enabled | toString) "true") }}
 apiVersion: apps/v1

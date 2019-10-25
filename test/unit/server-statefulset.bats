@@ -568,7 +568,6 @@ load _helpers
 }
 
 #--------------------------------------------------------------------
-<<<<<<< HEAD
 # extraContainers
 
 @test "server/standalone-StatefulSet: adds extra containers" {
@@ -649,7 +648,6 @@ load _helpers
       yq -r 'length' | tee /dev/stderr)
   [ "${containers_count}" = 1 ]
 
-=======
 # extra labels
 
 @test "server/standalone-StatefulSet: specify extraLabels" {
@@ -739,5 +737,4 @@ load _helpers
       . | tee /dev/stderr |
       yq -r '.spec.template.spec.securityContext.readOnlyRootFilesystem' | tee /dev/stderr)
   [ "${actual}" = "null" ]
->>>>>>> a2b2d32e92b38c16246b37e8dc2e118c2e3bfecc
 }
