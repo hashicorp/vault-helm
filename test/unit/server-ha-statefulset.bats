@@ -320,19 +320,19 @@ load _helpers
       yq -r '.spec.template.spec.containers[0].env' | tee /dev/stderr)
 
   local actual=$(echo $object |
-     yq -r '.[5].name' | tee /dev/stderr)
+     yq -r '.[6].name' | tee /dev/stderr)
   [ "${actual}" = "FOO" ]
 
   local actual=$(echo $object |
-      yq -r '.[5].value' | tee /dev/stderr)
+      yq -r '.[6].value' | tee /dev/stderr)
   [ "${actual}" = "bar" ]
 
   local actual=$(echo $object |
-      yq -r '.[6].name' | tee /dev/stderr)
+      yq -r '.[7].name' | tee /dev/stderr)
   [ "${actual}" = "FOOBAR" ]
 
   local actual=$(echo $object |
-      yq -r '.[6].value' | tee /dev/stderr)
+      yq -r '.[7].value' | tee /dev/stderr)
   [ "${actual}" = "foobar" ]
 }
 
@@ -354,23 +354,23 @@ load _helpers
       yq -r '.spec.template.spec.containers[0].env' | tee /dev/stderr)
 
   local actual=$(echo $object |
-      yq -r '.[5].name' | tee /dev/stderr)
+      yq -r '.[6].name' | tee /dev/stderr)
   [ "${actual}" = "ENV_FOO_0" ]
   local actual=$(echo $object |
-      yq -r '.[5].valueFrom.secretKeyRef.name' | tee /dev/stderr)
+      yq -r '.[6].valueFrom.secretKeyRef.name' | tee /dev/stderr)
   [ "${actual}" = "secret_name_0" ]
   local actual=$(echo $object |
-      yq -r '.[5].valueFrom.secretKeyRef.key' | tee /dev/stderr)
+      yq -r '.[6].valueFrom.secretKeyRef.key' | tee /dev/stderr)
   [ "${actual}" = "secret_key_0" ]
 
   local actual=$(echo $object |
-      yq -r '.[6].name' | tee /dev/stderr)
+      yq -r '.[7].name' | tee /dev/stderr)
   [ "${actual}" = "ENV_FOO_1" ]
   local actual=$(echo $object |
-      yq -r '.[6].valueFrom.secretKeyRef.name' | tee /dev/stderr)
+      yq -r '.[7].valueFrom.secretKeyRef.name' | tee /dev/stderr)
   [ "${actual}" = "secret_name_1" ]
   local actual=$(echo $object |
-      yq -r '.[6].valueFrom.secretKeyRef.key' | tee /dev/stderr)
+      yq -r '.[7].valueFrom.secretKeyRef.key' | tee /dev/stderr)
   [ "${actual}" = "secret_key_1" ]
 }
 
@@ -434,6 +434,16 @@ load _helpers
   [ "${actual}" = "1" ]
 }
 
+@test "server/ha-StatefulSet: can mount audit" {
+  cd `chart_dir`
+  local object=$(helm template \
+      -x templates/server-statefulset.yaml  \
+      --set 'server.ha.enabled=true' \
+      --set 'server.auditStorage.enabled=true' \
+      . | tee /dev/stderr |
+      yq -r '.spec.template.spec.containers[0].volumeMounts[] | select(.name == "audit")' | tee /dev/stderr)
+}
+
 @test "server/ha-StatefulSet: no data storage" {
   cd `chart_dir`
   local actual=$(helm template \
@@ -495,4 +505,90 @@ load _helpers
       . | tee /dev/stderr |
       yq -r '.spec.template.spec.nodeSelector' | tee /dev/stderr)
   [ "${actual}" = "testing" ]
+}
+
+#--------------------------------------------------------------------
+# Security Contexts
+@test "server/ha-StatefulSet: uid default" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      -x templates/server-statefulset.yaml \
+      --set 'server.ha.enabled=true' \
+      . | tee /dev/stderr |
+      yq -r '.spec.template.spec.securityContext.runAsUser' | tee /dev/stderr)
+  [ "${actual}" = "100" ]
+}
+
+@test "server/ha-StatefulSet: uid configurable" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      -x templates/server-statefulset.yaml \
+      --set 'server.uid=2000' \
+      --set 'server.ha.enabled=true' \
+      . | tee /dev/stderr |
+      yq -r '.spec.template.spec.securityContext.runAsUser' | tee /dev/stderr)
+  [ "${actual}" = "2000" ]
+}
+
+@test "server/ha-StatefulSet: gid default" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      -x templates/server-statefulset.yaml \
+      --set 'server.ha.enabled=true' \
+      . | tee /dev/stderr |
+      yq -r '.spec.template.spec.securityContext.runAsGroup' | tee /dev/stderr)
+  [ "${actual}" = "1000" ]
+}
+
+@test "server/ha-StatefulSet: gid configurable" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      -x templates/server-statefulset.yaml \
+      --set 'server.gid=2000' \
+      --set 'server.ha.enabled=true' \
+      . | tee /dev/stderr |
+      yq -r '.spec.template.spec.securityContext.runAsGroup' | tee /dev/stderr)
+  [ "${actual}" = "2000" ]
+}
+
+@test "server/ha-StatefulSet: fsgroup default" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      -x templates/server-statefulset.yaml \
+      --set 'server.ha.enabled=true' \
+      . | tee /dev/stderr |
+      yq -r '.spec.template.spec.securityContext.fsGroup' | tee /dev/stderr)
+  [ "${actual}" = "1000" ]
+}
+
+@test "server/ha-StatefulSet: fsgroup configurable" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      -x templates/server-statefulset.yaml \
+      --set 'server.gid=2000' \
+      --set 'server.ha.enabled=true' \
+      . | tee /dev/stderr |
+      yq -r '.spec.template.spec.securityContext.fsGroup' | tee /dev/stderr)
+  [ "${actual}" = "2000" ]
+}
+
+@test "server/ha-StatefulSet: readOnlyRootFilesystem default" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      -x templates/server-statefulset.yaml \
+      --set 'server.ha.enabled=true' \
+      . | tee /dev/stderr |
+      yq -r '.spec.template.spec.securityContext.readOnlyRootFilesystem' | tee /dev/stderr)
+  [ "${actual}" = "true" ]
+}
+
+@test "server/ha-StatefulSet: readOnlyRootFilesystem configurable" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      -x templates/server-statefulset.yaml \
+      --set 'server.ha.enabled=true' \
+      --set 'server.securityContext.readOnlyRootFilesystem=false' \
+      . | tee /dev/stderr |
+      yq -r '.spec.template.spec.securityContext.readOnlyRootFilesystem' | tee /dev/stderr)
+  [ "${actual}" = "null" ]
 }

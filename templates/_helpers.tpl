@@ -42,7 +42,7 @@ Add a special case for replicas=1, where it should default to 0 as well.
 {{- else if .Values.server.ha.disruptionBudget.maxUnavailable -}}
 {{ .Values.server.ha.disruptionBudget.maxUnavailable -}}
 {{- else -}}
-{{- ceil (sub (div (int .Values.server.ha.replicas) 2) 1) -}}
+{{- div (sub (div (mul (int .Values.server.ha.replicas) 10) 2) 1) 10 -}}
 {{- end -}}
 {{- end -}}
 
@@ -72,17 +72,6 @@ Set's the replica count based on the different modes configured by user
     {{- .Values.server.ha.replicas | default 3 -}}
   {{ else }}
     {{- default 1 -}}
-  {{ end }}
-{{- end -}}
-
-{{/*
-Set's fsGroup based on different modes.  Standalone is the only mode
-that requires fsGroup at this time because it uses PVC for the file
-storage backend.
-*/}}
-{{- define "vault.fsgroup" -}}
-  {{ if eq .mode "standalone" }}
-    {{- .Values.server.storageFsGroup | default 1000 -}}
   {{ end }}
 {{- end -}}
 
@@ -130,7 +119,6 @@ for users looking to use this chart with Consul Helm.
           - |
             sed -E "s/HOST_IP/${HOST_IP?}/g" /vault/config/extraconfig-from-values.hcl > /tmp/storageconfig.hcl;
             sed -Ei "s/POD_IP/${POD_IP?}/g" /tmp/storageconfig.hcl;
-            chown vault:vault /tmp/storageconfig.hcl;
             /usr/local/bin/docker-entrypoint.sh vault server -config=/tmp/storageconfig.hcl
   {{ end }}
 {{- end -}}
@@ -150,11 +138,11 @@ Set's which additional volumes should be mounted to the container
 based on the mode configured.
 */}}
 {{- define "vault.mounts" -}}
-  {{ if eq .mode "standalone" }}
-    {{ if eq (.Values.server.auditStorage.enabled | toString) "true" }}
+  {{ if eq (.Values.server.auditStorage.enabled | toString) "true" }}
             - name: audit
               mountPath: /vault/audit
-    {{ end }}
+  {{ end }}
+  {{ if eq .mode "standalone" }}
     {{ if eq (.Values.server.dataStorage.enabled | toString) "true" }}
             - name: data
               mountPath: /vault/data

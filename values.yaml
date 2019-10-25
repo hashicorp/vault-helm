@@ -7,6 +7,12 @@ global:
 
   # Image is the name (and tag) of the Vault Docker image.
   image: "vault:1.2.2"
+  # Overrides the default Image Pull Policy
+  imagePullPolicy: IfNotPresent
+  # Image pull secret to use for registry authentication.
+  imagePullSecrets: []
+  # imagePullSecrets:
+  #   - name: image-pull-secret
   # TLS for end-to-end encrypted transport
   tlsDisable: true
 
@@ -14,6 +20,10 @@ server:
   # Resource requests, limits, etc. for the server cluster placement. This
   # should map directly to the value of the resources field for a PodSpec.
   # By default no direct resource request is made.
+
+  securityContext:
+    readOnlyRootFilesystem: true
+
   resources:
   # resources:
   #   requests:
@@ -82,8 +92,8 @@ server:
       requiredDuringSchedulingIgnoredDuringExecution:
         - labelSelector:
             matchLabels:
-              app: {{ template "vault.name" . }}
-              release: "{{ .Release.Name }}"
+              app.kubernetes.io/name: {{ template "vault.name" . }}
+              app.kubernetes.io/instance: "{{ .Release.Name }}"
               component: server
           topologyKey: kubernetes.io/hostname
 
@@ -98,6 +108,11 @@ server:
   # nodeSelector: |
   #   beta.kubernetes.io/arch: amd64
   nodeSelector: {}
+
+  # Extra labels to attach to the server pods
+  # This should be a multi-line string mapping directly to the a map of
+  # the labels to apply to the server pods
+  extraLabels: {}
 
   # Extra annotations to attach to the server pods
   # This should be a multi-line string mapping directly to the a map of
@@ -239,11 +254,6 @@ server:
   serviceaccount:
     annotations: {}
   
-  # mlock prevents memory from being swapped to disk.  If swap is enabled this should 
-  # be true.
-  mlock:
-    enabled: true
-
 # Vault UI
 ui:
   # True if you want to create a Service entry for the Vault UI.
@@ -255,6 +265,11 @@ ui:
   serviceType: "ClusterIP"
   serviceNodePort: null
   externalPort: 8200
+
+  # loadBalancerSourceRanges:
+  #   - 10.0.0.0/16
+  #   - 1.78.23.3/32
+
   # loadBalancerIP:
 
   # Extra annotations to attach to the ui service

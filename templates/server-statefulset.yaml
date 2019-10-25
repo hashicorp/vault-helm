@@ -30,6 +30,9 @@ spec:
         app.kubernetes.io/name: {{ template "vault.name" . }}
         app.kubernetes.io/instance: {{ .Release.Name }}
         component: server
+        {{- if  .Values.server.extraLabels -}}
+          {{- toYaml .Values.server.extraLabels | nindent 8 -}}
+        {{- end -}}
       {{ template "vault.annotations" . }}
     spec:
       {{ template "vault.affinity" . }}
@@ -38,18 +41,23 @@ spec:
       terminationGracePeriodSeconds: 10
       serviceAccountName: {{ template "vault.fullname" . }}
       securityContext:
-        fsGroup: {{ template "vault.fsgroup" . }}
+        {{- if .Values.server.securityContext.readOnlyRootFilesystem }}
+        readOnlyRootFilesystem: true
+        {{- end }}
+        runAsNonRoot: true
+        runAsGroup: {{ .Values.server.gid | default 1000 }}
+        runAsUser: {{ .Values.server.uid | default 100 }}
+        fsGroup: {{ .Values.server.gid | default 1000 }}
       volumes:
         {{ template "vault.volumes" . }}
       containers:
         - name: vault
           {{ template "vault.resources" . }}
-          {{- if eq (.Values.server.mlock.enabled | toString) "true" }}
           securityContext:
             capabilities:
               add: ["IPC_LOCK"]
-          {{- end }}
           image: "{{ .Values.global.image }}"
+          imagePullPolicy: {{ .Values.global.imagePullPolicy }}
           command: {{ template "vault.command" . }}
           args: {{ template "vault.args" . }}
           env:
@@ -67,10 +75,8 @@ spec:
               value: "{{ include "vault.scheme" . }}://$(POD_IP):8200"
             - name: SKIP_CHOWN
               value: "true"
-            {{- if eq (.Values.server.mlock.enabled | toString) "false" }}
             - name: SKIP_SETCAP
               value: "true"
-            {{- end }}
             {{ template "vault.envs" . }}
             {{- include "vault.extraEnvironmentVars" .Values.server | nindent 12 }}
             {{- include "vault.extraSecretEnvironmentVars" .Values.server | nindent 12 }}
@@ -99,5 +105,9 @@ spec:
         {{- if .Values.server.extraContainers }}
           {{ toYaml .Values.server.extraContainers | nindent 8}}
         {{- end }}
+      {{- if .Values.global.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml .Values.global.imagePullSecrets | nindent 8 }}
+      {{- end }}
   {{ template "vault.volumeclaims" . }}
 {{ end }}

@@ -13,9 +13,7 @@ metadata:
     app.kubernetes.io/managed-by: {{ .Release.Service }}
 data:
   extraconfig-from-values.hcl: |-
-  {{- if eq (.Values.server.mlock.enabled | toString) "false" }}
     disable_mlock = true
-  {{- end }}
   {{- if eq .mode "standalone" }}
     {{ tpl .Values.server.standalone.config . | nindent 4 | trim }}
   {{- else if eq .mode "ha" }}
