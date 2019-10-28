@@ -60,9 +60,9 @@ server:
   # extraEnvironmentVars is a list of extra enviroment variables to set with the stateful set. These could be
   # used to include variables required for auto-unseal.
   extraEnvironmentVars: {}
-    # GOOGLE_REGION: global,
-    # GOOGLE_PROJECT: myproject,
-    # GOOGLE_CREDENTIALS: /vault/userconfig/myproject/myproject-creds.json
+    # GOOGLE_REGION: global
+    # GOOGLE_PROJECT: myproject
+    # GOOGLE_APPLICATION_CREDENTIALS: /vault/userconfig/myproject/myproject-creds.json
 
   # extraSecretEnvironmentVars is a list of extra enviroment variables to set with the stateful set.
   # These variables take value from existing Secret objects.
