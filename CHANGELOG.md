@@ -1,4 +1,4 @@
-## 0.1.3 (Unreleased)
+## 0.2.0 (Unreleased)
 
 Features:
 
@@ -14,6 +14,8 @@ Improvements:
 * Added the ability to add custom annotations to services
 * Added docker image for running bats test in CircleCI
 * Removed restrictions around `dev` mode such as annotations
+* `readOnlyRootFilesystem` is now configurable
+* Image Pull Policy is now configurable
 
 Bugs:
 
