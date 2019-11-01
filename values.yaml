@@ -4,17 +4,18 @@ global:
   # enabled is the master enabled switch. Setting this to true or false
   # will enable or disable all the components within this chart by default.
   enabled: true
-
-  # Image is the name (and tag) of the Vault Docker image.
-  image: "vault:1.2.4"
-  # Overrides the default Image Pull Policy
-  imagePullPolicy: IfNotPresent
   # Image pull secret to use for registry authentication.
   imagePullSecrets: []
   # imagePullSecrets:
   #   - name: image-pull-secret
   # TLS for end-to-end encrypted transport
   tlsDisable: true
+
+image:
+  repository: "vault"
+  tag: 1.2.4
+  # Overrides the default Image Pull Policy
+  pullPolicy: IfNotPresent
 
 server:
   # Resource requests, limits, etc. for the server cluster placement. This
