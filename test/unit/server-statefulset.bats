@@ -32,29 +32,50 @@ load _helpers
   [ "${actual}" = "false" ]
 }
 
-@test "server/standalone-StatefulSet: image defaults to global.image" {
+@test "server/standalone-StatefulSet: image defaults to image.repository:tag" {
   cd `chart_dir`
   local actual=$(helm template \
       -x templates/server-statefulset.yaml  \
-      --set 'global.image=foo' \
+      --set 'image.repository=foo' \
+      --set 'image.tag=1.2.3' \
       . | tee /dev/stderr |
       yq -r '.spec.template.spec.containers[0].image' | tee /dev/stderr)
-  [ "${actual}" = "foo" ]
+  [ "${actual}" = "foo:1.2.3" ]
 
   local actual=$(helm template \
       -x templates/server-statefulset.yaml  \
-      --set 'global.image=foo' \
+      --set 'image.repository=foo' \
+      --set 'image.tag=1.2.3' \
       --set 'server.standalone.enabled=true' \
       . | tee /dev/stderr |
       yq -r '.spec.template.spec.containers[0].image' | tee /dev/stderr)
-  [ "${actual}" = "foo" ]
+  [ "${actual}" = "foo:1.2.3" ]
+}
+
+@test "server/standalone-StatefulSet: image tag defaults to latest" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      -x templates/server-statefulset.yaml  \
+      --set 'image.repository=foo' \
+      --set 'image.tag=' \
+      . | tee /dev/stderr |
+      yq -r '.spec.template.spec.containers[0].image' | tee /dev/stderr)
+  [ "${actual}" = "foo:latest" ]
+
+  local actual=$(helm template \
+      -x templates/server-statefulset.yaml  \
+      --set 'image.repository=foo' \
+      --set 'image.tag=' \
+      --set 'server.standalone.enabled=true' \
+      . | tee /dev/stderr |
+      yq -r '.spec.template.spec.containers[0].image' | tee /dev/stderr)
+  [ "${actual}" = "foo:latest" ]
 }
 
 @test "server/standalone-StatefulSet: default imagePullPolicy" {
   cd `chart_dir`
   local actual=$(helm template \
       -x templates/server-statefulset.yaml  \
-      --set 'global.image=foo' \
       . | tee /dev/stderr |
       yq -r '.spec.template.spec.containers[0].imagePullPolicy' | tee /dev/stderr)
   [ "${actual}" = "IfNotPresent" ]
@@ -64,10 +85,10 @@ load _helpers
   cd `chart_dir`
   local actual=$(helm template \
       -x templates/server-statefulset.yaml  \
-      --set 'global.imagePullPolicy=foo' \
+      --set 'image.pullPolicy=Always' \
       . | tee /dev/stderr |
       yq -r '.spec.template.spec.containers[0].imagePullPolicy' | tee /dev/stderr)
-  [ "${actual}" = "foo" ]
+  [ "${actual}" = "Always" ]
 }
 
 @test "server/standalone-StatefulSet: Custom imagePullSecrets" {
