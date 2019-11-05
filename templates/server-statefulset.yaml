@@ -102,6 +102,14 @@ spec:
             periodSeconds: 3
             successThreshold: 1
             timeoutSeconds: 5
+          lifecycle:
+            # Vault container doesn't receive SIGTERM from Kubernetes
+            # and after the grace period ends, Kube sends SIGKILL.  This 
+            # causes issues with grace shutdowns such as deregistering itself
+            # from Consul (zombie services).
+            preStop:
+              exec:
+                command: ["/bin/sh","-c","kill -SIGTERM $(pidof vault)"]
       {{- if .Values.global.imagePullSecrets }}
       imagePullSecrets:
         {{- toYaml .Values.global.imagePullSecrets | nindent 8 }}
