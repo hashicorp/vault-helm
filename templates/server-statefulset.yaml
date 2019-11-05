@@ -102,6 +102,16 @@ spec:
             periodSeconds: 3
             successThreshold: 1
             timeoutSeconds: 5
+          {{- if .Values.server.livenessProbe.enabled }}
+          livenessProbe:
+            httpGet:
+              path: {{ .Values.server.livenessProbe.path | quote }}
+              port: 8200
+            initialDelaySeconds: 5
+            periodSeconds: 3
+            successThreshold: 1
+            timeoutSeconds: 5
+          {{- end }}
       {{- if .Values.global.imagePullSecrets }}
       imagePullSecrets:
         {{- toYaml .Values.global.imagePullSecrets | nindent 8 }}
