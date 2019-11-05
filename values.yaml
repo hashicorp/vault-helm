@@ -57,6 +57,11 @@ server:
   authDelegator:
     enabled: false
 
+  # Used to define custom readinessProbe settings
+  readinessProbe:
+    enabled: true
+    # If you need to use a http path instead of the default exec
+    # path: /v1/sys/health?standbyok
   # Used to enable a livenessProbe for the pods
   livenessProbe:
     enabled: false
@@ -137,7 +142,7 @@ server:
     targetPort: 8200
     # Extra annotations for the service definition
     annotations: {}
-    
+
   # This configures the Vault Statefulset to create a PVC for data
   # storage when using the file backend.
   # See https://www.vaultproject.io/docs/audit/index.html to know more
@@ -254,7 +259,7 @@ server:
   # Definition of the serviceaccount used to run Vault.
   serviceaccount:
     annotations: {}
-  
+
 # Vault UI
 ui:
   # True if you want to create a Service entry for the Vault UI.
