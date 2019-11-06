@@ -38,6 +38,8 @@ server:
   # cluster, very useful if you want to expose the Vault UI
   ingress:
     enabled: false
+    labels: {}
+      # traffic: external
     annotations: {}
       # kubernetes.io/ingress.class: nginx
       # kubernetes.io/tls-acme: "true"
