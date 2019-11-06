@@ -21,6 +21,7 @@ Bugs:
 
 * Fixed selector bugs related to Helm label updates (services, affinities, and pod disruption)
 * Fixed bug where audit storage was not being mounted in HA mode
+* Fixed bug where Vault pod wasn't receiving SIGTERM signals
 
 
 ## 0.1.2 (August 22nd, 2019)
