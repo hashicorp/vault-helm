@@ -105,7 +105,7 @@ spec:
           lifecycle:
             # Vault container doesn't receive SIGTERM from Kubernetes
             # and after the grace period ends, Kube sends SIGKILL.  This 
-            # causes issues with grace shutdowns such as deregistering itself
+            # causes issues with graceful shutdowns such as deregistering itself
             # from Consul (zombie services).
             preStop:
               exec:
