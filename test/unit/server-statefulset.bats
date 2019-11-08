@@ -646,7 +646,8 @@ load _helpers
 
   local containers_count=$(echo $object |
       yq -r 'length' | tee /dev/stderr)
-  [ "${containers_count}" = 1 ]
+  [ "${containers_count}" = 1 ]  
+}
 
 # extra labels
 
