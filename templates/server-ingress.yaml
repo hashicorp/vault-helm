@@ -11,6 +11,9 @@ metadata:
     app.kubernetes.io/name: {{ include "vault.name" . }}
     app.kubernetes.io/instance: {{ .Release.Name }}
     app.kubernetes.io/managed-by: {{ .Release.Service }}
+    {{- with .Values.server.ingress.labels }}
+      {{- toYaml . | nindent 4 }}
+    {{- end }}
   {{- with .Values.server.ingress.annotations }}
   annotations:
     {{- toYaml . | nindent 4 }}

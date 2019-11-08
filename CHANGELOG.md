@@ -1,4 +1,4 @@
-## 0.1.3 (Unreleased)
+## 0.2.0 (Unreleased)
 
 Features:
 
@@ -14,11 +14,14 @@ Improvements:
 * Added the ability to add custom annotations to services
 * Added docker image for running bats test in CircleCI
 * Removed restrictions around `dev` mode such as annotations
+* `readOnlyRootFilesystem` is now configurable
+* Image Pull Policy is now configurable
 
 Bugs:
 
 * Fixed selector bugs related to Helm label updates (services, affinities, and pod disruption)
 * Fixed bug where audit storage was not being mounted in HA mode
+* Fixed bug where Vault pod wasn't receiving SIGTERM signals
 
 
 ## 0.1.2 (August 22nd, 2019)

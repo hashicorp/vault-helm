@@ -45,3 +45,16 @@ load _helpers
   [ "${actual}" = "true" ]
 
 }
+
+@test "server/ingress: labels gets added to object" {
+  cd `chart_dir`
+
+  local actual=$(helm template \
+      -x templates/server-ingress.yaml \
+      --set 'server.ingress.enabled=true' \
+      --set 'server.ingress.labels.traffic=external' \
+      --set 'server.ingress.labels.team=dev' \
+      . | tee /dev/stderr |
+      yq -r '.metadata.labels.traffic' | tee /dev/stderr)
+  [ "${actual}" = "external" ]
+}
