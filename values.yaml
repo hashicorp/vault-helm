@@ -6,7 +6,7 @@ global:
   enabled: true
 
   # Image is the name (and tag) of the Vault Docker image.
-  image: "vault:1.2.2"
+  image: "vault:1.2.4"
   # Overrides the default Image Pull Policy
   imagePullPolicy: IfNotPresent
   # Image pull secret to use for registry authentication.
@@ -33,9 +33,8 @@ server:
   #     memory: 256Mi
   #     cpu: 250m
 
-  # Ingress settings
-  # Enabling it a ingress will be created which will manage external access to the
-  # cluster, very useful if you want to expose the Vault UI
+  # Ingress allows ingress services to be created to allow external access 
+  # from Kubernetes to access Vault pods.
   ingress:
     enabled: false
     labels: {}
@@ -79,7 +78,6 @@ server:
   extraVolumes: []
     # - type: secret (or "configMap")
     #   name: my-secret
-    #   load: false # if true, will add to `-config` to load by Vault
     #   path: null # default is `/vault/userconfig`
 
   # Affinity Settings
