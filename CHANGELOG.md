@@ -1,3 +1,9 @@
+## 0.2.1 (November 12th, 2019)
+
+Bugs:
+
+* Removed `readOnlyRootFilesystem` causing issues when validating deployments
+
 ## 0.2.0 (October 29th, 2019)
 
 Features:

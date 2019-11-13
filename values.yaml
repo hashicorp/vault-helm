@@ -21,9 +21,6 @@ server:
   # should map directly to the value of the resources field for a PodSpec.
   # By default no direct resource request is made.
 
-  securityContext:
-    readOnlyRootFilesystem: true
-
   resources:
   # resources:
   #   requests:
