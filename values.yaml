@@ -132,7 +132,7 @@ server:
     
   # This configures the Vault Statefulset to create a PVC for data
   # storage when using the file backend.
-  # See https://www.vaultproject.io/docs/audit/index.html to know more
+  # See https://www.vaultproject.io/docs/configuration/storage/index.html to know more
   dataStorage:
     enabled: true
     # Size of the PVC created
