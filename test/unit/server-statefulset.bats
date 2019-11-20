@@ -640,25 +640,6 @@ load _helpers
   [ "${actual}" = "2000" ]
 }
 
-@test "server/standalone-StatefulSet: readOnlyRootFilesystem default" {
-  cd `chart_dir`
-  local actual=$(helm template \
-      -x templates/server-statefulset.yaml \
-      . | tee /dev/stderr |
-      yq -r '.spec.template.spec.securityContext.readOnlyRootFilesystem' | tee /dev/stderr)
-  [ "${actual}" = "true" ]
-}
-
-@test "server/standalone-StatefulSet: readOnlyRootFilesystem configurable" {
-  cd `chart_dir`
-  local actual=$(helm template \
-      -x templates/server-statefulset.yaml \
-      --set 'server.securityContext.readOnlyRootFilesystem=false' \
-      . | tee /dev/stderr |
-      yq -r '.spec.template.spec.securityContext.readOnlyRootFilesystem' | tee /dev/stderr)
-  [ "${actual}" = "null" ]
-}
-
 #--------------------------------------------------------------------
 # health checks
 

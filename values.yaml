@@ -6,7 +6,7 @@ global:
   enabled: true
 
   # Image is the name (and tag) of the Vault Docker image.
-  image: "vault:1.2.2"
+  image: "vault:1.2.4"
   # Overrides the default Image Pull Policy
   imagePullPolicy: IfNotPresent
   # Image pull secret to use for registry authentication.
@@ -21,9 +21,6 @@ server:
   # should map directly to the value of the resources field for a PodSpec.
   # By default no direct resource request is made.
 
-  securityContext:
-    readOnlyRootFilesystem: true
-
   resources:
   # resources:
   #   requests:
@@ -33,11 +30,12 @@ server:
   #     memory: 256Mi
   #     cpu: 250m
 
-  # Ingress settings
-  # Enabling it a ingress will be created which will manage external access to the
-  # cluster, very useful if you want to expose the Vault UI
+  # Ingress allows ingress services to be created to allow external access 
+  # from Kubernetes to access Vault pods.
   ingress:
     enabled: false
+    labels: {}
+      # traffic: external
     annotations: {}
       # kubernetes.io/ingress.class: nginx
       # kubernetes.io/tls-acme: "true"
@@ -87,7 +85,6 @@ server:
   extraVolumes: []
     # - type: secret (or "configMap")
     #   name: my-secret
-    #   load: false # if true, will add to `-config` to load by Vault
     #   path: null # default is `/vault/userconfig`
 
   # Affinity Settings
@@ -145,7 +142,7 @@ server:
 
   # This configures the Vault Statefulset to create a PVC for data
   # storage when using the file backend.
-  # See https://www.vaultproject.io/docs/audit/index.html to know more
+  # See https://www.vaultproject.io/docs/configuration/storage/index.html to know more
   dataStorage:
     enabled: true
     # Size of the PVC created

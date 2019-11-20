@@ -1,4 +1,10 @@
-## 0.2.0 (Unreleased)
+## 0.2.1 (November 12th, 2019)
+
+Bugs:
+
+* Removed `readOnlyRootFilesystem` causing issues when validating deployments
+
+## 0.2.0 (October 29th, 2019)
 
 Features:
 
@@ -21,6 +27,7 @@ Bugs:
 
 * Fixed selector bugs related to Helm label updates (services, affinities, and pod disruption)
 * Fixed bug where audit storage was not being mounted in HA mode
+* Fixed bug where Vault pod wasn't receiving SIGTERM signals
 
 
 ## 0.1.2 (August 22nd, 2019)

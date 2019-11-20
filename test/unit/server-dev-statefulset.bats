@@ -376,24 +376,3 @@ load _helpers
       yq -r '.spec.template.spec.securityContext.fsGroup' | tee /dev/stderr)
   [ "${actual}" = "2000" ]
 }
-
-@test "server/dev-StatefulSet: readOnlyRootFilesystem default" {
-  cd `chart_dir`
-  local actual=$(helm template \
-      -x templates/server-statefulset.yaml \
-      --set 'server.dev.enabled=true' \
-      . | tee /dev/stderr |
-      yq -r '.spec.template.spec.securityContext.readOnlyRootFilesystem' | tee /dev/stderr)
-  [ "${actual}" = "true" ]
-}
-
-@test "server/dev-StatefulSet: readOnlyRootFilesystem configurable" {
-  cd `chart_dir`
-  local actual=$(helm template \
-      -x templates/server-statefulset.yaml \
-      --set 'server.dev.enabled=true' \
-      --set 'server.securityContext.readOnlyRootFilesystem=false' \
-      . | tee /dev/stderr |
-      yq -r '.spec.template.spec.securityContext.readOnlyRootFilesystem' | tee /dev/stderr)
-  [ "${actual}" = "null" ]
-}
