@@ -1,3 +1,9 @@
+## Unreleased
+
+Features:
+
+* Extra containers can now be added to the Vault pods
+
 ## 0.2.1 (November 12th, 2019)
 
 Bugs:
