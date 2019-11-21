@@ -117,6 +117,9 @@ spec:
             successThreshold: 1
             timeoutSeconds: 5
           {{- end }}
+        {{- if .Values.server.extraContainers }}
+          {{ toYaml .Values.server.extraContainers | nindent 8}}
+        {{- end }}
           lifecycle:
             # Vault container doesn't receive SIGTERM from Kubernetes
             # and after the grace period ends, Kube sends SIGKILL.  This 

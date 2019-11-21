@@ -54,6 +54,10 @@ server:
   # method.  https://www.vaultproject.io/docs/auth/kubernetes.html
   authDelegator:
     enabled: false
+  
+  # extraContainers is a list of sidecar containers. Specified as a raw YAML string.
+  extraContainers: null
+
 
   # Used to define custom readinessProbe settings
   readinessProbe:
