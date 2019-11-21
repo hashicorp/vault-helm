@@ -54,6 +54,10 @@ server:
   # method.  https://www.vaultproject.io/docs/auth/kubernetes.html
   authDelegator:
     enabled: false
+  
+  # extraContainers is a list of sidecar containers. Specified as a raw YAML string.
+  extraContainers: null
+
 
   # extraEnvironmentVars is a list of extra enviroment variables to set with the stateful set. These could be
   # used to include variables required for auto-unseal.
