@@ -397,7 +397,7 @@ load _helpers
       -x templates/server-statefulset.yaml \
       --set 'server.dev.enabled=true' \
       . | tee /dev/stderr |
-      yq -r '.spec.template.spec.securityContext.readOnlyRootFilesystem' | tee /dev/stderr)
+      yq -r '.spec.template.spec.containers[0].securityContext.readOnlyRootFilesystem' | tee /dev/stderr)
   [ "${actual}" = "true" ]
 }
 
@@ -408,6 +408,6 @@ load _helpers
       --set 'server.dev.enabled=true' \
       --set 'server.securityContext.readOnlyRootFilesystem=false' \
       . | tee /dev/stderr |
-      yq -r '.spec.template.spec.securityContext.readOnlyRootFilesystem' | tee /dev/stderr)
+      yq -r '.spec.template.spec.containers[0].securityContext.readOnlyRootFilesystem' | tee /dev/stderr)
   [ "${actual}" = "null" ]
 }
