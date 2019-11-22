@@ -39,6 +39,9 @@ spec:
       terminationGracePeriodSeconds: 10
       serviceAccountName: {{ template "vault.fullname" . }}
       securityContext:
+        {{- if .Values.server.securityContext.readOnlyRootFilesystem }}
+        readOnlyRootFilesystem: true
+        {{- end }}
         runAsNonRoot: true
         runAsGroup: {{ .Values.server.gid | default 1000 }}
         runAsUser: {{ .Values.server.uid | default 100 }}
