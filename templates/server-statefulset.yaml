@@ -53,8 +53,8 @@ spec:
           securityContext:
             capabilities:
               add: ["IPC_LOCK"]
-          image: {{ .Values.image.repository }}:{{ .Values.image.tag | default "latest" }}
-          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          image: {{ .Values.server.image.repository }}:{{ .Values.server.image.tag | default "latest" }}
+          imagePullPolicy: {{ .Values.server.image.pullPolicy }}
           command: {{ template "vault.command" . }}
           args: {{ template "vault.args" . }}
           env:

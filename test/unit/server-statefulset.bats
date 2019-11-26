@@ -32,20 +32,20 @@ load _helpers
   [ "${actual}" = "false" ]
 }
 
-@test "server/standalone-StatefulSet: image defaults to image.repository:tag" {
+@test "server/standalone-StatefulSet: image defaults to server.image.repository:tag" {
   cd `chart_dir`
   local actual=$(helm template \
       -x templates/server-statefulset.yaml  \
-      --set 'image.repository=foo' \
-      --set 'image.tag=1.2.3' \
+      --set 'server.image.repository=foo' \
+      --set 'server.image.tag=1.2.3' \
       . | tee /dev/stderr |
       yq -r '.spec.template.spec.containers[0].image' | tee /dev/stderr)
   [ "${actual}" = "foo:1.2.3" ]
 
   local actual=$(helm template \
       -x templates/server-statefulset.yaml  \
-      --set 'image.repository=foo' \
-      --set 'image.tag=1.2.3' \
+      --set 'server.image.repository=foo' \
+      --set 'server.image.tag=1.2.3' \
       --set 'server.standalone.enabled=true' \
       . | tee /dev/stderr |
       yq -r '.spec.template.spec.containers[0].image' | tee /dev/stderr)
@@ -56,16 +56,16 @@ load _helpers
   cd `chart_dir`
   local actual=$(helm template \
       -x templates/server-statefulset.yaml  \
-      --set 'image.repository=foo' \
-      --set 'image.tag=' \
+      --set 'server.image.repository=foo' \
+      --set 'server.image.tag=' \
       . | tee /dev/stderr |
       yq -r '.spec.template.spec.containers[0].image' | tee /dev/stderr)
   [ "${actual}" = "foo:latest" ]
 
   local actual=$(helm template \
       -x templates/server-statefulset.yaml  \
-      --set 'image.repository=foo' \
-      --set 'image.tag=' \
+      --set 'server.image.repository=foo' \
+      --set 'server.image.tag=' \
       --set 'server.standalone.enabled=true' \
       . | tee /dev/stderr |
       yq -r '.spec.template.spec.containers[0].image' | tee /dev/stderr)
@@ -85,7 +85,7 @@ load _helpers
   cd `chart_dir`
   local actual=$(helm template \
       -x templates/server-statefulset.yaml  \
-      --set 'image.pullPolicy=Always' \
+      --set 'server.image.pullPolicy=Always' \
       . | tee /dev/stderr |
       yq -r '.spec.template.spec.containers[0].imagePullPolicy' | tee /dev/stderr)
   [ "${actual}" = "Always" ]

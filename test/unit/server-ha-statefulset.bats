@@ -23,12 +23,12 @@ load _helpers
   [ "${actual}" = "false" ]
 }
 
-@test "server/ha-StatefulSet: image defaults to image.repository:tag" {
+@test "server/ha-StatefulSet: image defaults to server.image.repository:tag" {
   cd `chart_dir`
   local actual=$(helm template \
       -x templates/server-statefulset.yaml  \
-      --set 'image.repository=foo' \
-      --set 'image.tag=1.2.3' \
+      --set 'server.image.repository=foo' \
+      --set 'server.image.tag=1.2.3' \
       --set 'server.ha.enabled=true' \
       . | tee /dev/stderr |
       yq -r '.spec.template.spec.containers[0].image' | tee /dev/stderr)
@@ -40,8 +40,8 @@ load _helpers
 
   local actual=$(helm template \
       -x templates/server-statefulset.yaml  \
-      --set 'image.repository=foo' \
-      --set 'image.tag=' \
+      --set 'server.image.repository=foo' \
+      --set 'server.image.tag=' \
       --set 'server.ha.enabled=true' \
       . | tee /dev/stderr |
       yq -r '.spec.template.spec.containers[0].image' | tee /dev/stderr)

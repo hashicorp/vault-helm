@@ -11,16 +11,16 @@ global:
   # TLS for end-to-end encrypted transport
   tlsDisable: true
 
-image:
-  repository: "vault"
-  tag: 1.2.4
-  # Overrides the default Image Pull Policy
-  pullPolicy: IfNotPresent
-
 server:
   # Resource requests, limits, etc. for the server cluster placement. This
   # should map directly to the value of the resources field for a PodSpec.
   # By default no direct resource request is made.
+
+  image:
+    repository: "vault"
+    tag: 1.2.4
+    # Overrides the default Image Pull Policy
+    pullPolicy: IfNotPresent
 
   resources:
   # resources:
