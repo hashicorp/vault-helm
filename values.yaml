@@ -248,7 +248,7 @@ server:
       maxUnavailable: null
 
   # Definition of the serviceaccount used to run Vault.
-  serviceaccount:
+  serviceAccount:
     annotations: {}
   
 # Vault UI
