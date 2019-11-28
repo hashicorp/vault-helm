@@ -38,6 +38,7 @@ spec:
   {{- end }}
   {{- if and (eq (.Values.ui.serviceType | toString) "LoadBalancer") (.Values.ui.loadBalancerIP) }}
   loadBalancerIP: {{ .Values.ui.loadBalancerIP }}
+  externalTrafficPolicy: {{ .Values.ui.externalTrafficPolicy }}
   {{- end }}
 {{- end -}}
 

@@ -258,6 +258,22 @@ Sets extra service account annotations
 {{- end -}}
 
 {{/*
+Adds vault-init container for automated initialization and unsealing on Google Cloud Platform
+*/}}
+{{- define "vault.vault_init" -}}
+        - name: vault-init
+          image: "{{ .Values.vault_init.image }}"
+  {{- if .Values.vault_init.resources }}
+          resources:
+{{ toYaml .Values.vault_init.resources | indent 12}}
+    {{- end }}
+  {{- if .Values.vault_init.EnvironmentVars }}
+          env:
+{{ toYaml .Values.vault_init.EnvironmentVars | indent 12}}
+  {{- end -}}
+{{- end -}}
+
+{{/*
 Set's the container resources if the user has set any.
 */}}
 {{- define "vault.resources" -}}

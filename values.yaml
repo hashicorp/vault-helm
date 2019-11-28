@@ -262,6 +262,7 @@ ui:
   serviceType: "ClusterIP"
   serviceNodePort: null
   externalPort: 8200
+  externalTrafficPolicy: Cluster
 
   # loadBalancerSourceRanges:
   #   - 10.0.0.0/16
@@ -273,3 +274,17 @@ ui:
   # This should be a multi-line string mapping directly to the a map of
   # the annotations to apply to the ui service
   annotations: {}
+
+# Vault-init for Google Cloud Platform
+vault_init:
+  # The vault-init service automates the process of initializing and unsealing HashiCorp Vault
+  # instances running on Google Cloud Platform.
+  # After vault-init initializes a Vault server it stores master keys and root tokens
+  # encrypted using Google Cloud KMS, to a user defined Google Cloud Storage bucket.
+  enabled: false
+  image: "vault-init:latest"
+  EnvironmentVars: {}
+  resources:
+    requests:
+      cpu: "100m"
+      memory: "64Mi"
