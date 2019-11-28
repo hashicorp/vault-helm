@@ -86,7 +86,13 @@ spec:
               name: internal
             - containerPort: 8202
               name: replication
+          {{- if .Values.server.readinessProbe.enabled }}
           readinessProbe:
+            {{- if .Values.server.readinessProbe.path }}
+            httpGet:
+              path: {{ .Values.server.readinessProbe.path | quote }}
+              port: 8200
+            {{- else }}
             # Check status; unsealed vault servers return 0
             # The exit code reflects the seal status:
             #   0 - unsealed
@@ -94,11 +100,23 @@ spec:
             #   2 - sealed
             exec:
               command: ["/bin/sh", "-ec", "vault status -tls-skip-verify"]
+            {{- end }}
             failureThreshold: 2
             initialDelaySeconds: 5
             periodSeconds: 3
             successThreshold: 1
             timeoutSeconds: 5
+          {{- end }}
+          {{- if .Values.server.livenessProbe.enabled }}
+          livenessProbe:
+            httpGet:
+              path: {{ .Values.server.livenessProbe.path | quote }}
+              port: 8200
+            initialDelaySeconds: 5
+            periodSeconds: 3
+            successThreshold: 1
+            timeoutSeconds: 5
+          {{- end }}
         {{- if .Values.server.extraContainers }}
           {{ toYaml .Values.server.extraContainers | nindent 8}}
         {{- end }}

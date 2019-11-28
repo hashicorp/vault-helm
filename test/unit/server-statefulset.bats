@@ -741,3 +741,45 @@ load _helpers
       yq -r '.spec.template.spec.securityContext.fsGroup' | tee /dev/stderr)
   [ "${actual}" = "2000" ]
 }
+
+#--------------------------------------------------------------------
+# health checks
+
+@test "server/standalone-StatefulSet: readinessProbe default" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      -x templates/server-statefulset.yaml \
+      . | tee /dev/stderr |
+      yq -r '.spec.template.spec.containers[0].readinessProbe.exec.command[2]' | tee /dev/stderr)
+  [ "${actual}" = "vault status -tls-skip-verify" ]
+}
+
+@test "server/standalone-StatefulSet: readinessProbe configurable" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      -x templates/server-statefulset.yaml \
+      --set 'server.readinessProbe.enabled=false' \
+      . | tee /dev/stderr |
+      yq -r '.spec.template.spec.containers[0].readinessProbe' | tee /dev/stderr)
+  [ "${actual}" = "null" ]
+}
+
+
+@test "server/standalone-StatefulSet: livenessProbe default" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      -x templates/server-statefulset.yaml \
+      . | tee /dev/stderr |
+      yq -r '.spec.template.spec.containers[0].livenessProbe' | tee /dev/stderr)
+  [ "${actual}" = "null" ]
+}
+
+@test "server/standalone-StatefulSet: livenessProbe configurable" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      -x templates/server-statefulset.yaml \
+      --set 'server.livenessProbe.enabled=true' \
+      . | tee /dev/stderr |
+      yq -r '.spec.template.spec.containers[0].livenessProbe.httpGet.path' | tee /dev/stderr)
+  [ "${actual}" = "/v1/sys/health?standbyok" ]
+}

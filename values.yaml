@@ -60,6 +60,16 @@ server:
   extraContainers: null
 
 
+  # Used to define custom readinessProbe settings
+  readinessProbe:
+    enabled: true
+    # If you need to use a http path instead of the default exec
+    # path: /v1/sys/health?standbyok
+  # Used to enable a livenessProbe for the pods
+  livenessProbe:
+    enabled: false
+    path: /v1/sys/health?standbyok
+
   # extraEnvironmentVars is a list of extra enviroment variables to set with the stateful set. These could be
   # used to include variables required for auto-unseal.
   extraEnvironmentVars: {}
@@ -134,7 +144,7 @@ server:
     targetPort: 8200
     # Extra annotations for the service definition
     annotations: {}
-    
+
   # This configures the Vault Statefulset to create a PVC for data
   # storage when using the file backend.
   # See https://www.vaultproject.io/docs/configuration/storage/index.html to know more
@@ -251,7 +261,7 @@ server:
   # Definition of the serviceaccount used to run Vault.
   serviceaccount:
     annotations: {}
-  
+
 # Vault UI
 ui:
   # True if you want to create a Service entry for the Vault UI.
