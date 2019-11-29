@@ -3,6 +3,11 @@
 Features:
 
 * Extra containers can now be added to the Vault pods
+* Added configurability of pod probes
+
+Improvements:
+
+* Moved `global.image` to `server.image`
 
 ## 0.2.1 (November 12th, 2019)
 
