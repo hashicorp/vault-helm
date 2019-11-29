@@ -4,7 +4,7 @@ load _helpers
 
 @test "server/standalone: testing deployment" {
   cd `chart_dir`
-  helm install --name="$(name_prefix)" .
+  helm install "$(name_prefix)" .
   wait_for_running $(name_prefix)-0
 
   # Sealed, not initialized
@@ -107,6 +107,6 @@ load _helpers
 # Clean up
 teardown() {
   echo "helm/pvc teardown"
-  helm delete --purge vault
+  helm delete vault
   kubectl delete --all pvc
 }

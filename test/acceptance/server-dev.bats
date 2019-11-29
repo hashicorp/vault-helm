@@ -4,7 +4,7 @@ load _helpers
 
 @test "server/dev: testing deployment" {
   cd `chart_dir`
-  helm install --name="$(name_prefix)" --set='server.dev.enabled=true' .
+  helm install "$(name_prefix)" --set='server.dev.enabled=true' .
   wait_for_running $(name_prefix)-0
 
   # Replicas
@@ -51,6 +51,6 @@ load _helpers
 # Clean up
 teardown() {
   echo "helm/pvc teardown"
-  helm delete --purge vault
+  helm delete vault
   kubectl delete --all pvc
 }

@@ -5,7 +5,7 @@ load _helpers
 @test "server/ha: testing deployment" {
   cd `chart_dir`
 
-  helm install --name="$(name_prefix)" \
+  helm install "$(name_prefix)" \
     --set='server.ha.enabled=true' .
   wait_for_running $(name_prefix)-0
 
@@ -92,8 +92,8 @@ load _helpers
 
 # setup a consul env
 setup() {
-  helm install https://github.com/hashicorp/consul-helm/archive/v0.8.1.tar.gz \
-    --name consul \
+  helm install consul \
+    https://github.com/hashicorp/consul-helm/archive/v0.8.1.tar.gz \
     --set 'ui.enabled=false' \
 
   wait_for_running_consul
@@ -101,7 +101,7 @@ setup() {
 
 #cleanup
 teardown() {
-  helm delete --purge vault
-  helm delete --purge consul
+  helm delete vault
+  helm delete consul
   kubectl delete --all pvc
 }
