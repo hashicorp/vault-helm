@@ -23,15 +23,23 @@ The versions required are:
     untested. Other versions verified are Kubernetes 1.10, 1.11.
 
 ## Usage
+### by direct access
 
-For now, we do not host a chart repository. To use the charts, you must
+```
+vault-helm
+helm repo add vault https://github.com/hashicorp/vault-helm/charts/
+helm install vault/vault-helm
+```
+    
+### by compiling source    
+To use the charts, you must
 download this repository and unpack it into a directory. Either
 [download a tagged release](https://github.com/hashicorp/vault-helm/releases) or
 use `git checkout` to a tagged release.
 Assuming this repository was unpacked into the directory `vault-helm`, the chart can
 then be installed directly:
 
-    helm install ./vault-helm
+
 
 Please see the many options supported in the `values.yaml`
 file. These are also fully documented directly on the
