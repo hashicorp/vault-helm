@@ -26,7 +26,6 @@ The versions required are:
 ### by direct access
 
 ```
-vault-helm
 helm repo add vault https://github.com/hashicorp/vault-helm/charts/
 helm install vault/vault-helm
 ```
