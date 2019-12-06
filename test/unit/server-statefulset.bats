@@ -781,5 +781,26 @@ load _helpers
       --set 'server.livenessProbe.enabled=true' \
       . | tee /dev/stderr |
       yq -r '.spec.template.spec.containers[0].livenessProbe.httpGet.path' | tee /dev/stderr)
-  [ "${actual}" = "/v1/sys/health?standbyok" ]
+  [ "${actual}" = "/v1/sys/health?standbyok=true" ]
+}
+
+@test "server/standalone-StatefulSet: livenessProbe initialDelaySeconds default" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      -x templates/server-statefulset.yaml \
+      --set 'server.livenessProbe.enabled=true' \
+      . | tee /dev/stderr |
+      yq -r '.spec.template.spec.containers[0].livenessProbe.initialDelaySeconds' | tee /dev/stderr)
+  [ "${actual}" = "60" ]
+}
+
+@test "server/standalone-StatefulSet: livenessProbe initialDelaySeconds configurable" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      -x templates/server-statefulset.yaml \
+      --set 'server.livenessProbe.enabled=true' \
+      --set 'server.livenessProbe.initialDelaySeconds=30' \
+      . | tee /dev/stderr |
+      yq -r '.spec.template.spec.containers[0].livenessProbe.initialDelaySeconds' | tee /dev/stderr)
+  [ "${actual}" = "30" ]
 }
