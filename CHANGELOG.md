@@ -8,6 +8,7 @@ Features:
 Improvements:
 
 * Moved `global.image` to `server.image`
+* Changed UI service template to route pods that aren't ready via `publishNotReadyAddresses: true`
 
 Bugs:
 
