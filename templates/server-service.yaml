@@ -1,5 +1,5 @@
-# Service for Vault cluster
 {{- if and (eq (.Values.server.service.enabled | toString) "true" ) (eq (.Values.global.enabled | toString) "true") }}
+# Service for Vault cluster
 apiVersion: v1
 kind: Service
 metadata:

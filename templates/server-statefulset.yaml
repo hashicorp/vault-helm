@@ -1,6 +1,6 @@
-# StatefulSet to run the actual vault server cluster.
 {{ template "vault.mode" . }}
 {{- if and (ne .mode "") (eq (.Values.global.enabled | toString) "true") }}
+# StatefulSet to run the actual vault server cluster.
 apiVersion: apps/v1
 kind: StatefulSet
 metadata:
@@ -120,7 +120,7 @@ spec:
         {{- end }}
           lifecycle:
             # Vault container doesn't receive SIGTERM from Kubernetes
-            # and after the grace period ends, Kube sends SIGKILL.  This 
+            # and after the grace period ends, Kube sends SIGKILL.  This
             # causes issues with graceful shutdowns such as deregistering itself
             # from Consul (zombie services).
             preStop:

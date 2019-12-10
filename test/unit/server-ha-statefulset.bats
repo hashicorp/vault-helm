@@ -5,7 +5,7 @@ load _helpers
 @test "server/ha-StatefulSet: enable with server.ha.enabled true" {
   cd `chart_dir`
   local actual=$(helm template \
-      -x templates/server-statefulset.yaml  \
+      --show-only templates/server-statefulset.yaml  \
       --set 'server.ha.enabled=true' \
       . | tee /dev/stderr |
       yq 'length > 0' | tee /dev/stderr)
@@ -14,19 +14,18 @@ load _helpers
 
 @test "server/ha-StatefulSet: disable with global.enabled" {
   cd `chart_dir`
-  local actual=$(helm template \
-      -x templates/server-statefulset.yaml  \
+  run helm template \
+      --show-only templates/server-statefulset.yaml  \
       --set 'global.enabled=false' \
       --set 'server.ha.enabled=true' \
-      . | tee /dev/stderr |
-      yq 'length > 0' | tee /dev/stderr)
-  [ "${actual}" = "false" ]
+      .
+  [ "$status" -eq 1 ]
 }
 
 @test "server/ha-StatefulSet: image defaults to server.image.repository:tag" {
   cd `chart_dir`
   local actual=$(helm template \
-      -x templates/server-statefulset.yaml  \
+      --show-only templates/server-statefulset.yaml  \
       --set 'server.image.repository=foo' \
       --set 'server.image.tag=1.2.3' \
       --set 'server.ha.enabled=true' \
@@ -39,7 +38,7 @@ load _helpers
   cd `chart_dir`
 
   local actual=$(helm template \
-      -x templates/server-statefulset.yaml  \
+      --show-only templates/server-statefulset.yaml  \
       --set 'server.image.repository=foo' \
       --set 'server.image.tag=' \
       --set 'server.ha.enabled=true' \
@@ -54,7 +53,7 @@ load _helpers
 @test "server/ha-StatefulSet: tls disabled" {
   cd `chart_dir`
   local object=$(helm template \
-      -x templates/server-statefulset.yaml  \
+      --show-only templates/server-statefulset.yaml  \
       --set 'global.tlsDisable=true' \
       . | tee /dev/stderr |
       yq -r '.spec.template.spec.containers[0].env' | tee /dev/stderr)
@@ -70,7 +69,7 @@ load _helpers
 @test "server/ha-StatefulSet: tls enabled" {
   cd `chart_dir`
   local object=$(helm template \
-      -x templates/server-statefulset.yaml  \
+      --show-only templates/server-statefulset.yaml  \
       --set 'global.tlsDisable=false' \
       . | tee /dev/stderr |
       yq -r '.spec.template.spec.containers[0].env' | tee /dev/stderr)
@@ -90,7 +89,7 @@ load _helpers
 @test "server/ha-StatefulSet: OnDelete updateStrategy" {
   cd `chart_dir`
   local actual=$(helm template \
-      -x templates/server-statefulset.yaml  \
+      --show-only templates/server-statefulset.yaml  \
       --set 'server.ha.enabled=true' \
       . | tee /dev/stderr |
       yq -r '.spec.updateStrategy.type' | tee /dev/stderr)
@@ -103,14 +102,14 @@ load _helpers
 @test "server/ha-StatefulSet: default affinity" {
   cd `chart_dir`
   local actual=$(helm template \
-      -x templates/server-statefulset.yaml  \
+      --show-only templates/server-statefulset.yaml  \
       --set 'server.ha.enabled=true' \
       . | tee /dev/stderr |
       yq -r '.spec.template.spec.affinity' | tee /dev/stderr)
   [ "${actual}" != "null" ]
 
   local actual=$(helm template \
-      -x templates/server-statefulset.yaml  \
+      --show-only templates/server-statefulset.yaml  \
       --set 'server.ha.enabled=true' \
       --set 'server.affinity=' \
       . | tee /dev/stderr |
@@ -124,7 +123,7 @@ load _helpers
 @test "server/ha-StatefulSet: default replicas" {
   cd `chart_dir`
   local actual=$(helm template \
-      -x templates/server-statefulset.yaml  \
+      --show-only templates/server-statefulset.yaml  \
       --set 'server.ha.enabled=true' \
       . | tee /dev/stderr |
       yq -r '.spec.replicas' | tee /dev/stderr)
@@ -134,7 +133,7 @@ load _helpers
 @test "server/ha-StatefulSet: custom replicas" {
   cd `chart_dir`
   local actual=$(helm template \
-      -x templates/server-statefulset.yaml  \
+      --show-only templates/server-statefulset.yaml  \
       --set 'server.ha.enabled=true' \
       --set 'server.ha.replicas=10' \
       . | tee /dev/stderr |
@@ -148,7 +147,7 @@ load _helpers
 @test "server/ha-StatefulSet: default resources" {
   cd `chart_dir`
   local actual=$(helm template \
-      -x templates/server-statefulset.yaml  \
+      --show-only templates/server-statefulset.yaml  \
       --set 'server.ha.enabled=true' \
       . | tee /dev/stderr |
       yq -r '.spec.template.spec.containers[0].resources' | tee /dev/stderr)
@@ -158,7 +157,7 @@ load _helpers
 @test "server/ha-StatefulSet: custom resources" {
   cd `chart_dir`
   local actual=$(helm template \
-      -x templates/server-statefulset.yaml  \
+      --show-only templates/server-statefulset.yaml  \
       --set 'server.ha.enabled=true' \
       --set 'server.resources.requests.memory=256Mi' \
       --set 'server.resources.requests.cpu=250m' \
@@ -167,7 +166,7 @@ load _helpers
   [ "${actual}" = "256Mi" ]
 
   local actual=$(helm template \
-      -x templates/server-statefulset.yaml  \
+      --show-only templates/server-statefulset.yaml  \
       --set 'server.ha.enabled=true' \
       --set 'server.resources.limits.memory=256Mi' \
       --set 'server.resources.limits.cpu=250m' \
@@ -176,7 +175,7 @@ load _helpers
   [ "${actual}" = "256Mi" ]
 
   local actual=$(helm template \
-      -x templates/server-statefulset.yaml  \
+      --show-only templates/server-statefulset.yaml  \
       --set 'server.ha.enabled=true' \
       --set 'server.resources.requests.cpu=250m' \
       . | tee /dev/stderr |
@@ -184,7 +183,7 @@ load _helpers
   [ "${actual}" = "250m" ]
 
   local actual=$(helm template \
-      -x templates/server-statefulset.yaml  \
+      --show-only templates/server-statefulset.yaml  \
       --set 'server.ha.enabled=true' \
       --set 'server.resources.limits.cpu=250m' \
       . | tee /dev/stderr |
@@ -199,7 +198,7 @@ load _helpers
   cd `chart_dir`
   # Test that it defines it
   local object=$(helm template \
-      -x templates/server-statefulset.yaml  \
+      --show-only templates/server-statefulset.yaml  \
       --set 'server.ha.enabled=true' \
       --set 'server.extraVolumes[0].type=configMap' \
       --set 'server.extraVolumes[0].name=foo' \
@@ -216,7 +215,7 @@ load _helpers
 
   # Test that it mounts it
   local object=$(helm template \
-      -x templates/server-statefulset.yaml  \
+      --show-only templates/server-statefulset.yaml  \
       --set 'server.ha.enabled=true' \
       --set 'server.extraVolumes[0].type=configMap' \
       --set 'server.extraVolumes[0].name=foo' \
@@ -236,7 +235,7 @@ load _helpers
   cd `chart_dir`
   # Test that it mounts it
   local object=$(helm template \
-      -x templates/server-statefulset.yaml  \
+      --show-only templates/server-statefulset.yaml  \
       --set 'server.ha.enabled=true' \
       --set 'server.extraVolumes[0].type=configMap' \
       --set 'server.extraVolumes[0].name=foo' \
@@ -258,7 +257,7 @@ load _helpers
 
   # Test that it mounts it
   local object=$(helm template \
-      -x templates/server-statefulset.yaml  \
+      --show-only templates/server-statefulset.yaml  \
       --set 'server.ha.enabled=true' \
       --set 'server.extraVolumes[0].type=configMap' \
       --set 'server.extraVolumes[0].name=foo' \
@@ -280,7 +279,7 @@ load _helpers
 
   # Test that it defines it
   local object=$(helm template \
-      -x templates/server-statefulset.yaml  \
+      --show-only templates/server-statefulset.yaml  \
       --set 'server.ha.enabled=true' \
       --set 'server.extraVolumes[0].type=secret' \
       --set 'server.extraVolumes[0].name=foo' \
@@ -297,7 +296,7 @@ load _helpers
 
   # Test that it mounts it
   local object=$(helm template \
-      -x templates/server-statefulset.yaml  \
+      --show-only templates/server-statefulset.yaml  \
       --set 'server.ha.enabled=true' \
       --set 'server.extraVolumes[0].type=configMap' \
       --set 'server.extraVolumes[0].name=foo' \
@@ -319,7 +318,7 @@ load _helpers
 @test "server/ha-StatefulSet: set extraEnvironmentVars" {
   cd `chart_dir`
   local object=$(helm template \
-      -x templates/server-statefulset.yaml  \
+      --show-only templates/server-statefulset.yaml  \
       --set 'server.ha.enabled=true' \
       --set 'server.extraEnvironmentVars.FOO=bar' \
       --set 'server.extraEnvironmentVars.FOOBAR=foobar' \
@@ -349,7 +348,7 @@ load _helpers
 @test "server/ha-StatefulSet: set extraSecretEnvironmentVars" {
   cd `chart_dir`
   local object=$(helm template \
-      -x templates/server-statefulset.yaml  \
+      --show-only templates/server-statefulset.yaml  \
       --set 'server.ha.enabled=true' \
       --set 'server.extraSecretEnvironmentVars[0].envName=ENV_FOO_0' \
       --set 'server.extraSecretEnvironmentVars[0].secretName=secret_name_0' \
@@ -387,7 +386,7 @@ load _helpers
 @test "server/ha-StatefulSet: no storage by default" {
   cd `chart_dir`
   local actual=$(helm template \
-      -x templates/server-statefulset.yaml  \
+      --show-only templates/server-statefulset.yaml  \
       --set 'server.ha.enabled=true' \
       . | tee /dev/stderr |
       yq -r '.spec.volumeClaimTemplates | length' | tee /dev/stderr)
@@ -398,7 +397,7 @@ load _helpers
 @test "server/ha-StatefulSet: cant set data storage" {
   cd `chart_dir`
   local actual=$(helm template \
-      -x templates/server-statefulset.yaml  \
+      --show-only templates/server-statefulset.yaml  \
       --set 'server.ha.enabled=true' \
       --set 'server.dataStorage.enabled=true' \
       --set 'server.dataStorage.storageClass=foo' \
@@ -410,7 +409,7 @@ load _helpers
 @test "server/ha-StatefulSet: can set storageClass" {
   cd `chart_dir`
   local actual=$(helm template \
-      -x templates/server-statefulset.yaml  \
+      --show-only templates/server-statefulset.yaml  \
       --set 'server.ha.enabled=true' \
       --set 'server.dataStorage.enabled=false' \
       --set 'server.auditStorage.enabled=true' \
@@ -423,7 +422,7 @@ load _helpers
 @test "server/ha-StatefulSet: can disable storage" {
   cd `chart_dir`
   local actual=$(helm template \
-      -x templates/server-statefulset.yaml  \
+      --show-only templates/server-statefulset.yaml  \
       --set 'server.ha.enabled=true' \
       --set 'server.auditStorage.enabled=false' \
       --set 'server.dataStorage.enabled=false' \
@@ -432,7 +431,7 @@ load _helpers
   [ "${actual}" = "0" ]
 
   local actual=$(helm template \
-      -x templates/server-statefulset.yaml  \
+      --show-only templates/server-statefulset.yaml  \
       --set 'server.ha.enabled=true' \
       --set 'server.auditStorage.enabled=true' \
       --set 'server.dataStorage.enabled=false' \
@@ -444,7 +443,7 @@ load _helpers
 @test "server/ha-StatefulSet: can mount audit" {
   cd `chart_dir`
   local object=$(helm template \
-      -x templates/server-statefulset.yaml  \
+      --show-only templates/server-statefulset.yaml  \
       --set 'server.ha.enabled=true' \
       --set 'server.auditStorage.enabled=true' \
       . | tee /dev/stderr |
@@ -454,7 +453,7 @@ load _helpers
 @test "server/ha-StatefulSet: no data storage" {
   cd `chart_dir`
   local actual=$(helm template \
-      -x templates/server-statefulset.yaml  \
+      --show-only templates/server-statefulset.yaml  \
       --set 'server.ha.enabled=true' \
       --set 'server.auditStorage.enabled=false' \
       --set 'server.dataStorage.enabled=true' \
@@ -463,7 +462,7 @@ load _helpers
   [ "${actual}" = "0" ]
 
   local actual=$(helm template \
-      -x templates/server-statefulset.yaml  \
+      --show-only templates/server-statefulset.yaml  \
       --set 'server.ha.enabled=true' \
       --set 'server.auditStorage.enabled=true' \
       --set 'server.dataStorage.enabled=true' \
@@ -475,7 +474,7 @@ load _helpers
 @test "server/ha-StatefulSet: tolerations not set by default" {
   cd `chart_dir`
   local actual=$(helm template \
-      -x templates/server-statefulset.yaml  \
+      --show-only templates/server-statefulset.yaml  \
       --set 'server.ha.enabled=true' \
       . | tee /dev/stderr |
       yq '.spec.template.spec | .tolerations? == null' | tee /dev/stderr)
@@ -485,7 +484,7 @@ load _helpers
 @test "server/ha-StatefulSet: tolerations can be set" {
   cd `chart_dir`
   local actual=$(helm template \
-      -x templates/server-statefulset.yaml  \
+      --show-only templates/server-statefulset.yaml  \
       --set 'server.ha.enabled=true' \
       --set 'server.tolerations=foobar' \
       . | tee /dev/stderr |
@@ -496,7 +495,7 @@ load _helpers
 @test "server/ha-StatefulSet: nodeSelector is not set by default" {
   cd `chart_dir`
   local actual=$(helm template \
-      -x templates/server-statefulset.yaml  \
+      --show-only templates/server-statefulset.yaml  \
       --set 'server.ha.enabled=true' \
       . | tee /dev/stderr |
       yq '.spec.template.spec.nodeSelector' | tee /dev/stderr)
@@ -506,7 +505,7 @@ load _helpers
 @test "server/ha-StatefulSet: specified nodeSelector" {
   cd `chart_dir`
   local actual=$(helm template \
-      -x templates/server-statefulset.yaml \
+      --show-only templates/server-statefulset.yaml \
       --set 'server.ha.enabled=true' \
       --set 'server.nodeSelector=testing' \
       . | tee /dev/stderr |
@@ -519,7 +518,7 @@ load _helpers
 @test "server/ha-StatefulSet: uid default" {
   cd `chart_dir`
   local actual=$(helm template \
-      -x templates/server-statefulset.yaml \
+      --show-only templates/server-statefulset.yaml \
       --set 'server.ha.enabled=true' \
       . | tee /dev/stderr |
       yq -r '.spec.template.spec.securityContext.runAsUser' | tee /dev/stderr)
@@ -529,7 +528,7 @@ load _helpers
 @test "server/ha-StatefulSet: uid configurable" {
   cd `chart_dir`
   local actual=$(helm template \
-      -x templates/server-statefulset.yaml \
+      --show-only templates/server-statefulset.yaml \
       --set 'server.uid=2000' \
       --set 'server.ha.enabled=true' \
       . | tee /dev/stderr |
@@ -540,7 +539,7 @@ load _helpers
 @test "server/ha-StatefulSet: gid default" {
   cd `chart_dir`
   local actual=$(helm template \
-      -x templates/server-statefulset.yaml \
+      --show-only templates/server-statefulset.yaml \
       --set 'server.ha.enabled=true' \
       . | tee /dev/stderr |
       yq -r '.spec.template.spec.securityContext.runAsGroup' | tee /dev/stderr)
@@ -550,7 +549,7 @@ load _helpers
 @test "server/ha-StatefulSet: gid configurable" {
   cd `chart_dir`
   local actual=$(helm template \
-      -x templates/server-statefulset.yaml \
+      --show-only templates/server-statefulset.yaml \
       --set 'server.gid=2000' \
       --set 'server.ha.enabled=true' \
       . | tee /dev/stderr |
@@ -561,7 +560,7 @@ load _helpers
 @test "server/ha-StatefulSet: fsgroup default" {
   cd `chart_dir`
   local actual=$(helm template \
-      -x templates/server-statefulset.yaml \
+      --show-only templates/server-statefulset.yaml \
       --set 'server.ha.enabled=true' \
       . | tee /dev/stderr |
       yq -r '.spec.template.spec.securityContext.fsGroup' | tee /dev/stderr)
@@ -571,7 +570,7 @@ load _helpers
 @test "server/ha-StatefulSet: fsgroup configurable" {
   cd `chart_dir`
   local actual=$(helm template \
-      -x templates/server-statefulset.yaml \
+      --show-only templates/server-statefulset.yaml \
       --set 'server.gid=2000' \
       --set 'server.ha.enabled=true' \
       . | tee /dev/stderr |

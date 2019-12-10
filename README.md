@@ -16,7 +16,7 @@ of this README. Please refer to the Kubernetes and Helm documentation.
 
 The versions required are:
 
-  * **Helm 2.10+** - This is the earliest version of Helm tested. It is possible
+  * **Helm 3.0+** - This is the earliest version of Helm tested. It is possible
     it works with earlier versions but this chart is untested for those versions.
   * **Kubernetes 1.9+** - This is the earliest version of Kubernetes tested.
     It is possible that this chart works with earlier versions but it is
@@ -56,7 +56,7 @@ The acceptance tests require a Kubernetes cluster with a configured `kubectl`.
   ```
 * [helm](https://helm.sh)
   ```bash
-  brew install kubernetes-helm
+  brew install helm
   ```
 
 ### Running The Tests
@@ -180,13 +180,13 @@ Here are some examples of common test patterns:
     ```
     @test "syncCatalog/Deployment: disabled by default" {
       cd `chart_dir`
-      local actual=$(helm template \
+      run helm template \
           -x templates/server-statefulset.yaml  \
           --set 'global.enabled=false' \
-          . | tee /dev/stderr |
-          yq 'length > 0' | tee /dev/stderr)
-      [ "${actual}" = "false" ]
+          .
+      [ "$status" -eq 1 ]
     }
     ```
-    Here we are check the length of the command output to see if the anything is rendered.
-    This style can easily be switched to check that a file is rendered instead.
+    Here we are checking to ensure that the template isn't rendered by verifying that `helm template` exits with an error code.
+
+    *Note:* This test will not work correctly if you put any comments before the conditional statement.

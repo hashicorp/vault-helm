@@ -9,10 +9,12 @@ Improvements:
 
 * Moved `global.image` to `server.image`
 * Changed UI service template to route pods that aren't ready via `publishNotReadyAddresses: true`
+* Update chart to support Helm 3
 
 Bugs:
 
 * Fixed upgrade bug by removing chart label which contained the version
+* Fixed unit test failures due to Helm 3 CLI changes
 
 ## 0.2.1 (November 12th, 2019)
 
@@ -52,21 +54,21 @@ Features:
 
 * Added `extraSecretEnvironmentVars` to allow users to mount secrets as
   environment variables
-* Added `tlsDisable` configurable to change HTTP protocols from HTTP/HTTPS 
+* Added `tlsDisable` configurable to change HTTP protocols from HTTP/HTTPS
   depending on the value
-* Added `serviceNodePort` to configure a NodePort value when setting `serviceType` 
+* Added `serviceNodePort` to configure a NodePort value when setting `serviceType`
   to "NodePort"
 
 Improvements:
 
 * Changed UI port to 8200 for better HTTP protocol support
-* Added `path` to `extraVolumes` to define where the volume should be 
+* Added `path` to `extraVolumes` to define where the volume should be
   mounted.  Defaults to `/vault/userconfig`
 * Upgraded Vault to 1.2.2
 
 Bugs:
 
-* Fixed bug where upgrade would fail because immutable labels were being 
+* Fixed bug where upgrade would fail because immutable labels were being
   changed (Helm Version label)
 * Fixed bug where UI service used wrong selector after updating helm labels
 * Added `VAULT_API_ADDR` env to Vault pod to fixed bug where Vault thinks
