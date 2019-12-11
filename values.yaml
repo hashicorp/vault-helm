@@ -258,8 +258,8 @@ server:
     # replicas. If you'd like a custom value, you can specify an override here.
       maxUnavailable: null
 
-  # Definition of the serviceaccount used to run Vault.
-  serviceaccount:
+  # Definition of the serviceAccount used to run Vault.
+  serviceAccount:
     annotations: {}
 
 # Vault UI
