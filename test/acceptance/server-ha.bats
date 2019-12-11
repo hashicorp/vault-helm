@@ -31,7 +31,7 @@ load _helpers
   # Volume Mounts
   local volumeCount=$(kubectl get statefulset "$(name_prefix)" --output json |
     jq -r '.spec.template.spec.containers[0].volumeMounts | length')
-  [ "${volumeCount}" == "1" ]
+  [ "${volumeCount}" == "2" ]
 
   # Volumes
   local volumeCount=$(kubectl get statefulset "$(name_prefix)" --output json |
