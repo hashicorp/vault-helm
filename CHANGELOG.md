@@ -13,6 +13,7 @@ Improvements:
 Bugs:
 
 * Fixed upgrade bug by removing chart label which contained the version
+* Fixed typo on `serviceAccount` (was `serviceaccount`)
 
 ## 0.2.1 (November 12th, 2019)
 
