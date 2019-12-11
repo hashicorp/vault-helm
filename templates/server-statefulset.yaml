@@ -45,9 +45,6 @@ spec:
         fsGroup: {{ .Values.server.gid | default 1000 }}
       volumes:
         {{ template "vault.volumes" . }}
-        - name: temp-volume
-          emptyDir:
-            medium: Memory
         - name: home-volume
           emptyDir:
             medium: Memory
@@ -86,8 +83,6 @@ spec:
             {{- include "vault.extraSecretEnvironmentVars" .Values.server | nindent 12 }}
           volumeMounts:
           {{ template "vault.mounts" . }}
-            - name: temp-volume
-              mountPath: /tmp
             - name: home-volume
               mountPath: /home/vault
           ports:
