@@ -90,6 +90,7 @@ spec:
             httpGet:
               path: {{ .Values.server.readinessProbe.path | quote }}
               port: 8200
+              scheme: {{ include "vault.scheme" . | upper }}
             {{- else }}
             # Check status; unsealed vault servers return 0
             # The exit code reflects the seal status:
@@ -110,7 +111,8 @@ spec:
             httpGet:
               path: {{ .Values.server.livenessProbe.path | quote }}
               port: 8200
-            initialDelaySeconds: 5
+              scheme: {{ include "vault.scheme" . | upper }}
+            initialDelaySeconds: {{ .Values.server.livenessProbe.initialDelaySeconds }}
             periodSeconds: 3
             successThreshold: 1
             timeoutSeconds: 5

@@ -64,11 +64,12 @@ server:
   readinessProbe:
     enabled: true
     # If you need to use a http path instead of the default exec
-    # path: /v1/sys/health?standbyok
+    # path: /v1/sys/health?standbyok=true
   # Used to enable a livenessProbe for the pods
   livenessProbe:
     enabled: false
-    path: /v1/sys/health?standbyok
+    path: "/v1/sys/health?standbyok=true"
+    initialDelaySeconds: 60
 
   # extraEnvironmentVars is a list of extra enviroment variables to set with the stateful set. These could be
   # used to include variables required for auto-unseal.
