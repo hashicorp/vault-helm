@@ -9,11 +9,13 @@ Improvements:
 
 * Moved `global.image` to `server.image`
 * Changed UI service template to route pods that aren't ready via `publishNotReadyAddresses: true`
+* Added better HTTP/HTTPS scheme support to http probes.
 
 Bugs:
 
 * Fixed upgrade bug by removing chart label which contained the version
 * Fixed typo on `serviceAccount` (was `serviceaccount`)
+* Fixed readiness/liveliness HTTP probe default to accept standbys
 
 ## 0.2.1 (November 12th, 2019)
 
