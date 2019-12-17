@@ -16,6 +16,9 @@ server:
   # should map directly to the value of the resources field for a PodSpec.
   # By default no direct resource request is made.
 
+  securityContext:
+    readOnlyRootFilesystem: true
+
   image:
     repository: "vault"
     tag: 1.3.0
@@ -31,7 +34,7 @@ server:
   #     memory: 256Mi
   #     cpu: 250m
 
-  # Ingress allows ingress services to be created to allow external access 
+  # Ingress allows ingress services to be created to allow external access
   # from Kubernetes to access Vault pods.
   ingress:
     enabled: false
@@ -55,7 +58,7 @@ server:
   # method.  https://www.vaultproject.io/docs/auth/kubernetes.html
   authDelegator:
     enabled: false
-  
+
   # extraContainers is a list of sidecar containers. Specified as a raw YAML string.
   extraContainers: null
 

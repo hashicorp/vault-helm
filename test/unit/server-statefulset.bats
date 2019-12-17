@@ -667,7 +667,7 @@ load _helpers
 
   local containers_count=$(echo $object |
       yq -r 'length' | tee /dev/stderr)
-  [ "${containers_count}" = 1 ]  
+  [ "${containers_count}" = 1 ]
 }
 
 # extra labels
@@ -740,6 +740,25 @@ load _helpers
       . | tee /dev/stderr |
       yq -r '.spec.template.spec.securityContext.fsGroup' | tee /dev/stderr)
   [ "${actual}" = "2000" ]
+}
+
+@test "server/standalone-StatefulSet: readOnlyRootFilesystem default" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      -x templates/server-statefulset.yaml \
+      . | tee /dev/stderr |
+      yq -r '.spec.template.spec.containers[0].securityContext.readOnlyRootFilesystem' | tee /dev/stderr)
+  [ "${actual}" = "true" ]
+}
+
+@test "server/standalone-StatefulSet: readOnlyRootFilesystem configurable" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      -x templates/server-statefulset.yaml \
+      --set 'server.securityContext.readOnlyRootFilesystem=false' \
+      . | tee /dev/stderr |
+      yq -r '.spec.template.spec.containers[0].securityContext.readOnlyRootFilesystem' | tee /dev/stderr)
+  [ "${actual}" = "null" ]
 }
 
 #--------------------------------------------------------------------
