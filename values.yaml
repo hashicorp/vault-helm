@@ -11,6 +11,56 @@ global:
   # TLS for end-to-end encrypted transport
   tlsDisable: true
 
+injector:
+  # True if you want to enable vault agent injection.
+  enabled: true
+
+  # image for vault-k8s that contains the injector
+  image: "hashicorp/vault-k8s:0.1.0"
+  imagePullPolicy: "IfNotPresent"
+
+  # imageVaultAgent sets the name of the Vault image to use for the Vault Agent 
+  # containers.  This should be set to the official Vault image.  Vault 1.3.1+ is 
+  # required.
+  imageVaultAgent: "vault:1.3.1"
+
+  # namespaceSelector is the selector for restricting the webhook to only
+  # specific namespaces. This should be set to a multiline string.
+  # See https://kubernetes.io/docs/reference/access-authn-authz/extensible-admission-controllers/#matching-requests-namespaceselector
+  # for more details.
+  # Example:
+  # namespaceSelector: |
+  #    matchLabels:
+  #      sidecar-injector: enabled
+  namespaceSelector: {}
+
+  certs:
+    # secretName is the name of the secret that has the TLS certificate and
+    # private key to serve the injector webhook. If this is null, then the
+    # injector will default to its automatic management mode that will assign
+    # a service account to the injector to generate its own certificates.
+    secretName: null
+
+    # caBundle is a base64-encoded PEM-encoded certificate bundle for the
+    # CA that signed the TLS certificate that the webhook serves. This must
+    # be set if secretName is non-null.
+    caBundle: ""
+
+    # certName and keyName are the names of the files within the secret for
+    # the TLS cert and private key, respectively. These have reasonable
+    # defaults but can be customized if necessary.
+    certName: tls.crt
+    keyName: tls.key
+
+  resources: {}
+  # resources:
+  #   requests:
+  #     memory: 256Mi
+  #     cpu: 250m
+  #   limits:
+  #     memory: 256Mi
+  #     cpu: 250m
+
 server:
   # Resource requests, limits, etc. for the server cluster placement. This
   # should map directly to the value of the resources field for a PodSpec.
@@ -54,7 +104,7 @@ server:
   # account.  This cluster role binding can be used to setup Kubernetes auth
   # method.  https://www.vaultproject.io/docs/auth/kubernetes.html
   authDelegator:
-    enabled: false
+    enabled: true
   
   # extraContainers is a list of sidecar containers. Specified as a raw YAML string.
   extraContainers: null
