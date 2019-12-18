@@ -138,6 +138,14 @@ server:
     # used to communicate with pods directly through DNS instead of a round robin
     # load balancer.
     # clusterIP: None
+    
+    # Configures the service type for the main Vault service.  Can be ClusterIP 
+    # or NodePort.
+    #type: ClusterIP
+
+    # If type is set to "NodePort", a specific nodePort value can be configured, 
+    # will be random if left blank.
+    #nodePort: 30000
 
     # Port on which Vault server is listening
     port: 8200
