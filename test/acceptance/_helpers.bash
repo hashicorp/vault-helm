@@ -87,7 +87,7 @@ wait_for_running() {
     for i in $(seq 60); do
         if [ -n "$(check ${POD_NAME})" ]; then
             echo "${POD_NAME} is ready."
-            sleep 10
+            sleep 5
             return
         fi
 
@@ -117,7 +117,7 @@ wait_for_ready() {
     for i in $(seq 60); do
         if [ -n "$(check ${POD_NAME})" ]; then
             echo "${POD_NAME} is ready."
-            sleep 10
+            sleep 5
             return
         fi
 
@@ -146,7 +146,7 @@ wait_for_complete_job() {
     for i in $(seq 60); do
         if [ -n "$(check ${POD_NAME})" ]; then
             echo "${POD_NAME} is complete."
-            sleep 10
+            sleep 5
             return
         fi
 
