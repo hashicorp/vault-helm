@@ -8,7 +8,7 @@ metadata:
   labels:
     app.kubernetes.io/name: {{ include "vault.name" . }}-agent-injector
     app.kubernetes.io/instance: {{ .Release.Name }}
-    app.kubernetes.io/managed-by: {{ .Release.Service }}-agent-injector-svc
+    app.kubernetes.io/managed-by: {{ .Release.Service }}
     component: webhook
 spec:
   replicas: 1
