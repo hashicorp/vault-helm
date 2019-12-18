@@ -42,7 +42,7 @@ spec:
             - name: AGENT_INJECT_VAULT_ADDR
               value: {{ include "vault.scheme" . }}://{{ template "vault.fullname" . }}.{{ .Release.Namespace }}.svc:{{ .Values.server.service.port }}
             - name: AGENT_INJECT_VAULT_IMAGE
-              value: "{{ .Values.injector.vaultAgentImage }}"
+              value: "{{ .Values.injector.imageVaultAgent }}"
             {{- if .Values.injector.certs.secretName }}
             - name: AGENT_INJECT_CERT_FILE
               value: "/etc/webhook/certs/{{ .Values.injector.certs.certName }}"
