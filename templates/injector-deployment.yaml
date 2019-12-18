@@ -32,8 +32,8 @@ spec:
       containers:
         - name: sidecar-injector
           {{ template "injector.resources" . }}
-          image: "{{ .Values.injector.image }}"
-          imagePullPolicy: "{{ .Values.injector.imagePullPolicy }}"
+          image: "{{ .Values.injector.image.repository }}:{{ .Values.injector.image.tag }}"
+          imagePullPolicy: "{{ .Values.injector.image.pullPolicy }}"
           env:
             - name: AGENT_INJECT_LISTEN
               value: ":8080"
@@ -42,7 +42,7 @@ spec:
             - name: AGENT_INJECT_VAULT_ADDR
               value: {{ include "vault.scheme" . }}://{{ template "vault.fullname" . }}.{{ .Release.Namespace }}.svc:{{ .Values.server.service.port }}
             - name: AGENT_INJECT_VAULT_IMAGE
-              value: "{{ .Values.injector.imageVaultAgent }}"
+              value: "{{ .Values.injector.agentImage.repository }}:{{ .Values.injector.agentImage.tag }}"
             {{- if .Values.injector.certs.secretName }}
             - name: AGENT_INJECT_CERT_FILE
               value: "/etc/webhook/certs/{{ .Values.injector.certs.certName }}"

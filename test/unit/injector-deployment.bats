@@ -36,7 +36,16 @@ load _helpers
   cd `chart_dir`
   local actual=$(helm template \
       -x templates/injector-deployment.yaml  \
-      --set 'injector.image=foo:1.2.3' \
+      --set 'injector.image.repository=foo' \
+      --set 'injector.image.tag=1.2.3' \
+      . | tee /dev/stderr |
+      yq -r '.spec.template.spec.containers[0].image' | tee /dev/stderr)
+  [ "${actual}" = "foo:1.2.3" ]
+
+  local actual=$(helm template \
+      -x templates/injector-deployment.yaml  \
+      --set 'injector.image.repository=foo' \
+      --set 'injector.image.tag=1.2.3' \
       . | tee /dev/stderr |
       yq -r '.spec.template.spec.containers[0].image' | tee /dev/stderr)
   [ "${actual}" = "foo:1.2.3" ]
