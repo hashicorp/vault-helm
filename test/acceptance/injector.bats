@@ -4,7 +4,8 @@ load _helpers
 
 @test "injector: testing deployment" {
   cd `chart_dir`
-
+  
+  kubectl delete namespace acceptance --ignore-not-found=true
   kubectl create namespace acceptance
   kubectl config set-context --current --namespace=acceptance
 
