@@ -248,6 +248,17 @@ Sets extra ui service annotations
 {{- end -}}
 
 {{/*
+Set the service account name
+*/}}
+{{- define "vault.serviceAccount.name" -}}
+  {{- if ne .Values.server.serviceAccount.name "" -}}
+    {{- .Values.server.serviceAccount.name -}}
+  {{- else -}}
+    {{- template "vault.fullname" . -}}
+  {{- end -}}
+{{- end -}}
+
+{{/*
 Sets extra service account annotations
 */}}
 {{- define "vault.serviceAccount.annotations" -}}

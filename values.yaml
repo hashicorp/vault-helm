@@ -31,7 +31,7 @@ server:
   #     memory: 256Mi
   #     cpu: 250m
 
-  # Ingress allows ingress services to be created to allow external access 
+  # Ingress allows ingress services to be created to allow external access
   # from Kubernetes to access Vault pods.
   ingress:
     enabled: false
@@ -55,7 +55,7 @@ server:
   # method.  https://www.vaultproject.io/docs/auth/kubernetes.html
   authDelegator:
     enabled: false
-  
+
   # extraContainers is a list of sidecar containers. Specified as a raw YAML string.
   extraContainers: null
 
@@ -261,6 +261,8 @@ server:
 
   # Definition of the serviceAccount used to run Vault.
   serviceAccount:
+    create: true
+    name: ""
     annotations: {}
 
 # Vault UI

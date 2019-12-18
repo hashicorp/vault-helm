@@ -37,7 +37,7 @@ spec:
       {{ template "vault.tolerations" . }}
       {{ template "vault.nodeselector" . }}
       terminationGracePeriodSeconds: 10
-      serviceAccountName: {{ template "vault.fullname" . }}
+      serviceAccountName: {{ template "vault.serviceAccount.name" . }}
       securityContext:
         runAsNonRoot: true
         runAsGroup: {{ .Values.server.gid | default 1000 }}
@@ -122,7 +122,7 @@ spec:
         {{- end }}
           lifecycle:
             # Vault container doesn't receive SIGTERM from Kubernetes
-            # and after the grace period ends, Kube sends SIGKILL.  This 
+            # and after the grace period ends, Kube sends SIGKILL.  This
             # causes issues with graceful shutdowns such as deregistering itself
             # from Consul (zombie services).
             preStop:
