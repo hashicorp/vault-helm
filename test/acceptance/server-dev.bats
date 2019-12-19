@@ -4,6 +4,10 @@ load _helpers
 
 @test "server/dev: testing deployment" {
   cd `chart_dir`
+  kubectl delete namespace acceptance --ignore-not-found=true
+  kubectl create namespace acceptance
+  kubectl config set-context --current --namespace=acceptance
+
   helm install --name="$(name_prefix)" --set='server.dev.enabled=true' .
   wait_for_running $(name_prefix)-0
 
@@ -53,4 +57,5 @@ teardown() {
   echo "helm/pvc teardown"
   helm delete --purge vault
   kubectl delete --all pvc
+  kubectl delete namespace acceptance --ignore-not-found=true
 }

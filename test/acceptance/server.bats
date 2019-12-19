@@ -4,6 +4,11 @@ load _helpers
 
 @test "server/standalone: testing deployment" {
   cd `chart_dir`
+
+  kubectl delete namespace acceptance --ignore-not-found=true
+  kubectl create namespace acceptance
+  kubectl config set-context --current --namespace=acceptance
+
   helm install --name="$(name_prefix)" .
   wait_for_running $(name_prefix)-0
 
@@ -86,7 +91,7 @@ load _helpers
   [ "${token}" != "" ]
 
   # Vault Unseal
-  local pods=($(kubectl get pods -o json | jq -r '.items[].metadata.name'))
+  local pods=($(kubectl get pods --selector='app.kubernetes.io/name=vault' -o json | jq -r '.items[].metadata.name'))
   for pod in "${pods[@]}"
   do
       kubectl exec -ti ${pod} -- vault operator unseal ${token}
@@ -94,7 +99,7 @@ load _helpers
 
   wait_for_ready "$(name_prefix)-0"
 
-  # Sealed, not initialized
+  # Unsealed, initialized
   local sealed_status=$(kubectl exec "$(name_prefix)-0" -- vault status -format=json |
     jq -r '.sealed' )
   [ "${sealed_status}" == "false" ]
@@ -109,4 +114,5 @@ teardown() {
   echo "helm/pvc teardown"
   helm delete --purge vault
   kubectl delete --all pvc
+  kubectl delete namespace acceptance --ignore-not-found=true
 }

@@ -41,7 +41,7 @@ resource "google_container_cluster" "cluster" {
   project            = "${var.project}"
   enable_legacy_abac = true
   initial_node_count = 3
-  zone               = "${var.zone}"
+  location           = "${var.zone}"
   min_master_version = "${data.google_container_engine_versions.main.latest_master_version}"
   node_version       = "${data.google_container_engine_versions.main.latest_node_version}"
 
