@@ -4,6 +4,7 @@ Features:
 
 * Extra containers can now be added to the Vault pods
 * Added configurability of pod probes
+* Added Vault Agent Injector 
 
 Improvements:
 
