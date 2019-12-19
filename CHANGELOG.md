@@ -1,5 +1,7 @@
 ## Unreleased
 
+## 0.3.0 (December 19th, 2019)
+
 Features:
 
 * Extra containers can now be added to the Vault pods
@@ -10,7 +12,9 @@ Improvements:
 
 * Moved `global.image` to `server.image`
 * Changed UI service template to route pods that aren't ready via `publishNotReadyAddresses: true`
-* Added better HTTP/HTTPS scheme support to http probes.
+* Added better HTTP/HTTPS scheme support to http probes
+* Added configurable node port for Vault service
+* `server.authDelegator` is now enabled by default
 
 Bugs:
 
