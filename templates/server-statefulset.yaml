@@ -43,6 +43,7 @@ spec:
         runAsGroup: {{ .Values.server.gid | default 1000 }}
         runAsUser: {{ .Values.server.uid | default 100 }}
         fsGroup: {{ .Values.server.gid | default 1000 }}
+      schedulerName: {{ .Values.server.schedulerName | default "" }}
       volumes:
         {{ template "vault.volumes" . }}
       containers:

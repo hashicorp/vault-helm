@@ -147,6 +147,10 @@ server:
     #   name: my-secret
     #   path: null # default is `/vault/userconfig`
 
+  # schedulerName when using a custom scheduler for placing the pods
+  # If not provided the "default" kubernetes scheduler will be used
+  schedulerName: ""
+
   # Affinity Settings
   # Commenting out or setting as empty the affinity variable, will allow
   # deployment to single node services such as Minikube
