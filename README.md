@@ -2,11 +2,32 @@
 
 This repository contains the official HashiCorp Helm chart for installing
 and configuring Vault on Kubernetes. This chart supports multiple use
-cases of Vault on Kubernetes depending on the values provided.
+cases of Vault on Kubernetes depending on the values provided. The chart contains
+templates for two groups of Kubernetes resources: Vault Server and Vault Injector.
+Both named respectively in templates/ folder and logically grouped in the values
+file (_You might want to split these onto two separate values files_).
 
 For full documentation on this Helm chart along with all the ways you can
 use Vault with Kubernetes, please see the
 [Vault and Kubernetes documentation](https://www.vaultproject.io/docs/platform/k8s/index.html).
+
+#### Granulated setup
+In case you only need the server part of the chart you can set:
+```
+injector:
+  enabled: false
+```
+
+To opt out from the server part of the chart (Service, StatefulSet, PV):
+```
+server:
+  service:
+    enabled: false
+  dataStorage:
+    enabled: false
+  standalone:
+    enabled: false
+```
 
 ## Prerequisites
 
