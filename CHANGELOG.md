@@ -1,5 +1,11 @@
 ## Unreleased
 
+## 0.3.1 (January 2nd, 2020)
+
+Bugs:
+
+* Fixed injection bug causing kube-system pods to be rejected [VK8S-14]
+
 ## 0.3.0 (December 19th, 2019)
 
 Features:
