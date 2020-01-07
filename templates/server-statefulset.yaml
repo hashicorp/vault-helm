@@ -131,6 +131,9 @@ spec:
         {{- if .Values.server.extraContainers }}
           {{ toYaml .Values.server.extraContainers | nindent 8}}
         {{- end }}
+      {{- if .Values.server.priorityClassName }}
+      priorityClassName: {{ .Values.server.priorityClassName }}
+      {{- end }}
       {{- if .Values.global.imagePullSecrets }}
       imagePullSecrets:
         {{- toYaml .Values.global.imagePullSecrets | nindent 8 }}
