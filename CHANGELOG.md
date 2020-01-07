@@ -1,20 +1,32 @@
 ## Unreleased
 
+## 0.3.1 (January 2nd, 2020)
+
+Bugs:
+
+* Fixed injection bug causing kube-system pods to be rejected [VK8S-14]
+
+## 0.3.0 (December 19th, 2019)
+
 Features:
 
 * Extra containers can now be added to the Vault pods
 * Added configurability of pod probes
+* Added Vault Agent Injector 
 
 Improvements:
 
 * Moved `global.image` to `server.image`
 * Changed UI service template to route pods that aren't ready via `publishNotReadyAddresses: true`
-* Update chart to support Helm 3
+* Added better HTTP/HTTPS scheme support to http probes
+* Added configurable node port for Vault service
+* `server.authDelegator` is now enabled by default
 
 Bugs:
 
 * Fixed upgrade bug by removing chart label which contained the version
-* Fixed unit test failures due to Helm 3 CLI changes
+* Fixed typo on `serviceAccount` (was `serviceaccount`)
+* Fixed readiness/liveliness HTTP probe default to accept standbys
 
 ## 0.2.1 (November 12th, 2019)
 

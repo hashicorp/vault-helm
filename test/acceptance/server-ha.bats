@@ -5,6 +5,7 @@ load _helpers
 @test "server/ha: testing deployment" {
   cd `chart_dir`
 
+
   helm install --name="$(name_prefix)" \
     --set='server.ha.enabled=true' .
   wait_for_running $(name_prefix)-0
@@ -88,10 +89,12 @@ load _helpers
   [ "${init_status}" == "true" ]
 }
 
-# TODO: Auto unseal test
-
 # setup a consul env
 setup() {
+  kubectl delete namespace acceptance --ignore-not-found=true
+  kubectl create namespace acceptance
+  kubectl config set-context --current --namespace=acceptance
+
   helm install https://github.com/hashicorp/consul-helm/archive/v0.8.1.tar.gz \
     --name consul \
     --set 'ui.enabled=false' \
@@ -104,4 +107,5 @@ teardown() {
   helm delete --purge vault
   helm delete --purge consul
   kubectl delete --all pvc
+  kubectl delete namespace acceptance --ignore-not-found=true
 }

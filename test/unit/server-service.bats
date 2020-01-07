@@ -294,3 +294,59 @@ load _helpers
       yq -r '.spec.ports[0].targetPort' | tee /dev/stderr)
   [ "${actual}" = "80" ]
 }
+
+@test "server/Service: nodeport can set" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      -x templates/server-service.yaml \
+      --set 'server.dev.enabled=true' \
+      --set 'server.service.type=NodePort' \
+      --set 'server.service.nodePort=30008' \
+      . | tee /dev/stderr |
+      yq -r '.spec.ports[0].nodePort' | tee /dev/stderr)
+  [ "${actual}" = "30008" ]
+
+  local actual=$(helm template \
+      -x templates/server-service.yaml \
+      --set 'server.ha.enabled=true' \
+      --set 'server.service.type=NodePort' \
+      --set 'server.service.nodePort=30009' \
+      . | tee /dev/stderr |
+      yq -r '.spec.ports[0].nodePort' | tee /dev/stderr)
+  [ "${actual}" = "30009" ]
+
+  local actual=$(helm template \
+      -x templates/server-service.yaml \
+      --set 'server.service.type=NodePort' \
+      --set 'server.service.nodePort=30010' \
+      . | tee /dev/stderr |
+      yq -r '.spec.ports[0].nodePort' | tee /dev/stderr)
+  [ "${actual}" = "30010" ]
+}
+
+@test "server/Service: nodeport can't set when type isn't NodePort" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      -x templates/server-service.yaml \
+      --set 'server.dev.enabled=true' \
+      --set 'server.service.nodePort=30008' \
+      . | tee /dev/stderr |
+      yq -r '.spec.ports[0].nodePort' | tee /dev/stderr)
+  [ "${actual}" = "null" ]
+
+  local actual=$(helm template \
+      -x templates/server-service.yaml \
+      --set 'server.ha.enabled=true' \
+      --set 'server.service.nodePort=30009' \
+      . | tee /dev/stderr |
+      yq -r '.spec.ports[0].nodePort' | tee /dev/stderr)
+  [ "${actual}" = "null" ]
+
+  local actual=$(helm template \
+      -x templates/server-service.yaml \
+      --set 'server.standalone.enabled=true' \
+      --set 'server.service.nodePort=30010' \
+      . | tee /dev/stderr |
+      yq -r '.spec.ports[0].nodePort' | tee /dev/stderr)
+  [ "${actual}" = "null" ]
+}

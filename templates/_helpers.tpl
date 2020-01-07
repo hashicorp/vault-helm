@@ -226,7 +226,6 @@ Set's the node selector for pod placement when running in standalone and HA mode
   {{- end }}
 {{- end -}}
 
-
 {{/*
 Sets extra pod annotations
 */}}
@@ -250,10 +249,10 @@ Sets extra ui service annotations
 {{/*
 Sets extra service account annotations
 */}}
-{{- define "vault.serviceaccount.annotations" -}}
-  {{- if and (ne .mode "dev") .Values.server.serviceaccount.annotations }}
+{{- define "vault.serviceAccount.annotations" -}}
+  {{- if and (ne .mode "dev") .Values.server.serviceAccount.annotations }}
   annotations:
-    {{- toYaml .Values.server.serviceaccount.annotations | nindent 4 }}
+    {{- toYaml .Values.server.serviceAccount.annotations | nindent 4 }}
   {{- end }}
 {{- end -}}
 
@@ -264,6 +263,16 @@ Set's the container resources if the user has set any.
   {{- if .Values.server.resources -}}
           resources:
 {{ toYaml .Values.server.resources | indent 12}}
+  {{ end }}
+{{- end -}}
+
+{{/*
+Sets the container resources if the user has set any.
+*/}}
+{{- define "injector.resources" -}}
+  {{- if .Values.injector.resources -}}
+          resources:
+{{ toYaml .Values.injector.resources | indent 12}}
   {{ end }}
 {{- end -}}
 

@@ -11,6 +11,60 @@ global:
   # TLS for end-to-end encrypted transport
   tlsDisable: true
 
+injector:
+  # True if you want to enable vault agent injection.
+  enabled: true
+
+  # image sets the repo and tag of the vault-k8s image to use for the injector.
+  image:
+    repository: "hashicorp/vault-k8s"
+    tag: "0.1.1"
+    pullPolicy: IfNotPresent
+
+  # agentImage sets the repo and tag of the Vault image to use for the Vault Agent 
+  # containers.  This should be set to the official Vault image.  Vault 1.3.1+ is 
+  # required.
+  agentImage:
+    repository: "vault"
+    tag: "1.3.1"
+
+  # namespaceSelector is the selector for restricting the webhook to only
+  # specific namespaces. This should be set to a multiline string.
+  # See https://kubernetes.io/docs/reference/access-authn-authz/extensible-admission-controllers/#matching-requests-namespaceselector
+  # for more details.
+  # Example:
+  # namespaceSelector: |
+  #    matchLabels:
+  #      sidecar-injector: enabled
+  namespaceSelector: {}
+
+  certs:
+    # secretName is the name of the secret that has the TLS certificate and
+    # private key to serve the injector webhook. If this is null, then the
+    # injector will default to its automatic management mode that will assign
+    # a service account to the injector to generate its own certificates.
+    secretName: null
+
+    # caBundle is a base64-encoded PEM-encoded certificate bundle for the
+    # CA that signed the TLS certificate that the webhook serves. This must
+    # be set if secretName is non-null.
+    caBundle: ""
+
+    # certName and keyName are the names of the files within the secret for
+    # the TLS cert and private key, respectively. These have reasonable
+    # defaults but can be customized if necessary.
+    certName: tls.crt
+    keyName: tls.key
+
+  resources: {}
+  # resources:
+  #   requests:
+  #     memory: 256Mi
+  #     cpu: 250m
+  #   limits:
+  #     memory: 256Mi
+  #     cpu: 250m
+
 server:
   # Resource requests, limits, etc. for the server cluster placement. This
   # should map directly to the value of the resources field for a PodSpec.
@@ -18,7 +72,7 @@ server:
 
   image:
     repository: "vault"
-    tag: 1.3.0
+    tag: "1.3.1"
     # Overrides the default Image Pull Policy
     pullPolicy: IfNotPresent
 
@@ -54,7 +108,7 @@ server:
   # account.  This cluster role binding can be used to setup Kubernetes auth
   # method.  https://www.vaultproject.io/docs/auth/kubernetes.html
   authDelegator:
-    enabled: false
+    enabled: true
   
   # extraContainers is a list of sidecar containers. Specified as a raw YAML string.
   extraContainers: null
@@ -64,11 +118,12 @@ server:
   readinessProbe:
     enabled: true
     # If you need to use a http path instead of the default exec
-    # path: /v1/sys/health?standbyok
+    # path: /v1/sys/health?standbyok=true
   # Used to enable a livenessProbe for the pods
   livenessProbe:
     enabled: false
-    path: /v1/sys/health?standbyok
+    path: "/v1/sys/health?standbyok=true"
+    initialDelaySeconds: 60
 
   # extraEnvironmentVars is a list of extra enviroment variables to set with the stateful set. These could be
   # used to include variables required for auto-unseal.
@@ -137,6 +192,14 @@ server:
     # used to communicate with pods directly through DNS instead of a round robin
     # load balancer.
     # clusterIP: None
+    
+    # Configures the service type for the main Vault service.  Can be ClusterIP 
+    # or NodePort.
+    #type: ClusterIP
+
+    # If type is set to "NodePort", a specific nodePort value can be configured, 
+    # will be random if left blank.
+    #nodePort: 30000
 
     # Port on which Vault server is listening
     port: 8200
@@ -258,8 +321,8 @@ server:
     # replicas. If you'd like a custom value, you can specify an override here.
       maxUnavailable: null
 
-  # Definition of the serviceaccount used to run Vault.
-  serviceaccount:
+  # Definition of the serviceAccount used to run Vault.
+  serviceAccount:
     annotations: {}
 
 # Vault UI
