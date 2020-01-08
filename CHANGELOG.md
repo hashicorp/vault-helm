@@ -1,5 +1,11 @@
 ## Unreleased
 
+## 0.3.2 (January 8th, 2020)
+
+Bugs:
+
+* Fixed injection bug where TLS Skip Verify was true by default [VK8S-35]
+
 ## 0.3.1 (January 2nd, 2020)
 
 Bugs:
