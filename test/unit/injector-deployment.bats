@@ -118,7 +118,7 @@ load _helpers
 
   local actual=$(echo $object |
      yq -r '.[4].name' | tee /dev/stderr)
-  [ "${actual}" = "AGENT_INJECT_CERT_FILE" ]
+  [ "${actual}" = "AGENT_INJECT_TLS_CERT_FILE" ]
 
   local actual=$(echo $object |
       yq -r '.[4].value' | tee /dev/stderr)
@@ -126,7 +126,7 @@ load _helpers
 
   local actual=$(echo $object |
       yq -r '.[5].name' | tee /dev/stderr)
-  [ "${actual}" = "AGENT_INJECT_KEY_FILE" ]
+  [ "${actual}" = "AGENT_INJECT_TLS_KEY_FILE" ]
 
   local actual=$(echo $object |
       yq -r '.[5].value' | tee /dev/stderr)
