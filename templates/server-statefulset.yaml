@@ -38,6 +38,9 @@ spec:
       {{ template "vault.nodeselector" . }}
       terminationGracePeriodSeconds: 10
       serviceAccountName: {{ template "vault.fullname" . }}
+      {{ if  .Values.server.shareProcessNamespace }}
+      shareProcessNamespace: true
+      {{ end }}
       securityContext:
         runAsNonRoot: true
         runAsGroup: {{ .Values.server.gid | default 1000 }}

@@ -113,6 +113,10 @@ server:
   # extraContainers is a list of sidecar containers. Specified as a raw YAML string.
   extraContainers: null
 
+  # shareProcessNamespace enables process namespace sharing between Vault and the extraContainers
+  # This is useful if Vault must be signaled, e.g. to send a SIGHUP for log rotation
+  shareProcessNamespace: false
+  
   # extraArgs is a string containing additional Vault server arguments.
   extraArgs: ""
 
