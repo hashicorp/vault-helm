@@ -804,3 +804,13 @@ load _helpers
       yq -r '.spec.template.spec.containers[0].livenessProbe.initialDelaySeconds' | tee /dev/stderr)
   [ "${actual}" = "30" ]
 }
+
+@test "server/standalone-StatefulSet: add extraArgs" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      -x templates/server-statefulset.yaml \
+      --set 'server.extraArgs=foobar' \
+      . | tee /dev/stderr |
+       yq -r '.spec.template.spec.containers[0].args[0]' | tee /dev/stderr)
+  [[ "${actual}" = *"foobar"* ]]
+}

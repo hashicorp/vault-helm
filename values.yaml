@@ -113,6 +113,8 @@ server:
   # extraContainers is a list of sidecar containers. Specified as a raw YAML string.
   extraContainers: null
 
+  # extraArgs is a string containing additional Vault server arguments.
+  extraArgs: ""
 
   # Used to define custom readinessProbe settings
   readinessProbe:
