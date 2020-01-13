@@ -670,6 +670,33 @@ load _helpers
   [ "${containers_count}" = 1 ]  
 }
 
+# sharedProcessNamespace
+
+@test "server/standalone-StatefulSet: shareProcessNamespace disabled by default" {
+  cd `chart_dir`
+
+  # Test that it defines it
+  local actual=$(helm template \
+      -x templates/server-statefulset.yaml  \
+      . | tee /dev/stderr |
+      yq -r '.spec.template.spec.shareProcessNamespace' | tee /dev/stderr)
+
+  [ "${actual}" = "null" ]  
+}
+
+@test "server/standalone-StatefulSet: shareProcessNamespace enabled" {
+  cd `chart_dir`
+
+  # Test that it defines it
+  local actual=$(helm template \
+      -x templates/server-statefulset.yaml  \
+      --set 'server.shareProcessNamespace=true' \
+      . | tee /dev/stderr |
+      yq -r '.spec.template.spec.shareProcessNamespace' | tee /dev/stderr)
+
+  [ "${actual}" = "true" ]  
+}
+
 # extra labels
 
 @test "server/standalone-StatefulSet: specify extraLabels" {
