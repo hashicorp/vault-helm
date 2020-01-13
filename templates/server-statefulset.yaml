@@ -15,7 +15,7 @@ spec:
   podManagementPolicy: Parallel
   replicas: {{ template "vault.replicas" . }}
   updateStrategy:
-    type: OnDelete
+    type: {{ .Values.server.updateStrategyType }}
   selector:
     matchLabels:
       app.kubernetes.io/name: {{ template "vault.name" . }}
@@ -122,7 +122,7 @@ spec:
         {{- end }}
           lifecycle:
             # Vault container doesn't receive SIGTERM from Kubernetes
-            # and after the grace period ends, Kube sends SIGKILL.  This 
+            # and after the grace period ends, Kube sends SIGKILL.  This
             # causes issues with graceful shutdowns such as deregistering itself
             # from Consul (zombie services).
             preStop:
