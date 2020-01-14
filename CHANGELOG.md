@@ -1,5 +1,9 @@
 ## Unreleased
 
+Security:
+
+* Added `server.extraArgs` to allow loading of additional Vault configurations containing sensitive settings [GH-175](https://github.com/hashicorp/vault-helm/issues/175)
+
 ## 0.3.2 (January 8th, 2020)
 
 Bugs:
