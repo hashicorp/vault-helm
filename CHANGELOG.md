@@ -1,5 +1,7 @@
 ## Unreleased
 
+## 0.3.3 (January 14th, 2020)
+
 Bugs:
 
 * Fixed injection bug where wrong environment variables were being used for manually mounted TLS files
