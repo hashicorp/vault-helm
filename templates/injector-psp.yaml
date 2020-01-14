@@ -1,0 +1,47 @@
+{{- if and (eq (.Values.injector.enabled | toString) "true" ) (and (eq (.Values.global.enabled | toString) "true") (eq (.Values.global.pspEnable | toString) "true") ) }}
+apiVersion: policy/v1beta1
+kind: PodSecurityPolicy
+metadata:
+  name: {{ template "vault.fullname" . }}-agent-injector
+  labels:
+    app.kubernetes.io/name: {{ include "vault.name" . }}
+    app.kubernetes.io/instance: {{ .Release.Name }}
+    app.kubernetes.io/managed-by: {{ .Release.Service }}
+  annotations:
+    seccomp.security.alpha.kubernetes.io/allowedProfileNames: docker/default,runtime/default
+    apparmor.security.beta.kubernetes.io/allowedProfileNames: runtime/default
+    seccomp.security.alpha.kubernetes.io/defaultProfileName:  runtime/default
+    apparmor.security.beta.kubernetes.io/defaultProfileName:  runtime/default
+spec:
+  privileged: false
+  # Required to prevent escalations to root.
+  allowPrivilegeEscalation: false
+  volumes:
+    - configMap
+    - emptyDir
+    - projected
+    - secret
+    - downwardAPI
+  hostNetwork: false
+  hostIPC: false
+  hostPID: false
+  runAsUser:
+    # Require the container to run without root privileges.
+    rule: MustRunAsNonRoot
+  seLinux:
+    # This policy assumes the nodes are using AppArmor rather than SELinux.
+    rule: RunAsAny
+  supplementalGroups:
+    rule: MustRunAs
+    ranges:
+      # Forbid adding the root group.
+      - min: 1
+        max: 65535
+  fsGroup:
+    rule: MustRunAs
+    ranges:
+      # Forbid adding the root group.
+      - min: 1
+        max: 65535
+  readOnlyRootFilesystem: false
+{{ end }}
