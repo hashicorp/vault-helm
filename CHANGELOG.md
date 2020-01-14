@@ -2,13 +2,13 @@
 
 ## 0.3.3 (January 14th, 2020)
 
-Bugs:
-
-* Fixed injection bug where wrong environment variables were being used for manually mounted TLS files
-
 Security:
 
 * Added `server.extraArgs` to allow loading of additional Vault configurations containing sensitive settings [GH-175](https://github.com/hashicorp/vault-helm/issues/175)
+
+Bugs:
+
+* Fixed injection bug where wrong environment variables were being used for manually mounted TLS files
 
 ## 0.3.2 (January 8th, 2020)
 
