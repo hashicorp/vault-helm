@@ -10,6 +10,8 @@ global:
   #   - name: image-pull-secret
   # TLS for end-to-end encrypted transport
   tlsDisable: true
+  # Create PodSecurityPolicy for pods
+  pspEnable: false
 
 injector:
   # True if you want to enable vault agent injection.
@@ -21,8 +23,8 @@ injector:
     tag: "0.1.2"
     pullPolicy: IfNotPresent
 
-  # agentImage sets the repo and tag of the Vault image to use for the Vault Agent 
-  # containers.  This should be set to the official Vault image.  Vault 1.3.1+ is 
+  # agentImage sets the repo and tag of the Vault image to use for the Vault Agent
+  # containers.  This should be set to the official Vault image.  Vault 1.3.1+ is
   # required.
   agentImage:
     repository: "vault"
@@ -85,7 +87,7 @@ server:
   #     memory: 256Mi
   #     cpu: 250m
 
-  # Ingress allows ingress services to be created to allow external access 
+  # Ingress allows ingress services to be created to allow external access
   # from Kubernetes to access Vault pods.
   ingress:
     enabled: false
@@ -109,7 +111,7 @@ server:
   # method.  https://www.vaultproject.io/docs/auth/kubernetes.html
   authDelegator:
     enabled: true
-  
+
   # extraContainers is a list of sidecar containers. Specified as a raw YAML string.
   extraContainers: null
 
@@ -192,12 +194,12 @@ server:
     # used to communicate with pods directly through DNS instead of a round robin
     # load balancer.
     # clusterIP: None
-    
-    # Configures the service type for the main Vault service.  Can be ClusterIP 
+
+    # Configures the service type for the main Vault service.  Can be ClusterIP
     # or NodePort.
     #type: ClusterIP
 
-    # If type is set to "NodePort", a specific nodePort value can be configured, 
+    # If type is set to "NodePort", a specific nodePort value can be configured,
     # will be random if left blank.
     #nodePort: 30000
 
