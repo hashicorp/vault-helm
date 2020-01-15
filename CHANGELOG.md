@@ -4,6 +4,10 @@ Improvements:
 
 * Allow process namespace sharing between Vault and sidecar containers
 
+Bugs:
+
+* Fix bug where Vault lifecycle was appended after extra containers.
+
 ## 0.3.3 (January 14th, 2020)
 
 Security:
