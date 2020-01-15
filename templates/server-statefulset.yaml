@@ -117,9 +117,6 @@ spec:
             successThreshold: 1
             timeoutSeconds: 5
           {{- end }}
-        {{- if .Values.server.extraContainers }}
-          {{ toYaml .Values.server.extraContainers | nindent 8}}
-        {{- end }}
           lifecycle:
             # Vault container doesn't receive SIGTERM from Kubernetes
             # and after the grace period ends, Kube sends SIGKILL.  This 
@@ -128,6 +125,9 @@ spec:
             preStop:
               exec:
                 command: ["/bin/sh","-c","kill -SIGTERM $(pidof vault)"]
+        {{- if .Values.server.extraContainers }}
+          {{ toYaml .Values.server.extraContainers | nindent 8}}
+        {{- end }}
       {{- if .Values.global.imagePullSecrets }}
       imagePullSecrets:
         {{- toYaml .Values.global.imagePullSecrets | nindent 8 }}
