@@ -1,5 +1,9 @@
 ## Unreleased
 
+Improvements:
+
+* Allow process namespace sharing between Vault and sidecar containers
+
 ## 0.3.3 (January 14th, 2020)
 
 Security:
