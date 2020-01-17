@@ -43,15 +43,15 @@ injector:
   # Label selectors are only available in Kubernetes 1.15 or higher.
   # Possible options:
   # *disabled*: The webhook is applied to all pods.
-  # *explicit*: The webhook is only applied to pods with the label present. Set the label to *failure* to enfore the injection (else the pod is rejected).
-  # *defaultIgnore*: If the label is not present, the webhook is applied but any errors are ignored. Set the label to *failure* to enfore the injection (else the pod is rejected).
+  # *explicit*: The webhook is only applied to pods with the label present. Set the label to *failure* to enforce the injection (else the pod is rejected).
+  # *defaultIgnore*: If the label is not present, the webhook is applied but any errors are ignored. Set the label to *failure* to enforce the injection (else the pod is rejected).
   # Example:
   # labels:
   #   vault.hashicorp.com/agent-inject: failure
   # If labelSelector is set to explicit or defaultIgnore, two webhooks with the corresponding failure policies are created.
   labelSelector: disabled
 
-  # If labelSeletor is set to disabled, the failurePolicy for the webhook can be set explicitly.
+  # If labelSelector is set to disabled, the failurePolicy for the webhook can be set explicitly.
   # See https://kubernetes.io/docs/reference/access-authn-authz/extensible-admission-controllers/#failure-policy
   failurePolicy: ignore
 
