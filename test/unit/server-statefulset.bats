@@ -841,3 +841,28 @@ load _helpers
        yq -r '.spec.template.spec.containers[0].args[0]' | tee /dev/stderr)
   [[ "${actual}" = *"foobar"* ]]
 }
+
+# priorityClassName
+
+@test "server/standalone-StatefulSet: priorityClassName disabled by default" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      -x templates/server-statefulset.yaml  \
+      . | tee /dev/stderr |
+      yq -r '.spec.template.spec.priorityClassName' | tee /dev/stderr)
+
+  [ "${actual}" = "null" ]  
+}
+
+@test "server/standalone-StatefulSet: priorityClassName enabled" {
+  cd `chart_dir`
+
+  # Test that it defines it
+  local actual=$(helm template \
+      -x templates/server-statefulset.yaml  \
+      --set 'server.priorityClassName=foo' \
+      . | tee /dev/stderr |
+      yq -r '.spec.template.spec.priorityClassName' | tee /dev/stderr)
+
+  [ "${actual}" = "foo" ]  
+}
