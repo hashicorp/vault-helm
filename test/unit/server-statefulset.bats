@@ -856,8 +856,6 @@ load _helpers
 
 @test "server/standalone-StatefulSet: priorityClassName enabled" {
   cd `chart_dir`
-
-  # Test that it defines it
   local actual=$(helm template \
       -x templates/server-statefulset.yaml  \
       --set 'server.priorityClassName=foo' \
