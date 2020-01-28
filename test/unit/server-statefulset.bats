@@ -841,3 +841,24 @@ load _helpers
        yq -r '.spec.template.spec.containers[0].args[0]' | tee /dev/stderr)
   [[ "${actual}" = *"foobar"* ]]
 }
+
+#--------------------------------------------------------------------
+# preStop
+@test "server/standalone-StatefulSet: preStop sleep duration default" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      -x templates/server-statefulset.yaml \
+      . | tee /dev/stderr |
+       yq -r '.spec.template.spec.containers[0].lifecycle.preStop.exec.command[2]' | tee /dev/stderr)
+  [[ "${actual}" = "sleep 5 &&"* ]]
+}
+
+@test "server/standalone-StatefulSet: preStop sleep duration 10" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      -x templates/server-statefulset.yaml \
+      --set 'server.preStopSleepSeconds=10' \
+      . | tee /dev/stderr |
+       yq -r '.spec.template.spec.containers[0].lifecycle.preStop.exec.command[2]' | tee /dev/stderr)
+  [[ "${actual}" = "sleep 10 &&"* ]]
+}
