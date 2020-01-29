@@ -117,19 +117,19 @@ load _helpers
       yq -r '.spec.template.spec.containers[0].env' | tee /dev/stderr)
 
   local actual=$(echo $object |
-     yq -r '.[4].name' | tee /dev/stderr)
+     yq -r '.[5].name' | tee /dev/stderr)
   [ "${actual}" = "AGENT_INJECT_TLS_CERT_FILE" ]
 
   local actual=$(echo $object |
-      yq -r '.[4].value' | tee /dev/stderr)
+      yq -r '.[5].value' | tee /dev/stderr)
   [ "${actual}" = "/etc/webhook/certs/test.crt" ]
 
   local actual=$(echo $object |
-      yq -r '.[5].name' | tee /dev/stderr)
+      yq -r '.[6].name' | tee /dev/stderr)
   [ "${actual}" = "AGENT_INJECT_TLS_KEY_FILE" ]
 
   local actual=$(echo $object |
-      yq -r '.[5].value' | tee /dev/stderr)
+      yq -r '.[6].value' | tee /dev/stderr)
   [ "${actual}" = "/etc/webhook/certs/test.key" ]
 }
 
@@ -147,11 +147,11 @@ load _helpers
       yq -r '.spec.template.spec.containers[0].env' | tee /dev/stderr)
 
   local actual=$(echo $object |
-     yq -r '.[4].name' | tee /dev/stderr)
+     yq -r '.[5].name' | tee /dev/stderr)
   [ "${actual}" = "AGENT_INJECT_TLS_AUTO" ]
 
   local actual=$(echo $object |
-      yq -r '.[5].name' | tee /dev/stderr)
+      yq -r '.[6].name' | tee /dev/stderr)
   [ "${actual}" = "AGENT_INJECT_TLS_AUTO_HOSTS" ]
 }
 
@@ -188,4 +188,37 @@ load _helpers
   local actual=$(echo $object |
       yq -r '.[2].value' | tee /dev/stderr)
   [ "${actual}" = "http://not-external-test-vault.default.svc:8200" ]
+}
+
+@test "injector/deployment: default authPath" {
+  cd `chart_dir`
+  local object=$(helm template \
+      --show-only templates/injector-deployment.yaml  \
+      . | tee /dev/stderr |
+      yq -r '.spec.template.spec.containers[0].env' | tee /dev/stderr)
+
+  local actual=$(echo $object |
+     yq -r '.[3].name' | tee /dev/stderr)
+  [ "${actual}" = "AGENT_INJECT_VAULT_AUTH_PATH" ]
+
+  local actual=$(echo $object |
+      yq -r '.[3].value' | tee /dev/stderr)
+  [ "${actual}" = "auth/kubernetes" ]
+}
+
+@test "injector/deployment: custom authPath" {
+  cd `chart_dir`
+  local object=$(helm template \
+      --show-only templates/injector-deployment.yaml  \
+      --set 'injector.authPath=auth/k8s' \
+      . | tee /dev/stderr |
+      yq -r '.spec.template.spec.containers[0].env' | tee /dev/stderr)
+
+  local actual=$(echo $object |
+     yq -r '.[3].name' | tee /dev/stderr)
+  [ "${actual}" = "AGENT_INJECT_VAULT_AUTH_PATH" ]
+
+  local actual=$(echo $object |
+      yq -r '.[3].value' | tee /dev/stderr)
+  [ "${actual}" = "auth/k8s" ]
 }
