@@ -127,7 +127,13 @@ spec:
             # from Consul (zombie services).
             preStop:
               exec:
-                command: ["/bin/sh","-c","kill -SIGTERM $(pidof vault)"]
+                command: [
+                  "/bin/sh", "-c",
+                  # Adding a sleep here to give the pod eviction a
+                  # chance to propagate, so requests will not be made
+                  # to this pod while it's terminating
+                  "sleep {{ .Values.server.preStopSleepSeconds }} && kill -SIGTERM $(pidof vault)",
+                ]
         {{- if .Values.server.extraContainers }}
           {{ toYaml .Values.server.extraContainers | nindent 8}}
         {{- end }}
