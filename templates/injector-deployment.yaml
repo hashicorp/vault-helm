@@ -29,6 +29,18 @@ spec:
         runAsNonRoot: true
         runAsGroup: {{ .Values.injector.gid | default 1000 }}
         runAsUser: {{ .Values.injector.uid | default 100 }}
+      {{- if .Values.injector.affinity }}
+      affinity:
+        {{ tpl .Values.injector.affinity . | nindent 8 | trim }}
+      {{- end }}
+      {{- if .Values.injector.tolerations }}
+      tolerations:
+        {{ tpl .Values.injector.tolerations . | nindent 8 | trim }}
+      {{- end }}
+      {{- if .Values.injector.nodeSelector }}
+      nodeSelector:
+        {{ tpl .Values.injector.nodeSelector . | nindent 8 | trim }}
+      {{- end }}
       containers:
         - name: sidecar-injector
           {{ template "injector.resources" . }}

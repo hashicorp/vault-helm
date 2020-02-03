@@ -154,3 +154,69 @@ load _helpers
       yq -r '.[5].name' | tee /dev/stderr)
   [ "${actual}" = "AGENT_INJECT_TLS_AUTO_HOSTS" ]
 }
+
+#--------------------------------------------------------------------
+# affinity
+
+@test "injector/deployment: affinity not set by default" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      -x templates/injector-deployment.yaml \
+      . | tee /dev/stderr |
+      yq -r '.spec.template.spec.affinity' | tee /dev/stderr)
+  [ "${actual}" == "null" ]
+}
+
+@test "injector/deployment: affinity can be set" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      -x templates/injector-deployment.yaml \
+      --set 'injector.affinity=foobar' \
+      . | tee /dev/stderr |
+      yq -r '.spec.template.spec.affinity' | tee /dev/stderr)
+  [ "${actual}" == "foobar" ]
+}
+
+#--------------------------------------------------------------------
+# tolerations
+
+@test "injector/deployment: tolerations not set by default" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      -x templates/injector-deployment.yaml \
+      . | tee /dev/stderr |
+      yq -r '.spec.template.spec.tolerations' | tee /dev/stderr)
+  [ "${actual}" == "null" ]
+}
+
+@test "injector/deployment: tolerations can be set" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      -x templates/injector-deployment.yaml \
+      --set 'injector.tolerations=foobar' \
+      . | tee /dev/stderr |
+      yq -r '.spec.template.spec.tolerations' | tee /dev/stderr)
+  [ "${actual}" == "foobar" ]
+}
+
+#--------------------------------------------------------------------
+# nodeSelector
+
+@test "injector/deployment: nodeSelector not set by default" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      -x templates/injector-deployment.yaml \
+      . | tee /dev/stderr |
+      yq -r '.spec.template.spec.nodeSelector' | tee /dev/stderr)
+  [ "${actual}" == "null" ]
+}
+
+@test "injector/deployment: nodeSelector can be set" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      -x templates/injector-deployment.yaml \
+      --set 'injector.nodeSelector=foobar' \
+      . | tee /dev/stderr |
+      yq -r '.spec.template.spec.nodeSelector' | tee /dev/stderr)
+  [ "${actual}" == "foobar" ]
+}
