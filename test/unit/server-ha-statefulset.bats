@@ -96,6 +96,17 @@ load _helpers
   [ "${actual}" = "OnDelete" ]
 }
 
+@test "server/ha-StatefulSet: RollingUpdate updateStrategy" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      -x templates/server-statefulset.yaml  \
+      --set 'server.ha.enabled=true' \
+      --set 'server.updateStrategyType="RollingUpdate"' \
+      . | tee /dev/stderr |
+      yq -r '.spec.updateStrategy.type' | tee /dev/stderr)
+  [ "${actual}" = "RollingUpdate" ]
+}
+
 #--------------------------------------------------------------------
 # affinity
 

@@ -1,5 +1,31 @@
 ## Unreleased
 
+Improvements:
+
+* Allow process namespace sharing between Vault and sidecar containers
+* Added configurable to change updateStrategy
+* Added sleep in the preStop lifecycle step
+
+Bugs:
+
+* Fix bug where Vault lifecycle was appended after extra containers.
+
+## 0.3.3 (January 14th, 2020)
+
+Security:
+
+* Added `server.extraArgs` to allow loading of additional Vault configurations containing sensitive settings [GH-175](https://github.com/hashicorp/vault-helm/issues/175)
+
+Bugs:
+
+* Fixed injection bug where wrong environment variables were being used for manually mounted TLS files
+
+## 0.3.2 (January 8th, 2020)
+
+Bugs:
+
+* Fixed injection bug where TLS Skip Verify was true by default [VK8S-35]
+
 ## 0.3.1 (January 2nd, 2020)
 
 Bugs:

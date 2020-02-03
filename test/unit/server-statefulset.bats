@@ -669,6 +669,33 @@ load _helpers
   [ "${containers_count}" = 1 ]
 }
 
+# sharedProcessNamespace
+
+@test "server/standalone-StatefulSet: shareProcessNamespace disabled by default" {
+  cd `chart_dir`
+
+  # Test that it defines it
+  local actual=$(helm template \
+      -x templates/server-statefulset.yaml  \
+      . | tee /dev/stderr |
+      yq -r '.spec.template.spec.shareProcessNamespace' | tee /dev/stderr)
+
+  [ "${actual}" = "null" ]  
+}
+
+@test "server/standalone-StatefulSet: shareProcessNamespace enabled" {
+  cd `chart_dir`
+
+  # Test that it defines it
+  local actual=$(helm template \
+      -x templates/server-statefulset.yaml  \
+      --set 'server.shareProcessNamespace=true' \
+      . | tee /dev/stderr |
+      yq -r '.spec.template.spec.shareProcessNamespace' | tee /dev/stderr)
+
+  [ "${actual}" = "true" ]  
+}
+
 # extra labels
 
 @test "server/standalone-StatefulSet: specify extraLabels" {
@@ -802,4 +829,35 @@ load _helpers
       . | tee /dev/stderr |
       yq -r '.spec.template.spec.containers[0].livenessProbe.initialDelaySeconds' | tee /dev/stderr)
   [ "${actual}" = "30" ]
+}
+
+@test "server/standalone-StatefulSet: add extraArgs" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      -x templates/server-statefulset.yaml \
+      --set 'server.extraArgs=foobar' \
+      . | tee /dev/stderr |
+       yq -r '.spec.template.spec.containers[0].args[0]' | tee /dev/stderr)
+  [[ "${actual}" = *"foobar"* ]]
+}
+
+#--------------------------------------------------------------------
+# preStop
+@test "server/standalone-StatefulSet: preStop sleep duration default" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      -x templates/server-statefulset.yaml \
+      . | tee /dev/stderr |
+       yq -r '.spec.template.spec.containers[0].lifecycle.preStop.exec.command[2]' | tee /dev/stderr)
+  [[ "${actual}" = "sleep 5 &&"* ]]
+}
+
+@test "server/standalone-StatefulSet: preStop sleep duration 10" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      -x templates/server-statefulset.yaml \
+      --set 'server.preStopSleepSeconds=10' \
+      . | tee /dev/stderr |
+       yq -r '.spec.template.spec.containers[0].lifecycle.preStop.exec.command[2]' | tee /dev/stderr)
+  [[ "${actual}" = "sleep 10 &&"* ]]
 }

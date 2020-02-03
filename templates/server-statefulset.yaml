@@ -15,7 +15,7 @@ spec:
   podManagementPolicy: Parallel
   replicas: {{ template "vault.replicas" . }}
   updateStrategy:
-    type: OnDelete
+    type: {{ .Values.server.updateStrategyType }}
   selector:
     matchLabels:
       app.kubernetes.io/name: {{ template "vault.name" . }}
@@ -38,6 +38,9 @@ spec:
       {{ template "vault.nodeselector" . }}
       terminationGracePeriodSeconds: 10
       serviceAccountName: {{ template "vault.fullname" . }}
+      {{ if  .Values.server.shareProcessNamespace }}
+      shareProcessNamespace: true
+      {{ end }}
       securityContext:
         runAsNonRoot: true
         runAsGroup: {{ .Values.server.gid | default 1000 }}
@@ -117,9 +120,6 @@ spec:
             successThreshold: 1
             timeoutSeconds: 5
           {{- end }}
-        {{- if .Values.server.extraContainers }}
-          {{ toYaml .Values.server.extraContainers | nindent 8}}
-        {{- end }}
           lifecycle:
             # Vault container doesn't receive SIGTERM from Kubernetes
             # and after the grace period ends, Kube sends SIGKILL.  This
@@ -127,7 +127,16 @@ spec:
             # from Consul (zombie services).
             preStop:
               exec:
-                command: ["/bin/sh","-c","kill -SIGTERM $(pidof vault)"]
+                command: [
+                  "/bin/sh", "-c",
+                  # Adding a sleep here to give the pod eviction a
+                  # chance to propagate, so requests will not be made
+                  # to this pod while it's terminating
+                  "sleep {{ .Values.server.preStopSleepSeconds }} && kill -SIGTERM $(pidof vault)",
+                ]
+        {{- if .Values.server.extraContainers }}
+          {{ toYaml .Values.server.extraContainers | nindent 8}}
+        {{- end }}
       {{- if .Values.global.imagePullSecrets }}
       imagePullSecrets:
         {{- toYaml .Values.global.imagePullSecrets | nindent 8 }}

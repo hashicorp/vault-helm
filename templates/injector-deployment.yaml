@@ -44,9 +44,9 @@ spec:
             - name: AGENT_INJECT_VAULT_IMAGE
               value: "{{ .Values.injector.agentImage.repository }}:{{ .Values.injector.agentImage.tag }}"
             {{- if .Values.injector.certs.secretName }}
-            - name: AGENT_INJECT_CERT_FILE
+            - name: AGENT_INJECT_TLS_CERT_FILE
               value: "/etc/webhook/certs/{{ .Values.injector.certs.certName }}"
-            - name: AGENT_INJECT_KEY_FILE
+            - name: AGENT_INJECT_TLS_KEY_FILE
               value: "/etc/webhook/certs/{{ .Values.injector.certs.keyName }}"
             {{- else }}
             - name: AGENT_INJECT_TLS_AUTO
