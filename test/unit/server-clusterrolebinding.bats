@@ -31,32 +31,32 @@ load _helpers
       --show-only templates/server-clusterrolebinding.yaml  \
       --set 'global.enabled=false' \
       . || echo "---") | tee /dev/stderr |
-      yq 'length > 0' | tee /dev/stderr || echo "false")
+      yq 'length > 0' | tee /dev/stderr)
   [ "${actual}" = "false" ]
 }
 
 @test "server/ClusterRoleBinding: can disable with server.authDelegator" {
   cd `chart_dir`
-  local actual=$(helm template \
+  local actual=$( (helm template \
       --show-only templates/server-clusterrolebinding.yaml  \
       --set 'server.authDelegator.enabled=false' \
-      . | tee /dev/stderr |
+      . || echo "---") | tee /dev/stderr |
       yq 'length > 0' | tee /dev/stderr)
   [ "${actual}" = "false" ]
 
-  local actual=$(helm template \
+  local actual=$( (helm template \
       --show-only templates/server-clusterrolebinding.yaml  \
       --set 'server.authDelegator.enabled=false' \
       --set 'server.ha.enabled=true' \
-      . | tee /dev/stderr |
+      . || echo "---") | tee /dev/stderr |
       yq 'length > 0' | tee /dev/stderr)
   [ "${actual}" = "false" ]
 
-  local actual=$(helm template \
+  local actual=$( (helm template \
       --show-only templates/server-clusterrolebinding.yaml  \
       --set 'server.authDelegator.enabled=false' \
       --set 'server.dev.enabled=true' \
-      . | tee /dev/stderr |
+      . || echo "---") | tee /dev/stderr |
       yq 'length > 0' | tee /dev/stderr)
   [ "${actual}" = "false" ]
 }

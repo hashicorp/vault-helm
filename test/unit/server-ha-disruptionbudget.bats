@@ -14,31 +14,31 @@ load _helpers
 
 @test "server/DisruptionBudget: disable with server.enabled" {
   cd `chart_dir`
-  local actual=$(helm template \
+  local actual=$( (helm template \
       --show-only templates/server-disruptionbudget.yaml  \
       --set 'globa.enabled=false' \
       --set 'server.ha.enabled=false' \
-      . | tee /dev/stderr |
+      . || echo "---") | tee /dev/stderr |
       yq 'length > 0' | tee /dev/stderr)
   [ "${actual}" = "false" ]
 }
 
 @test "server/DisruptionBudget: disable with server.disruptionBudget.enabled" {
   cd `chart_dir`
-  local actual=$(helm template \
+  local actual=$( (helm template \
       --show-only templates/server-disruptionbudget.yaml  \
       --set 'server.ha.disruptionBudget.enabled=false' \
-      . | tee /dev/stderr |
+      . || echo "---") | tee /dev/stderr |
       yq 'length > 0' | tee /dev/stderr)
   [ "${actual}" = "false" ]
 }
 
 @test "server/DisruptionBudget: disable with global.enabled" {
   cd `chart_dir`
-  local actual=$(helm template \
+  local actual=$( (helm template \
       --show-only templates/server-disruptionbudget.yaml  \
       --set 'global.enabled=false' \
-      . | tee /dev/stderr |
+      . || echo "---") | tee /dev/stderr |
       yq 'length > 0' | tee /dev/stderr)
   [ "${actual}" = "false" ]
 }

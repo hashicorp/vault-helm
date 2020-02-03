@@ -14,11 +14,11 @@ load _helpers
 
 @test "server/ha-StatefulSet: disable with global.enabled" {
   cd `chart_dir`
-  local actual=$(helm template \
+  local actual=$( (helm template \
       --show-only templates/server-statefulset.yaml  \
       --set 'global.enabled=false' \
       --set 'server.ha.enabled=true' \
-      . | tee /dev/stderr |
+      . || echo "---") | tee /dev/stderr |
       yq 'length > 0' | tee /dev/stderr)
   [ "${actual}" = "false" ]
 }
@@ -100,7 +100,7 @@ load _helpers
 @test "server/ha-StatefulSet: RollingUpdate updateStrategy" {
   cd `chart_dir`
   local actual=$(helm template \
-      -x templates/server-statefulset.yaml  \
+      --show-only templates/server-statefulset.yaml  \
       --set 'server.ha.enabled=true' \
       --set 'server.updateStrategyType="RollingUpdate"' \
       . | tee /dev/stderr |

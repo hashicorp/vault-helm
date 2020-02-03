@@ -23,11 +23,11 @@ load _helpers
 
 @test "server/standalone-StatefulSet: disable with global.enabled" {
   cd `chart_dir`
-  local actual=$(helm template \
+  local actual=$( (helm template \
       --show-only templates/server-statefulset.yaml  \
       --set 'global.enabled=false' \
       --set 'server.standalone.enabled=true' \
-      . | tee /dev/stderr |
+      . || echo "---") | tee /dev/stderr |
       yq 'length > 0' | tee /dev/stderr)
   [ "${actual}" = "false" ]
 }
@@ -677,7 +677,7 @@ load _helpers
 
   # Test that it defines it
   local actual=$(helm template \
-      -x templates/server-statefulset.yaml  \
+      --show-only templates/server-statefulset.yaml  \
       . | tee /dev/stderr |
       yq -r '.spec.template.spec.shareProcessNamespace' | tee /dev/stderr)
 
@@ -689,7 +689,7 @@ load _helpers
 
   # Test that it defines it
   local actual=$(helm template \
-      -x templates/server-statefulset.yaml  \
+      --show-only templates/server-statefulset.yaml  \
       --set 'server.shareProcessNamespace=true' \
       . | tee /dev/stderr |
       yq -r '.spec.template.spec.shareProcessNamespace' | tee /dev/stderr)
@@ -835,7 +835,7 @@ load _helpers
 @test "server/standalone-StatefulSet: add extraArgs" {
   cd `chart_dir`
   local actual=$(helm template \
-      -x templates/server-statefulset.yaml \
+      --show-only templates/server-statefulset.yaml \
       --set 'server.extraArgs=foobar' \
       . | tee /dev/stderr |
        yq -r '.spec.template.spec.containers[0].args[0]' | tee /dev/stderr)
@@ -847,7 +847,7 @@ load _helpers
 @test "server/standalone-StatefulSet: preStop sleep duration default" {
   cd `chart_dir`
   local actual=$(helm template \
-      -x templates/server-statefulset.yaml \
+      --show-only templates/server-statefulset.yaml \
       . | tee /dev/stderr |
        yq -r '.spec.template.spec.containers[0].lifecycle.preStop.exec.command[2]' | tee /dev/stderr)
   [[ "${actual}" = "sleep 5 &&"* ]]
@@ -856,7 +856,7 @@ load _helpers
 @test "server/standalone-StatefulSet: preStop sleep duration 10" {
   cd `chart_dir`
   local actual=$(helm template \
-      -x templates/server-statefulset.yaml \
+      --show-only templates/server-statefulset.yaml \
       --set 'server.preStopSleepSeconds=10' \
       . | tee /dev/stderr |
        yq -r '.spec.template.spec.containers[0].lifecycle.preStop.exec.command[2]' | tee /dev/stderr)

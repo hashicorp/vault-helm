@@ -14,11 +14,11 @@ load _helpers
 
 @test "server/dev-StatefulSet: disable with global.enabled" {
   cd `chart_dir`
-  local actual=$(helm template \
+  local actual=$( (helm template \
       --show-only templates/server-statefulset.yaml  \
       --set 'global.enabled=false' \
       --set 'server.dev.enabled=true' \
-      . | tee /dev/stderr |
+      . || echo "---") | tee /dev/stderr |
       yq 'length > 0' | tee /dev/stderr)
   [ "${actual}" = "false" ]
 }
@@ -39,7 +39,7 @@ load _helpers
   cd `chart_dir`
 
   local actual=$(helm template \
-      -x templates/server-statefulset.yaml  \
+      --show-only templates/server-statefulset.yaml  \
       --set 'server.image.repository=foo' \
       --set 'server.image.tag=' \
       --set 'server.dev.enabled=true' \
