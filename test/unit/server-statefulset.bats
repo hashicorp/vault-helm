@@ -5,7 +5,7 @@ load _helpers
 @test "server/standalone-StatefulSet: default server.standalone.enabled" {
   cd `chart_dir`
   local actual=$(helm template \
-      -x templates/server-statefulset.yaml  \
+      --show-only templates/server-statefulset.yaml  \
       . | tee /dev/stderr |
       yq 'length > 0' | tee /dev/stderr)
   [ "${actual}" = "true" ]
@@ -14,7 +14,7 @@ load _helpers
 @test "server/standalone-StatefulSet: enable with server.standalone.enabled true" {
   cd `chart_dir`
   local actual=$(helm template \
-      -x templates/server-statefulset.yaml  \
+      --show-only templates/server-statefulset.yaml  \
       --set 'server.standalone.enabled=true' \
       . | tee /dev/stderr |
       yq 'length > 0' | tee /dev/stderr)
@@ -24,7 +24,7 @@ load _helpers
 @test "server/standalone-StatefulSet: disable with global.enabled" {
   cd `chart_dir`
   local actual=$(helm template \
-      -x templates/server-statefulset.yaml  \
+      --show-only templates/server-statefulset.yaml  \
       --set 'global.enabled=false' \
       --set 'server.standalone.enabled=true' \
       . | tee /dev/stderr |
@@ -35,7 +35,7 @@ load _helpers
 @test "server/standalone-StatefulSet: image defaults to server.image.repository:tag" {
   cd `chart_dir`
   local actual=$(helm template \
-      -x templates/server-statefulset.yaml  \
+      --show-only templates/server-statefulset.yaml  \
       --set 'server.image.repository=foo' \
       --set 'server.image.tag=1.2.3' \
       . | tee /dev/stderr |
@@ -43,7 +43,7 @@ load _helpers
   [ "${actual}" = "foo:1.2.3" ]
 
   local actual=$(helm template \
-      -x templates/server-statefulset.yaml  \
+      --show-only templates/server-statefulset.yaml  \
       --set 'server.image.repository=foo' \
       --set 'server.image.tag=1.2.3' \
       --set 'server.standalone.enabled=true' \
@@ -55,7 +55,7 @@ load _helpers
 @test "server/standalone-StatefulSet: image tag defaults to latest" {
   cd `chart_dir`
   local actual=$(helm template \
-      -x templates/server-statefulset.yaml  \
+      --show-only templates/server-statefulset.yaml  \
       --set 'server.image.repository=foo' \
       --set 'server.image.tag=' \
       . | tee /dev/stderr |
@@ -63,7 +63,7 @@ load _helpers
   [ "${actual}" = "foo:latest" ]
 
   local actual=$(helm template \
-      -x templates/server-statefulset.yaml  \
+      --show-only templates/server-statefulset.yaml  \
       --set 'server.image.repository=foo' \
       --set 'server.image.tag=' \
       --set 'server.standalone.enabled=true' \
@@ -75,7 +75,7 @@ load _helpers
 @test "server/standalone-StatefulSet: default imagePullPolicy" {
   cd `chart_dir`
   local actual=$(helm template \
-      -x templates/server-statefulset.yaml  \
+      --show-only templates/server-statefulset.yaml  \
       . | tee /dev/stderr |
       yq -r '.spec.template.spec.containers[0].imagePullPolicy' | tee /dev/stderr)
   [ "${actual}" = "IfNotPresent" ]
@@ -84,7 +84,7 @@ load _helpers
 @test "server/standalone-StatefulSet: Custom imagePullPolicy" {
   cd `chart_dir`
   local actual=$(helm template \
-      -x templates/server-statefulset.yaml  \
+      --show-only templates/server-statefulset.yaml  \
       --set 'server.image.pullPolicy=Always' \
       . | tee /dev/stderr |
       yq -r '.spec.template.spec.containers[0].imagePullPolicy' | tee /dev/stderr)
@@ -94,7 +94,7 @@ load _helpers
 @test "server/standalone-StatefulSet: Custom imagePullSecrets" {
   cd `chart_dir`
   local object=$(helm template \
-      -x templates/server-statefulset.yaml  \
+      --show-only templates/server-statefulset.yaml  \
       --set 'global.imagePullSecrets[0].name=foo' \
       --set 'global.imagePullSecrets[1].name=bar' \
       . | tee /dev/stderr |
@@ -112,7 +112,7 @@ load _helpers
 @test "server/standalone-StatefulSet: default imagePullSecrets" {
   cd `chart_dir`
   local actual=$(helm template \
-      -x templates/server-statefulset.yaml  \
+      --show-only templates/server-statefulset.yaml  \
       . | tee /dev/stderr |
       yq -r '.spec.template.spec.imagePullSecrets' | tee /dev/stderr)
   [ "${actual}" = "null" ]
@@ -124,7 +124,7 @@ load _helpers
 @test "server/standalone-StatefulSet: OnDelete updateStrategy" {
   cd `chart_dir`
   local actual=$(helm template \
-      -x templates/server-statefulset.yaml  \
+      --show-only templates/server-statefulset.yaml  \
       . | tee /dev/stderr |
       yq -r '.spec.updateStrategy.type' | tee /dev/stderr)
   [ "${actual}" = "OnDelete" ]
@@ -136,7 +136,7 @@ load _helpers
 @test "server/standalone-StatefulSet: default replicas" {
   cd `chart_dir`
   local actual=$(helm template \
-      -x templates/server-statefulset.yaml  \
+      --show-only templates/server-statefulset.yaml  \
       --set 'server.standalone.enabled=true' \
       . | tee /dev/stderr |
       yq -r '.spec.replicas' | tee /dev/stderr)
@@ -146,14 +146,14 @@ load _helpers
 @test "server/standalone-StatefulSet: custom replicas" {
   cd `chart_dir`
   local actual=$(helm template \
-      -x templates/server-statefulset.yaml  \
+      --show-only templates/server-statefulset.yaml  \
       --set 'server.standalone.replicas=100' \
       . | tee /dev/stderr |
       yq -r '.spec.replicas' | tee /dev/stderr)
   [ "${actual}" = "1" ]
 
   local actual=$(helm template \
-      -x templates/server-statefulset.yaml  \
+      --show-only templates/server-statefulset.yaml  \
       --set 'server.standalone.enabled=true' \
       --set 'server.standalone.replicas=100' \
       . | tee /dev/stderr |
@@ -167,7 +167,7 @@ load _helpers
 @test "server/standalone-StatefulSet: default resources" {
   cd `chart_dir`
   local actual=$(helm template \
-      -x templates/server-statefulset.yaml  \
+      --show-only templates/server-statefulset.yaml  \
       --set 'server.standalone.enabled=true' \
       . | tee /dev/stderr |
       yq -r '.spec.template.spec.containers[0].resources' | tee /dev/stderr)
@@ -177,7 +177,7 @@ load _helpers
 @test "server/standalone-StatefulSet: custom resources" {
   cd `chart_dir`
   local actual=$(helm template \
-      -x templates/server-statefulset.yaml  \
+      --show-only templates/server-statefulset.yaml  \
       --set 'server.standalone.enabled=true' \
       --set 'server.resources.requests.memory=256Mi' \
       --set 'server.resources.requests.cpu=250m' \
@@ -186,7 +186,7 @@ load _helpers
   [ "${actual}" = "256Mi" ]
 
   local actual=$(helm template \
-      -x templates/server-statefulset.yaml  \
+      --show-only templates/server-statefulset.yaml  \
       --set 'server.standalone.enabled=true' \
       --set 'server.resources.limits.memory=256Mi' \
       --set 'server.resources.limits.cpu=250m' \
@@ -195,7 +195,7 @@ load _helpers
   [ "${actual}" = "256Mi" ]
 
   local actual=$(helm template \
-      -x templates/server-statefulset.yaml  \
+      --show-only templates/server-statefulset.yaml  \
       --set 'server.standalone.enabled=true' \
       --set 'server.resources.requests.cpu=250m' \
       . | tee /dev/stderr |
@@ -203,7 +203,7 @@ load _helpers
   [ "${actual}" = "250m" ]
 
   local actual=$(helm template \
-      -x templates/server-statefulset.yaml  \
+      --show-only templates/server-statefulset.yaml  \
       --set 'server.standalone.enabled=true' \
       --set 'server.resources.limits.cpu=250m' \
       . | tee /dev/stderr |
@@ -219,7 +219,7 @@ load _helpers
 
   # Test that it defines it
   local object=$(helm template \
-      -x templates/server-statefulset.yaml  \
+      --show-only templates/server-statefulset.yaml  \
       --set 'server.extraVolumes[0].type=configMap' \
       --set 'server.extraVolumes[0].name=foo' \
       . | tee /dev/stderr |
@@ -234,7 +234,7 @@ load _helpers
   [ "${actual}" = "null" ]
 
   local object=$(helm template \
-      -x templates/server-statefulset.yaml  \
+      --show-only templates/server-statefulset.yaml  \
       --set 'server.standalone.enabled=true' \
       --set 'server.extraVolumes[0].type=configMap' \
       --set 'server.extraVolumes[0].name=foo' \
@@ -251,7 +251,7 @@ load _helpers
 
   # Test that it mounts it
   local object=$(helm template \
-      -x templates/server-statefulset.yaml  \
+      --show-only templates/server-statefulset.yaml  \
       --set 'server.extraVolumes[0].type=configMap' \
       --set 'server.extraVolumes[0].name=foo' \
       . | tee /dev/stderr |
@@ -266,7 +266,7 @@ load _helpers
   [ "${actual}" = "/vault/userconfig/foo" ]
 
   local object=$(helm template \
-      -x templates/server-statefulset.yaml  \
+      --show-only templates/server-statefulset.yaml  \
       --set 'server.standalone.enabled=true' \
       --set 'server.extraVolumes[0].type=configMap' \
       --set 'server.extraVolumes[0].name=foo' \
@@ -287,7 +287,7 @@ load _helpers
 
   # Test that it defines it
   local object=$(helm template \
-      -x templates/server-statefulset.yaml  \
+      --show-only templates/server-statefulset.yaml  \
       --set 'server.extraVolumes[0].type=secret' \
       --set 'server.extraVolumes[0].name=foo' \
       . | tee /dev/stderr |
@@ -302,7 +302,7 @@ load _helpers
   [ "${actual}" = "foo" ]
 
   local object=$(helm template \
-      -x templates/server-statefulset.yaml  \
+      --show-only templates/server-statefulset.yaml  \
       --set 'server.standalone.enabled=true' \
       --set 'server.extraVolumes[0].type=secret' \
       --set 'server.extraVolumes[0].name=foo' \
@@ -319,7 +319,7 @@ load _helpers
 
   # Test that it mounts it
   local object=$(helm template \
-      -x templates/server-statefulset.yaml  \
+      --show-only templates/server-statefulset.yaml  \
       --set 'server.extraVolumes[0].type=configMap' \
       --set 'server.extraVolumes[0].name=foo' \
       . | tee /dev/stderr |
@@ -334,7 +334,7 @@ load _helpers
   [ "${actual}" = "/vault/userconfig/foo" ]
 
   local object=$(helm template \
-      -x templates/server-statefulset.yaml  \
+      --show-only templates/server-statefulset.yaml  \
       --set 'server.standalone.enabled=true' \
       --set 'server.extraVolumes[0].type=configMap' \
       --set 'server.extraVolumes[0].name=foo' \
@@ -353,7 +353,7 @@ load _helpers
 @test "server/standalone-StatefulSet: can mount audit" {
   cd `chart_dir`
   local object=$(helm template \
-      -x templates/server-statefulset.yaml  \
+      --show-only templates/server-statefulset.yaml  \
       --set 'server.auditStorage.enabled=true' \
       . | tee /dev/stderr |
       yq -r '.spec.template.spec.containers[0].volumeMounts[] | select(.name == "audit")' | tee /dev/stderr)
@@ -365,7 +365,7 @@ load _helpers
 @test "server/standalone-StatefulSet: set extraEnvironmentVars" {
   cd `chart_dir`
   local object=$(helm template \
-      -x templates/server-statefulset.yaml  \
+      --show-only templates/server-statefulset.yaml  \
       --set 'server.stanadlone.enabled=true' \
       --set 'server.extraEnvironmentVars.FOO=bar' \
       --set 'server.extraEnvironmentVars.FOOBAR=foobar' \
@@ -389,7 +389,7 @@ load _helpers
   [ "${actual}" = "foobar" ]
 
   local object=$(helm template \
-      -x templates/server-statefulset.yaml  \
+      --show-only templates/server-statefulset.yaml  \
       --set 'server.extraEnvironmentVars.FOO=bar' \
       --set 'server.extraEnvironmentVars.FOOBAR=foobar' \
       . | tee /dev/stderr |
@@ -418,13 +418,13 @@ load _helpers
 @test "server/standalone-StatefulSet: storageClass on claim by default" {
   cd `chart_dir`
   local actual=$(helm template \
-      -x templates/server-statefulset.yaml  \
+      --show-only templates/server-statefulset.yaml  \
       . | tee /dev/stderr |
       yq -r '.spec.volumeClaimTemplates[0].spec.storageClassName' | tee /dev/stderr)
   [ "${actual}" = "null" ]
 
   local actual=$(helm template \
-      -x templates/server-statefulset.yaml  \
+      --show-only templates/server-statefulset.yaml  \
       --set 'server.standalone.enabled=true' \
       . | tee /dev/stderr |
       yq -r '.spec.volumeClaimTemplates[0].spec.storageClassName' | tee /dev/stderr)
@@ -435,7 +435,7 @@ load _helpers
 @test "server/standalone-StatefulSet: can set storageClass" {
   cd `chart_dir`
   local actual=$(helm template \
-      -x templates/server-statefulset.yaml  \
+      --show-only templates/server-statefulset.yaml  \
       --set 'server.dataStorage.enabled=true' \
       --set 'server.dataStorage.storageClass=foo' \
       . | tee /dev/stderr |
@@ -443,7 +443,7 @@ load _helpers
   [ "${actual}" = "foo" ]
 
   local actual=$(helm template \
-      -x templates/server-statefulset.yaml  \
+      --show-only templates/server-statefulset.yaml  \
       --set 'server.standalone.enabled=true' \
       --set 'server.dataStorage.enabled=false' \
       --set 'server.auditStorage.enabled=true' \
@@ -453,7 +453,7 @@ load _helpers
   [ "${actual}" = "foo" ]
 
   local actual=$(helm template \
-      -x templates/server-statefulset.yaml  \
+      --show-only templates/server-statefulset.yaml  \
       --set 'server.standalone.enabled=true' \
       --set 'server.auditStorage.enabled=true' \
       --set 'server.auditStorage.storageClass=foo' \
@@ -462,7 +462,7 @@ load _helpers
   [ "${actual}" = "foo" ]
 
   local actual=$(helm template \
-      -x templates/server-statefulset.yaml  \
+      --show-only templates/server-statefulset.yaml  \
       --set 'server.auditStorage.enabled=true' \
       --set 'server.dataStorage.enabled=true' \
       . | tee /dev/stderr |
@@ -470,7 +470,7 @@ load _helpers
   [ "${actual}" = "2" ]
 
   local actual=$(helm template \
-      -x templates/server-statefulset.yaml  \
+      --show-only templates/server-statefulset.yaml  \
       --set 'server.standalone.enabled=true' \
       --set 'server.auditStorage.enabled=true' \
       --set 'server.dataStorage.enabled=true' \
@@ -482,7 +482,7 @@ load _helpers
 @test "server/standalone-StatefulSet: can disable storage" {
   cd `chart_dir`
   local actual=$(helm template \
-      -x templates/server-statefulset.yaml  \
+      --show-only templates/server-statefulset.yaml  \
       --set 'server.auditStorage.enabled=false' \
       --set 'server.dataStorage.enabled=true' \
       . | tee /dev/stderr |
@@ -490,7 +490,7 @@ load _helpers
   [ "${actual}" = "1" ]
 
   local actual=$(helm template \
-      -x templates/server-statefulset.yaml  \
+      --show-only templates/server-statefulset.yaml  \
       --set 'server.auditStorage.enabled=true' \
       --set 'server.dataStorage.enabled=false' \
       . | tee /dev/stderr |
@@ -498,7 +498,7 @@ load _helpers
   [ "${actual}" = "1" ]
 
   local actual=$(helm template \
-      -x templates/server-statefulset.yaml  \
+      --show-only templates/server-statefulset.yaml  \
       --set 'server.standalone.enabled=true' \
       --set 'server.auditStorage.enabled=false' \
       --set 'server.dataStorage.enabled=true' \
@@ -507,7 +507,7 @@ load _helpers
   [ "${actual}" = "1" ]
 
   local actual=$(helm template \
-      -x templates/server-statefulset.yaml  \
+      --show-only templates/server-statefulset.yaml  \
       --set 'server.standalone.enabled=true' \
       --set 'server.auditStorage.enabled=true' \
       --set 'server.dataStorage.enabled=false' \
@@ -516,7 +516,7 @@ load _helpers
   [ "${actual}" = "1" ]
 
   local actual=$(helm template \
-      -x templates/server-statefulset.yaml  \
+      --show-only templates/server-statefulset.yaml  \
       --set 'server.auditStorage.enabled=true' \
       --set 'server.dataStorage.enabled=true' \
       . | tee /dev/stderr |
@@ -524,7 +524,7 @@ load _helpers
   [ "${actual}" = "2" ]
 
   local actual=$(helm template \
-      -x templates/server-statefulset.yaml  \
+      --show-only templates/server-statefulset.yaml  \
       --set 'server.standalone.enabled=true' \
       --set 'server.auditStorage.enabled=true' \
       --set 'server.dataStorage.enabled=true' \
@@ -533,7 +533,7 @@ load _helpers
   [ "${actual}" = "2" ]
 
   local actual=$(helm template \
-      -x templates/server-statefulset.yaml  \
+      --show-only templates/server-statefulset.yaml  \
       --set 'server.auditStorage.enabled=fa;se' \
       --set 'server.dataStorage.enabled=false' \
       . | tee /dev/stderr |
@@ -541,7 +541,7 @@ load _helpers
   [ "${actual}" = "0" ]
 
   local actual=$(helm template \
-      -x templates/server-statefulset.yaml  \
+      --show-only templates/server-statefulset.yaml  \
       --set 'server.standalone.enabled=true' \
       --set 'server.auditStorage.enabled=false' \
       --set 'server.dataStorage.enabled=false' \
@@ -553,7 +553,7 @@ load _helpers
 @test "server/standalone-StatefulSet: tolerations not set by default" {
   cd `chart_dir`
   local actual=$(helm template \
-      -x templates/server-statefulset.yaml  \
+      --show-only templates/server-statefulset.yaml  \
       . | tee /dev/stderr |
       yq '.spec.template.spec | .tolerations? == null' | tee /dev/stderr)
   [ "${actual}" = "true" ]
@@ -562,7 +562,7 @@ load _helpers
 @test "server/standalone-StatefulSet: tolerations can be set" {
   cd `chart_dir`
   local actual=$(helm template \
-      -x templates/server-statefulset.yaml  \
+      --show-only templates/server-statefulset.yaml  \
       --set 'server.tolerations=foobar' \
       . | tee /dev/stderr |
       yq '.spec.template.spec.tolerations == "foobar"' | tee /dev/stderr)
@@ -572,7 +572,7 @@ load _helpers
 @test "server/standalone-StatefulSet: nodeSelector is not set by default" {
   cd `chart_dir`
   local actual=$(helm template \
-      -x templates/server-statefulset.yaml  \
+      --show-only templates/server-statefulset.yaml  \
       . | tee /dev/stderr |
       yq '.spec.template.spec.nodeSelector' | tee /dev/stderr)
   [ "${actual}" = "null" ]
@@ -581,7 +581,7 @@ load _helpers
 @test "server/standalone-StatefulSet: specified nodeSelector" {
   cd `chart_dir`
   local actual=$(helm template \
-      -x templates/server-statefulset.yaml \
+      --show-only templates/server-statefulset.yaml \
       --set 'server.nodeSelector=testing' \
       . | tee /dev/stderr |
       yq -r '.spec.template.spec.nodeSelector' | tee /dev/stderr)
@@ -596,7 +596,7 @@ load _helpers
 
   # Test that it defines it
   local object=$(helm template \
-      -x templates/server-statefulset.yaml  \
+      --show-only templates/server-statefulset.yaml  \
       --set 'server.extraContainers[0].image=test-image' \
       --set 'server.extraContainers[0].name=test-container' \
       --set 'server.extraContainers[0].ports[0].name=test-port' \
@@ -642,7 +642,7 @@ load _helpers
 
   # Test that it defines it
   local object=$(helm template \
-      -x templates/server-statefulset.yaml  \
+      --show-only templates/server-statefulset.yaml  \
       --set 'server.extraContainers[0].image=test-image' \
       --set 'server.extraContainers[0].name=test-container' \
       --set 'server.extraContainers[1].image=test-image' \
@@ -661,13 +661,13 @@ load _helpers
 
   # Test that it defines it
   local object=$(helm template \
-      -x templates/server-statefulset.yaml  \
+      --show-only templates/server-statefulset.yaml  \
       . | tee /dev/stderr |
       yq -r '.spec.template.spec.containers' | tee /dev/stderr)
 
   local containers_count=$(echo $object |
       yq -r 'length' | tee /dev/stderr)
-  [ "${containers_count}" = 1 ]  
+  [ "${containers_count}" = 1 ]
 }
 
 # sharedProcessNamespace
@@ -702,7 +702,7 @@ load _helpers
 @test "server/standalone-StatefulSet: specify extraLabels" {
   cd `chart_dir`
   local actual=$(helm template \
-      -x templates/server-statefulset.yaml \
+      --show-only templates/server-statefulset.yaml \
       --set 'server.extraLabels.foo=bar' \
       . | tee /dev/stderr |
       yq -r '.spec.template.metadata.labels.foo' | tee /dev/stderr)
@@ -715,7 +715,7 @@ load _helpers
 @test "server/standalone-StatefulSet: uid default" {
   cd `chart_dir`
   local actual=$(helm template \
-      -x templates/server-statefulset.yaml \
+      --show-only templates/server-statefulset.yaml \
       . | tee /dev/stderr |
       yq -r '.spec.template.spec.securityContext.runAsUser' | tee /dev/stderr)
   [ "${actual}" = "100" ]
@@ -724,7 +724,7 @@ load _helpers
 @test "server/standalone-StatefulSet: uid configurable" {
   cd `chart_dir`
   local actual=$(helm template \
-      -x templates/server-statefulset.yaml \
+      --show-only templates/server-statefulset.yaml \
       --set 'server.uid=2000' \
       . | tee /dev/stderr |
       yq -r '.spec.template.spec.securityContext.runAsUser' | tee /dev/stderr)
@@ -734,7 +734,7 @@ load _helpers
 @test "server/standalone-StatefulSet: gid default" {
   cd `chart_dir`
   local actual=$(helm template \
-      -x templates/server-statefulset.yaml \
+      --show-only templates/server-statefulset.yaml \
       . | tee /dev/stderr |
       yq -r '.spec.template.spec.securityContext.runAsGroup' | tee /dev/stderr)
   [ "${actual}" = "1000" ]
@@ -743,7 +743,7 @@ load _helpers
 @test "server/standalone-StatefulSet: gid configurable" {
   cd `chart_dir`
   local actual=$(helm template \
-      -x templates/server-statefulset.yaml \
+      --show-only templates/server-statefulset.yaml \
       --set 'server.gid=2000' \
       . | tee /dev/stderr |
       yq -r '.spec.template.spec.securityContext.runAsGroup' | tee /dev/stderr)
@@ -753,7 +753,7 @@ load _helpers
 @test "server/standalone-StatefulSet: fsgroup default" {
   cd `chart_dir`
   local actual=$(helm template \
-      -x templates/server-statefulset.yaml \
+      --show-only templates/server-statefulset.yaml \
       . | tee /dev/stderr |
       yq -r '.spec.template.spec.securityContext.fsGroup' | tee /dev/stderr)
   [ "${actual}" = "1000" ]
@@ -762,7 +762,7 @@ load _helpers
 @test "server/standalone-StatefulSet: fsgroup configurable" {
   cd `chart_dir`
   local actual=$(helm template \
-      -x templates/server-statefulset.yaml \
+      --show-only templates/server-statefulset.yaml \
       --set 'server.gid=2000' \
       . | tee /dev/stderr |
       yq -r '.spec.template.spec.securityContext.fsGroup' | tee /dev/stderr)
@@ -775,7 +775,7 @@ load _helpers
 @test "server/standalone-StatefulSet: readinessProbe default" {
   cd `chart_dir`
   local actual=$(helm template \
-      -x templates/server-statefulset.yaml \
+      --show-only templates/server-statefulset.yaml \
       . | tee /dev/stderr |
       yq -r '.spec.template.spec.containers[0].readinessProbe.exec.command[2]' | tee /dev/stderr)
   [ "${actual}" = "vault status -tls-skip-verify" ]
@@ -784,7 +784,7 @@ load _helpers
 @test "server/standalone-StatefulSet: readinessProbe configurable" {
   cd `chart_dir`
   local actual=$(helm template \
-      -x templates/server-statefulset.yaml \
+      --show-only templates/server-statefulset.yaml \
       --set 'server.readinessProbe.enabled=false' \
       . | tee /dev/stderr |
       yq -r '.spec.template.spec.containers[0].readinessProbe' | tee /dev/stderr)
@@ -795,7 +795,7 @@ load _helpers
 @test "server/standalone-StatefulSet: livenessProbe default" {
   cd `chart_dir`
   local actual=$(helm template \
-      -x templates/server-statefulset.yaml \
+      --show-only templates/server-statefulset.yaml \
       . | tee /dev/stderr |
       yq -r '.spec.template.spec.containers[0].livenessProbe' | tee /dev/stderr)
   [ "${actual}" = "null" ]
@@ -804,7 +804,7 @@ load _helpers
 @test "server/standalone-StatefulSet: livenessProbe configurable" {
   cd `chart_dir`
   local actual=$(helm template \
-      -x templates/server-statefulset.yaml \
+      --show-only templates/server-statefulset.yaml \
       --set 'server.livenessProbe.enabled=true' \
       . | tee /dev/stderr |
       yq -r '.spec.template.spec.containers[0].livenessProbe.httpGet.path' | tee /dev/stderr)
@@ -814,7 +814,7 @@ load _helpers
 @test "server/standalone-StatefulSet: livenessProbe initialDelaySeconds default" {
   cd `chart_dir`
   local actual=$(helm template \
-      -x templates/server-statefulset.yaml \
+      --show-only templates/server-statefulset.yaml \
       --set 'server.livenessProbe.enabled=true' \
       . | tee /dev/stderr |
       yq -r '.spec.template.spec.containers[0].livenessProbe.initialDelaySeconds' | tee /dev/stderr)
@@ -824,7 +824,7 @@ load _helpers
 @test "server/standalone-StatefulSet: livenessProbe initialDelaySeconds configurable" {
   cd `chart_dir`
   local actual=$(helm template \
-      -x templates/server-statefulset.yaml \
+      --show-only templates/server-statefulset.yaml \
       --set 'server.livenessProbe.enabled=true' \
       --set 'server.livenessProbe.initialDelaySeconds=30' \
       . | tee /dev/stderr |

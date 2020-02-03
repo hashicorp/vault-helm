@@ -9,7 +9,7 @@ load _helpers
   kubectl create namespace acceptance
   kubectl config set-context --current --namespace=acceptance
 
-  helm install --name="$(name_prefix)" .
+  helm install "$(name_prefix)" .
   wait_for_running $(name_prefix)-0
 
   # Sealed, not initialized
@@ -112,7 +112,7 @@ load _helpers
 # Clean up
 teardown() {
   echo "helm/pvc teardown"
-  helm delete --purge vault
+  helm delete vault
   kubectl delete --all pvc
   kubectl delete namespace acceptance --ignore-not-found=true
 }
