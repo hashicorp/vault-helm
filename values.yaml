@@ -65,6 +65,12 @@ injector:
   #     memory: 256Mi
   #     cpu: 250m
 
+  # vaultAddress is a custom Vault FQDN to configure injector with. It's useful
+  # when running Vault with custom service discovery like Consul as it eliminates
+  # the necessity of having 'vault.hashicorp.com/service' annotation for each pod.
+  vaultAddress: ""
+  # vaultAddress: "vault.service.consul"
+
 server:
   # Resource requests, limits, etc. for the server cluster placement. This
   # should map directly to the value of the resources field for a PodSpec.
@@ -120,7 +126,7 @@ server:
   # shareProcessNamespace enables process namespace sharing between Vault and the extraContainers
   # This is useful if Vault must be signaled, e.g. to send a SIGHUP for log rotation
   shareProcessNamespace: false
-  
+
   # extraArgs is a string containing additional Vault server arguments.
   extraArgs: ""
 

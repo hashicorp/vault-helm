@@ -154,3 +154,36 @@ load _helpers
       yq -r '.[5].name' | tee /dev/stderr)
   [ "${actual}" = "AGENT_INJECT_TLS_AUTO_HOSTS" ]
 }
+
+@test "injector/deployment: default Vault address" {
+  cd `chart_dir`
+  local object=$(helm template \
+      -x templates/injector-deployment.yaml  \
+      . | tee /dev/stderr |
+      yq -r '.spec.template.spec.containers[0].env' | tee /dev/stderr)
+
+  local actual=$(echo $object |
+      yq -r '.[2].name' | tee /dev/stderr)
+  [ "${actual}" = "AGENT_INJECT_VAULT_ADDR" ]
+
+  local actual=$(echo $object |
+      yq -r '.[2].value' | tee /dev/stderr)
+  [ "${actual}" = "http://release-name-vault.default.svc:8200" ]
+}
+
+@test "injector/deployment: custom Vault address" {
+  cd `chart_dir`
+  local object=$(helm template \
+      -x templates/injector-deployment.yaml  \
+      --set 'injector.vaultAddress=vault.service.consul' \
+      . | tee /dev/stderr |
+      yq -r '.spec.template.spec.containers[0].env' | tee /dev/stderr)
+
+  local actual=$(echo $object |
+      yq -r '.[2].name' | tee /dev/stderr)
+  [ "${actual}" = "AGENT_INJECT_VAULT_ADDR" ]
+
+  local actual=$(echo $object |
+      yq -r '.[2].value' | tee /dev/stderr)
+  [ "${actual}" = "http://vault.service.consul:8200" ]
+}

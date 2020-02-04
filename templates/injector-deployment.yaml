@@ -40,7 +40,11 @@ spec:
             - name: AGENT_INJECT_LOG_LEVEL
               value: {{ .Values.injector.logLevel | default "info" }}
             - name: AGENT_INJECT_VAULT_ADDR
+            {{- if .Values.injector.vaultAddress }}
+              value: {{ include "vault.scheme" . }}://{{ .Values.injector.vaultAddress }}:{{ .Values.server.service.port }}
+            {{- else}}
               value: {{ include "vault.scheme" . }}://{{ template "vault.fullname" . }}.{{ .Release.Namespace }}.svc:{{ .Values.server.service.port }}
+            {{- end}}
             - name: AGENT_INJECT_VAULT_IMAGE
               value: "{{ .Values.injector.agentImage.repository }}:{{ .Values.injector.agentImage.tag }}"
             {{- if .Values.injector.certs.secretName }}
