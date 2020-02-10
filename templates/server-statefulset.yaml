@@ -51,9 +51,6 @@ spec:
       containers:
         - name: vault
           {{ template "vault.resources" . }}
-          securityContext:
-            capabilities:
-              add: ["IPC_LOCK"]
           image: {{ .Values.server.image.repository }}:{{ .Values.server.image.tag | default "latest" }}
           imagePullPolicy: {{ .Values.server.image.pullPolicy }}
           command: {{ template "vault.command" . }}
