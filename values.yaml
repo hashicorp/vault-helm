@@ -146,6 +146,9 @@ server:
     path: "/v1/sys/health?standbyok=true"
     initialDelaySeconds: 60
 
+  # Used to set the sleep time during the preStop step
+  preStopSleepSeconds: 5
+
   # extraEnvironmentVars is a list of extra enviroment variables to set with the stateful set. These could be
   # used to include variables required for auto-unseal.
   extraEnvironmentVars: {}

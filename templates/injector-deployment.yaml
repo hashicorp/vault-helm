@@ -1,5 +1,5 @@
-# Deployment for the injector
 {{- if and (eq (.Values.injector.enabled | toString) "true" ) (eq (.Values.global.enabled | toString) "true") }}
+# Deployment for the injector
 apiVersion: apps/v1
 kind: Deployment
 metadata:

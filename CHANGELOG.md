@@ -3,7 +3,9 @@
 Improvements:
 
 * Allow process namespace sharing between Vault and sidecar containers
-* Addedd configurable to change updateStrategy
+* Added configurable to change updateStrategy
+* Added sleep in the preStop lifecycle step
+* Updated chart and tests to Helm 3
 
 Bugs:
 

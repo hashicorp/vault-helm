@@ -1,7 +1,7 @@
-# PodDisruptionBudget to prevent degrading the server cluster through
-# voluntary cluster changes.
 {{ template "vault.mode" . }}
 {{- if and (and (eq (.Values.global.enabled | toString) "true") (eq .mode "ha")) (eq (.Values.server.ha.disruptionBudget.enabled | toString) "true") -}}
+# PodDisruptionBudget to prevent degrading the server cluster through
+# voluntary cluster changes.
 apiVersion: policy/v1beta1
 kind: PodDisruptionBudget
 metadata:
