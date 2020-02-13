@@ -842,6 +842,7 @@ load _helpers
   [[ "${actual}" = *"foobar"* ]]
 }
 
+#--------------------------------------------------------------------
 # priorityClassName
 
 @test "server/standalone-StatefulSet: priorityClassName disabled by default" {
@@ -863,6 +864,9 @@ load _helpers
       yq -r '.spec.template.spec.priorityClassName' | tee /dev/stderr)
 
   [ "${actual}" = "foo" ]  
+
+#--------------------------------------------------------------------
+# preStop
 
 @test "server/standalone-StatefulSet: preStop sleep duration default" {
   cd `chart_dir`
