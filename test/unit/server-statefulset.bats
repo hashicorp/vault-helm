@@ -867,7 +867,6 @@ load _helpers
 
 #--------------------------------------------------------------------
 # preStop
-
 @test "server/standalone-StatefulSet: preStop sleep duration default" {
   cd `chart_dir`
   local actual=$(helm template \
