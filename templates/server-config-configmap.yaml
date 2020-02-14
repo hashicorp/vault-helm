@@ -19,5 +19,6 @@ data:
   {{- else if eq .mode "ha" }}
     {{ tpl .Values.server.ha.config . | nindent 4 | trim }}
   {{ end }}
+  {{- .Values.server.extraConfigFiles | nindent 2 }}
 {{- end }}
 {{- end }}

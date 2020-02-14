@@ -117,6 +117,15 @@ server:
   # extraContainers is a list of sidecar containers. Specified as a raw YAML string.
   extraContainers: null
 
+  # extraConfigFiles is a list of extra files to add to the ConfigMap containing the vault configuration.
+  # These files are mounted to /vault/config in the vault containers and could be referenced via extraArgs.
+  # This could also be useful if trying to add files to the containers specified with extraContainers.
+  extraConfigFiles: ""
+  # extraConfigFiles: |
+  #   init-script.sh: |
+  #     #!/bin/sh -ve
+  #     echo "Init commands here"
+
   # shareProcessNamespace enables process namespace sharing between Vault and the extraContainers
   # This is useful if Vault must be signaled, e.g. to send a SIGHUP for log rotation
   shareProcessNamespace: false
@@ -159,6 +168,7 @@ server:
     # - type: secret (or "configMap")
     #   name: my-secret
     #   path: null # default is `/vault/userconfig`
+    #   defaultMode: 0777 # optional
 
   # Affinity Settings
   # Commenting out or setting as empty the affinity variable, will allow
