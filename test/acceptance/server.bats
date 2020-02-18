@@ -21,11 +21,6 @@ load _helpers
     jq -r '.initialized')
   [ "${init_status}" == "false" ]
 
-  # Security
-  local ipc=$(kubectl get statefulset "$(name_prefix)" --output json |
-    jq -r '.spec.template.spec.containers[0].securityContext.capabilities.add[0]')
-  [ "${ipc}" == "IPC_LOCK" ]
-
   # Replicas
   local replicas=$(kubectl get statefulset "$(name_prefix)" --output json |
     jq -r '.spec.replicas')
