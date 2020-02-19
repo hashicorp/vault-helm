@@ -850,6 +850,26 @@ load _helpers
   [ "${actual}" = "bar" ]
 }
 
+# extra annotations
+
+@test "server/standalone-StatefulSet: default statefulSet.annotation" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      --show-only templates/server-statefulset.yaml \
+      . | tee /dev/stderr |
+      yq -r '.metadata.annotations' | tee /dev/stderr)
+  [ "${actual}" = "null" ]
+}
+
+@test "server/standalone-StatefulSet: specify statefulSet.annotations" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      --show-only templates/server-statefulset.yaml \
+      --set 'server.statefulSet.annotations.foo=bar' \
+      . | tee /dev/stderr |
+      yq -r '.metadata.annotations.foo' | tee /dev/stderr)
+  [ "${actual}" = "bar" ]
+}
 
 #--------------------------------------------------------------------
 # Security Contexts
