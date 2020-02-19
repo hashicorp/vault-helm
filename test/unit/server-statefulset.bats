@@ -852,7 +852,7 @@ load _helpers
 
 # extra annotations
 
-@test "server/standalone-StatefulSet: default statefulSet.annotation" {
+@test "server/standalone-StatefulSet: default statefulSet.annotations" {
   cd `chart_dir`
   local actual=$(helm template \
       --show-only templates/server-statefulset.yaml \
