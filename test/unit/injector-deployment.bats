@@ -154,3 +154,37 @@ load _helpers
       yq -r '.[5].name' | tee /dev/stderr)
   [ "${actual}" = "AGENT_INJECT_TLS_AUTO_HOSTS" ]
 }
+
+@test "injector/deployment: with externalVaultAddr" {
+  cd `chart_dir`
+  local object=$(helm template \
+      --show-only templates/injector-deployment.yaml  \
+      --set 'injector.externalVaultAddr=http://vault-outside' \
+      . | tee /dev/stderr |
+      yq -r '.spec.template.spec.containers[0].env' | tee /dev/stderr)
+
+  local actual=$(echo $object |
+     yq -r '.[2].name' | tee /dev/stderr)
+  [ "${actual}" = "AGENT_INJECT_VAULT_ADDR" ]
+
+  local actual=$(echo $object |
+      yq -r '.[2].value' | tee /dev/stderr)
+  [ "${actual}" = "http://vault-outside" ]
+}
+
+@test "injector/deployment: without externalVaultAddr" {
+  cd `chart_dir`
+  local object=$(helm template \
+      --show-only templates/injector-deployment.yaml  \
+      --release-name not-external-test  \
+      . | tee /dev/stderr |
+      yq -r '.spec.template.spec.containers[0].env' | tee /dev/stderr)
+
+  local actual=$(echo $object |
+     yq -r '.[2].name' | tee /dev/stderr)
+  [ "${actual}" = "AGENT_INJECT_VAULT_ADDR" ]
+
+  local actual=$(echo $object |
+      yq -r '.[2].value' | tee /dev/stderr)
+  [ "${actual}" = "http://not-external-test-vault.default.svc:8200" ]
+}

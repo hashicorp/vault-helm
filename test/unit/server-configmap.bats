@@ -82,3 +82,13 @@ load _helpers
       yq '.data["extraconfig-from-values.hcl"] | match("bar") | length' | tee /dev/stderr)
   [ ! -z "${actual}" ]
 }
+
+@test "server/ConfigMap: disabled by injector.externalVaultAddr" {
+  cd `chart_dir`
+  local actual=$( (helm template \
+      --show-only templates/server-config-configmap.yaml \
+      --set 'injector.externalVaultAddr=http://vault-outside' \
+      . || echo "---") | tee /dev/stderr |
+      yq 'length > 0' | tee /dev/stderr)
+  [ "${actual}" = "false" ]
+}
