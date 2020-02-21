@@ -1,3 +1,5 @@
+{{ template "vault.mode" . }}
+{{- if ne .mode "external" }}
 {{- if .Values.server.ingress.enabled -}}
 {{- $serviceName := include "vault.fullname" . -}}
 {{- $servicePort := .Values.server.service.port -}}
@@ -41,4 +43,5 @@ spec:
               servicePort: {{ $servicePort }}
         {{- end }}
   {{- end }}
+{{- end }}
 {{- end }}

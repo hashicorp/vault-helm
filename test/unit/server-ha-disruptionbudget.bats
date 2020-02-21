@@ -43,6 +43,16 @@ load _helpers
   [ "${actual}" = "false" ]
 }
 
+@test "server/DisruptionBudget: disable with injector.exernalVaultAddr" {
+  cd `chart_dir`
+  local actual=$( (helm template \
+      --show-only templates/server-disruptionbudget.yaml  \
+      --set 'injector.externalVaultAddr=http://vault-outside' \
+      . || echo "---") | tee /dev/stderr |
+      yq 'length > 0' | tee /dev/stderr)
+  [ "${actual}" = "false" ]
+}
+
 @test "server/DisruptionBudget: correct maxUnavailable with n=1" {
   cd `chart_dir`
   local actual=$(helm template \

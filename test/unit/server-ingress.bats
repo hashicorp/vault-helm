@@ -11,6 +11,17 @@ load _helpers
   [ "${actual}" = "false" ]
 }
 
+@test "server/ingress: disable by injector.externalVaultAddr" {
+  cd `chart_dir`
+  local actual=$( (helm template \
+      --show-only templates/server-ingress.yaml  \
+      --set 'server.ingress.enabled=true' \
+      --set 'injector.externalVaultAddr=http://vault-outside' \
+      . || echo "---") | tee /dev/stderr |
+      yq 'length > 0' | tee /dev/stderr)
+  [ "${actual}" = "false" ]
+}
+
 @test "server/ingress: checking host entry gets added and path is /" {
   cd `chart_dir`
   local actual=$(helm template \

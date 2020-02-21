@@ -51,7 +51,9 @@ Set the variable 'mode' to the server mode requested by the user to simplify
 template logic.
 */}}
 {{- define "vault.mode" -}}
-  {{- if eq (.Values.server.dev.enabled | toString) "true" -}}
+  {{- if .Values.injector.externalVaultAddr -}}
+    {{- $_ := set . "mode" "external" -}}
+  {{- else if eq (.Values.server.dev.enabled | toString) "true" -}}
     {{- $_ := set . "mode" "dev" -}}
   {{- else if eq (.Values.server.ha.enabled | toString) "true" -}}
     {{- $_ := set . "mode" "ha" -}}

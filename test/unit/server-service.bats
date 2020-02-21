@@ -113,6 +113,36 @@ load _helpers
   [ "${actual}" = "false" ]
 }
 
+@test "server/Service: disable with injector.externalVaultAddr" {
+  cd `chart_dir`
+  local actual=$( (helm template \
+      --show-only templates/server-service.yaml  \
+      --set 'server.dev.enabled=true' \
+      --set 'injector.externalVaultAddr=http://vault-outside' \
+      --set 'server.service.enabled=true' \
+      . || echo "---") | tee /dev/stderr |
+      yq 'length > 0' | tee /dev/stderr)
+  [ "${actual}" = "false" ]
+
+  local actual=$( (helm template \
+      --show-only templates/server-service.yaml  \
+      --set 'server.ha.enabled=true' \
+      --set 'injector.externalVaultAddr=http://vault-outside' \
+      --set 'server.service.enabled=true' \
+      . || echo "---") | tee /dev/stderr |
+      yq 'length > 0' | tee /dev/stderr)
+  [ "${actual}" = "false" ]
+
+  local actual=$( (helm template \
+      --show-only templates/server-service.yaml  \
+      --set 'server.standalone.enabled=true' \
+      --set 'injector.externalVaultAddr=http://vault-outside' \
+      --set 'server.service.enabled=true' \
+      . || echo "---") | tee /dev/stderr |
+      yq 'length > 0' | tee /dev/stderr)
+  [ "${actual}" = "false" ]
+}
+
 # This can be seen as testing just what we put into the YAML raw, but
 # this is such an important part of making everything work we verify it here.
 @test "server/Service: tolerates unready endpoints" {

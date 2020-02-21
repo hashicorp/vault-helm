@@ -15,6 +15,10 @@ injector:
   # True if you want to enable vault agent injection.
   enabled: true
 
+  # External vault server address for the injector to use. Setting this will
+  # disable deployment of a vault server along with the injector.
+  externalVaultAddr: ""
+
   # image sets the repo and tag of the vault-k8s image to use for the injector.
   image:
     repository: "hashicorp/vault-k8s"
