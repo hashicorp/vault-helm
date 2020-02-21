@@ -1,5 +1,7 @@
 ## Unreleased
 
+## 0.4.0 (February 21st, 2020)
+
 Improvements:
 
 * Allow process namespace sharing between Vault and sidecar containers [[GH-174](https://github.com/hashicorp/vault-helm/pull/174)]
