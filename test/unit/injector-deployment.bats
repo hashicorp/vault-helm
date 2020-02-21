@@ -177,6 +177,7 @@ load _helpers
   local object=$(helm template \
       --show-only templates/injector-deployment.yaml  \
       --release-name not-external-test  \
+      --namespace default \
       . | tee /dev/stderr |
       yq -r '.spec.template.spec.containers[0].env' | tee /dev/stderr)
 
