@@ -1,7 +1,7 @@
 {{ template "vault.mode" . }}
 {{- if ne .mode "external" }}
 {{- if and (eq (.Values.global.enabled | toString) "true") (ne .mode "dev") -}}
-{{ if or (ne .Values.server.standalone.config "")  (ne .Values.server.ha.config "") -}}
+{{ if or (.Values.server.standalone.config) (.Values.server.ha.config) -}}
 apiVersion: v1
 kind: ConfigMap
 metadata:
