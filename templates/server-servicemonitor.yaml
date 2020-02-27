@@ -1,0 +1,32 @@
+{{ if .Values.prometheus.operator.enabled }}
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: {{ template "vault.fullname" . }}
+  labels:
+    helm.sh/chart: {{ include "vault.chart" . }}
+    app.kubernetes.io/name: {{ include "vault.name" . }}
+    app.kubernetes.io/instance: {{ .Release.Name }}
+    app.kubernetes.io/managed-by: {{ .Release.Service }}
+    {{- toYaml .Values.prometheus.operator.serviceMonitor.selector | nindent 4 }}
+spec:
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: {{ template "vault.name" . }}
+      app.kubernetes.io/instance: {{ .Release.Name }}
+  endpoints:
+  - port: http
+    interval: {{ .Values.prometheus.operator.serviceMonitor.interval }}
+    scrapeTimeout: {{ .Values.prometheus.operator.serviceMonitor.scrapeTimeout }}
+    scheme: {{ include "vault.scheme" . | lower }}
+    path: /v1/sys/metrics
+    params:
+      format:
+      - prometheus
+    tlsConfig:
+      insecureSkipVerify: true
+
+  namespaceSelector:
+    matchNames:
+      - {{ .Release.Namespace }}
+{{ end }}

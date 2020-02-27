@@ -1,0 +1,17 @@
+{{ if and (.Values.prometheus.operator.prometheusRules.enabled) (.Values.prometheus.operator.prometheusRules.rules) }}
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: {{ template "vault.fullname" . }}
+  labels:
+    helm.sh/chart: {{ include "vault.chart" . }}
+    app.kubernetes.io/name: {{ include "vault.name" . }}
+    app.kubernetes.io/instance: {{ .Release.Name }}
+    app.kubernetes.io/managed-by: {{ .Release.Service }}
+    {{ toYaml .Values.prometheus.operator.prometheusRules.selector | nindent 4 }}
+spec:
+  groups:
+  - name: {{ include "vault.fullname" . }}
+    rules:
+      {{- toYaml .Values.prometheus.operator.prometheusRules.rules | nindent 6 }}
+{{- end }}
