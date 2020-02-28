@@ -19,6 +19,11 @@ injector:
   # disable deployment of a vault server along with the injector.
   externalVaultAddr: ""
 
+  # Path to kubernetes authentication, default auth/kubernetes
+  # Desirable when using in multiple clusters
+  # Set in vault by running `vault auth enable -path some-path kubernetes`
+  auth_path: "auth/kubernetes"
+
   # image sets the repo and tag of the vault-k8s image to use for the injector.
   image:
     repository: "hashicorp/vault-k8s"

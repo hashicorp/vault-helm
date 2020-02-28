@@ -35,6 +35,8 @@ spec:
           image: "{{ .Values.injector.image.repository }}:{{ .Values.injector.image.tag }}"
           imagePullPolicy: "{{ .Values.injector.image.pullPolicy }}"
           env:
+            - name: AGENT_INJECT_VAULT_AUTH_PATH
+              value: {{ .Values.injector.auth_path }}
             - name: AGENT_INJECT_LISTEN
               value: ":8080"
             - name: AGENT_INJECT_LOG_LEVEL
