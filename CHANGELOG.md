@@ -1,5 +1,9 @@
 ## Unreleased
 
+Improvements:
+
+* Option to set `AGENT_INJECT_VAULT_AUTH_PATH` for the injector [[GH-185](https://github.com/hashicorp/vault-helm/pull/185)]
+
 ## 0.4.0 (February 21st, 2020)
 
 Improvements:
