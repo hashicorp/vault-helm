@@ -79,7 +79,7 @@ wait_for_running() {
     for i in $(seq 60); do
         if [ -n "$(check ${POD_NAME})" ]; then
             echo "${POD_NAME} is ready."
-            sleep 10
+            sleep 5
             return
         fi
 
@@ -88,5 +88,64 @@ wait_for_running() {
     done
 
     echo "${POD_NAME} never became ready."
+    exit 1
+}
+
+wait_for_ready() {
+    POD_NAME=$1
+
+    check() {
+        # This requests the pod and checks whether the status is running
+        # and the ready state is true. If so, it outputs the name. Otherwise
+        # it outputs empty. Therefore, to check for success, check for nonzero
+        # string length.
+        kubectl get pods $1 -o json | \
+            jq -r 'select(
+                .status.phase == "Running" and
+                ([ .status.conditions[] | select(.type == "Ready" and .status == "True") ] | length) == 1
+            ) | .metadata.namespace + "/" + .metadata.name'
+    }
+
+    for i in $(seq 60); do
+        if [ -n "$(check ${POD_NAME})" ]; then
+            echo "${POD_NAME} is ready."
+            sleep 5
+            return
+        fi
+
+        echo "Waiting for ${POD_NAME} to be ready..."
+        sleep 2
+    done
+
+    echo "${POD_NAME} never became ready."
+    exit 1
+}
+
+wait_for_complete_job() {
+	POD_NAME=$1
+
+    check() {
+        # This requests the pod and checks whether the status is running
+        # and the ready state is true. If so, it outputs the name. Otherwise
+        # it outputs empty. Therefore, to check for success, check for nonzero
+        # string length.
+        kubectl get job $1 -o json | \
+            jq -r 'select(
+                .status.succeeded == 1 
+            ) | .metadata.namespace + "/" + .metadata.name'
+    }
+
+    for i in $(seq 60); do
+        if [ -n "$(check ${POD_NAME})" ]; then
+            echo "${POD_NAME} is complete."
+            sleep 5
+            return
+        fi
+
+        echo "Waiting for ${POD_NAME} to be complete..."
+        sleep 2
+    done
+
+    echo "${POD_NAME} never completed."
     exit 1
 }

@@ -4,16 +4,89 @@ global:
   # enabled is the master enabled switch. Setting this to true or false
   # will enable or disable all the components within this chart by default.
   enabled: true
-
-  # Image is the name (and tag) of the Vault Docker image.
-  image: "vault:1.2.2"
+  # Image pull secret to use for registry authentication.
+  imagePullSecrets: []
+  # imagePullSecrets:
+  #   - name: image-pull-secret
   # TLS for end-to-end encrypted transport
   tlsDisable: true
+
+injector:
+  # True if you want to enable vault agent injection.
+  enabled: true
+
+  # External vault server address for the injector to use. Setting this will
+  # disable deployment of a vault server along with the injector.
+  externalVaultAddr: ""
+
+  # image sets the repo and tag of the vault-k8s image to use for the injector.
+  image:
+    repository: "hashicorp/vault-k8s"
+    tag: "0.2.0"
+    pullPolicy: IfNotPresent
+
+  # agentImage sets the repo and tag of the Vault image to use for the Vault Agent
+  # containers.  This should be set to the official Vault image.  Vault 1.3.1+ is
+  # required.
+  agentImage:
+    repository: "vault"
+    tag: "1.3.2"
+
+  # Mount Path of the Vault Kubernetes Auth Method.
+  authPath: "auth/kubernetes"
+
+  # namespaceSelector is the selector for restricting the webhook to only
+  # specific namespaces. This should be set to a multiline string.
+  # See https://kubernetes.io/docs/reference/access-authn-authz/extensible-admission-controllers/#matching-requests-namespaceselector
+  # for more details.
+  # Example:
+  # namespaceSelector: |
+  #    matchLabels:
+  #      sidecar-injector: enabled
+  namespaceSelector: {}
+
+  certs:
+    # secretName is the name of the secret that has the TLS certificate and
+    # private key to serve the injector webhook. If this is null, then the
+    # injector will default to its automatic management mode that will assign
+    # a service account to the injector to generate its own certificates.
+    secretName: null
+
+    # caBundle is a base64-encoded PEM-encoded certificate bundle for the
+    # CA that signed the TLS certificate that the webhook serves. This must
+    # be set if secretName is non-null.
+    caBundle: ""
+
+    # certName and keyName are the names of the files within the secret for
+    # the TLS cert and private key, respectively. These have reasonable
+    # defaults but can be customized if necessary.
+    certName: tls.crt
+    keyName: tls.key
+
+  resources: {}
+  # resources:
+  #   requests:
+  #     memory: 256Mi
+  #     cpu: 250m
+  #   limits:
+  #     memory: 256Mi
+  #     cpu: 250m
 
 server:
   # Resource requests, limits, etc. for the server cluster placement. This
   # should map directly to the value of the resources field for a PodSpec.
   # By default no direct resource request is made.
+
+  image:
+    repository: "vault"
+    tag: "1.3.2"
+    # Overrides the default Image Pull Policy
+    pullPolicy: IfNotPresent
+
+  # Configure the Update Strategy Type for the StatefulSet
+  # See https://kubernetes.io/docs/concepts/workloads/controllers/statefulset/#update-strategies
+  updateStrategyType: "OnDelete"
+
   resources:
   # resources:
   #   requests:
@@ -23,11 +96,12 @@ server:
   #     memory: 256Mi
   #     cpu: 250m
 
-  # Ingress settings
-  # Enabling it a ingress will be created which will manage external access to the
-  # cluster, very useful if you want to expose the Vault UI
+  # Ingress allows ingress services to be created to allow external access
+  # from Kubernetes to access Vault pods.
   ingress:
     enabled: false
+    labels: {}
+      # traffic: external
     annotations: {}
       # kubernetes.io/ingress.class: nginx
       # kubernetes.io/tls-acme: "true"
@@ -45,14 +119,38 @@ server:
   # account.  This cluster role binding can be used to setup Kubernetes auth
   # method.  https://www.vaultproject.io/docs/auth/kubernetes.html
   authDelegator:
+    enabled: true
+
+  # extraContainers is a list of sidecar containers. Specified as a raw YAML string.
+  extraContainers: null
+
+  # shareProcessNamespace enables process namespace sharing between Vault and the extraContainers
+  # This is useful if Vault must be signaled, e.g. to send a SIGHUP for log rotation
+  shareProcessNamespace: false
+
+  # extraArgs is a string containing additional Vault server arguments.
+  extraArgs: ""
+
+  # Used to define custom readinessProbe settings
+  readinessProbe:
+    enabled: true
+    # If you need to use a http path instead of the default exec
+    # path: /v1/sys/health?standbyok=true
+  # Used to enable a livenessProbe for the pods
+  livenessProbe:
     enabled: false
+    path: "/v1/sys/health?standbyok=true"
+    initialDelaySeconds: 60
+
+  # Used to set the sleep time during the preStop step
+  preStopSleepSeconds: 5
 
   # extraEnvironmentVars is a list of extra enviroment variables to set with the stateful set. These could be
   # used to include variables required for auto-unseal.
   extraEnvironmentVars: {}
-    # GOOGLE_REGION: global,
-    # GOOGLE_PROJECT: myproject,
-    # GOOGLE_CREDENTIALS: /vault/userconfig/myproject/myproject-creds.json
+    # GOOGLE_REGION: global
+    # GOOGLE_PROJECT: myproject
+    # GOOGLE_APPLICATION_CREDENTIALS: /vault/userconfig/myproject/myproject-creds.json
 
   # extraSecretEnvironmentVars is a list of extra enviroment variables to set with the stateful set.
   # These variables take value from existing Secret objects.
@@ -67,7 +165,6 @@ server:
   extraVolumes: []
     # - type: secret (or "configMap")
     #   name: my-secret
-    #   load: false # if true, will add to `-config` to load by Vault
     #   path: null # default is `/vault/userconfig`
 
   # Affinity Settings
@@ -116,16 +213,24 @@ server:
     # load balancer.
     # clusterIP: None
 
+    # Configures the service type for the main Vault service.  Can be ClusterIP
+    # or NodePort.
+    #type: ClusterIP
+
+    # If type is set to "NodePort", a specific nodePort value can be configured,
+    # will be random if left blank.
+    #nodePort: 30000
+
     # Port on which Vault server is listening
     port: 8200
     # Target port to which the service should be mapped to
     targetPort: 8200
     # Extra annotations for the service definition
     annotations: {}
-    
+
   # This configures the Vault Statefulset to create a PVC for data
   # storage when using the file backend.
-  # See https://www.vaultproject.io/docs/audit/index.html to know more
+  # See https://www.vaultproject.io/docs/configuration/storage/index.html to know more
   dataStorage:
     enabled: true
     # Size of the PVC created
@@ -236,14 +341,9 @@ server:
     # replicas. If you'd like a custom value, you can specify an override here.
       maxUnavailable: null
 
-  # Definition of the serviceaccount used to run Vault.
-  serviceaccount:
+  # Definition of the serviceAccount used to run Vault.
+  serviceAccount:
     annotations: {}
-  
-  # mlock prevents memory from being swapped to disk.  If swap is enabled this should 
-  # be true.
-  mlock:
-    enabled: true
 
 # Vault UI
 ui:
@@ -256,6 +356,11 @@ ui:
   serviceType: "ClusterIP"
   serviceNodePort: null
   externalPort: 8200
+
+  # loadBalancerSourceRanges:
+  #   - 10.0.0.0/16
+  #   - 1.78.23.3/32
+
   # loadBalancerIP:
 
   # Extra annotations to attach to the ui service
