@@ -45,6 +45,8 @@ spec:
             {{- else }}
               value: {{ include "vault.scheme" . }}://{{ template "vault.fullname" . }}.{{ .Release.Namespace }}.svc:{{ .Values.server.service.port }}
             {{- end }}
+            - name: AGENT_INJECT_VAULT_AUTH_PATH
+              value: {{ .Values.injector.authPath }}
             - name: AGENT_INJECT_VAULT_IMAGE
               value: "{{ .Values.injector.agentImage.repository }}:{{ .Values.injector.agentImage.tag }}"
             {{- if .Values.injector.certs.secretName }}
