@@ -6,6 +6,7 @@ load _helpers
   cd `chart_dir`
 
   helm install "$(name_prefix)" \
+    --set server.affinity=null \
     --set='server.ha.enabled=true' .
   
   # Breathing room
@@ -97,10 +98,10 @@ setup() {
   kubectl create namespace acceptance
   kubectl config set-context --current --namespace=acceptance
 
-  helm install consul \
-    https://github.com/hashicorp/consul-helm/archive/v0.16.2.tar.gz \
+  helm install consul https://github.com/hashicorp/consul-helm/archive/v0.8.1.tar.gz \
     --set 'ui.enabled=false' \
-    --wait 
+    --set server.affinity=null \
+    --wait
 }
 
 #cleanup

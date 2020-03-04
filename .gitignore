@@ -10,3 +10,6 @@ vaul-helm-dev-creds.json
 ./test/unit/vaul-helm-dev-creds.json
 ./test/acceptance/values.yaml
 ./test/acceptance/values.yml
+
+# IDEs
+.idea/*

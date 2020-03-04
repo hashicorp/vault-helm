@@ -72,8 +72,6 @@ spec:
               value: "{{ include "vault.scheme" . }}://127.0.0.1:8200"
             - name: VAULT_API_ADDR
               value: "{{ include "vault.scheme" . }}://$(POD_IP):8200"
-            - name: VAULT_CLUSTER_ADDR
-              value: "https://$(POD_IP):8201"
             - name: SKIP_CHOWN
               value: "true"
             - name: SKIP_SETCAP
