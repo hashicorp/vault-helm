@@ -139,7 +139,7 @@ setup() {
   kubectl create namespace acceptance
   kubectl config set-context --current --namespace=acceptance
 
-  helm install consul https://github.com/hashicorp/consul-helm/archive/v0.8.1.tar.gz \
+  helm install consul https://github.com/hashicorp/consul-helm/archive/v0.17.0.tar.gz \
     --set 'ui.enabled=false' \
     --wait
 }
