@@ -3,6 +3,7 @@
 Improvements:
 
 * Option to set `AGENT_INJECT_VAULT_AUTH_PATH` for the injector [[GH-185](https://github.com/hashicorp/vault-helm/pull/185)]
+* Added environment variables for logging and revocation on Vault Agent Injector [[GH-219](https://github.com/hashicorp/vault-helm/pull/219)]
 
 ## 0.4.0 (February 21st, 2020)
 
