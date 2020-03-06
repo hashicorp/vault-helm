@@ -35,10 +35,10 @@ injector:
   # Mount Path of the Vault Kubernetes Auth Method.
   authPath: "auth/kubernetes"
 
-  # Configures the log verbosity of the injector
+  # Configures the log verbosity of the injector. Supported log levels: Trace, Debug, Error, Warn, Info
   logLevel: "info"
 
-  # Configures the log format of the injector
+  # Configures the log format of the injector. Supported log formats: "standard", "json".
   logFormat: "standard"
   
   # Configures all Vault Agent sidecars to revoke their token when shutting down
