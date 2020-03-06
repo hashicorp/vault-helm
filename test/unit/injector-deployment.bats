@@ -222,3 +222,102 @@ load _helpers
       yq -r '.[3].value' | tee /dev/stderr)
   [ "${actual}" = "auth/k8s" ]
 }
+
+@test "injector/deployment: default logLevel" {
+  cd `chart_dir`
+  local object=$(helm template \
+      --show-only templates/injector-deployment.yaml  \
+      . | tee /dev/stderr |
+      yq -r '.spec.template.spec.containers[0].env' | tee /dev/stderr)
+
+  local actual=$(echo $object |
+     yq -r '.[1].name' | tee /dev/stderr)
+  [ "${actual}" = "AGENT_INJECT_LOG_LEVEL" ]
+
+  local actual=$(echo $object |
+      yq -r '.[1].value' | tee /dev/stderr)
+  [ "${actual}" = "info" ]
+}
+
+@test "injector/deployment: custom logLevel" {
+  cd `chart_dir`
+  local object=$(helm template \
+      --show-only templates/injector-deployment.yaml  \
+      --set 'injector.logLevel=foo' \
+      . | tee /dev/stderr |
+      yq -r '.spec.template.spec.containers[0].env' | tee /dev/stderr)
+
+  local actual=$(echo $object |
+     yq -r '.[1].name' | tee /dev/stderr)
+  [ "${actual}" = "AGENT_INJECT_LOG_LEVEL" ]
+
+  local actual=$(echo $object |
+      yq -r '.[1].value' | tee /dev/stderr)
+  [ "${actual}" = "foo" ]
+}
+
+@test "injector/deployment: default logFormat" {
+  cd `chart_dir`
+  local object=$(helm template \
+      --show-only templates/injector-deployment.yaml  \
+      . | tee /dev/stderr |
+      yq -r '.spec.template.spec.containers[0].env' | tee /dev/stderr)
+
+  local actual=$(echo $object |
+     yq -r '.[7].name' | tee /dev/stderr)
+  [ "${actual}" = "AGENT_INJECT_LOG_FORMAT" ]
+
+  local actual=$(echo $object |
+      yq -r '.[7].value' | tee /dev/stderr)
+  [ "${actual}" = "standard" ]
+}
+
+@test "injector/deployment: custom logFormat" {
+  cd `chart_dir`
+  local object=$(helm template \
+      --show-only templates/injector-deployment.yaml  \
+      --set 'injector.logFormat=json' \
+      . | tee /dev/stderr |
+      yq -r '.spec.template.spec.containers[0].env' | tee /dev/stderr)
+
+  local actual=$(echo $object |
+     yq -r '.[7].name' | tee /dev/stderr)
+  [ "${actual}" = "AGENT_INJECT_LOG_FORMAT" ]
+
+  local actual=$(echo $object |
+      yq -r '.[7].value' | tee /dev/stderr)
+  [ "${actual}" = "json" ]
+}
+
+@test "injector/deployment: default revoke on shutdown" {
+  cd `chart_dir`
+  local object=$(helm template \
+      --show-only templates/injector-deployment.yaml  \
+      . | tee /dev/stderr |
+      yq -r '.spec.template.spec.containers[0].env' | tee /dev/stderr)
+
+  local actual=$(echo $object |
+     yq -r '.[8].name' | tee /dev/stderr)
+  [ "${actual}" = "AGENT_INJECT_REVOKE_ON_SHUTDOWN" ]
+
+  local actual=$(echo $object |
+      yq -r '.[8].value' | tee /dev/stderr)
+  [ "${actual}" = "false" ]
+}
+
+@test "injector/deployment: custom revoke on shutdown" {
+  cd `chart_dir`
+  local object=$(helm template \
+      --show-only templates/injector-deployment.yaml  \
+      --set 'injector.revokeOnShutdown=true' \
+      . | tee /dev/stderr |
+      yq -r '.spec.template.spec.containers[0].env' | tee /dev/stderr)
+
+  local actual=$(echo $object |
+     yq -r '.[8].name' | tee /dev/stderr)
+  [ "${actual}" = "AGENT_INJECT_REVOKE_ON_SHUTDOWN" ]
+
+  local actual=$(echo $object |
+      yq -r '.[8].value' | tee /dev/stderr)
+  [ "${actual}" = "true" ]
+}

@@ -22,7 +22,7 @@ injector:
   # image sets the repo and tag of the vault-k8s image to use for the injector.
   image:
     repository: "hashicorp/vault-k8s"
-    tag: "0.2.0"
+    tag: "0.3.0"
     pullPolicy: IfNotPresent
 
   # agentImage sets the repo and tag of the Vault image to use for the Vault Agent
@@ -30,10 +30,19 @@ injector:
   # required.
   agentImage:
     repository: "vault"
-    tag: "1.3.2"
+    tag: "1.3.3"
 
   # Mount Path of the Vault Kubernetes Auth Method.
   authPath: "auth/kubernetes"
+
+  # Configures the log verbosity of the injector. Supported log levels: Trace, Debug, Error, Warn, Info
+  logLevel: "info"
+
+  # Configures the log format of the injector. Supported log formats: "standard", "json".
+  logFormat: "standard"
+  
+  # Configures all Vault Agent sidecars to revoke their token when shutting down
+  revokeOnShutdown: false
 
   # namespaceSelector is the selector for restricting the webhook to only
   # specific namespaces. This should be set to a multiline string.
@@ -79,7 +88,7 @@ server:
 
   image:
     repository: "vault"
-    tag: "1.3.2"
+    tag: "1.3.3"
     # Overrides the default Image Pull Policy
     pullPolicy: IfNotPresent
 
