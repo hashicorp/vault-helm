@@ -223,7 +223,7 @@ load _helpers
   [ "${actual}" = "auth/k8s" ]
 }
 
-@test "injector/deployment: defualt logLevel" {
+@test "injector/deployment: default logLevel" {
   cd `chart_dir`
   local object=$(helm template \
       --show-only templates/injector-deployment.yaml  \
