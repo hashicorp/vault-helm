@@ -16,10 +16,7 @@ metadata:
     {{- with .Values.server.ingress.labels }}
       {{- toYaml . | nindent 4 }}
     {{- end }}
-  {{- with .Values.server.ingress.annotations }}
-  annotations:
-    {{- toYaml . | nindent 4 }}
-  {{- end }}
+  {{- template "vault.ingress.annotations" . }}
 spec:
 {{- if .Values.server.ingress.tls }}
   tls:
