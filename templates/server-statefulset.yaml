@@ -83,7 +83,7 @@ spec:
           {{ template "vault.mounts" . }}
           ports:
             - containerPort: 8200
-              name: http
+              name: {{ include "vault.scheme" . }}
             - containerPort: 8201
               name: internal
             - containerPort: 8202
