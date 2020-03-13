@@ -2,13 +2,22 @@
 
 Improvements:
 
-* Allow process namespace sharing between Vault and sidecar containers
-* Added configurable to change updateStrategy
-* Added sleep in the preStop lifecycle step
+* Option to set `AGENT_INJECT_VAULT_AUTH_PATH` for the injector [[GH-185](https://github.com/hashicorp/vault-helm/pull/185)]
+* Added environment variables for logging and revocation on Vault Agent Injector [[GH-219](https://github.com/hashicorp/vault-helm/pull/219)]
+
+## 0.4.0 (February 21st, 2020)
+
+Improvements:
+
+* Allow process namespace sharing between Vault and sidecar containers [[GH-174](https://github.com/hashicorp/vault-helm/pull/174)]
+* Added configurable to change updateStrategy [[GH-172](https://github.com/hashicorp/vault-helm/pull/172)]
+* Added sleep in the preStop lifecycle step [[GH-188](https://github.com/hashicorp/vault-helm/pull/188)]
+* Updated chart and tests to Helm 3 [[GH-195](https://github.com/hashicorp/vault-helm/pull/195)]
+* Adds Values.injector.externalVaultAddr to use the injector with an external vault [[GH-207](https://github.com/hashicorp/vault-helm/pull/207)]
 
 Bugs:
 
-* Fix bug where Vault lifecycle was appended after extra containers.
+* Fix bug where Vault lifecycle was appended after extra containers. [[GH-179](https://github.com/hashicorp/vault-helm/pull/179)]
 
 ## 0.3.3 (January 14th, 2020)
 

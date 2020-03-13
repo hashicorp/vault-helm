@@ -1,6 +1,7 @@
-# StatefulSet to run the actual vault server cluster.
 {{ template "vault.mode" . }}
+{{- if ne .mode "external" }}
 {{- if and (ne .mode "") (eq (.Values.global.enabled | toString) "true") }}
+# StatefulSet to run the actual vault server cluster.
 apiVersion: apps/v1
 kind: StatefulSet
 metadata:
@@ -142,4 +143,5 @@ spec:
         {{- toYaml .Values.global.imagePullSecrets | nindent 8 }}
       {{- end }}
   {{ template "vault.volumeclaims" . }}
+{{ end }}
 {{ end }}

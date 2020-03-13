@@ -1,4 +1,5 @@
 {{ template "vault.mode" . }}
+{{- if ne .mode "external" }}
 {{- if and (eq (.Values.global.enabled | toString) "true") (ne .mode "dev") -}}
 {{ if or (ne .Values.server.standalone.config "")  (ne .Values.server.ha.config "") -}}
 apiVersion: v1
@@ -19,5 +20,6 @@ data:
   {{- else if eq .mode "ha" }}
     {{ tpl .Values.server.ha.config . | nindent 4 | trim }}
   {{ end }}
+{{- end }}
 {{- end }}
 {{- end }}

@@ -4,9 +4,20 @@ load _helpers
 
 @test "server/ingress: disabled by default" {
   cd `chart_dir`
-  local actual=$(helm template \
-      -x templates/server-ingress.yaml  \
-      . | tee /dev/stderr |
+  local actual=$( (helm template \
+      --show-only templates/server-ingress.yaml  \
+      . || echo "---") | tee /dev/stderr |
+      yq 'length > 0' | tee /dev/stderr)
+  [ "${actual}" = "false" ]
+}
+
+@test "server/ingress: disable by injector.externalVaultAddr" {
+  cd `chart_dir`
+  local actual=$( (helm template \
+      --show-only templates/server-ingress.yaml  \
+      --set 'server.ingress.enabled=true' \
+      --set 'injector.externalVaultAddr=http://vault-outside' \
+      . || echo "---") | tee /dev/stderr |
       yq 'length > 0' | tee /dev/stderr)
   [ "${actual}" = "false" ]
 }
@@ -14,7 +25,7 @@ load _helpers
 @test "server/ingress: checking host entry gets added and path is /" {
   cd `chart_dir`
   local actual=$(helm template \
-      -x templates/server-ingress.yaml \
+      --show-only templates/server-ingress.yaml \
       --set 'server.ingress.enabled=true' \
       --set 'server.ingress.hosts[0].host=test.com' \
       --set 'server.ingress.hosts[0].paths[0]=/' \
@@ -23,7 +34,7 @@ load _helpers
   [ "${actual}" = 'test.com' ]
 
   local actual=$(helm template \
-      -x templates/server-ingress.yaml \
+      --show-only templates/server-ingress.yaml \
       --set 'server.ingress.enabled=true' \
       --set 'server.ingress.hosts[0].host=test.com' \
       --set 'server.ingress.hosts[0].paths[0]=/' \
@@ -36,7 +47,7 @@ load _helpers
   cd `chart_dir`
 
   local actual=$(helm template \
-      -x templates/server-ingress.yaml \
+      --show-only templates/server-ingress.yaml \
       --set 'server.ingress.enabled=true' \
       --set 'server.ingress.hosts[0].host=test.com' \
       --set 'server.ingress.hosts[0].paths[0]=/' \
@@ -50,7 +61,7 @@ load _helpers
   cd `chart_dir`
 
   local actual=$(helm template \
-      -x templates/server-ingress.yaml \
+      --show-only templates/server-ingress.yaml \
       --set 'server.ingress.enabled=true' \
       --set 'server.ingress.labels.traffic=external' \
       --set 'server.ingress.labels.team=dev' \

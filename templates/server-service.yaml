@@ -1,5 +1,7 @@
-# Service for Vault cluster
+{{ template "vault.mode" . }}
+{{- if ne .mode "external" }}
 {{- if and (eq (.Values.server.service.enabled | toString) "true" ) (eq (.Values.global.enabled | toString) "true") }}
+# Service for Vault cluster
 apiVersion: v1
 kind: Service
 metadata:
@@ -42,4 +44,5 @@ spec:
     app.kubernetes.io/name: {{ include "vault.name" . }}
     app.kubernetes.io/instance: {{ .Release.Name }}
     component: server
+{{- end }}
 {{- end }}

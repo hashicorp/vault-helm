@@ -1,11 +1,12 @@
 {{ template "vault.mode" . }}
+{{- if ne .mode "external" }}
 {{- if and (ne .mode "") (eq (.Values.global.enabled | toString) "true") }}
+{{- if eq (.Values.ui.enabled | toString) "true" }}
 # Headless service for Vault server DNS entries. This service should only
 # point to Vault servers. For access to an agent, one should assume that
 # the agent is installed locally on the node and the NODE_IP should be used.
 # If the node can't run a Vault agent, then this service can be used to
 # communicate directly to a server agent.
-{{- if eq (.Values.ui.enabled | toString) "true" }}
 apiVersion: v1
 kind: Service
 metadata:
@@ -42,4 +43,5 @@ spec:
   {{- end }}
 {{- end -}}
 
+{{ end }}
 {{ end }}

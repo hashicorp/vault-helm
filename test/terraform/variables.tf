@@ -15,7 +15,7 @@ variable "zone" {
 
 variable "init_cli" {
   default     = true
-  description = "Whether to init the CLI tools kubectl, helm, etc. or not."
+  description = "Whether to init kubectl or not."
 }
 
 variable "gcp_service_account" {
