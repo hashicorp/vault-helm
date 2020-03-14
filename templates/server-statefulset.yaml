@@ -87,7 +87,7 @@ spec:
             - containerPort: 8201
               name: {{ include "vault.scheme" . }}-internal
             - containerPort: 8202
-              name: {{ include "vault.scheme" . }}-replication
+              name: {{ include "vault.scheme" . }}-rep
           {{- if .Values.server.readinessProbe.enabled }}
           readinessProbe:
             {{- if .Values.server.readinessProbe.path }}
