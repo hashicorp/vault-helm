@@ -133,6 +133,10 @@ Set's additional environment variables based on the mode.
             - name: VAULT_DEV_ROOT_TOKEN_ID
               value: "root"
   {{ end }}
+  {{ if and (eq .mode "ha") (eq (.Values.server.ha.raft.enabled | toString) "true") }}
+            - name: VAULT_CLUSTER_ADDR
+              value: "https://$(HOSTNAME).vault-internal:8201"
+  {{ end }}
 {{- end -}}
 
 {{/*
@@ -144,7 +148,7 @@ based on the mode configured.
             - name: audit
               mountPath: /vault/audit
   {{ end }}
-  {{ if eq .mode "standalone" }}
+  {{ if or (eq .mode "standalone") (and (eq .mode "ha") (eq (.Values.server.ha.raft.enabled | toString) "true"))  }}
     {{ if eq (.Values.server.dataStorage.enabled | toString) "true" }}
             - name: data
               mountPath: /vault/data
@@ -169,7 +173,7 @@ storage might be desired by the user.
 {{- define "vault.volumeclaims" -}}
   {{- if and (ne .mode "dev") (or .Values.server.dataStorage.enabled .Values.server.auditStorage.enabled) }}
   volumeClaimTemplates:
-      {{- if and (eq (.Values.server.dataStorage.enabled | toString) "true") (eq .mode "standalone") }}
+      {{- if and (eq (.Values.server.dataStorage.enabled | toString) "true") (or (eq .mode "standalone") (eq (.Values.server.ha.raft.enabled | toString ) "true" )) }}
     - metadata:
         name: data
       spec:
