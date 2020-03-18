@@ -314,8 +314,14 @@ server:
   ha:
     enabled: false
     replicas: 3
-
+    
+    # Enables Vault's integrated Raft storage.  Unlike the typical HA modes where 
+    # Vault's persistence is external (such as Consul), enabling Raft mode will create 
+    # persistent volumes for Vault to store data.  The Vault cluster will coordinate leader 
+    # elections and failovers internally.
     raft:
+      
+      # Enables Raft integrated storage
       enabled: false
       config: |
         ui = true
