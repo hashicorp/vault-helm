@@ -21,7 +21,7 @@ spec:
   clusterIP: None
   publishNotReadyAddresses: true
   ports:
-    - name: http
+    - name: "{{ include "vault.scheme" . }}"
       port: {{ .Values.server.service.port }}
       targetPort: {{ .Values.server.service.targetPort }}
     - name: internal
