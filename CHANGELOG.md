@@ -1,5 +1,9 @@
 ## Unreleased
 
+Features:
+
+* Added Raft support for HA mode [[GH-228](https://github.com/hashicorp/vault-helm/pull/229)]
+
 Improvements:
 
 * Option to set `AGENT_INJECT_VAULT_AUTH_PATH` for the injector [[GH-185](https://github.com/hashicorp/vault-helm/pull/185)]
