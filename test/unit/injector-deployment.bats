@@ -321,3 +321,41 @@ load _helpers
       yq -r '.[8].value' | tee /dev/stderr)
   [ "${actual}" = "true" ]
 }
+
+#--------------------------------------------------------------------
+# extraEnvironmentVars
+
+@test "injector/deployment: set extraEnvironmentVars" {
+  cd `chart_dir`
+  local object=$(helm template \
+      --show-only templates/injector-deployment.yaml  \
+      --set 'injector.extraEnvironmentVars.FOO=bar' \
+      --set 'injector.extraEnvironmentVars.FOOBAR=foobar' \
+      --set 'injector.extraEnvironmentVars.lower\.case=sanitized' \
+      . | tee /dev/stderr |
+      yq -r '.spec.template.spec.containers[0].env' | tee /dev/stderr)
+
+  local actual=$(echo $object |
+     yq -r '.[9].name' | tee /dev/stderr)
+  [ "${actual}" = "FOO" ]
+
+  local actual=$(echo $object |
+      yq -r '.[9].value' | tee /dev/stderr)
+  [ "${actual}" = "bar" ]
+
+  local actual=$(echo $object |
+      yq -r '.[10].name' | tee /dev/stderr)
+  [ "${actual}" = "FOOBAR" ]
+
+  local actual=$(echo $object |
+      yq -r '.[10].value' | tee /dev/stderr)
+  [ "${actual}" = "foobar" ]
+
+  local actual=$(echo $object |
+      yq -r '.[11].name' | tee /dev/stderr)
+  [ "${actual}" = "LOWER_CASE" ]
+
+  local actual=$(echo $object |
+      yq -r '.[11].value' | tee /dev/stderr)
+  [ "${actual}" = "sanitized" ]
+}
