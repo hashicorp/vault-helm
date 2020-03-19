@@ -12,7 +12,7 @@ metadata:
     app.kubernetes.io/instance: {{ .Release.Name }}
     app.kubernetes.io/managed-by: {{ .Release.Service }}
 spec:
-  serviceName: {{ template "vault.fullname" . }}
+  serviceName: {{ template "vault.fullname" . }}-internal
   podManagementPolicy: Parallel
   replicas: {{ template "vault.replicas" . }}
   updateStrategy:
@@ -71,11 +71,15 @@ spec:
             - name: VAULT_ADDR
               value: "{{ include "vault.scheme" . }}://127.0.0.1:8200"
             - name: VAULT_API_ADDR
-              value: "{{ include "vault.scheme" . }}://$(POD_IP):8200"
+              value: "{{ include "vault.scheme" . }}-internal://$(POD_IP):8200"
             - name: SKIP_CHOWN
               value: "true"
             - name: SKIP_SETCAP
               value: "true"
+            - name: HOSTNAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.name
             {{ template "vault.envs" . }}
             {{- include "vault.extraEnvironmentVars" .Values.server | nindent 12 }}
             {{- include "vault.extraSecretEnvironmentVars" .Values.server | nindent 12 }}
