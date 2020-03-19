@@ -64,6 +64,7 @@ spec:
               value: {{ .Values.injector.logFormat | default "standard" }}
             - name: AGENT_INJECT_REVOKE_ON_SHUTDOWN
               value: "{{ .Values.injector.revokeOnShutdown | default false }}"
+            {{- include "vault.extraEnvironmentVars" .Values.injector | nindent 12 }}
           args:
             - agent-inject
             - 2>&1
