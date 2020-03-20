@@ -561,6 +561,25 @@ load _helpers
   [ "${actual}" = "0" ]
 }
 
+@test "server/standalone-StatefulSet: affinity is set by default" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      --show-only templates/server-statefulset.yaml  \
+      . | tee /dev/stderr |
+      yq '.spec.template.spec.affinity["podAntiAffinity"]? != null' | tee /dev/stderr)
+  [ "${actual}" = "true" ]
+}
+
+@test "server/standalone-StatefulSet: affinity can be set" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      --show-only templates/server-statefulset.yaml  \
+      --set 'server.affinity=foobar' \
+      . | tee /dev/stderr |
+      yq '.spec.template.spec.affinity == "foobar"' | tee /dev/stderr)
+  [ "${actual}" = "true" ]
+}
+
 @test "server/standalone-StatefulSet: tolerations not set by default" {
   cd `chart_dir`
   local actual=$(helm template \

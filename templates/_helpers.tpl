@@ -213,6 +213,16 @@ Set's the affinity for pod placement when running in standalone and HA modes.
 {{- end -}}
 
 {{/*
+Sets the injector affinity for pod placement
+*/}}
+{{- define "injector.affinity" -}}
+  {{- if .Values.injector.affinity }}
+      affinity:
+        {{ tpl .Values.injector.affinity . | nindent 8 | trim }}
+  {{ end }}
+{{- end -}}
+
+{{/*
 Set's the toleration for pod placement when running in standalone and HA modes.
 */}}
 {{- define "vault.tolerations" -}}
@@ -223,12 +233,32 @@ Set's the toleration for pod placement when running in standalone and HA modes.
 {{- end -}}
 
 {{/*
+Sets the injector toleration for pod placement
+*/}}
+{{- define "injector.tolerations" -}}
+  {{- if .Values.injector.tolerations }}
+      tolerations:
+        {{ tpl .Values.injector.tolerations . | nindent 8 | trim }}
+  {{- end }}
+{{- end -}}
+
+{{/*
 Set's the node selector for pod placement when running in standalone and HA modes.
 */}}
 {{- define "vault.nodeselector" -}}
   {{- if and (ne .mode "dev") .Values.server.nodeSelector }}
       nodeSelector:
         {{ tpl .Values.server.nodeSelector . | indent 8 | trim }}
+  {{- end }}
+{{- end -}}
+
+{{/*
+Sets the injector node selector for pod placement
+*/}}
+{{- define "injector.nodeselector" -}}
+  {{- if .Values.injector.nodeSelector }}
+      nodeSelector:
+        {{ tpl .Values.injector.nodeSelector . | indent 8 | trim }}
   {{- end }}
 {{- end -}}
 
