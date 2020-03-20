@@ -86,6 +86,23 @@ injector:
   extraEnvironmentVars: {}
     # KUBERNETES_SERVICE_HOST: kubernetes.default.svc
 
+  # Affinity Settings for injector pods
+  # This should be a multi-line string matching the affinity section of a
+  # PodSpec.
+  affinity: null
+
+  # Toleration Settings for injector pods
+  # This should be a multi-line string matching the Toleration array
+  # in a PodSpec.
+  tolerations: null
+
+  # nodeSelector labels for injector pod assignment, formatted as a muli-line string.
+  # ref: https://kubernetes.io/docs/concepts/configuration/assign-pod-node/#nodeselector
+  # Example:
+  # nodeSelector: |
+  #   beta.kubernetes.io/arch: amd64
+  nodeSelector: null
+
 server:
   # Resource requests, limits, etc. for the server cluster placement. This
   # should map directly to the value of the resources field for a PodSpec.

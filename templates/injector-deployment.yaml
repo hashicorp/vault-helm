@@ -24,6 +24,9 @@ spec:
         app.kubernetes.io/instance: {{ .Release.Name }}
         component: webhook
     spec:
+      {{ template "injector.affinity" . }}
+      {{ template "injector.tolerations" . }}
+      {{ template "injector.nodeselector" . }}
       serviceAccountName: "{{ template "vault.fullname" . }}-agent-injector"
       securityContext:
         runAsNonRoot: true
