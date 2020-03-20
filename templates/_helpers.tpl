@@ -278,7 +278,7 @@ Sets extra ui service annotations
 {{- define "vault.ui.annotations" -}}
   {{- if .Values.ui.annotations }}
   annotations:
-    {{- toYaml .Values.ui.annotations | nindent 4 }}
+    {{- tpl .Values.ui.annotations . | nindent 4 }}
   {{- end }}
 {{- end -}}
 
@@ -288,7 +288,17 @@ Sets extra service account annotations
 {{- define "vault.serviceAccount.annotations" -}}
   {{- if and (ne .mode "dev") .Values.server.serviceAccount.annotations }}
   annotations:
-    {{- toYaml .Values.server.serviceAccount.annotations | nindent 4 }}
+    {{- tpl .Values.server.serviceAccount.annotations . | nindent 4 }}
+  {{- end }}
+{{- end -}}
+
+{{/*
+Sets extra ingress annotations
+*/}}
+{{- define "vault.ingress.annotations" -}}
+  {{- if .Values.server.ingress.annotations }}
+  annotations:
+    {{- tpl .Values.server.ingress.annotations . | nindent 4 }}
   {{- end }}
 {{- end -}}
 
