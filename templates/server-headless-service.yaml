@@ -15,7 +15,7 @@ metadata:
   annotations:
     service.alpha.kubernetes.io/tolerate-unready-endpoints: "true"
 {{- if .Values.server.service.annotations }}
-{{ toYaml .Values.server.service.annotations | indent 4 }}
+{{ tpl .Values.server.service.annotations . | indent 4 }}
 {{- end }}
 spec:
   clusterIP: None
