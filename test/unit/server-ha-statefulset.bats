@@ -403,6 +403,28 @@ load _helpers
   [ "${actual}" = "secret_key_1" ]
 }
 
+
+#--------------------------------------------------------------------
+# VAULT_CLUSTER_ADDR renders
+
+@test "server/ha-StatefulSet: cluster addr renders" {
+  cd `chart_dir`
+  local object=$(helm template \
+      --show-only templates/server-statefulset.yaml  \
+      --set 'server.ha.enabled=true' \
+      --set 'server.ha.raft.enabled=true' \
+      . | tee /dev/stderr |
+      yq -r '.spec.template.spec.containers[0].env' | tee /dev/stderr)
+  
+  local actual=$(echo $object |
+     yq -r '.[7].name' | tee /dev/stderr)
+  [ "${actual}" = "VAULT_CLUSTER_ADDR" ]
+
+  local actual=$(echo $object |
+     yq -r '.[7].value' | tee /dev/stderr)
+  [ "${actual}" = 'https://$(HOSTNAME).RELEASE-NAME-vault-internal:8201' ]
+}
+
 #--------------------------------------------------------------------
 # storage class
 
