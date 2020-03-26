@@ -135,7 +135,7 @@ Set's additional environment variables based on the mode.
   {{ end }}
   {{ if and (eq .mode "ha") (eq (.Values.server.ha.raft.enabled | toString) "true") }}
             - name: VAULT_CLUSTER_ADDR
-              value: "https://$(HOSTNAME).vault-internal:8201"
+              value: "https://$(HOSTNAME).{{ template "vault.fullname" . }}-internal:8201"
   {{ end }}
 {{- end -}}
 
