@@ -262,7 +262,7 @@ server:
     annotations: {}
 
   # This configures the Vault Statefulset to create a PVC for data
-  # storage when using the file backend.
+  # storage when using the file or raft backend storage engines.
   # See https://www.vaultproject.io/docs/configuration/storage/index.html to know more
   dataStorage:
     enabled: true
@@ -341,8 +341,8 @@ server:
     
     # Enables Vault's integrated Raft storage.  Unlike the typical HA modes where 
     # Vault's persistence is external (such as Consul), enabling Raft mode will create 
-    # persistent volumes for Vault to store data.  The Vault cluster will coordinate leader 
-    # elections and failovers internally.
+    # persistent volumes for Vault to store data according to the configuration under server.dataStorage.
+    # The Vault cluster will coordinate leader elections and failovers internally.
     raft:
       
       # Enables Raft integrated storage
