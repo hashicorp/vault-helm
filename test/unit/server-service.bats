@@ -173,7 +173,7 @@ load _helpers
   cd `chart_dir`
   local actual=$(helm template \
       --show-only templates/server-service.yaml \
-      --set 'server.service.annotations.vaultIsAwesome=true' \
+      --set 'server.service.annotations=vaultIsAwesome: true' \
       . | tee /dev/stderr |
       yq -r '.metadata.annotations["vaultIsAwesome"]' | tee /dev/stderr)
   [ "${actual}" = "true" ]

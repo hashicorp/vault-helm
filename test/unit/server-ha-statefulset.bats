@@ -349,19 +349,19 @@ load _helpers
       yq -r '.spec.template.spec.containers[0].env' | tee /dev/stderr)
 
   local actual=$(echo $object |
-     yq -r '.[6].name' | tee /dev/stderr)
+     yq -r '.[7].name' | tee /dev/stderr)
   [ "${actual}" = "FOO" ]
 
   local actual=$(echo $object |
-      yq -r '.[6].value' | tee /dev/stderr)
+      yq -r '.[7].value' | tee /dev/stderr)
   [ "${actual}" = "bar" ]
 
   local actual=$(echo $object |
-      yq -r '.[7].name' | tee /dev/stderr)
+      yq -r '.[8].name' | tee /dev/stderr)
   [ "${actual}" = "FOOBAR" ]
 
   local actual=$(echo $object |
-      yq -r '.[7].value' | tee /dev/stderr)
+      yq -r '.[8].value' | tee /dev/stderr)
   [ "${actual}" = "foobar" ]
 }
 
@@ -383,24 +383,46 @@ load _helpers
       yq -r '.spec.template.spec.containers[0].env' | tee /dev/stderr)
 
   local actual=$(echo $object |
-      yq -r '.[6].name' | tee /dev/stderr)
+      yq -r '.[7].name' | tee /dev/stderr)
   [ "${actual}" = "ENV_FOO_0" ]
   local actual=$(echo $object |
-      yq -r '.[6].valueFrom.secretKeyRef.name' | tee /dev/stderr)
+      yq -r '.[7].valueFrom.secretKeyRef.name' | tee /dev/stderr)
   [ "${actual}" = "secret_name_0" ]
   local actual=$(echo $object |
-      yq -r '.[6].valueFrom.secretKeyRef.key' | tee /dev/stderr)
+      yq -r '.[7].valueFrom.secretKeyRef.key' | tee /dev/stderr)
   [ "${actual}" = "secret_key_0" ]
 
   local actual=$(echo $object |
-      yq -r '.[7].name' | tee /dev/stderr)
+      yq -r '.[8].name' | tee /dev/stderr)
   [ "${actual}" = "ENV_FOO_1" ]
   local actual=$(echo $object |
-      yq -r '.[7].valueFrom.secretKeyRef.name' | tee /dev/stderr)
+      yq -r '.[8].valueFrom.secretKeyRef.name' | tee /dev/stderr)
   [ "${actual}" = "secret_name_1" ]
   local actual=$(echo $object |
-      yq -r '.[7].valueFrom.secretKeyRef.key' | tee /dev/stderr)
+      yq -r '.[8].valueFrom.secretKeyRef.key' | tee /dev/stderr)
   [ "${actual}" = "secret_key_1" ]
+}
+
+
+#--------------------------------------------------------------------
+# VAULT_CLUSTER_ADDR renders
+
+@test "server/ha-StatefulSet: cluster addr renders" {
+  cd `chart_dir`
+  local object=$(helm template \
+      --show-only templates/server-statefulset.yaml  \
+      --set 'server.ha.enabled=true' \
+      --set 'server.ha.raft.enabled=true' \
+      . | tee /dev/stderr |
+      yq -r '.spec.template.spec.containers[0].env' | tee /dev/stderr)
+  
+  local actual=$(echo $object |
+     yq -r '.[7].name' | tee /dev/stderr)
+  [ "${actual}" = "VAULT_CLUSTER_ADDR" ]
+
+  local actual=$(echo $object |
+     yq -r '.[7].value' | tee /dev/stderr)
+  [ "${actual}" = 'https://$(HOSTNAME).RELEASE-NAME-vault-internal:8201' ]
 }
 
 #--------------------------------------------------------------------
