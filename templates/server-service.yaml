@@ -37,7 +37,7 @@ spec:
       {{- if and (.Values.server.service.nodePort) (eq (.Values.server.service.type | toString) "NodePort") }}
       nodePort: {{ .Values.server.service.nodePort }}
       {{- end }}
-    - name: {{ include "vault.scheme" . }}-internal
+    - name: https-internal
       port: 8201
       targetPort: 8201
   selector:
