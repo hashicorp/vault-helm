@@ -394,9 +394,9 @@ load _helpers
 
   local actual=$(helm template \
       --show-only templates/server-service.yaml \
-      --set "global.tlsDisable=true" \
+      --set 'global.tlsDisable=true' \
       . | tee /dev/stderr |
-      yq -r ".spec.ports | map(select(.port==8200)) | .[] .name" | tee /dev/stderr)
+      yq -r '.spec.ports | map(select(.port==8200)) | .[] .name' | tee /dev/stderr)
   [ "${actual}" = "http" ]
 }
 
@@ -405,9 +405,9 @@ load _helpers
 
   local actual=$(helm template \
       --show-only templates/server-service.yaml \
-      --set "global.tlsDisable=true" \
+      --set 'global.tlsDisable=true' \
       . | tee /dev/stderr |
-      yq -r ".spec.ports | map(select(.port==8201)) | .[] .name" | tee /dev/stderr)
+      yq -r '.spec.ports | map(select(.port==8201)) | .[] .name' | tee /dev/stderr)
   [ "${actual}" = "http-internal" ]
 }
 
@@ -416,9 +416,9 @@ load _helpers
 
   local actual=$(helm template \
       --show-only templates/server-service.yaml \
-      --set "global.tlsDisable=false" \
+      --set 'global.tlsDisable=false' \
       . | tee /dev/stderr |
-      yq -r ".spec.ports | map(select(.port==8200)) | .[] .name" | tee /dev/stderr)
+      yq -r '.spec.ports | map(select(.port==8200)) | .[] .name' | tee /dev/stderr)
   [ "${actual}" = "https" ]
 }
 
@@ -427,8 +427,8 @@ load _helpers
 
   local actual=$(helm template \
       --show-only templates/server-service.yaml \
-      --set "global.tlsDisable=false" \
+      --set 'global.tlsDisable=false' \
       . | tee /dev/stderr |
-      yq -r ".spec.ports | map(select(.port==8201)) | .[] .name" | tee /dev/stderr)
+      yq -r '.spec.ports | map(select(.port==8201)) | .[] .name' | tee /dev/stderr)
   [ "${actual}" = "https-internal" ]
 }
