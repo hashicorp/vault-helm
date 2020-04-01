@@ -388,3 +388,47 @@ load _helpers
       yq -r '.spec.ports[0].nodePort' | tee /dev/stderr)
   [ "${actual}" = "null" ]
 }
+
+@test "server/Service: vault port name is http, when tlsDisable is true" {
+  cd `chart_dir`
+
+  local actual=$(helm template \
+      --show-only templates/server-service.yaml \
+      --set "global.tlsDisable=true" \
+      . | tee /dev/stderr |
+      yq -r ".spec.ports | map(select(.port==8200)) | .[] .name" | tee /dev/stderr)
+  [ "${actual}" = "http" ]
+}
+
+@test "server/Service: vault internal port name is http-internal, when tlsDisable is true" {
+  cd `chart_dir`
+
+  local actual=$(helm template \
+      --show-only templates/server-service.yaml \
+      --set "global.tlsDisable=true" \
+      . | tee /dev/stderr |
+      yq -r ".spec.ports | map(select(.port==8201)) | .[] .name" | tee /dev/stderr)
+  [ "${actual}" = "http-internal" ]
+}
+
+@test "server/Service: vault port name is https, when tlsDisable is false" {
+  cd `chart_dir`
+
+  local actual=$(helm template \
+      --show-only templates/server-service.yaml \
+      --set "global.tlsDisable=false" \
+      . | tee /dev/stderr |
+      yq -r ".spec.ports | map(select(.port==8200)) | .[] .name" | tee /dev/stderr)
+  [ "${actual}" = "https" ]
+}
+
+@test "server/Service: vault internal port name is https-internal, when tlsDisable is false" {
+  cd `chart_dir`
+
+  local actual=$(helm template \
+      --show-only templates/server-service.yaml \
+      --set "global.tlsDisable=false" \
+      . | tee /dev/stderr |
+      yq -r ".spec.ports | map(select(.port==8201)) | .[] .name" | tee /dev/stderr)
+  [ "${actual}" = "https-internal" ]
+}
