@@ -103,8 +103,11 @@ setup() {
 
 #cleanup
 teardown() {
-  helm delete vault
-  helm delete consul
-  kubectl delete --all pvc
-  kubectl delete namespace acceptance --ignore-not-found=true
+  if [[ ${CLEANUP:-true} == "true" ]]
+  then
+      helm delete vault
+      helm delete consul
+      kubectl delete --all pvc
+      kubectl delete namespace acceptance --ignore-not-found=true
+  fi
 }
