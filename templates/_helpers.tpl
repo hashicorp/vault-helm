@@ -133,10 +133,6 @@ Set's additional environment variables based on the mode.
             - name: VAULT_DEV_ROOT_TOKEN_ID
               value: "root"
   {{ end }}
-  {{ if and (eq .mode "ha") (eq (.Values.server.ha.raft.enabled | toString) "true") }}
-            - name: VAULT_CLUSTER_ADDR
-              value: "https://$(HOSTNAME).{{ template "vault.fullname" . }}-internal:8201"
-  {{ end }}
 {{- end -}}
 
 {{/*

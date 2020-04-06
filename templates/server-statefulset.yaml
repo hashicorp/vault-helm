@@ -89,7 +89,7 @@ spec:
                 fieldRef:
                   fieldPath: metadata.name
             - name: VAULT_CLUSTER_ADDR
-              value: "https://$(HOSTNAME).{{ template "vault.fullname" . }}-internal"
+              value: "https://$(HOSTNAME).{{ template "vault.fullname" . }}-internal:8201"
             {{ template "vault.envs" . }}
             {{- include "vault.extraEnvironmentVars" .Values.server | nindent 12 }}
             {{- include "vault.extraSecretEnvironmentVars" .Values.server | nindent 12 }}

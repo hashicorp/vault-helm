@@ -417,11 +417,11 @@ load _helpers
       yq -r '.spec.template.spec.containers[0].env' | tee /dev/stderr)
   
   local actual=$(echo $object |
-     yq -r '.[7].name' | tee /dev/stderr)
+     yq -r '.[9].name' | tee /dev/stderr)
   [ "${actual}" = "VAULT_CLUSTER_ADDR" ]
 
   local actual=$(echo $object |
-     yq -r '.[7].value' | tee /dev/stderr)
+     yq -r '.[9].value' | tee /dev/stderr)
   [ "${actual}" = 'https://$(HOSTNAME).RELEASE-NAME-vault-internal:8201' ]
 }
 
