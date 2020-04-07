@@ -76,7 +76,7 @@ load _helpers
   helm install "$(name_prefix)-west" \
     --set='injector.enabled=false' \
     --set='server.image.repository=hashicorp/vault-enterprise' \
-    --set='server.image.tag=1.4.0-rc1_ent' \
+    --set='server.image.tag=1.4.0_ent' \
     --set='server.ha.enabled=true' \
     --set='server.ha.raft.enabled=true' .
   wait_for_running "$(name_prefix)-west-0"
