@@ -110,7 +110,7 @@ server:
 
   image:
     repository: "vault"
-    tag: "1.4.0-rc1"
+    tag: "1.4.0"
     # Overrides the default Image Pull Policy
     pullPolicy: IfNotPresent
 
