@@ -426,3 +426,30 @@ ui:
   # This should be a multi-line string mapping directly to the a map of
   # the annotations to apply to the ui service
   annotations: {}
+
+# This will run helm post-install hook to init the vault
+initvault:
+  enabled: false
+
+# The ldap auth related params
+  ldapauth:
+    enabled: false
+    ldap_url: "ldap://"
+    userattr: ""
+    userdn: ""
+    groupdn: ""
+    upndomain: ""
+
+# The GitHub auth related params
+  githubauth:
+    enabled: false
+    organization: ""
+
+# The Kubernetes auth related params
+  k8sauth:
+    enabled: false
+    token_reviewer_jwt: ""
+    kubernetes_host: ""
+    kubernetes_ca_cert: ""
+
+# More Auth can be added here as per reqiurement

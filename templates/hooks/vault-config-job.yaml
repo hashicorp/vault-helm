@@ -1,0 +1,30 @@
+{{- if .Values.initvault.enabled }}
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: vault-config-job
+  annotations:
+    "helm.sh/hook": "post-install"
+spec:
+  template:
+    spec:
+      containers:
+      - name: vault-config-install
+        image: {{ .Values.server.image.repository }}:{{ .Values.server.image.tag | default "latest" }}
+        imagePullPolicy: IfNotPresent
+        command: ["sh", "/tmp/vault-config.sh"]
+        volumeMounts:
+        - name: vault-config-sh
+          mountPath: /tmp/vault-config.sh
+          subPath: vault-config.sh
+      restartPolicy: OnFailure
+      terminationGracePeriodSeconds: 0
+      volumes:
+      - name: vault-config-sh
+        configMap:
+          name: vault-config-sh
+          defaultMode: 0777
+  backoffLimit: 5
+  completions: 1
+  parallelism: 1
+  {{- end }}
