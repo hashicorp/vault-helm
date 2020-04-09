@@ -1,8 +1,11 @@
 ## Unreleased
 
+## 0.5.0 (April 9th, 2020)
+
 Features:
 
 * Added Raft support for HA mode [[GH-228](https://github.com/hashicorp/vault-helm/pull/229)]
+* Now supports Vault Enterprise [[GH-250](https://github.com/hashicorp/vault-helm/pull/250)]
 
 Improvements:
 
