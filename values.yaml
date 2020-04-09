@@ -110,7 +110,7 @@ server:
 
   image:
     repository: "vault"
-    tag: "1.3.3"
+    tag: "1.4.0"
     # Overrides the default Image Pull Policy
     pullPolicy: IfNotPresent
 
@@ -349,7 +349,6 @@ server:
       enabled: false
       config: |
         ui = true
-        cluster_addr = "https://POD_IP:8201"
 
         listener "tcp" {
           tls_disable = 1
@@ -361,12 +360,12 @@ server:
           path = "/vault/data"
         }
 
+        service_registration "kubernetes" {}
     # config is a raw string of default configuration when using a Stateful
     # deployment. Default is to use a Consul for its HA storage backend.
     # This should be HCL.
     config: |
       ui = true
-      cluster_addr = "https://POD_IP:8201"
 
       listener "tcp" {
         tls_disable = 1
@@ -377,6 +376,8 @@ server:
         path = "vault"
         address = "HOST_IP:8500"
       }
+
+      service_registration "kubernetes" {}
 
       # Example configuration for using auto-unseal, using Google Cloud KMS. The
       # GKMS keys must already exist, and the cluster must have a service account

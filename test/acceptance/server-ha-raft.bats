@@ -102,7 +102,7 @@ load _helpers
 
   kubectl exec "$(name_prefix)-0" -- vault login ${root}
 
-  local raft_status=$(kubectl exec "$(name_prefix)-0" -- vault operator raft configuration -format=json | 
+  local raft_status=$(kubectl exec "$(name_prefix)-0" -- vault operator raft list-peers -format=json | 
     jq -r '.data.config.servers | length')
   [ "${raft_status}" == "3" ]
 }
@@ -115,7 +115,10 @@ setup() {
 
 #cleanup
 teardown() {
-  helm delete vault
-  kubectl delete --all pvc
-  kubectl delete namespace acceptance --ignore-not-found=true
+  if [[ ${CLEANUP:-true} == "true" ]]
+  then
+      helm delete vault
+      kubectl delete --all pvc
+      kubectl delete namespace acceptance --ignore-not-found=true
+  fi
 }
