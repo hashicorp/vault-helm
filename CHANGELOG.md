@@ -1,5 +1,13 @@
 ## Unreleased
 
+Features:
+
+Improvements:
+* Removed IPC_LOCK privileges since swap is disabled on containers [[GH-198](https://github.com/hashicorp/vault-helm/pull/198)]
+
+Bugs:
+* Fixed default ingress path [[GH-224](https://github.com/hashicorp/vault-helm/pull/224)]
+
 ## 0.5.0 (April 9th, 2020)
 
 Features:
