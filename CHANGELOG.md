@@ -1,10 +1,12 @@
 ## Unreleased
 
+## 0.5.0 (April 9th, 2020)
+
 Features:
 
 * Added Raft support for HA mode [[GH-228](https://github.com/hashicorp/vault-helm/pull/229)]
-
-Improvements:
+* Now supports Vault Enterprise [[GH-250](https://github.com/hashicorp/vault-helm/pull/250)]
+* Added K8s Service Registration for HA modes [[GH-250](https://github.com/hashicorp/vault-helm/pull/250)]
 
 * Option to set `AGENT_INJECT_VAULT_AUTH_PATH` for the injector [[GH-185](https://github.com/hashicorp/vault-helm/pull/185)]
 * Added environment variables for logging and revocation on Vault Agent Injector [[GH-219](https://github.com/hashicorp/vault-helm/pull/219)]
