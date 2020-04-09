@@ -133,7 +133,7 @@ server:
     enabled: false
     labels: {}
       # traffic: external
-    annotations: {}
+    annotations: ""
       # |
       # kubernetes.io/ingress.class: nginx
       # kubernetes.io/tls-acme: "true"
@@ -222,7 +222,7 @@ server:
   # Example:
   # nodeSelector: |
   #   beta.kubernetes.io/arch: amd64
-  nodeSelector: {}
+  nodeSelector: ""
 
   # Extra labels to attach to the server pods
   # This should be a multi-line string mapping directly to the a map of
@@ -232,7 +232,7 @@ server:
   # Extra annotations to attach to the server pods
   # This should be a multi-line string mapping directly to the a map of
   # the annotations to apply to the server pods
-  annotations: {}
+  annotations: ""
 
   # Enables a headless service to be used by the Vault Statefulset
   service:
