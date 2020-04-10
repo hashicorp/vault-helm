@@ -25,7 +25,6 @@ spec:
       - prometheus
     tlsConfig:
       insecureSkipVerify: true
-
   namespaceSelector:
     matchNames:
       - {{ .Release.Namespace }}
