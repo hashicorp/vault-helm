@@ -1,7 +1,7 @@
 # MaaS Vault
 
 This is a forked version of HashiCorp's Vault Helm Chart. It is forked for business continuity (should the original be deleted) and to adhere to the MPL-2.0 license of public disclosure of source changes.
-This repository is used as a submodule in other repositories that install and setup Vault. No changes should be required in this repository.
+This repository is used as a submodule in other repositories that install and setup Vault.
 
 # Vault Helm Chart
 
@@ -45,7 +45,6 @@ $ helm install vault hashicorp/vault
 Please see the many options supported in the `values.yaml`
 file. These are also fully documented directly on the
 [Vault website](https://www.vaultproject.io/docs/platform/k8s/helm.html).
-
 
 ## Customizations
 
