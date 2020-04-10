@@ -617,8 +617,8 @@ server:
     # load balancer.
     # clusterIP: None
 
-    # Configures the service type for the main Vault service.  Can be ClusterIP
-    # or NodePort.
+    # Configures the service type for the main Vault service.  Can be ClusterIP,
+    # NodePort, or LoadBalancer.
     #type: ClusterIP
 
     # Do not wait for pods to be ready
