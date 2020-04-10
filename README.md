@@ -6,7 +6,7 @@ cases of Vault on Kubernetes depending on the values provided.
 
 For full documentation on this Helm chart along with all the ways you can
 use Vault with Kubernetes, please see the
-[Vault and Kubernetes documentation](https://www.vaultproject.io/docs/platform/k8s/index.html).
+[Vault and Kubernetes documentation](https://www.vaultproject.io/docs/platform/k8s/).
 
 ## Prerequisites
 
