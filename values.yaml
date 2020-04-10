@@ -667,8 +667,8 @@ server:
     # load balancer.
     # clusterIP: None
 
-    # Configures the service type for the main Vault service.  Can be ClusterIP
-    # or NodePort.
+    # Configures the service type for the main Vault service.  Can be ClusterIP,
+    # NodePort, or LoadBalancer.
     #type: ClusterIP
 
     # Do not wait for pods to be ready
@@ -684,15 +684,9 @@ server:
     # will be random if left blank.
     #nodePort: 30000
 
-    # When HA mode is enabled
-    # If type is set to "NodePort", a specific nodePort value can be configured,
-    # will be random if left blank.
-    #activeNodePort: 30001
-
-    # When HA mode is enabled
-    # If type is set to "NodePort", a specific nodePort value can be configured,
-    # will be random if left blank.
-    #standbyNodePort: 30002
+    # If type is set to "LoadBalancer", a specific IP address can be attached
+    # to the load balancer, will be random if left blank.
+    #loadBalancerIP: 
 
     # Port on which Vault server is listening
     port: 8200
