@@ -36,9 +36,9 @@ spec:
         {{- range (.paths | default (list "/")) }}
           - path: {{ . }}
             backend:
-              serviceName: {{ $serviceName }}
+              serviceName: {{ $serviceName }}-active
               servicePort: {{ $servicePort }}
-        {{- end }}
+  {{- end }}
   {{- end }}
 {{- end }}
 {{- end }}
