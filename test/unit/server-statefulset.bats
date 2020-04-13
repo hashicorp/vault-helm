@@ -892,3 +892,47 @@ load _helpers
        yq -r '.spec.template.spec.containers[0].lifecycle.preStop.exec.command[2]' | tee /dev/stderr)
   [[ "${actual}" = "sleep 10 &&"* ]]
 }
+
+@test "server/standalone-StatefulSet: vault port name is http, when tlsDisable is true" {
+  cd `chart_dir`
+
+  local actual=$(helm template \
+      --show-only templates/server-statefulset.yaml \
+      --set 'global.tlsDisable=true' \
+      . | tee /dev/stderr |
+      yq -r '.spec.template.spec.containers[0].ports | map(select(.containerPort==8200)) | .[] .name' | tee /dev/stderr)
+  [ "${actual}" = "http" ]
+}
+
+@test "server/standalone-StatefulSet: vault replication port name is http-rep, when tlsDisable is true" {
+  cd `chart_dir`
+
+  local actual=$(helm template \
+      --show-only templates/server-statefulset.yaml \
+      --set 'global.tlsDisable=true' \
+      . | tee /dev/stderr |
+      yq -r '.spec.template.spec.containers[0].ports | map(select(.containerPort==8202)) | .[] .name' | tee /dev/stderr)
+  [ "${actual}" = "http-rep" ]
+}
+
+@test "server/standalone-StatefulSet: vault port name is https, when tlsDisable is false" {
+  cd `chart_dir`
+
+  local actual=$(helm template \
+      --show-only templates/server-statefulset.yaml \
+      --set 'global.tlsDisable=false' \
+      . | tee /dev/stderr |
+      yq -r '.spec.template.spec.containers[0].ports | map(select(.containerPort==8200)) | .[] .name' | tee /dev/stderr)
+  [ "${actual}" = "https" ]
+}
+
+@test "server/standalone-StatefulSet: vault replication port name is https-rep, when tlsDisable is false" {
+  cd `chart_dir`
+
+  local actual=$(helm template \
+      --show-only templates/server-statefulset.yaml \
+      --set 'global.tlsDisable=false' \
+      . | tee /dev/stderr |
+      yq -r '.spec.template.spec.containers[0].ports | map(select(.containerPort==8202)) | .[] .name' | tee /dev/stderr)
+  [ "${actual}" = "https-rep" ]
+}
