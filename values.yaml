@@ -153,6 +153,11 @@ server:
   authDelegator:
     enabled: true
 
+  # extraInitContainers is a list of init containers. Specified as a raw YAML string.
+  # This is useful if you need to run a script to provision TLS certificates or
+  # write out configuration files in a dynamic way.
+  extraInitContainers: null
+
   # extraContainers is a list of sidecar containers. Specified as a raw YAML string.
   extraContainers: null
 
