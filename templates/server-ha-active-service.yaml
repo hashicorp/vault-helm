@@ -14,7 +14,7 @@ metadata:
     app.kubernetes.io/managed-by: {{ .Release.Service }}
   annotations:
 {{- if .Values.server.service.annotations }}
-{{ toYaml .Values.server.service.annotations | indent 4 }}
+{{ tpl .Values.server.service.annotations . | indent 4 }}
 {{- end }}
 spec:
   type: ClusterIP
