@@ -91,6 +91,10 @@ spec:
             periodSeconds: 2
             successThreshold: 1
             timeoutSeconds: 5
+      {{- if .Values.global.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml .Values.global.imagePullSecrets | nindent 8 }}
+      {{- end }}
 {{- if .Values.injector.certs.secretName }}
           volumeMounts:
             - name: webhook-certs
