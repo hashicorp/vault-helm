@@ -202,15 +202,15 @@ server:
   # Affinity Settings
   # Commenting out or setting as empty the affinity variable, will allow
   # deployment to single node services such as Minikube
-  affinity: |
-    podAntiAffinity:
-      requiredDuringSchedulingIgnoredDuringExecution:
-        - labelSelector:
-            matchLabels:
-              app.kubernetes.io/name: {{ template "vault.name" . }}
-              app.kubernetes.io/instance: "{{ .Release.Name }}"
-              component: server
-          topologyKey: kubernetes.io/hostname
+  #affinity: |
+  #  podAntiAffinity:
+  #    requiredDuringSchedulingIgnoredDuringExecution:
+  #      - labelSelector:
+  #          matchLabels:
+  #            app.kubernetes.io/name: {{ template "vault.name" . }}
+  #            app.kubernetes.io/instance: "{{ .Release.Name }}"
+  #            component: server
+  #        topologyKey: kubernetes.io/hostname
 
   # Toleration Settings for server pods
   # This should be a multi-line string matching the Toleration array
