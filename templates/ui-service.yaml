@@ -1,4 +1,5 @@
 {{ template "vault.mode" . }}
+{{- if ne .mode "external" }}
 {{- if and (ne .mode "") (eq (.Values.global.enabled | toString) "true") }}
 {{- if eq (.Values.ui.enabled | toString) "true" }}
 # Headless service for Vault server DNS entries. This service should only
@@ -24,7 +25,7 @@ spec:
     component: server
   publishNotReadyAddresses: true
   ports:
-    - name: http
+    - name: {{ include "vault.scheme" . }}
       port: {{ .Values.ui.externalPort }}
       targetPort: 8200
       {{- if .Values.ui.serviceNodePort }}
@@ -42,4 +43,5 @@ spec:
   {{- end }}
 {{- end -}}
 
+{{ end }}
 {{ end }}

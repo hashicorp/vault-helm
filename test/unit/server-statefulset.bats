@@ -32,6 +32,17 @@ load _helpers
   [ "${actual}" = "false" ]
 }
 
+@test "server/standalone-StatefulSet: disable with injector.externalVaultAddr" {
+  cd `chart_dir`
+  local actual=$( (helm template \
+      --show-only templates/server-statefulset.yaml  \
+      --set 'injector.externalVaultAddr=http://vault-outside' \
+      --set 'server.standalone.enabled=true' \
+      . || echo "---") | tee /dev/stderr |
+      yq 'length > 0' | tee /dev/stderr)
+  [ "${actual}" = "false" ]
+}
+
 @test "server/standalone-StatefulSet: image defaults to server.image.repository:tag" {
   cd `chart_dir`
   local actual=$(helm template \
@@ -373,19 +384,19 @@ load _helpers
       yq -r '.spec.template.spec.containers[0].env' | tee /dev/stderr)
 
   local actual=$(echo $object |
-     yq -r '.[6].name' | tee /dev/stderr)
+     yq -r '.[10].name' | tee /dev/stderr)
   [ "${actual}" = "FOO" ]
 
   local actual=$(echo $object |
-      yq -r '.[6].value' | tee /dev/stderr)
+      yq -r '.[10].value' | tee /dev/stderr)
   [ "${actual}" = "bar" ]
 
   local actual=$(echo $object |
-      yq -r '.[7].name' | tee /dev/stderr)
+      yq -r '.[11].name' | tee /dev/stderr)
   [ "${actual}" = "FOOBAR" ]
 
   local actual=$(echo $object |
-      yq -r '.[7].value' | tee /dev/stderr)
+      yq -r '.[11].value' | tee /dev/stderr)
   [ "${actual}" = "foobar" ]
 
   local object=$(helm template \
@@ -396,19 +407,19 @@ load _helpers
       yq -r '.spec.template.spec.containers[0].env' | tee /dev/stderr)
 
   local actual=$(echo $object |
-     yq -r '.[6].name' | tee /dev/stderr)
+     yq -r '.[10].name' | tee /dev/stderr)
   [ "${actual}" = "FOO" ]
 
   local actual=$(echo $object |
-      yq -r '.[6].value' | tee /dev/stderr)
+      yq -r '.[10].value' | tee /dev/stderr)
   [ "${actual}" = "bar" ]
 
   local actual=$(echo $object |
-      yq -r '.[7].name' | tee /dev/stderr)
+      yq -r '.[11].name' | tee /dev/stderr)
   [ "${actual}" = "FOOBAR" ]
 
   local actual=$(echo $object |
-      yq -r '.[7].value' | tee /dev/stderr)
+      yq -r '.[11].value' | tee /dev/stderr)
   [ "${actual}" = "foobar" ]
 }
 
@@ -548,6 +559,25 @@ load _helpers
       . | tee /dev/stderr |
       yq -r '.spec.volumeClaimTemplates | length' | tee /dev/stderr)
   [ "${actual}" = "0" ]
+}
+
+@test "server/standalone-StatefulSet: affinity is set by default" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      --show-only templates/server-statefulset.yaml  \
+      . | tee /dev/stderr |
+      yq '.spec.template.spec.affinity["podAntiAffinity"]? != null' | tee /dev/stderr)
+  [ "${actual}" = "true" ]
+}
+
+@test "server/standalone-StatefulSet: affinity can be set" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      --show-only templates/server-statefulset.yaml  \
+      --set 'server.affinity=foobar' \
+      . | tee /dev/stderr |
+      yq '.spec.template.spec.affinity == "foobar"' | tee /dev/stderr)
+  [ "${actual}" = "true" ]
 }
 
 @test "server/standalone-StatefulSet: tolerations not set by default" {
@@ -884,4 +914,48 @@ load _helpers
       . | tee /dev/stderr |
        yq -r '.spec.template.spec.containers[0].lifecycle.preStop.exec.command[2]' | tee /dev/stderr)
   [[ "${actual}" = "sleep 10 &&"* ]]
+}
+
+@test "server/standalone-StatefulSet: vault port name is http, when tlsDisable is true" {
+  cd `chart_dir`
+
+  local actual=$(helm template \
+      --show-only templates/server-statefulset.yaml \
+      --set 'global.tlsDisable=true' \
+      . | tee /dev/stderr |
+      yq -r '.spec.template.spec.containers[0].ports | map(select(.containerPort==8200)) | .[] .name' | tee /dev/stderr)
+  [ "${actual}" = "http" ]
+}
+
+@test "server/standalone-StatefulSet: vault replication port name is http-rep, when tlsDisable is true" {
+  cd `chart_dir`
+
+  local actual=$(helm template \
+      --show-only templates/server-statefulset.yaml \
+      --set 'global.tlsDisable=true' \
+      . | tee /dev/stderr |
+      yq -r '.spec.template.spec.containers[0].ports | map(select(.containerPort==8202)) | .[] .name' | tee /dev/stderr)
+  [ "${actual}" = "http-rep" ]
+}
+
+@test "server/standalone-StatefulSet: vault port name is https, when tlsDisable is false" {
+  cd `chart_dir`
+
+  local actual=$(helm template \
+      --show-only templates/server-statefulset.yaml \
+      --set 'global.tlsDisable=false' \
+      . | tee /dev/stderr |
+      yq -r '.spec.template.spec.containers[0].ports | map(select(.containerPort==8200)) | .[] .name' | tee /dev/stderr)
+  [ "${actual}" = "https" ]
+}
+
+@test "server/standalone-StatefulSet: vault replication port name is https-rep, when tlsDisable is false" {
+  cd `chart_dir`
+
+  local actual=$(helm template \
+      --show-only templates/server-statefulset.yaml \
+      --set 'global.tlsDisable=false' \
+      . | tee /dev/stderr |
+      yq -r '.spec.template.spec.containers[0].ports | map(select(.containerPort==8202)) | .[] .name' | tee /dev/stderr)
+  [ "${actual}" = "https-rep" ]
 }

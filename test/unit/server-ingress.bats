@@ -11,6 +11,17 @@ load _helpers
   [ "${actual}" = "false" ]
 }
 
+@test "server/ingress: disable by injector.externalVaultAddr" {
+  cd `chart_dir`
+  local actual=$( (helm template \
+      --show-only templates/server-ingress.yaml  \
+      --set 'server.ingress.enabled=true' \
+      --set 'injector.externalVaultAddr=http://vault-outside' \
+      . || echo "---") | tee /dev/stderr |
+      yq 'length > 0' | tee /dev/stderr)
+  [ "${actual}" = "false" ]
+}
+
 @test "server/ingress: checking host entry gets added and path is /" {
   cd `chart_dir`
   local actual=$(helm template \
@@ -57,4 +68,16 @@ load _helpers
       . | tee /dev/stderr |
       yq -r '.metadata.labels.traffic' | tee /dev/stderr)
   [ "${actual}" = "external" ]
+}
+
+@test "server/ingress: annotations added to object" {
+  cd `chart_dir`
+
+  local actual=$(helm template \
+      --show-only templates/server-ingress.yaml \
+      --set 'server.ingress.enabled=true' \
+      --set 'server.ingress.annotations=kubernetes.io/ingress.class: nginx' \
+      . | tee /dev/stderr |
+      yq -r '.metadata.annotations["kubernetes.io/ingress.class"]' | tee /dev/stderr)
+  [ "${actual}" = "nginx" ]
 }

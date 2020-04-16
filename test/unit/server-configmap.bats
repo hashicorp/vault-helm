@@ -19,11 +19,41 @@ load _helpers
 
   local actual=$(helm template \
       --show-only templates/server-config-configmap.yaml \
+      --set 'server.ha.enabled=true' \
+      --set 'server.ha.raft.enabled=true' \
+      . | tee /dev/stderr |
+      yq 'length > 0' | tee /dev/stderr)
+  [ "${actual}" = "true" ]
+
+  local actual=$(helm template \
+      --show-only templates/server-config-configmap.yaml \
       --set 'server.standalone.enabled=true' \
       . | tee /dev/stderr |
       yq 'length > 0' | tee /dev/stderr)
   [ "${actual}" = "true" ]
 }
+
+@test "server/ConfigMap: raft config disabled by default" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      --show-only templates/server-config-configmap.yaml \
+      --set 'server.ha.enabled=true' \
+      . | tee /dev/stderr |
+      grep "raft" | yq 'length > 0' | tee /dev/stderr)
+  [ "${actual}" != "true" ]
+}
+
+@test "server/ConfigMap: raft config can be enabled" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      --show-only templates/server-config-configmap.yaml \
+      --set 'server.ha.enabled=true' \
+      --set 'server.ha.raft.enabled=true' \
+      . | tee /dev/stderr |
+      grep "raft" | yq 'length > 0' | tee /dev/stderr)
+  [ "${actual}" = "true" ]
+}
+
 
 @test "server/ConfigMap: disabled by server.dev.enabled true" {
   cd `chart_dir`
@@ -81,4 +111,14 @@ load _helpers
       . | tee /dev/stderr |
       yq '.data["extraconfig-from-values.hcl"] | match("bar") | length' | tee /dev/stderr)
   [ ! -z "${actual}" ]
+}
+
+@test "server/ConfigMap: disabled by injector.externalVaultAddr" {
+  cd `chart_dir`
+  local actual=$( (helm template \
+      --show-only templates/server-config-configmap.yaml \
+      --set 'injector.externalVaultAddr=http://vault-outside' \
+      . || echo "---") | tee /dev/stderr |
+      yq 'length > 0' | tee /dev/stderr)
+  [ "${actual}" = "false" ]
 }

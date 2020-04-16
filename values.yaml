@@ -15,10 +15,14 @@ injector:
   # True if you want to enable vault agent injection.
   enabled: true
 
+  # External vault server address for the injector to use. Setting this will
+  # disable deployment of a vault server along with the injector.
+  externalVaultAddr: ""
+
   # image sets the repo and tag of the vault-k8s image to use for the injector.
   image:
     repository: "hashicorp/vault-k8s"
-    tag: "0.1.2"
+    tag: "0.3.0"
     pullPolicy: IfNotPresent
 
   # agentImage sets the repo and tag of the Vault image to use for the Vault Agent
@@ -26,14 +30,26 @@ injector:
   # required.
   agentImage:
     repository: "vault"
-    tag: "1.3.1"
+    tag: "1.4.0"
+
+  # Mount Path of the Vault Kubernetes Auth Method.
+  authPath: "auth/kubernetes"
+
+  # Configures the log verbosity of the injector. Supported log levels: Trace, Debug, Error, Warn, Info
+  logLevel: "info"
+
+  # Configures the log format of the injector. Supported log formats: "standard", "json".
+  logFormat: "standard"
+  
+  # Configures all Vault Agent sidecars to revoke their token when shutting down
+  revokeOnShutdown: false
 
   # namespaceSelector is the selector for restricting the webhook to only
-  # specific namespaces. This should be set to a multiline string.
+  # specific namespaces.
   # See https://kubernetes.io/docs/reference/access-authn-authz/extensible-admission-controllers/#matching-requests-namespaceselector
   # for more details.
   # Example:
-  # namespaceSelector: |
+  # namespaceSelector:
   #    matchLabels:
   #      sidecar-injector: enabled
   namespaceSelector: {}
@@ -70,6 +86,28 @@ injector:
   # for more details.
   priorityClassName: null
 
+  # extraEnvironmentVars is a list of extra enviroment variables to set in the
+  # injector deployment.
+  extraEnvironmentVars: {}
+    # KUBERNETES_SERVICE_HOST: kubernetes.default.svc
+
+  # Affinity Settings for injector pods
+  # This should be a multi-line string matching the affinity section of a
+  # PodSpec.
+  affinity: null
+
+  # Toleration Settings for injector pods
+  # This should be a multi-line string matching the Toleration array
+  # in a PodSpec.
+  tolerations: null
+
+  # nodeSelector labels for injector pod assignment, formatted as a muli-line string.
+  # ref: https://kubernetes.io/docs/concepts/configuration/assign-pod-node/#nodeselector
+  # Example:
+  # nodeSelector: |
+  #   beta.kubernetes.io/arch: amd64
+  nodeSelector: null
+
 server:
   # Resource requests, limits, etc. for the server cluster placement. This
   # should map directly to the value of the resources field for a PodSpec.
@@ -77,7 +115,7 @@ server:
 
   image:
     repository: "vault"
-    tag: "1.3.1"
+    tag: "1.4.0"
     # Overrides the default Image Pull Policy
     pullPolicy: IfNotPresent
 
@@ -107,6 +145,7 @@ server:
     labels: {}
       # traffic: external
     annotations: {}
+      # |
       # kubernetes.io/ingress.class: nginx
       # kubernetes.io/tls-acme: "true"
     hosts:
@@ -131,7 +170,7 @@ server:
   # shareProcessNamespace enables process namespace sharing between Vault and the extraContainers
   # This is useful if Vault must be signaled, e.g. to send a SIGHUP for log rotation
   shareProcessNamespace: false
-  
+
   # extraArgs is a string containing additional Vault server arguments.
   extraArgs: ""
 
@@ -229,11 +268,12 @@ server:
     port: 8200
     # Target port to which the service should be mapped to
     targetPort: 8200
-    # Extra annotations for the service definition
+    # Extra annotations for the service definition. This should be a multi-line
+    # string formatted as a map of the annotations to apply to the service.
     annotations: {}
 
   # This configures the Vault Statefulset to create a PVC for data
-  # storage when using the file backend.
+  # storage when using the file or raft backend storage engines.
   # See https://www.vaultproject.io/docs/configuration/storage/index.html to know more
   dataStorage:
     enabled: true
@@ -309,7 +349,29 @@ server:
   ha:
     enabled: false
     replicas: 3
+    
+    # Enables Vault's integrated Raft storage.  Unlike the typical HA modes where 
+    # Vault's persistence is external (such as Consul), enabling Raft mode will create 
+    # persistent volumes for Vault to store data according to the configuration under server.dataStorage.
+    # The Vault cluster will coordinate leader elections and failovers internally.
+    raft:
+      
+      # Enables Raft integrated storage
+      enabled: false
+      config: |
+        ui = true
 
+        listener "tcp" {
+          tls_disable = 1
+          address = "[::]:8200"
+          cluster_address = "[::]:8201"
+        }
+
+        storage "raft" {
+          path = "/vault/data"
+        }
+
+        service_registration "kubernetes" {}
     # config is a raw string of default configuration when using a Stateful
     # deployment. Default is to use a Consul for its HA storage backend.
     # This should be HCL.
@@ -325,6 +387,8 @@ server:
         path = "vault"
         address = "HOST_IP:8500"
       }
+
+      service_registration "kubernetes" {}
 
       # Example configuration for using auto-unseal, using Google Cloud KMS. The
       # GKMS keys must already exist, and the cluster must have a service account
@@ -347,6 +411,9 @@ server:
 
   # Definition of the serviceAccount used to run Vault.
   serviceAccount:
+    # Extra annotations for the serviceAccount definition. This should be a
+    # multi-line string formatted as a map of the annotations to apply to the
+    # serviceAccount.
     annotations: {}
 
 # Vault UI
