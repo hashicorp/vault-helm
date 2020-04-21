@@ -40,7 +40,7 @@ injector:
 
   # Configures the log format of the injector. Supported log formats: "standard", "json".
   logFormat: "standard"
-  
+
   # Configures all Vault Agent sidecars to revoke their token when shutting down
   revokeOnShutdown: false
 
@@ -338,15 +338,17 @@ server:
   ha:
     enabled: false
     replicas: 3
-    
-    # Enables Vault's integrated Raft storage.  Unlike the typical HA modes where 
-    # Vault's persistence is external (such as Consul), enabling Raft mode will create 
+
+    # Enables Vault's integrated Raft storage.  Unlike the typical HA modes where
+    # Vault's persistence is external (such as Consul), enabling Raft mode will create
     # persistent volumes for Vault to store data according to the configuration under server.dataStorage.
     # The Vault cluster will coordinate leader elections and failovers internally.
     raft:
-      
+
       # Enables Raft integrated storage
       enabled: false
+      # Set the Node Raft ID to the name of the pod
+      setNodeId: false
       config: |
         ui = true
 
