@@ -13,9 +13,7 @@ metadata:
     app.kubernetes.io/instance: {{ .Release.Name }}
     app.kubernetes.io/managed-by: {{ .Release.Service }}
   annotations:
-{{- if .Values.server.service.annotations }}
-{{ tpl .Values.server.service.annotations . | indent 4 }}
-{{- end }}
+{{ template "vault.service.annotations" .}}
 spec:
   type: ClusterIP
   publishNotReadyAddresses: true

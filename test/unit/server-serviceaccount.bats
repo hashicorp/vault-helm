@@ -23,6 +23,14 @@ load _helpers
   local actual=$(helm template \
       --show-only templates/server-serviceaccount.yaml  \
       --set 'server.ha.enabled=true' \
+      --set 'server.serviceAccount.annotations.foo=bar' \
+      . | tee /dev/stderr |
+      yq -r '.metadata.annotations["foo"]' | tee /dev/stderr)
+  [ "${actual}" = "bar" ]
+
+  local actual=$(helm template \
+      --show-only templates/server-serviceaccount.yaml  \
+      --set 'server.ha.enabled=true' \
       . | tee /dev/stderr |
       yq -r '.metadata.annotations["foo"]' | tee /dev/stderr)
   [ "${actual}" = "null" ]
