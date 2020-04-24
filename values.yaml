@@ -308,26 +308,27 @@ server:
     # deployment. Default is to use a PersistentVolumeClaim mounted at /vault/data
     # and store data there. This is only used when using a Replica count of 1, and
     # using a stateful set. This should be HCL.
-    config:
-      ui: true
-      listener:
-        tcp:
-          address: "[::]:8200"
-          cluster_address: "[::]:8201"
-          tls_disable: 1
-      storage:
-        file:
-          path: "/vault/data"
+    config: |
+      ui = true
+
+      listener "tcp" {
+        tls_disable = 1
+        address = "[::]:8200"
+        cluster_address = "[::]:8201"
+      }
+      storage "file" {
+        path = "/vault/data"
+      }
 
       # Example configuration for using auto-unseal, using Google Cloud KMS. The
       # GKMS keys must already exist, and the cluster must have a service account
       # that is authorized to access GCP KMS.
-      #seal:
-      #  - gcpckms:
-      #      crypto_key: "vault-helm-unseal-key"
-      #      key_ring: "vault-helm-unseal-kr"
-      #      project: "vault-helm-dev"
-      #      region: global
+      #seal "gcpckms" {
+      #   project     = "vault-helm-dev"
+      #   region      = "global"
+      #   key_ring    = "vault-helm-unseal-kr"
+      #   crypto_key  = "vault-helm-unseal-key"
+      #}
 
   # Run Vault in "HA" mode. There are no storage requirements unless audit log
   # persistence is required.  In HA mode Vault will configure itself to use Consul
@@ -363,26 +364,30 @@ server:
     # config is a raw string of default configuration when using a Stateful
     # deployment. Default is to use a Consul for its HA storage backend.
     # This should be HCL.
-    config:
-      ui: true
-      listener:
-        - tcp:
-            address: "[::]:8200"
-            cluster_address: "[::]:8201"
-            tls_disable: 1
-      storage:
-        - consul:
-            address: "HOST_IP:8500"
-            path: vault
+    config: |
+      ui = true
+
+      listener "tcp" {
+        tls_disable = 1
+        address = "[::]:8200"
+        cluster_address = "[::]:8201"
+      }
+      storage "consul" {
+        path = "vault"
+        address = "HOST_IP:8500"
+      }
+
+      service_registration "kubernetes" {}
+
       # Example configuration for using auto-unseal, using Google Cloud KMS. The
       # GKMS keys must already exist, and the cluster must have a service account
       # that is authorized to access GCP KMS.
-      #seal:
-      #  - gcpckms:
-      #      crypto_key: "vault-helm-unseal-key"
-      #      key_ring: "vault-helm-unseal-kr"
-      #      project: "vault-helm-dev"
-      #      region: global
+      #seal "gcpckms" {
+      #   project     = "vault-helm-dev-246514"
+      #   region      = "global"
+      #   key_ring    = "vault-helm-unseal-kr"
+      #   crypto_key  = "vault-helm-unseal-key"
+      #}
 
     # A disruption budget limits the number of pods of a replicated application
     # that are down simultaneously from voluntary disruptions
