@@ -14,7 +14,7 @@ metadata:
     app.kubernetes.io/managed-by: {{ .Release.Service }}
 data:
   extraconfig-from-values.hcl: |-
-  {{- if or (eq .mode "ha") (eq .mode "standalone")}}
+  {{- if or (eq .mode "ha") (eq .mode "standalone") }}
   {{- $type := typeOf (index .Values.server .mode).config }}
   {{- if eq $type "string" }}
     disable_mlock = true
@@ -26,8 +26,11 @@ data:
     {{ tpl .Values.server.ha.raft.config . | nindent 4 | trim }}
   {{ end }}
   {{- else }}
-  {{- $config := merge (dict "disable_mlock" true) (index .Values.server .mode).config }}
-{{ $config | toPrettyJson | indent 4 }}
+  {{- if and (eq .mode "ha") (eq (.Values.server.ha.raft.enabled | toString) "true") }}
+{{ merge (dict "disable_mlock" true) (index .Values.server .mode).raft.config | toPrettyJson | indent 4 }}
+  {{- else }}
+{{ merge (dict "disable_mlock" true) (index .Values.server .mode).config | toPrettyJson | indent 4 }}
+  {{- end }}
   {{- end }}
   {{- end }}
 {{- end }}
