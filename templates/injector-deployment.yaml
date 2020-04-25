@@ -35,7 +35,7 @@ spec:
       containers:
         - name: sidecar-injector
           {{ template "injector.resources" . }}
-          image: "{{ .Values.injector.image.repository }}:{{ .Values.injector.image.tag }}"
+          image: "{{ .Values.injector.image.repository }}:{{ .Values.injector.image.tag | default .Chart.AppVersion }}"
           imagePullPolicy: "{{ .Values.injector.image.pullPolicy }}"
           env:
             - name: AGENT_INJECT_LISTEN

@@ -56,7 +56,7 @@ spec:
       containers:
         - name: vault
           {{ template "vault.resources" . }}
-          image: {{ .Values.server.image.repository }}:{{ .Values.server.image.tag | default "latest" }}
+          image: {{ .Values.server.image.repository }}:{{ .Values.server.image.tag | default .Chart.AppVersion }}
           imagePullPolicy: {{ .Values.server.image.pullPolicy }}
           command: {{ template "vault.command" . }}
           args: {{ template "vault.args" . }}

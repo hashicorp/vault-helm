@@ -30,7 +30,9 @@ injector:
   # required.
   agentImage:
     repository: "vault"
-    tag: "1.4.0"
+    # Image tag defaults to .Chart.AppVersion
+    # Uncomment below to use the latest version
+    #tag: "latest"
 
   # Mount Path of the Vault Kubernetes Auth Method.
   authPath: "auth/kubernetes"
@@ -110,7 +112,9 @@ server:
 
   image:
     repository: "vault"
-    tag: "1.4.0"
+    # Image tag defaults to .Chart.AppVersion
+    # Uncomment below to use the latest version
+    #tag: "latest"
     # Overrides the default Image Pull Policy
     pullPolicy: IfNotPresent
 
