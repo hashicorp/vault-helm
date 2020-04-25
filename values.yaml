@@ -118,6 +118,31 @@ server:
   # See https://kubernetes.io/docs/concepts/workloads/controllers/statefulset/#update-strategies
   updateStrategyType: "OnDelete"
 
+  # Container process group id
+  #gid: 1000
+
+  # Container process user id
+  #uid: 100
+
+  # Pod security context
+  #runAsNonRoot: true
+
+  # Custom init containers
+  customInitContainers: |
+  #  - name: "fix-volume-permissions"
+  #    image: "alpine:3.10"
+  #    imagePullPolicy: "IfNotPresent"
+  #    securityContext:
+  #      runAsUser: 0
+  #    command:
+  #      - 'sh'
+  #      - '-c'
+  #      - |
+  #        chown -R {{ .Values.server.uid }}:{{ .Values.server.gid }} /vault/data
+  #    volumeMounts:
+  #      - mountPath: "/vault/data"
+  #        name: data
+
   resources:
   # resources:
   #   requests:

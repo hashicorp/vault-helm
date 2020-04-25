@@ -43,10 +43,14 @@ spec:
       shareProcessNamespace: true
       {{ end }}
       securityContext:
-        runAsNonRoot: true
+        runAsNonRoot: {{ .Values.server.runAsNonRoot | default true }}
         runAsGroup: {{ .Values.server.gid | default 1000 }}
         runAsUser: {{ .Values.server.uid | default 100 }}
         fsGroup: {{ .Values.server.gid | default 1000 }}
+      initContainers:
+   {{- if .Values.server.customInitContainers }}
+{{ tpl .Values.server.customInitContainers . | indent 6 }}
+    {{- end }}
       volumes:
         {{ template "vault.volumes" . }}
       containers:
