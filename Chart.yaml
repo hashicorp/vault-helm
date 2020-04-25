@@ -1,7 +1,8 @@
 apiVersion: v2
 name: vault
-version: 0.4.0
-appVersion: 1.3.3
+type: application
+version: 0.5.0
+appVersion: 1.4.0
 description: Install and configure Vault on Kubernetes.
 keywords: ["vault", "security", "encryption", "secrets", "management", "automation", "infrastructure"]
 home: https://www.vaultproject.io
@@ -11,4 +12,4 @@ sources:
   - https://github.com/hashicorp/vault-helm
   - https://github.com/hashicorp/vault-k8s
 engine: gotpl
-kubeVersion: ">=1.10.0-0"
+kubeVersion: ">=1.12.0-0"
