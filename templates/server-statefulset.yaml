@@ -91,7 +91,7 @@ spec:
             - name: VAULT_RAFT_NODE_ID
               valueFrom:
                 fieldRef:
-                  fieldPath: metadata.namespace
+                  fieldPath: metadata.name
             {{- end }}
             {{ template "vault.envs" . }}
             {{- include "vault.extraEnvironmentVars" .Values.server | nindent 12 }}
