@@ -210,6 +210,16 @@ load _helpers
       --set 'server.ha.enabled=true' \
       --set 'ui.serviceType=LoadBalancer' \
       --set 'ui.enabled=true' \
+      --set 'ui.annotations.foo=bar' \
+      . | tee /dev/stderr |
+      yq -r '.metadata.annotations["foo"]' | tee /dev/stderr)
+  [ "${actual}" = "bar" ]
+
+  local actual=$(helm template \
+      --show-only templates/ui-service.yaml  \
+      --set 'server.ha.enabled=true' \
+      --set 'ui.serviceType=LoadBalancer' \
+      --set 'ui.enabled=true' \
       . | tee /dev/stderr |
       yq -r '.metadata.annotations["foo"]' | tee /dev/stderr)
   [ "${actual}" = "null" ]

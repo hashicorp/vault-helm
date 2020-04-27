@@ -137,6 +137,9 @@ server:
       # |
       # kubernetes.io/ingress.class: nginx
       # kubernetes.io/tls-acme: "true"
+      #   or
+      # kubernetes.io/ingress.class: nginx
+      # kubernetes.io/tls-acme: "true"
     hosts:
       - host: chart-example.local
         paths: []
@@ -230,8 +233,8 @@ server:
   extraLabels: {}
 
   # Extra annotations to attach to the server pods
-  # This should be a multi-line string mapping directly to the a map of
-  # the annotations to apply to the server pods
+  # This can either be YAML or a YAML-formatted multi-line templated string map
+  # of the annotations to apply to the server pods
   annotations: {}
 
   # Enables a headless service to be used by the Vault Statefulset
@@ -257,8 +260,9 @@ server:
     port: 8200
     # Target port to which the service should be mapped to
     targetPort: 8200
-    # Extra annotations for the service definition. This should be a multi-line
-    # string formatted as a map of the annotations to apply to the service.
+    # Extra annotations for the service definition. This can either be YAML or a
+    # YAML-formatted multi-line templated string map of the annotations to apply
+    # to the service.
     annotations: {}
 
   # This configures the Vault Statefulset to create a PVC for data
@@ -400,9 +404,9 @@ server:
 
   # Definition of the serviceAccount used to run Vault.
   serviceAccount:
-    # Extra annotations for the serviceAccount definition. This should be a
-    # multi-line string formatted as a map of the annotations to apply to the
-    # serviceAccount.
+    # Extra annotations for the serviceAccount definition. This can either be
+    # YAML or a YAML-formatted multi-line templated string map of the
+    # annotations to apply to the serviceAccount.
     annotations: {}
 
 # Vault UI
@@ -424,6 +428,6 @@ ui:
   # loadBalancerIP:
 
   # Extra annotations to attach to the ui service
-  # This should be a multi-line string mapping directly to the a map of
-  # the annotations to apply to the ui service
+  # This can either be YAML or a YAML-formatted multi-line templated string map
+  # of the annotations to apply to the ui service
   annotations: {}

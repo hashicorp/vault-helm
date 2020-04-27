@@ -1,0 +1,9 @@
+server:
+  annotations: |
+    environment: production
+    milk: oat
+    myName: "{{ .Release.Name }}"
+  service:
+    annotations:
+      active: sometimes
+      pickMe: please

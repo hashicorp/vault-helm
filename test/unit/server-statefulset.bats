@@ -936,3 +936,25 @@ load _helpers
       yq -r '.spec.template.spec.containers[0].ports | map(select(.containerPort==8202)) | .[] .name' | tee /dev/stderr)
   [ "${actual}" = "https-rep" ]
 }
+
+#--------------------------------------------------------------------
+# annotations
+@test "server/standalone-StatefulSet: generic annotations string" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      --show-only templates/server-statefulset.yaml \
+      --set 'server.annotations=vaultIsAwesome: true' \
+      . | tee /dev/stderr |
+      yq -r '.spec.template.metadata.annotations["vaultIsAwesome"]' | tee /dev/stderr)
+  [ "${actual}" = "true" ]
+}
+
+@test "server/ha-standby-Service: generic annotations yaml" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      --show-only templates/server-statefulset.yaml \
+      --set 'server.annotations.vaultIsAwesome=true' \
+      . | tee /dev/stderr |
+      yq -r '.spec.template.metadata.annotations["vaultIsAwesome"]' | tee /dev/stderr)
+  [ "${actual}" = "true" ]
+}
