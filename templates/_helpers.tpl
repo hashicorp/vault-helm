@@ -83,7 +83,7 @@ defined a custom configuration.  Additionally iterates over any
 extra volumes the user may have specified (such as a secret with TLS).
 */}}
 {{- define "vault.volumes" -}}
-  {{- if and (ne .mode "dev") (or (ne .Values.server.standalone.config "")  (ne .Values.server.ha.config "")) }}
+  {{- if and (ne .mode "dev") (or (.Values.server.standalone.config) (.Values.server.ha.config)) }}
         - name: config
           configMap:
             name: {{ template "vault.fullname" . }}-config
@@ -150,7 +150,7 @@ based on the mode configured.
               mountPath: /vault/data
     {{ end }}
   {{ end }}
-  {{ if and (ne .mode "dev") (or (ne .Values.server.standalone.config "")  (ne .Values.server.ha.config "")) }}
+  {{ if and (ne .mode "dev") (or (.Values.server.standalone.config)  (.Values.server.ha.config)) }}
             - name: config
               mountPath: /vault/config
   {{ end }}
