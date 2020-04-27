@@ -3,6 +3,7 @@
 Features:
 
 Improvements:
+* Server configs can now be defined in YAML.  Multi-line string configs are still compatible [GH-213](https://github.com/hashicorp/vault-helm/pull/213)
 * Removed IPC_LOCK privileges since swap is disabled on containers [[GH-198](https://github.com/hashicorp/vault-helm/pull/198)]
 * Use port names that map to vault.scheme [[GH-223](https://github.com/hashicorp/vault-helm/pull/223)]
 
