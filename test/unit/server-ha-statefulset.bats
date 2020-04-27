@@ -443,7 +443,7 @@ load _helpers
 
   local actual=$(echo $object |
      yq -r '.[10].valueFrom.fieldRef.fieldPath' | tee /dev/stderr)
-  [ "${actual}" = 'metadata.namespace' ]
+  [ "${actual}" = 'metadata.name' ]
 }
 
 #--------------------------------------------------------------------
