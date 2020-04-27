@@ -7,6 +7,7 @@ Improvements:
 * Removed IPC_LOCK privileges since swap is disabled on containers [[GH-198](https://github.com/hashicorp/vault-helm/pull/198)]
 * Use port names that map to vault.scheme [[GH-223](https://github.com/hashicorp/vault-helm/pull/223)]
 * Allow both yaml and multi-line string annotations [[GH-272](https://github.com/hashicorp/vault-helm/pull/272)]
+* Added configurable to set the Raft node name to hostname [[GH-269](https://github.com/hashicorp/vault-helm/pull/269)]
 
 Bugs:
 * Fixed default ingress path [[GH-224](https://github.com/hashicorp/vault-helm/pull/224)]
