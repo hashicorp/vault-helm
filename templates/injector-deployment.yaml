@@ -28,10 +28,6 @@ spec:
       {{ template "injector.tolerations" . }}
       {{ template "injector.nodeselector" . }}
       serviceAccountName: "{{ template "vault.fullname" . }}-agent-injector"
-      securityContext:
-        runAsNonRoot: true
-        runAsGroup: {{ .Values.injector.gid | default 1000 }}
-        runAsUser: {{ .Values.injector.uid | default 100 }}
       containers:
         - name: sidecar-injector
           {{ template "injector.resources" . }}

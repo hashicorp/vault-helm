@@ -1,0 +1,19 @@
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: vault-injector
+  labels:
+    app.kubernetes.io/name: vault-injector
+    app.kubernetes.io/instance: vault
+spec:
+  podSelector:
+    matchLabels:
+      app.kubernetes.io/name: {{ template "vault.name" . }}-agent-injector
+      app.kubernetes.io/instance: {{ .Release.Name }}
+      component: webhook
+  ingress:
+    - from:
+        - namespaceSelector: {}
+      ports:
+      - port: 8080
+        protocol: TCP

@@ -21,8 +21,8 @@ injector:
 
   # image sets the repo and tag of the vault-k8s image to use for the injector.
   image:
-    repository: "hashicorp/vault-k8s"
-    tag: "0.3.0"
+    repository: "openlabred/vault-k8s"
+    tag: "0.3.1"
     pullPolicy: IfNotPresent
 
   # agentImage sets the repo and tag of the Vault image to use for the Vault Agent
@@ -49,10 +49,10 @@ injector:
   # See https://kubernetes.io/docs/reference/access-authn-authz/extensible-admission-controllers/#matching-requests-namespaceselector
   # for more details.
   # Example:
-  # namespaceSelector:
-  #    matchLabels:
-  #      sidecar-injector: enabled
-  namespaceSelector: {}
+  namespaceSelector:
+     matchLabels:
+       vault.hashicorp.com/agent-webhook: enabled
+  #namespaceSelector: {}
 
   certs:
     # secretName is the name of the secret that has the TLS certificate and

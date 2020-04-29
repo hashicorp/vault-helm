@@ -9,6 +9,10 @@ metadata:
     app.kubernetes.io/managed-by: {{ .Release.Service }}
 webhooks:
   - name: vault.hashicorp.com
+    sideEffects: None
+    admissionReviewVersions: ["v1", "v1beta1"]
+    timeoutSeconds: 5
+    failurePolicy: Fail
     clientConfig:
       service:
         name: {{ template "vault.fullname" . }}-agent-injector-svc
@@ -19,7 +23,11 @@ webhooks:
       - operations: ["CREATE", "UPDATE"]
         apiGroups: [""]
         apiVersions: ["v1"]
-        resources: ["pods"]
+        resources: ["deployments", "jobs", "pods", "statefulsets"]
+      - operations: ["CREATE", "UPDATE"]
+        apiGroups: ["apps.openshift.io"]
+        apiVersions: ["v1"]
+        resources: ["deploymentConfig"]
 {{- if .Values.injector.namespaceSelector }}
     namespaceSelector:
 {{ toYaml .Values.injector.namespaceSelector | indent 6}}
