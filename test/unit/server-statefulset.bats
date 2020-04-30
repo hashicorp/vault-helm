@@ -711,7 +711,7 @@ load _helpers
       . | tee /dev/stderr |
       yq -r '.spec.template.spec.shareProcessNamespace' | tee /dev/stderr)
 
-  [ "${actual}" = "null" ]  
+  [ "${actual}" = "null" ]
 }
 
 @test "server/standalone-StatefulSet: shareProcessNamespace enabled" {
@@ -724,7 +724,7 @@ load _helpers
       . | tee /dev/stderr |
       yq -r '.spec.template.spec.shareProcessNamespace' | tee /dev/stderr)
 
-  [ "${actual}" = "true" ]  
+  [ "${actual}" = "true" ]
 }
 
 # extra labels
@@ -956,5 +956,27 @@ load _helpers
       --set 'server.annotations.vaultIsAwesome=true' \
       . | tee /dev/stderr |
       yq -r '.spec.template.metadata.annotations["vaultIsAwesome"]' | tee /dev/stderr)
+  [ "${actual}" = "true" ]
+}
+
+#--------------------------------------------------------------------
+# priorityClassName
+
+@test "server/standalone-StatefulSet: priorityClassName not set by default" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      --show-only templates/server-statefulset.yaml  \
+      . | tee /dev/stderr |
+      yq '.spec.template.spec | .priorityClassName? == null' | tee /dev/stderr)
+  [ "${actual}" = "true" ]
+}
+
+@test "server/standalone-StatefulSet: priorityClassName can be set" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      --show-only templates/server-statefulset.yaml  \
+      --set 'server.priorityClassName=armaggeddon' \
+      . | tee /dev/stderr |
+      yq '.spec.template.spec | .priorityClassName == "armaggeddon"' | tee /dev/stderr)
   [ "${actual}" = "true" ]
 }
