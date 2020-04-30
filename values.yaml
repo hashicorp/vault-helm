@@ -256,6 +256,12 @@ server:
     # will be random if left blank.
     #nodePort: 30000
 
+    # loadBalancerSourceRanges:
+    #   - 10.0.0.0/16
+    #   - 1.78.23.3/32
+
+    # loadBalancerIP:
+
     # Port on which Vault server is listening
     port: 8200
     # Target port to which the service should be mapped to

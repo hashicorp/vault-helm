@@ -25,6 +25,15 @@ spec:
   {{- if .Values.server.service.clusterIP }}
   clusterIP: {{ .Values.server.service.clusterIP }}
   {{- end }}
+  {{- if and (eq (.Values.server.service.serviceType | toString) "LoadBalancer") (.Values.server.service.loadBalancerSourceRanges) }}
+  loadBalancerSourceRanges:
+    {{- range $cidr := .Values.server.service.loadBalancerSourceRanges }}
+      - {{ $cidr }}
+    {{- end }}
+  {{- end }}
+  {{- if and (eq (.Values.server.service.serviceType | toString) "LoadBalancer") (.Values.server.service.loadBalancerIP) }}
+  loadBalancerIP: {{ .Values.server.service.loadBalancerIP }}
+  {{- end }}
   # We want the servers to become available even if they're not ready
   # since this DNS is also used for join operations.
   publishNotReadyAddresses: true

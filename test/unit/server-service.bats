@@ -410,3 +410,45 @@ load _helpers
       yq -r '.spec.ports | map(select(.port==8200)) | .[] .name' | tee /dev/stderr)
   [ "${actual}" = "https" ]
 }
+
+@test "server/Service: LoadBalancerIP set if specified and serviceType == LoadBalancer" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      --show-only templates/server-service.yaml  \
+      --set 'server.service.serviceType=LoadBalancer' \
+      --set 'server.service.enabled=true' \
+      --set 'server.service.loadBalancerIP=123.123.123.123' \
+      . | tee /dev/stderr |
+      yq -r '.spec.loadBalancerIP' | tee /dev/stderr)
+  [ "${actual}" = "123.123.123.123" ]
+
+  local actual=$(helm template \
+      --show-only templates/server-service.yaml  \
+      --set 'server.service.serviceType=ClusterIP' \
+      --set 'server.service.enabled=true' \
+      --set 'server.service.loadBalancerIP=123.123.123.123' \
+      . | tee /dev/stderr |
+      yq -r '.spec.loadBalancerIP' | tee /dev/stderr)
+  [ "${actual}" = "null" ]
+}
+
+@test "server/Service: set loadBalancerSourceRanges when LoadBalancer is configured as serviceType" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      --show-only templates/server-service.yaml  \
+      --set 'server.service.serviceType=LoadBalancer' \
+      --set 'server.service.enabled=true' \
+      --set 'server.service.loadBalancerSourceRanges={"123.123.123.123"}' \
+      . | tee /dev/stderr |
+      yq -r '.spec.loadBalancerSourceRanges[0]' | tee /dev/stderr)
+  [ "${actual}" = "123.123.123.123" ]
+
+  local actual=$(helm template \
+      --show-only templates/server-service.yaml  \
+      --set 'server.service.serviceType=ClusterIP' \
+      --set 'server.service.enabled=true' \
+      --set 'server.service.loadBalancerSourceRanges={"123.123.123.123"}' \
+      . | tee /dev/stderr |
+      yq -r '.spec.loadBalancerSourceRanges[0]' | tee /dev/stderr)
+  [ "${actual}" = "null" ]
+}
