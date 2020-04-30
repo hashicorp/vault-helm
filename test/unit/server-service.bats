@@ -452,3 +452,24 @@ load _helpers
       yq -r '.spec.loadBalancerSourceRanges[0]' | tee /dev/stderr)
   [ "${actual}" = "null" ]
 }
+
+@test "server/Service: active pod only selector not set by default" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      --show-only templates/server-service.yaml  \
+      --set 'server.service.enabled=true' \
+      . | tee /dev/stderr |
+      yq -r '.spec.selector["vault-active"]' | tee /dev/stderr)
+  [ "${actual}" = "null" ]
+}
+
+@test "server/Service: active pod only selector can be set" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      --show-only templates/server-service.yaml  \
+      --set 'server.service.enabled=true' \
+      --set 'server.service.activeVaultPodOnly=true' \
+      . | tee /dev/stderr |
+      yq -r '.spec.selector["vault-active"]' | tee /dev/stderr)
+  [ "${actual}" = 'true' ]
+}
