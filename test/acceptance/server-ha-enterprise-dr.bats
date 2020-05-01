@@ -10,7 +10,8 @@ load _helpers
     --set='server.image.tag=1.4.0_ent' \
     --set='injector.enabled=false' \
     --set='server.ha.enabled=true' \
-    --set='server.ha.raft.enabled=true' .
+    --set='server.ha.raft.enabled=true' \
+    -f test/acceptance/${KUB_ENV}.yaml .
   wait_for_running "$(name_prefix)-east-0"
 
   # Sealed, not initialized
@@ -78,7 +79,8 @@ load _helpers
     --set='server.image.repository=hashicorp/vault-enterprise' \
     --set='server.image.tag=1.4.0_ent' \
     --set='server.ha.enabled=true' \
-    --set='server.ha.raft.enabled=true' .
+    --set='server.ha.raft.enabled=true' \
+    -f test/acceptance/${KUB_ENV}.yaml .
   wait_for_running "$(name_prefix)-west-0"
 
   # Sealed, not initialized

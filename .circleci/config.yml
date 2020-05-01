@@ -1,11 +1,53 @@
 version: 2
 jobs:
   bats-unit-test:
-    machine: true
+    docker:
+        - image: hashicorpdev/vault-helm-test:0.1.0
     steps:
-      - checkout
-      - run: make test-image
-      - run: make test-unit
+        - checkout
+        - run: 
+            name: unit tests
+            command: bats ./test/unit -t
+  acceptance:
+    machine:
+        image: ubuntu-1604:201903-01
+    environment:
+        K8S_VERSION: v1.18.2
+        KUBECONFIG: /home/circleci/.kube/config
+        MINIKUBE_HOME: /home/circleci
+        CHANGE_MINIKUBE_NONE_USER: true
+        KUB_ENV: minikube
+    steps:
+        - checkout
+        - run:
+            name: setup kubetcl
+            command: |
+                sudo apt-get update -y
+                curl -LO https://storage.googleapis.com/kubernetes-release/release/${K8S_VERSION}/bin/linux/amd64/kubectl
+                chmod +x kubectl
+                sudo mv kubectl /usr/local/bin/
+                mkdir -p ${HOME}/.kube
+                touch ${HOME}/.kube/config
+                sudo apt-get install -y conntrack
+        - run:
+            name: setup helm
+            command: |
+                curl https://raw.githubusercontent.com/helm/helm/master/scripts/get-helm-3 | bash
+        - run:
+            name: setup minikube
+            command: |
+                curl -Lo minikube https://storage.googleapis.com/minikube/releases/latest/minikube-linux-amd64
+                chmod +x minikube
+                sudo mv minikube /usr/local/bin/
+        - run: 
+            name: start minikube
+            command: |
+                sudo -E minikube start --vm-driver=none --kubernetes-version=${K8S_VERSION}
+        - run:
+            name: Run acceptance tests
+            command: |
+                bats ./test/acceptance -t
+
   update-helm-charts-index:
     docker:
       - image: circleci/golang:latest
@@ -19,11 +61,13 @@ jobs:
                 -H 'Accept: application/json' \
                 -d "{\"branch\": \"master\",\"parameters\":{\"SOURCE_REPO\": \"${CIRCLE_PROJECT_USERNAME}/${CIRCLE_PROJECT_REPONAME}\",\"SOURCE_TAG\": \"${CIRCLE_TAG}\"}}" \
                 "${CIRCLE_ENDPOINT}/${CIRCLE_PROJECT}/pipeline"
+
 workflows:
   version: 2
   build_and_test:
     jobs:
       - bats-unit-test
+      - acceptance
   update-helm-charts-index:
     jobs:
       - update-helm-charts-index:

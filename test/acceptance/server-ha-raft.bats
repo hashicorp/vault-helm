@@ -7,7 +7,8 @@ load _helpers
 
   helm install "$(name_prefix)" \
     --set='server.ha.enabled=true' \
-    --set='server.ha.raft.enabled=true' .
+    --set='server.ha.raft.enabled=true' \
+    -f test/acceptance/${KUB_ENV}.yaml .
   wait_for_running $(name_prefix)-0
 
   # Sealed, not initialized

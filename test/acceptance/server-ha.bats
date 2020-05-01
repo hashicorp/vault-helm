@@ -6,7 +6,8 @@ load _helpers
   cd `chart_dir`
 
   helm install "$(name_prefix)" \
-    --set='server.ha.enabled=true' .
+    --set='server.ha.enabled=true' \
+    -f test/acceptance/${KUB_ENV}.yaml .
   wait_for_running $(name_prefix)-0
 
   # Sealed, not initialized
@@ -92,6 +93,7 @@ setup() {
   helm install consul \
     https://github.com/hashicorp/consul-helm/archive/v0.16.2.tar.gz \
     --set 'ui.enabled=false' \
+    -f test/acceptance/${KUB_ENV}.yaml \
 
   wait_for_running_consul
 }

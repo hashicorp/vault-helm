@@ -7,7 +7,8 @@ test-unit:
 	@docker run -it -v ${PWD}:/helm-test vault-helm-test bats /helm-test/test/unit
 
 test-acceptance:
-	@docker run -it -v ${PWD}:/helm-test vault-helm-test bats /helm-test/test/acceptance
+	@docker run -it -v ${PWD}:/helm-test \
+	-e KUB_ENV=GKE vault-helm-test bats /helm-test/test/acceptance
 
 test-bats: test-unit test-acceptance
 
