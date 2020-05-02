@@ -27,6 +27,9 @@ spec:
       {{ template "injector.affinity" . }}
       {{ template "injector.tolerations" . }}
       {{ template "injector.nodeselector" . }}
+      {{- if .Values.injector.priorityClassName }}
+      priorityClassName: {{ .Values.injector.priorityClassName }}
+      {{- end }}
       serviceAccountName: "{{ template "vault.fullname" . }}-agent-injector"
       securityContext:
         runAsNonRoot: true

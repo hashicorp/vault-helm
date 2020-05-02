@@ -403,7 +403,6 @@ load _helpers
   [ "${actual}" = "secret_key_1" ]
 }
 
-
 #--------------------------------------------------------------------
 # VAULT_CLUSTER_ADDR renders
 
@@ -415,7 +414,7 @@ load _helpers
       --set 'server.ha.raft.enabled=true' \
       . | tee /dev/stderr |
       yq -r '.spec.template.spec.containers[0].env' | tee /dev/stderr)
-  
+
   local actual=$(echo $object |
      yq -r '.[9].name' | tee /dev/stderr)
   [ "${actual}" = "VAULT_CLUSTER_ADDR" ]
@@ -423,6 +422,28 @@ load _helpers
   local actual=$(echo $object |
      yq -r '.[9].value' | tee /dev/stderr)
   [ "${actual}" = 'https://$(HOSTNAME).RELEASE-NAME-vault-internal:8201' ]
+}
+
+#--------------------------------------------------------------------
+# VAULT_RAFT_NODE_ID renders
+
+@test "server/ha-StatefulSet: raft node ID renders" {
+  cd `chart_dir`
+  local object=$(helm template \
+      --show-only templates/server-statefulset.yaml  \
+      --set 'server.ha.enabled=true' \
+      --set 'server.ha.raft.enabled=true' \
+      --set 'server.ha.raft.setNodeId=true' \
+      . | tee /dev/stderr |
+      yq -r '.spec.template.spec.containers[0].env' | tee /dev/stderr)
+
+  local actual=$(echo $object |
+     yq -r '.[10].name' | tee /dev/stderr)
+  [ "${actual}" = "VAULT_RAFT_NODE_ID" ]
+
+  local actual=$(echo $object |
+     yq -r '.[10].valueFrom.fieldRef.fieldPath' | tee /dev/stderr)
+  [ "${actual}" = 'metadata.name' ]
 }
 
 #--------------------------------------------------------------------

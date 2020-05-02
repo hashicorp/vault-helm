@@ -83,7 +83,7 @@ defined a custom configuration.  Additionally iterates over any
 extra volumes the user may have specified (such as a secret with TLS).
 */}}
 {{- define "vault.volumes" -}}
-  {{- if and (ne .mode "dev") (or (ne .Values.server.standalone.config "")  (ne .Values.server.ha.config "")) }}
+  {{- if and (ne .mode "dev") (or (.Values.server.standalone.config) (.Values.server.ha.config)) }}
         - name: config
           configMap:
             name: {{ template "vault.fullname" . }}-config
@@ -150,7 +150,7 @@ based on the mode configured.
               mountPath: /vault/data
     {{ end }}
   {{ end }}
-  {{ if and (ne .mode "dev") (or (ne .Values.server.standalone.config "")  (ne .Values.server.ha.config "")) }}
+  {{ if and (ne .mode "dev") (or (.Values.server.standalone.config)  (.Values.server.ha.config)) }}
             - name: config
               mountPath: /vault/config
   {{ end }}
@@ -264,7 +264,12 @@ Sets extra pod annotations
 {{- define "vault.annotations" -}}
   {{- if and (ne .mode "dev") .Values.server.annotations }}
       annotations:
-        {{- tpl .Values.server.annotations . | nindent 8 }}
+        {{- $tp := typeOf .Values.server.annotations }}
+        {{- if eq $tp "string" }}
+          {{- tpl .Values.server.annotations . | nindent 8 }}
+        {{- else }}
+          {{- toYaml .Values.server.annotations | nindent 8 }}
+        {{- end }}
   {{- end }}
 {{- end -}}
 
@@ -274,7 +279,12 @@ Sets extra ui service annotations
 {{- define "vault.ui.annotations" -}}
   {{- if .Values.ui.annotations }}
   annotations:
-    {{- tpl .Values.ui.annotations . | nindent 4 }}
+    {{- $tp := typeOf .Values.ui.annotations }}
+    {{- if eq $tp "string" }}
+      {{- tpl .Values.ui.annotations . | nindent 4 }}
+    {{- else }}
+      {{- toYaml .Values.ui.annotations | nindent 4 }}
+    {{- end }}
   {{- end }}
 {{- end -}}
 
@@ -284,7 +294,12 @@ Sets extra service account annotations
 {{- define "vault.serviceAccount.annotations" -}}
   {{- if and (ne .mode "dev") .Values.server.serviceAccount.annotations }}
   annotations:
-    {{- tpl .Values.server.serviceAccount.annotations . | nindent 4 }}
+    {{- $tp := typeOf .Values.server.serviceAccount.annotations }}
+    {{- if eq $tp "string" }}
+      {{- tpl .Values.server.serviceAccount.annotations . | nindent 4 }}
+    {{- else }}
+      {{- toYaml .Values.server.serviceAccount.annotations | nindent 4 }}
+    {{- end }}
   {{- end }}
 {{- end -}}
 
@@ -294,7 +309,26 @@ Sets extra ingress annotations
 {{- define "vault.ingress.annotations" -}}
   {{- if .Values.server.ingress.annotations }}
   annotations:
-    {{- tpl .Values.server.ingress.annotations . | nindent 4 }}
+    {{- $tp := typeOf .Values.server.ingress.annotations }}
+    {{- if eq $tp "string" }}
+      {{- tpl .Values.server.ingress.annotations . | nindent 4 }}
+    {{- else }}
+      {{- toYaml .Values.server.ingress.annotations | nindent 4 }}
+    {{- end }}
+  {{- end }}
+{{- end -}}
+
+{{/*
+Sets extra vault server Service annotations
+*/}}
+{{- define "vault.service.annotations" -}}
+  {{- if .Values.server.service.annotations }}
+    {{- $tp := typeOf .Values.server.service.annotations }}
+    {{- if eq $tp "string" }}
+      {{- tpl .Values.server.service.annotations . | nindent 4 }}
+    {{- else }}
+      {{- toYaml .Values.server.service.annotations | nindent 4 }}
+    {{- end }}
   {{- end }}
 {{- end -}}
 
