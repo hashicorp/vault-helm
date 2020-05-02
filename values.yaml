@@ -127,6 +127,11 @@ server:
   #     memory: 256Mi
   #     cpu: 250m
 
+  # Pod's group id.
+  gid: 1000
+  # Pod's user id.
+  uid: 100
+
   # Ingress allows ingress services to be created to allow external access
   # from Kubernetes to access Vault pods.
   ingress:

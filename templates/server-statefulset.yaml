@@ -44,9 +44,9 @@ spec:
       {{ end }}
       securityContext:
         runAsNonRoot: true
-        runAsGroup: {{ .Values.server.gid | default 1000 }}
-        runAsUser: {{ .Values.server.uid | default 100 }}
-        fsGroup: {{ .Values.server.gid | default 1000 }}
+        runAsGroup: {{ .Values.server.gid }}
+        runAsUser: {{ .Values.server.uid }}
+        fsGroup: {{ .Values.server.gid }}
       volumes:
         {{ template "vault.volumes" . }}
       containers:
