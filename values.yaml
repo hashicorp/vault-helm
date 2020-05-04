@@ -103,6 +103,9 @@ injector:
   #   beta.kubernetes.io/arch: amd64
   nodeSelector: null
 
+  # Priority class for injector pods
+  priorityClassName: ""
+
 server:
   # Resource requests, limits, etc. for the server cluster placement. This
   # should map directly to the value of the resources field for a PodSpec.
@@ -226,6 +229,9 @@ server:
   # nodeSelector: |
   #   beta.kubernetes.io/arch: amd64
   nodeSelector: {}
+
+  # Priority class for server pods
+  priorityClassName: ""
 
   # Extra labels to attach to the server pods
   # This should be a multi-line string mapping directly to the a map of
