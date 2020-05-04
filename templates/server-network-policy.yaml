@@ -1,4 +1,4 @@
----
+{{- if .Values.openshift }}
 apiVersion: networking.k8s.io/v1
 kind: NetworkPolicy
 metadata:
@@ -17,3 +17,4 @@ spec:
       ports:
       - port: 8200
         protocol: TCP
+{{ end }}

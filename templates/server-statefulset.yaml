@@ -42,6 +42,14 @@ spec:
       {{ if  .Values.server.shareProcessNamespace }}
       shareProcessNamespace: true
       {{ end }}
+# Until https://github.com/hashicorp/vault-k8s/pull/126 will be merged
+{{- if .Values.openshift }}
+      securityContext:
+        runAsNonRoot: true
+        runAsGroup: {{ .Values.server.gid | default 1000 }}
+        runAsUser: {{ .Values.server.uid | default 100 }}
+        fsGroup: {{ .Values.server.gid | default 1000 }}
+{{ end }}
       volumes:
         {{ template "vault.volumes" . }}
       containers:
