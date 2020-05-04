@@ -13,6 +13,8 @@ metadata:
     app.kubernetes.io/instance: {{ .Release.Name }}
     app.kubernetes.io/managed-by: {{ .Release.Service }}
   annotations:
+    # OCP
+    service.beta.openshift.io/serving-cert-secret-name: {{ .Release.Name }}-vault-cert
 {{ template "vault.service.annotations" .}}
 spec:
   type: ClusterIP

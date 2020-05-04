@@ -97,6 +97,11 @@ extra volumes the user may have specified (such as a secret with TLS).
             secretName: {{ .name }}
           {{- end }}
   {{- end }}
+  # OCP
+        - name: {{ .Release.Name }}-vault-cert
+          secret:
+            secretName: poc-vault-cert
+            defaultMode: 420
 {{- end -}}
 
 {{/*
@@ -159,6 +164,10 @@ based on the mode configured.
               readOnly: true
               mountPath: {{ .path | default "/vault/userconfig" }}/{{ .name }}
   {{- end }}
+  # OCP
+            - name: poc-vault-cert
+              mountPath: /var/run/secrets/kubernetes.io/certs
+  
 {{- end -}}
 
 {{/*
