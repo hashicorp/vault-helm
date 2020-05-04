@@ -425,6 +425,9 @@ ui:
   # example, setting this to "LoadBalancer" will create an external load
   # balancer (for supported K8S installations) to access the UI.
   enabled: false
+  publishNotReadyAddresses: true
+  # The service should only contain selectors for active Vault pod
+  activeVaultPodOnly: false
   serviceType: "ClusterIP"
   serviceNodePort: null
   externalPort: 8200
