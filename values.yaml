@@ -23,6 +23,7 @@ injector:
   externalVaultAddr: ""
 
   # image sets the repo and tag of the vault-k8s image to use for the injector.
+  # image points to openlabred/vault-k8s repository, pending https://github.com/hashicorp/vault-k8s/pull/126
   image:
     repository: "openlabred/vault-k8s"
     tag: "0.3.1"
@@ -336,7 +337,7 @@ server:
       listener "tcp" {
         address = "[::]:8200"
         cluster_address = "[::]:8201"
-        # Enable TLS by commenting the line beloe if deploying to OpenShift
+        # Enable TLS by commenting the line below if deploying to OpenShift
         # OpenShift CA generate TLS certificates for Vault
         tls_disable = 1
         # Uncomment the lines below if deploying to OpenShift
@@ -398,7 +399,7 @@ server:
       ui = true
 
       listener "tcp" {
-        # Enable TLS by commenting the line beloe if deploying to OpenShift
+        # Enable TLS by commenting the line below if deploying to OpenShift
         # OpenShift CA generate TLS certificates for Vault
         tls_disable = 1
         address = "[::]:8200"
