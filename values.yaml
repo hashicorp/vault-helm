@@ -81,11 +81,6 @@ injector:
   #     memory: 256Mi
   #     cpu: 250m
 
-  # priorityClassName launches injector pods with a priority class.
-  # See: https://kubernetes.io/docs/concepts/configuration/pod-priority-preemption/
-  # for more details.
-  priorityClassName: null
-
   # extraEnvironmentVars is a list of extra enviroment variables to set in the
   # injector deployment.
   extraEnvironmentVars: {}
@@ -136,12 +131,6 @@ server:
   #     cpu: 250m
 
   # Ingress allows ingress services to be created to allow external access
-  # priorityClassName launches server pods with a priority class.
-  # See: https://kubernetes.io/docs/concepts/configuration/pod-priority-preemption/
-  # for more details.
-  priorityClassName: null
-
-  # Ingress allows ingress services to be created to allow external access 
   # from Kubernetes to access Vault pods.
   ingress:
     enabled: false
