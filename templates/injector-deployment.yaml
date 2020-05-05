@@ -28,13 +28,10 @@ spec:
       {{ template "injector.tolerations" . }}
       {{ template "injector.nodeselector" . }}
       serviceAccountName: "{{ template "vault.fullname" . }}-agent-injector"
-# Until https://github.com/hashicorp/vault-k8s/pull/126 will be merged
-{{- if not .Values.openshift }}
       securityContext:
         runAsNonRoot: true
         runAsGroup: {{ .Values.injector.gid | default 1000 }}
         runAsUser: {{ .Values.injector.uid | default 100 }}
-{{- end }}
       containers:
         - name: sidecar-injector
           {{ template "injector.resources" . }}
