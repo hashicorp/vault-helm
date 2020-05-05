@@ -97,11 +97,6 @@ extra volumes the user may have specified (such as a secret with TLS).
             secretName: {{ .name }}
           {{- end }}
   {{- end }}
-  # OCP
-        - name: {{ .Release.Name }}-vault-cert
-          secret:
-            secretName: poc-vault-cert
-            defaultMode: 420
 {{- end -}}
 
 {{/*
@@ -164,9 +159,6 @@ based on the mode configured.
               readOnly: true
               mountPath: {{ .path | default "/vault/userconfig" }}/{{ .name }}
   {{- end }}
-  # OCP
-            - name: poc-vault-cert
-              mountPath: /var/run/secrets/kubernetes.io/certs
   
 {{- end -}}
 
@@ -323,6 +315,21 @@ Sets extra ingress annotations
       {{- tpl .Values.server.ingress.annotations . | nindent 4 }}
     {{- else }}
       {{- toYaml .Values.server.ingress.annotations | nindent 4 }}
+    {{- end }}
+  {{- end }}
+{{- end -}}
+
+{{/*
+Sets extra route annotations
+*/}}
+{{- define "vault.route.annotations" -}}
+  {{- if .Values.server.route.annotations }}
+  annotations:
+    {{- $tp := typeOf .Values.server.route.annotations }}
+    {{- if eq $tp "string" }}
+      {{- tpl .Values.server.route.annotations . | nindent 4 }}
+    {{- else }}
+      {{- toYaml .Values.server.route.annotations | nindent 4 }}
     {{- end }}
   {{- end }}
 {{- end -}}

@@ -13,12 +13,13 @@ metadata:
     app.kubernetes.io/instance: {{ .Release.Name }}
     app.kubernetes.io/managed-by: {{ .Release.Service }}
   annotations:
+{{- if .Values.openshift }}
+    service.beta.openshift.io/serving-cert-secret-name: {{ .Release.Name }}-vault-cert
+{{- end }}
     # This must be set in addition to publishNotReadyAddresses due
     # to an open issue where it may not work:
     # https://github.com/kubernetes/kubernetes/issues/58662
     service.alpha.kubernetes.io/tolerate-unready-endpoints: "true"
-    # OCP
-    service.beta.openshift.io/serving-cert-secret-name: {{ .Release.Name }}-vault-cert
 {{ template "vault.service.annotations" .}}
 spec:
   {{- if .Values.server.service.type}}

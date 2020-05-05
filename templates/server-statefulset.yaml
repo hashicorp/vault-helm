@@ -42,16 +42,22 @@ spec:
       {{ if  .Values.server.shareProcessNamespace }}
       shareProcessNamespace: true
       {{ end }}
-# Until https://github.com/hashicorp/vault-k8s/pull/126 will be merged
-{{- if .Values.openshift }}
+      # Until https://github.com/hashicorp/vault-k8s/pull/126 will be merged
+{{- if not .Values.openshift }}
       securityContext:
         runAsNonRoot: true
         runAsGroup: {{ .Values.server.gid | default 1000 }}
         runAsUser: {{ .Values.server.uid | default 100 }}
         fsGroup: {{ .Values.server.gid | default 1000 }}
-{{ end }}
+{{- end }}
       volumes:
         {{ template "vault.volumes" . }}
+{{- if .Values.openshift }}
+        - name: {{ .Release.Name }}-vault-cert
+          secret:
+            secretName: poc-vault-cert
+            defaultMode: 420
+{{- end }}
       containers:
         - name: vault
           {{ template "vault.resources" . }}
@@ -101,6 +107,10 @@ spec:
             {{- include "vault.extraSecretEnvironmentVars" .Values.server | nindent 12 }}
           volumeMounts:
           {{ template "vault.mounts" . }}
+{{- if .Values.openshift }}
+            - name: poc-vault-cert
+              mountPath: /var/run/secrets/kubernetes.io/certs
+{{- end }}
           ports:
             - containerPort: 8200
               name: {{ include "vault.scheme" . }}

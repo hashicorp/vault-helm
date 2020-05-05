@@ -29,7 +29,7 @@ spec:
       {{ template "injector.nodeselector" . }}
       serviceAccountName: "{{ template "vault.fullname" . }}-agent-injector"
 # Until https://github.com/hashicorp/vault-k8s/pull/126 will be merged
-{{- if .Values.openshift }}
+{{- if not .Values.openshift }}
       securityContext:
         runAsNonRoot: true
         runAsGroup: {{ .Values.injector.gid | default 1000 }}
