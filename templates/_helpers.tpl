@@ -51,7 +51,9 @@ Set the variable 'mode' to the server mode requested by the user to simplify
 template logic.
 */}}
 {{- define "vault.mode" -}}
-  {{- if eq (.Values.server.dev.enabled | toString) "true" -}}
+  {{- if .Values.injector.externalVaultAddr -}}
+    {{- $_ := set . "mode" "external" -}}
+  {{- else if eq (.Values.server.dev.enabled | toString) "true" -}}
     {{- $_ := set . "mode" "dev" -}}
   {{- else if eq (.Values.server.ha.enabled | toString) "true" -}}
     {{- $_ := set . "mode" "ha" -}}
@@ -81,7 +83,7 @@ defined a custom configuration.  Additionally iterates over any
 extra volumes the user may have specified (such as a secret with TLS).
 */}}
 {{- define "vault.volumes" -}}
-  {{- if and (ne .mode "dev") (or (ne .Values.server.standalone.config "")  (ne .Values.server.ha.config "")) }}
+  {{- if and (ne .mode "dev") (or (.Values.server.standalone.config) (.Values.server.ha.config)) }}
         - name: config
           configMap:
             name: {{ template "vault.fullname" . }}-config
@@ -119,7 +121,7 @@ for users looking to use this chart with Consul Helm.
           - |
             sed -E "s/HOST_IP/${HOST_IP?}/g" /vault/config/extraconfig-from-values.hcl > /tmp/storageconfig.hcl;
             sed -Ei "s/POD_IP/${POD_IP?}/g" /tmp/storageconfig.hcl;
-            /usr/local/bin/docker-entrypoint.sh vault server -config=/tmp/storageconfig.hcl
+            /usr/local/bin/docker-entrypoint.sh vault server -config=/tmp/storageconfig.hcl {{ .Values.server.extraArgs }}
   {{ end }}
 {{- end -}}
 
@@ -142,13 +144,13 @@ based on the mode configured.
             - name: audit
               mountPath: /vault/audit
   {{ end }}
-  {{ if eq .mode "standalone" }}
+  {{ if or (eq .mode "standalone") (and (eq .mode "ha") (eq (.Values.server.ha.raft.enabled | toString) "true"))  }}
     {{ if eq (.Values.server.dataStorage.enabled | toString) "true" }}
             - name: data
               mountPath: /vault/data
     {{ end }}
   {{ end }}
-  {{ if and (ne .mode "dev") (or (ne .Values.server.standalone.config "")  (ne .Values.server.ha.config "")) }}
+  {{ if and (ne .mode "dev") (or (.Values.server.standalone.config)  (.Values.server.ha.config)) }}
             - name: config
               mountPath: /vault/config
   {{ end }}
@@ -167,7 +169,7 @@ storage might be desired by the user.
 {{- define "vault.volumeclaims" -}}
   {{- if and (ne .mode "dev") (or .Values.server.dataStorage.enabled .Values.server.auditStorage.enabled) }}
   volumeClaimTemplates:
-      {{- if and (eq (.Values.server.dataStorage.enabled | toString) "true") (eq .mode "standalone") }}
+      {{- if and (eq (.Values.server.dataStorage.enabled | toString) "true") (or (eq .mode "standalone") (eq (.Values.server.ha.raft.enabled | toString ) "true" )) }}
     - metadata:
         name: data
       spec:
@@ -207,12 +209,32 @@ Set's the affinity for pod placement when running in standalone and HA modes.
 {{- end -}}
 
 {{/*
+Sets the injector affinity for pod placement
+*/}}
+{{- define "injector.affinity" -}}
+  {{- if .Values.injector.affinity }}
+      affinity:
+        {{ tpl .Values.injector.affinity . | nindent 8 | trim }}
+  {{ end }}
+{{- end -}}
+
+{{/*
 Set's the toleration for pod placement when running in standalone and HA modes.
 */}}
 {{- define "vault.tolerations" -}}
   {{- if and (ne .mode "dev") .Values.server.tolerations }}
       tolerations:
         {{ tpl .Values.server.tolerations . | nindent 8 | trim }}
+  {{- end }}
+{{- end -}}
+
+{{/*
+Sets the injector toleration for pod placement
+*/}}
+{{- define "injector.tolerations" -}}
+  {{- if .Values.injector.tolerations }}
+      tolerations:
+        {{ tpl .Values.injector.tolerations . | nindent 8 | trim }}
   {{- end }}
 {{- end -}}
 
@@ -227,12 +249,27 @@ Set's the node selector for pod placement when running in standalone and HA mode
 {{- end -}}
 
 {{/*
+Sets the injector node selector for pod placement
+*/}}
+{{- define "injector.nodeselector" -}}
+  {{- if .Values.injector.nodeSelector }}
+      nodeSelector:
+        {{ tpl .Values.injector.nodeSelector . | indent 8 | trim }}
+  {{- end }}
+{{- end -}}
+
+{{/*
 Sets extra pod annotations
 */}}
 {{- define "vault.annotations" -}}
   {{- if and (ne .mode "dev") .Values.server.annotations }}
       annotations:
-        {{- tpl .Values.server.annotations . | nindent 8 }}
+        {{- $tp := typeOf .Values.server.annotations }}
+        {{- if eq $tp "string" }}
+          {{- tpl .Values.server.annotations . | nindent 8 }}
+        {{- else }}
+          {{- toYaml .Values.server.annotations | nindent 8 }}
+        {{- end }}
   {{- end }}
 {{- end -}}
 
@@ -242,7 +279,12 @@ Sets extra ui service annotations
 {{- define "vault.ui.annotations" -}}
   {{- if .Values.ui.annotations }}
   annotations:
-    {{- toYaml .Values.ui.annotations | nindent 4 }}
+    {{- $tp := typeOf .Values.ui.annotations }}
+    {{- if eq $tp "string" }}
+      {{- tpl .Values.ui.annotations . | nindent 4 }}
+    {{- else }}
+      {{- toYaml .Values.ui.annotations | nindent 4 }}
+    {{- end }}
   {{- end }}
 {{- end -}}
 
@@ -252,7 +294,41 @@ Sets extra service account annotations
 {{- define "vault.serviceAccount.annotations" -}}
   {{- if and (ne .mode "dev") .Values.server.serviceAccount.annotations }}
   annotations:
-    {{- toYaml .Values.server.serviceAccount.annotations | nindent 4 }}
+    {{- $tp := typeOf .Values.server.serviceAccount.annotations }}
+    {{- if eq $tp "string" }}
+      {{- tpl .Values.server.serviceAccount.annotations . | nindent 4 }}
+    {{- else }}
+      {{- toYaml .Values.server.serviceAccount.annotations | nindent 4 }}
+    {{- end }}
+  {{- end }}
+{{- end -}}
+
+{{/*
+Sets extra ingress annotations
+*/}}
+{{- define "vault.ingress.annotations" -}}
+  {{- if .Values.server.ingress.annotations }}
+  annotations:
+    {{- $tp := typeOf .Values.server.ingress.annotations }}
+    {{- if eq $tp "string" }}
+      {{- tpl .Values.server.ingress.annotations . | nindent 4 }}
+    {{- else }}
+      {{- toYaml .Values.server.ingress.annotations | nindent 4 }}
+    {{- end }}
+  {{- end }}
+{{- end -}}
+
+{{/*
+Sets extra vault server Service annotations
+*/}}
+{{- define "vault.service.annotations" -}}
+  {{- if .Values.server.service.annotations }}
+    {{- $tp := typeOf .Values.server.service.annotations }}
+    {{- if eq $tp "string" }}
+      {{- tpl .Values.server.service.annotations . | nindent 4 }}
+    {{- else }}
+      {{- toYaml .Values.server.service.annotations | nindent 4 }}
+    {{- end }}
   {{- end }}
 {{- end -}}
 
@@ -282,9 +358,9 @@ Inject extra environment vars in the format key:value, if populated
 {{- define "vault.extraEnvironmentVars" -}}
 {{- if .extraEnvironmentVars -}}
 {{- range $key, $value := .extraEnvironmentVars }}
-- name: {{ $key }}
+- name: {{ printf "%s" $key | replace "." "_" | upper | quote }}
   value: {{ $value | quote }}
-{{- end -}}
+{{- end }}
 {{- end -}}
 {{- end -}}
 

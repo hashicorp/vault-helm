@@ -123,7 +123,7 @@ Changes to the Helm chart should be accompanied by appropriate unit tests.
 In all of the tests in this repo, the base command being run is [helm template](https://docs.helm.sh/helm/#helm-template) which turns the templated files into straight yaml output.
 In this way, we're able to test that the various conditionals in the templates render as we would expect.
 
-Each test defines the files that should be rendered using the `-x` flag, then it might adjust chart values by adding `--set` flags as well.
+Each test defines the files that should be rendered using the `--show-only` flag, then it might adjust chart values by adding `--set` flags as well.
 The output from this `helm template` command is then piped to [yq](https://pypi.org/project/yq/).
 `yq` allows us to pull out just the information we're interested in, either by referencing its position in the yaml file directly or giving information about it (like its length).
 The `-r` flag can be used with `yq` to return a raw string instead of a quoted one which is especially useful when looking for an exact match.
@@ -142,7 +142,7 @@ Here are some examples of common test patterns:
     @test "ui/Service: no type by default" {
       cd `chart_dir`
       local actual=$(helm template \
-          -x templates/ui-service.yaml  \
+          --show-only templates/ui-service.yaml  \
           . | tee /dev/stderr |
           yq -r '.spec.type' | tee /dev/stderr)
       [ "${actual}" = "null" ]
@@ -158,7 +158,7 @@ Here are some examples of common test patterns:
     @test "ui/Service: specified type" {
       cd `chart_dir`
       local actual=$(helm template \
-          -x templates/ui-service.yaml  \
+          --show-only templates/ui-service.yaml  \
           --set 'ui.serviceType=LoadBalancer' \
           . | tee /dev/stderr |
           yq -r '.spec.type' | tee /dev/stderr)
@@ -173,7 +173,7 @@ Here are some examples of common test patterns:
 	@test "server/standalone-StatefulSet: custom resources" {
 	  cd `chart_dir`
 	  local actual=$(helm template \
-		  -x templates/server-statefulset.yaml  \
+		  --show-only templates/server-statefulset.yaml  \
 		  --set 'server.standalone.enabled=true' \
 		  --set 'server.resources.requests.memory=256Mi' \
 		  --set 'server.resources.requests.cpu=250m' \
@@ -182,7 +182,7 @@ Here are some examples of common test patterns:
 	  [ "${actual}" = "256Mi" ]
 
 	  local actual=$(helm template \
-		  -x templates/server-statefulset.yaml  \
+		  --show-only templates/server-statefulset.yaml  \
 		  --set 'server.standalone.enabled=true' \
 		  --set 'server.resources.limits.memory=256Mi' \
 		  --set 'server.resources.limits.cpu=250m' \
@@ -197,10 +197,10 @@ Here are some examples of common test patterns:
     ```
     @test "syncCatalog/Deployment: disabled by default" {
       cd `chart_dir`
-      local actual=$(helm template \
-          -x templates/server-statefulset.yaml  \
+      local actual=$( (helm template \
+          --show-only templates/server-statefulset.yaml  \
           --set 'global.enabled=false' \
-          . | tee /dev/stderr |
+          . || echo "---") | tee /dev/stderr |
           yq 'length > 0' | tee /dev/stderr)
       [ "${actual}" = "false" ]
     }

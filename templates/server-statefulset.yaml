@@ -1,6 +1,7 @@
-# StatefulSet to run the actual vault server cluster.
 {{ template "vault.mode" . }}
+{{- if ne .mode "external" }}
 {{- if and (ne .mode "") (eq (.Values.global.enabled | toString) "true") }}
+# StatefulSet to run the actual vault server cluster.
 apiVersion: apps/v1
 kind: StatefulSet
 metadata:
@@ -11,11 +12,11 @@ metadata:
     app.kubernetes.io/instance: {{ .Release.Name }}
     app.kubernetes.io/managed-by: {{ .Release.Service }}
 spec:
-  serviceName: {{ template "vault.fullname" . }}
+  serviceName: {{ template "vault.fullname" . }}-internal
   podManagementPolicy: Parallel
   replicas: {{ template "vault.replicas" . }}
   updateStrategy:
-    type: OnDelete
+    type: {{ .Values.server.updateStrategyType }}
   selector:
     matchLabels:
       app.kubernetes.io/name: {{ template "vault.name" . }}
@@ -36,8 +37,14 @@ spec:
       {{ template "vault.affinity" . }}
       {{ template "vault.tolerations" . }}
       {{ template "vault.nodeselector" . }}
+      {{- if .Values.server.priorityClassName }}
+      priorityClassName: {{ .Values.server.priorityClassName }}
+      {{- end }}
       terminationGracePeriodSeconds: 10
       serviceAccountName: {{ template "vault.fullname" . }}
+      {{ if  .Values.server.shareProcessNamespace }}
+      shareProcessNamespace: true
+      {{ end }}
       securityContext:
         runAsNonRoot: true
         runAsGroup: {{ .Values.server.gid | default 1000 }}
@@ -48,9 +55,6 @@ spec:
       containers:
         - name: vault
           {{ template "vault.resources" . }}
-          securityContext:
-            capabilities:
-              add: ["IPC_LOCK"]
           image: {{ .Values.server.image.repository }}:{{ .Values.server.image.tag | default "latest" }}
           imagePullPolicy: {{ .Values.server.image.pullPolicy }}
           command: {{ template "vault.command" . }}
@@ -64,6 +68,14 @@ spec:
               valueFrom:
                 fieldRef:
                   fieldPath: status.podIP
+            - name: VAULT_K8S_POD_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.name
+            - name: VAULT_K8S_NAMESPACE
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.namespace
             - name: VAULT_ADDR
               value: "{{ include "vault.scheme" . }}://127.0.0.1:8200"
             - name: VAULT_API_ADDR
@@ -72,6 +84,18 @@ spec:
               value: "true"
             - name: SKIP_SETCAP
               value: "true"
+            - name: HOSTNAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.name
+            - name: VAULT_CLUSTER_ADDR
+              value: "https://$(HOSTNAME).{{ template "vault.fullname" . }}-internal:8201"
+            {{- if and (eq (.Values.server.ha.raft.enabled | toString) "true") (eq (.Values.server.ha.raft.setNodeId | toString) "true") }}
+            - name: VAULT_RAFT_NODE_ID
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.name
+            {{- end }}
             {{ template "vault.envs" . }}
             {{- include "vault.extraEnvironmentVars" .Values.server | nindent 12 }}
             {{- include "vault.extraSecretEnvironmentVars" .Values.server | nindent 12 }}
@@ -79,11 +103,11 @@ spec:
           {{ template "vault.mounts" . }}
           ports:
             - containerPort: 8200
-              name: http
+              name: {{ include "vault.scheme" . }}
             - containerPort: 8201
-              name: internal
+              name: https-internal
             - containerPort: 8202
-              name: replication
+              name: {{ include "vault.scheme" . }}-rep
           {{- if .Values.server.readinessProbe.enabled }}
           readinessProbe:
             {{- if .Values.server.readinessProbe.path }}
@@ -117,20 +141,27 @@ spec:
             successThreshold: 1
             timeoutSeconds: 5
           {{- end }}
-        {{- if .Values.server.extraContainers }}
-          {{ toYaml .Values.server.extraContainers | nindent 8}}
-        {{- end }}
           lifecycle:
             # Vault container doesn't receive SIGTERM from Kubernetes
-            # and after the grace period ends, Kube sends SIGKILL.  This 
+            # and after the grace period ends, Kube sends SIGKILL.  This
             # causes issues with graceful shutdowns such as deregistering itself
             # from Consul (zombie services).
             preStop:
               exec:
-                command: ["/bin/sh","-c","kill -SIGTERM $(pidof vault)"]
+                command: [
+                  "/bin/sh", "-c",
+                  # Adding a sleep here to give the pod eviction a
+                  # chance to propagate, so requests will not be made
+                  # to this pod while it's terminating
+                  "sleep {{ .Values.server.preStopSleepSeconds }} && kill -SIGTERM $(pidof vault)",
+                ]
+        {{- if .Values.server.extraContainers }}
+          {{ toYaml .Values.server.extraContainers | nindent 8}}
+        {{- end }}
       {{- if .Values.global.imagePullSecrets }}
       imagePullSecrets:
         {{- toYaml .Values.global.imagePullSecrets | nindent 8 }}
       {{- end }}
   {{ template "vault.volumeclaims" . }}
+{{ end }}
 {{ end }}

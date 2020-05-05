@@ -19,7 +19,7 @@ load _helpers
 
   kubectl label secret test app=vault-agent-demo
 
-  helm install --name="$(name_prefix)" \
+  helm install "$(name_prefix)" \
     --set="server.extraVolumes[0].type=secret" \
     --set="server.extraVolumes[0].name=test" .
   wait_for_running $(name_prefix)-0
@@ -45,11 +45,14 @@ load _helpers
 
 # Clean up
 teardown() {
-  echo "helm/pvc teardown"
-  helm delete --purge vault
-  kubectl delete --all pvc
-  kubectl delete secret test 
-  kubectl delete job pgdump
-  kubectl delete deployment postgres
-  kubectl delete namespace acceptance
+  if [[ ${CLEANUP:-true} == "true" ]]
+  then
+      echo "helm/pvc teardown"
+      helm delete vault
+      kubectl delete --all pvc
+      kubectl delete secret test 
+      kubectl delete job pgdump
+      kubectl delete deployment postgres
+      kubectl delete namespace acceptance
+  fi
 }

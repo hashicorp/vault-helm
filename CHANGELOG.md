@@ -1,5 +1,57 @@
 ## Unreleased
 
+Features:
+
+Improvements:
+* Server configs can now be defined in YAML.  Multi-line string configs are still compatible [GH-213](https://github.com/hashicorp/vault-helm/pull/213)
+* Removed IPC_LOCK privileges since swap is disabled on containers [[GH-198](https://github.com/hashicorp/vault-helm/pull/198)]
+* Use port names that map to vault.scheme [[GH-223](https://github.com/hashicorp/vault-helm/pull/223)]
+* Allow both yaml and multi-line string annotations [[GH-272](https://github.com/hashicorp/vault-helm/pull/272)]
+* Added configurable to set the Raft node name to hostname [[GH-269](https://github.com/hashicorp/vault-helm/pull/269)]
+* Support setting priorityClassName on pods [[GH-282](https://github.com/hashicorp/vault-helm/pull/282)]
+
+Bugs:
+* Fixed default ingress path [[GH-224](https://github.com/hashicorp/vault-helm/pull/224)]
+* Fixed annotations for HA standby/active services [[GH-268](https://github.com/hashicorp/vault-helm/pull/268)]
+
+## 0.5.0 (April 9th, 2020)
+
+Features:
+
+* Added Raft support for HA mode [[GH-228](https://github.com/hashicorp/vault-helm/pull/229)]
+* Now supports Vault Enterprise [[GH-250](https://github.com/hashicorp/vault-helm/pull/250)]
+* Added K8s Service Registration for HA modes [[GH-250](https://github.com/hashicorp/vault-helm/pull/250)]
+
+* Option to set `AGENT_INJECT_VAULT_AUTH_PATH` for the injector [[GH-185](https://github.com/hashicorp/vault-helm/pull/185)]
+* Added environment variables for logging and revocation on Vault Agent Injector [[GH-219](https://github.com/hashicorp/vault-helm/pull/219)]
+* Option to set environment variables for the injector deployment [[GH-232](https://github.com/hashicorp/vault-helm/pull/232)]
+* Added affinity, tolerations, and nodeSelector options for the injector deployment [[GH-234](https://github.com/hashicorp/vault-helm/pull/234)]
+* Made all annotations multi-line strings [[GH-227](https://github.com/hashicorp/vault-helm/pull/227)]
+
+## 0.4.0 (February 21st, 2020)
+
+Improvements:
+
+* Allow process namespace sharing between Vault and sidecar containers [[GH-174](https://github.com/hashicorp/vault-helm/pull/174)]
+* Added configurable to change updateStrategy [[GH-172](https://github.com/hashicorp/vault-helm/pull/172)]
+* Added sleep in the preStop lifecycle step [[GH-188](https://github.com/hashicorp/vault-helm/pull/188)]
+* Updated chart and tests to Helm 3 [[GH-195](https://github.com/hashicorp/vault-helm/pull/195)]
+* Adds Values.injector.externalVaultAddr to use the injector with an external vault [[GH-207](https://github.com/hashicorp/vault-helm/pull/207)]
+
+Bugs:
+
+* Fix bug where Vault lifecycle was appended after extra containers. [[GH-179](https://github.com/hashicorp/vault-helm/pull/179)]
+
+## 0.3.3 (January 14th, 2020)
+
+Security:
+
+* Added `server.extraArgs` to allow loading of additional Vault configurations containing sensitive settings [GH-175](https://github.com/hashicorp/vault-helm/issues/175)
+
+Bugs:
+
+* Fixed injection bug where wrong environment variables were being used for manually mounted TLS files
+
 ## 0.3.2 (January 8th, 2020)
 
 Bugs:

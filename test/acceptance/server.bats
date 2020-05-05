@@ -9,7 +9,7 @@ load _helpers
   kubectl create namespace acceptance
   kubectl config set-context --current --namespace=acceptance
 
-  helm install --name="$(name_prefix)" .
+  helm install "$(name_prefix)" .
   wait_for_running $(name_prefix)-0
 
   # Sealed, not initialized
@@ -20,11 +20,6 @@ load _helpers
   local init_status=$(kubectl exec "$(name_prefix)-0" -- vault status -format=json |
     jq -r '.initialized')
   [ "${init_status}" == "false" ]
-
-  # Security
-  local ipc=$(kubectl get statefulset "$(name_prefix)" --output json |
-    jq -r '.spec.template.spec.containers[0].securityContext.capabilities.add[0]')
-  [ "${ipc}" == "IPC_LOCK" ]
 
   # Replicas
   local replicas=$(kubectl get statefulset "$(name_prefix)" --output json |
@@ -111,8 +106,11 @@ load _helpers
 
 # Clean up
 teardown() {
-  echo "helm/pvc teardown"
-  helm delete --purge vault
-  kubectl delete --all pvc
-  kubectl delete namespace acceptance --ignore-not-found=true
+  if [[ ${CLEANUP:-true} == "true" ]]
+  then
+      echo "helm/pvc teardown"
+      helm delete vault
+      kubectl delete --all pvc
+      kubectl delete namespace acceptance --ignore-not-found=true
+  fi
 }

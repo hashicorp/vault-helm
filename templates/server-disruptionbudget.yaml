@@ -1,7 +1,8 @@
+{{ template "vault.mode" . }}
+{{- if ne .mode "external" -}}
+{{- if and (and (eq (.Values.global.enabled | toString) "true") (eq .mode "ha")) (eq (.Values.server.ha.disruptionBudget.enabled | toString) "true") -}}
 # PodDisruptionBudget to prevent degrading the server cluster through
 # voluntary cluster changes.
-{{ template "vault.mode" . }}
-{{- if and (and (eq (.Values.global.enabled | toString) "true") (eq .mode "ha")) (eq (.Values.server.ha.disruptionBudget.enabled | toString) "true") -}}
 apiVersion: policy/v1beta1
 kind: PodDisruptionBudget
 metadata:
@@ -19,4 +20,5 @@ spec:
       app.kubernetes.io/name: {{ include "vault.name" . }}
       app.kubernetes.io/instance: {{ .Release.Name }}
       component: server
+{{- end -}}
 {{- end -}}

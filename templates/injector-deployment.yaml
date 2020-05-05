@@ -1,5 +1,5 @@
-# Deployment for the injector
 {{- if and (eq (.Values.injector.enabled | toString) "true" ) (eq (.Values.global.enabled | toString) "true") }}
+# Deployment for the injector
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -24,6 +24,12 @@ spec:
         app.kubernetes.io/instance: {{ .Release.Name }}
         component: webhook
     spec:
+      {{ template "injector.affinity" . }}
+      {{ template "injector.tolerations" . }}
+      {{ template "injector.nodeselector" . }}
+      {{- if .Values.injector.priorityClassName }}
+      priorityClassName: {{ .Values.injector.priorityClassName }}
+      {{- end }}
       serviceAccountName: "{{ template "vault.fullname" . }}-agent-injector"
       securityContext:
         runAsNonRoot: true
@@ -40,13 +46,19 @@ spec:
             - name: AGENT_INJECT_LOG_LEVEL
               value: {{ .Values.injector.logLevel | default "info" }}
             - name: AGENT_INJECT_VAULT_ADDR
+            {{- if .Values.injector.externalVaultAddr }}
+              value: "{{ .Values.injector.externalVaultAddr }}"
+            {{- else }}
               value: {{ include "vault.scheme" . }}://{{ template "vault.fullname" . }}.{{ .Release.Namespace }}.svc:{{ .Values.server.service.port }}
+            {{- end }}
+            - name: AGENT_INJECT_VAULT_AUTH_PATH
+              value: {{ .Values.injector.authPath }}
             - name: AGENT_INJECT_VAULT_IMAGE
               value: "{{ .Values.injector.agentImage.repository }}:{{ .Values.injector.agentImage.tag }}"
             {{- if .Values.injector.certs.secretName }}
-            - name: AGENT_INJECT_CERT_FILE
+            - name: AGENT_INJECT_TLS_CERT_FILE
               value: "/etc/webhook/certs/{{ .Values.injector.certs.certName }}"
-            - name: AGENT_INJECT_KEY_FILE
+            - name: AGENT_INJECT_TLS_KEY_FILE
               value: "/etc/webhook/certs/{{ .Values.injector.certs.keyName }}"
             {{- else }}
             - name: AGENT_INJECT_TLS_AUTO
@@ -54,6 +66,11 @@ spec:
             - name: AGENT_INJECT_TLS_AUTO_HOSTS
               value: {{ template "vault.fullname" . }}-agent-injector-svc,{{ template "vault.fullname" . }}-agent-injector-svc.{{ .Release.Namespace }},{{ template "vault.fullname" . }}-agent-injector-svc.{{ .Release.Namespace }}.svc
             {{- end }}
+            - name: AGENT_INJECT_LOG_FORMAT
+              value: {{ .Values.injector.logFormat | default "standard" }}
+            - name: AGENT_INJECT_REVOKE_ON_SHUTDOWN
+              value: "{{ .Values.injector.revokeOnShutdown | default false }}"
+            {{- include "vault.extraEnvironmentVars" .Values.injector | nindent 12 }}
           args:
             - agent-inject
             - 2>&1

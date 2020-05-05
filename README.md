@@ -6,7 +6,7 @@ cases of Vault on Kubernetes depending on the values provided.
 
 For full documentation on this Helm chart along with all the ways you can
 use Vault with Kubernetes, please see the
-[Vault and Kubernetes documentation](https://www.vaultproject.io/docs/platform/k8s/index.html).
+[Vault and Kubernetes documentation](https://www.vaultproject.io/docs/platform/k8s/).
 
 ## Prerequisites
 
@@ -16,7 +16,7 @@ of this README. Please refer to the Kubernetes and Helm documentation.
 
 The versions required are:
 
-  * **Helm 2.10+** - This is the earliest version of Helm tested. It is possible
+  * **Helm 3.0+** - This is the earliest version of Helm tested. It is possible
     it works with earlier versions but this chart is untested for those versions.
   * **Kubernetes 1.9+** - This is the earliest version of Kubernetes tested.
     It is possible that this chart works with earlier versions but it is
@@ -35,4 +35,4 @@ then be installed directly:
 
 Please see the many options supported in the `values.yaml`
 file. These are also fully documented directly on the
-[Vault website](https://www.vaultproject.io/docs/platform/k8s/helm.html).
+[Vault website](https://www.vaultproject.io/docs/platform/k8s/helm).
