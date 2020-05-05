@@ -55,7 +55,7 @@ spec:
 {{- if .Values.openshift }}
         - name: {{ .Release.Name }}-vault-cert
           secret:
-            secretName: poc-vault-cert
+            secretName: {{ .Release.Name }}-vault-cert
             defaultMode: 420
 {{- end }}
       containers:
@@ -108,7 +108,7 @@ spec:
           volumeMounts:
           {{ template "vault.mounts" . }}
 {{- if .Values.openshift }}
-            - name: poc-vault-cert
+            - name: {{ .Release.Name }}-vault-cert
               mountPath: /var/run/secrets/kubernetes.io/certs
 {{- end }}
           ports:
