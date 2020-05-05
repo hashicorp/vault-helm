@@ -15,4 +15,4 @@ roleRef:
 subjects:
   - kind: ServiceAccount
     name: {{ template "vault.fullname" . }}-agent-injector
-{{ end }}
+{{- end }}

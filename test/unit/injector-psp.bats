@@ -4,9 +4,9 @@ load _helpers
 
 @test "injector/PodSecurityPolicy: PodSecurityPolicy not enabled by default" {
   cd `chart_dir`
-  local actual=$(helm template \
-      -x templates/injector-psp.yaml  \
-      . | tee /dev/stderr |
+  local actual=$( (helm template \
+      --show-only templates/injector-psp.yaml  \
+      . || echo "---") | tee /dev/stderr |
       yq 'length > 0' | tee /dev/stderr)
   [ "${actual}" = "false" ]
 }
@@ -14,7 +14,7 @@ load _helpers
 @test "injector/PodSecurityPolicy: enable with injector.enabled and global.pspEnable" {
   cd `chart_dir`
   local actual=$(helm template \
-      -x templates/injector-psp.yaml  \
+      --show-only templates/injector-psp.yaml  \
       --set 'injector.enabled=true' \
       --set 'global.pspEnable=true' \
       . | tee /dev/stderr |
@@ -24,12 +24,12 @@ load _helpers
 
 @test "injector/PodSecurityPolicy: disable with global.enabled" {
   cd `chart_dir`
-  local actual=$(helm template \
-      -x templates/injector-psp.yaml  \
+  local actual=$( (helm template \
+      --show-only templates/injector-psp.yaml  \
       --set 'global.enabled=false' \
       --set 'injector.enabled=true' \
       --set 'global.pspEnable=true' \
-      . | tee /dev/stderr |
+      . || echo "---") | tee /dev/stderr |
       yq 'length > 0' | tee /dev/stderr)
   [ "${actual}" = "false" ]
 }

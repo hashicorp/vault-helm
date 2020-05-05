@@ -16,4 +16,4 @@ roleRef:
 subjects:
   - kind: ServiceAccount
     name: {{ template "vault.fullname" . }}
-{{ end }}
+{{- end }}

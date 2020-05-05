@@ -4,9 +4,9 @@ load _helpers
 
 @test "injector/PodSecurityPolicy-RoleBinding: PodSecurityPolicy-RoleBinding not enabled by default" {
   cd `chart_dir`
-  local actual=$(helm template \
-      -x templates/injector-psp-rolebinding.yaml  \
-      . | tee /dev/stderr |
+  local actual=$( (helm template \
+      --show-only templates/injector-psp-rolebinding.yaml  \
+      . || echo "---" ) | tee /dev/stderr |
       yq 'length > 0' | tee /dev/stderr)
   [ "${actual}" = "false" ]
 }
@@ -14,7 +14,7 @@ load _helpers
 @test "injector/PodSecurityPolicy-RoleBinding: enable with injector.enabled and global.pspEnable" {
   cd `chart_dir`
   local actual=$(helm template \
-      -x templates/injector-psp-rolebinding.yaml  \
+      --show-only templates/injector-psp-rolebinding.yaml  \
       --set 'injector.enabled=true' \
       --set 'global.pspEnable=true' \
       . | tee /dev/stderr |
@@ -24,12 +24,12 @@ load _helpers
 
 @test "injector/PodSecurityPolicy-RoleBinding: disable with global.enabled" {
   cd `chart_dir`
-  local actual=$(helm template \
-      -x templates/injector-psp-rolebinding.yaml  \
+  local actual=$( (helm template \
+      --show-only templates/injector-psp-rolebinding.yaml  \
       --set 'global.enabled=false' \
       --set 'injector.enabled=true' \
       --set 'global.pspEnable=true' \
-      . | tee /dev/stderr |
+      . || echo "---") | tee /dev/stderr |
       yq 'length > 0' | tee /dev/stderr)
   [ "${actual}" = "false" ]
 }
