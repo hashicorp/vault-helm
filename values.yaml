@@ -1,4 +1,4 @@
- Available parameters and their default values for the Vault chart.
+# Available parameters and their default values for the Vault chart.
 
 global:
   # enabled is the master enabled switch. Setting this to true or false
@@ -358,7 +358,6 @@ server:
       #   crypto_key  = "vault-helm-unseal-key"
       #}
 
-
   # Run Vault in "HA" mode. There are no storage requirements unless audit log
   # persistence is required.  In HA mode Vault will configure itself to use Consul
   # for its storage backend.  The default configuration provided will work the Consul
@@ -415,7 +414,6 @@ server:
       }
 
       service_registration "kubernetes" {}
-
 
       # Example configuration for using auto-unseal, using Google Cloud KMS. The
       # GKMS keys must already exist, and the cluster must have a service account
