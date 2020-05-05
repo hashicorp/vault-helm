@@ -159,7 +159,6 @@ based on the mode configured.
               readOnly: true
               mountPath: {{ .path | default "/vault/userconfig" }}/{{ .name }}
   {{- end }}
-  
 {{- end -}}
 
 {{/*

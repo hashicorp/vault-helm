@@ -1,4 +1,4 @@
-# Available parameters and their default values for the Vault chart.
+ Available parameters and their default values for the Vault chart.
 
 global:
   # enabled is the master enabled switch. Setting this to true or false
@@ -9,7 +9,7 @@ global:
   # imagePullSecrets:
   #   - name: image-pull-secret
   # TLS for end-to-end encrypted transport
-  tlsDisable: false
+  tlsDisable: true
 
 # If deploying to OpenShift
 openshift: false
@@ -52,10 +52,10 @@ injector:
   # See https://kubernetes.io/docs/reference/access-authn-authz/extensible-admission-controllers/#matching-requests-namespaceselector
   # for more details.
   # Example:
-  namespaceSelector:
-     matchLabels:
-       vault.hashicorp.com/agent-webhook: enabled
-  #namespaceSelector: {}
+  # namespaceSelector:
+  #    matchLabels:
+  #      sidecar-injector: enabled
+  namespaceSelector: {}
 
   certs:
     # secretName is the name of the secret that has the TLS certificate and
@@ -135,7 +135,7 @@ server:
   # If deployment is on OpenShift, the following block is ignored.
   # In order to expose the service, use the route section below
   ingress:
-    enabled: true
+    enabled: false
     labels: {}
       # traffic: external
     annotations: {}
@@ -321,7 +321,7 @@ server:
   # the "file" backend.  This mode is not highly available and should not be scaled
   # past a single replica.
   standalone:
-    enabled: false
+    enabled: "-"
 
     # config is a raw string of default configuration when using a Stateful
     # deployment. Default is to use a PersistentVolumeClaim mounted at /vault/data
@@ -332,6 +332,7 @@ server:
     
     config: |
       ui = true
+
       listener "tcp" {
         address = "[::]:8200"
         cluster_address = "[::]:8201"
@@ -346,6 +347,17 @@ server:
       storage "file" {
         path = "/vault/data"
       }
+
+      # Example configuration for using auto-unseal, using Google Cloud KMS. The
+      # GKMS keys must already exist, and the cluster must have a service account
+      # that is authorized to access GCP KMS.
+      #seal "gcpckms" {
+      #   project     = "vault-helm-dev"
+      #   region      = "global"
+      #   key_ring    = "vault-helm-unseal-kr"
+      #   crypto_key  = "vault-helm-unseal-key"
+      #}
+
 
   # Run Vault in "HA" mode. There are no storage requirements unless audit log
   # persistence is required.  In HA mode Vault will configure itself to use Consul
@@ -385,6 +397,7 @@ server:
     # This should be HCL.
     config: |
       ui = true
+
       listener "tcp" {
         # Enable TLS by commenting the line beloe if deploying to OpenShift
         # OpenShift CA generate TLS certificates for Vault
@@ -400,6 +413,7 @@ server:
         path = "vault"
         address = "HOST_IP:8500"
       }
+
       service_registration "kubernetes" {}
 
 

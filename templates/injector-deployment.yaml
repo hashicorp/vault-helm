@@ -34,7 +34,7 @@ spec:
         runAsNonRoot: true
         runAsGroup: {{ .Values.injector.gid | default 1000 }}
         runAsUser: {{ .Values.injector.uid | default 100 }}
-{{ end }}
+{{- end }}
       containers:
         - name: sidecar-injector
           {{ template "injector.resources" . }}
