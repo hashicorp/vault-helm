@@ -347,23 +347,13 @@ server:
         path = "/vault/data"
       }
 
-    #config: |
-    #  ui = true,
-    #  listener "tcp" {
-    #    address = "0.0.0.0:8200"
-    #    cluster_address = "[::]:8201"
-    #  }
-    #  storage "file" {
-    #    path = "/vault/data"
-    #  }
-
   # Run Vault in "HA" mode. There are no storage requirements unless audit log
   # persistence is required.  In HA mode Vault will configure itself to use Consul
   # for its storage backend.  The default configuration provided will work the Consul
   # Helm project by default.  It is possible to manually configure Vault to use a
   # different HA backend.
   ha:
-    enabled: true
+    enabled: false
     replicas: 3
 
     # Enables Vault's integrated Raft storage.  Unlike the typical HA modes where
