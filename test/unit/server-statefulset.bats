@@ -873,6 +873,29 @@ load _helpers
 }
 
 #--------------------------------------------------------------------
+# priorityClassName
+
+@test "server/standalone-StatefulSet: priorityClassName disabled by default" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      -x templates/server-statefulset.yaml  \
+      . | tee /dev/stderr |
+      yq -r '.spec.template.spec.priorityClassName' | tee /dev/stderr)
+
+  [ "${actual}" = "null" ]  
+}
+
+@test "server/standalone-StatefulSet: priorityClassName enabled" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      -x templates/server-statefulset.yaml  \
+      --set 'server.priorityClassName=foo' \
+      . | tee /dev/stderr |
+      yq -r '.spec.template.spec.priorityClassName' | tee /dev/stderr)
+
+  [ "${actual}" = "foo" ]  
+
+#--------------------------------------------------------------------
 # preStop
 @test "server/standalone-StatefulSet: preStop sleep duration default" {
   cd `chart_dir`
