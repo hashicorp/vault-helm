@@ -761,6 +761,16 @@ load _helpers
   [ "${actual}" = "2000" ]
 }
 
+@test "server/standalone-StatefulSet: uid nullable" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      --show-only templates/server-statefulset.yaml \
+      --set 'server.uid=null' \
+      . | tee /dev/stderr |
+      yq -r '.spec.template.spec.securityContext.runAsUser' | tee /dev/stderr)
+  [ "${actual}" = "null" ]
+}
+
 @test "server/standalone-StatefulSet: gid default" {
   cd `chart_dir`
   local actual=$(helm template \
@@ -778,6 +788,16 @@ load _helpers
       . | tee /dev/stderr |
       yq -r '.spec.template.spec.securityContext.runAsGroup' | tee /dev/stderr)
   [ "${actual}" = "2000" ]
+}
+
+@test "server/standalone-StatefulSet: gid nullable" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      --show-only templates/server-statefulset.yaml \
+      --set 'server.gid=null' \
+      . | tee /dev/stderr |
+      yq -r '.spec.template.spec.securityContext.runAsGroup' | tee /dev/stderr)
+  [ "${actual}" = "null" ]
 }
 
 @test "server/standalone-StatefulSet: fsgroup default" {
@@ -798,6 +818,17 @@ load _helpers
       yq -r '.spec.template.spec.securityContext.fsGroup' | tee /dev/stderr)
   [ "${actual}" = "2000" ]
 }
+
+@test "server/standalone-StatefulSet: fsgroup nullable" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      --show-only templates/server-statefulset.yaml \
+      --set 'server.gid=null' \
+      . | tee /dev/stderr |
+      yq -r '.spec.template.spec.securityContext.fsGroup' | tee /dev/stderr)
+  [ "${actual}" = "null" ]
+}
+
 
 #--------------------------------------------------------------------
 # health checks
