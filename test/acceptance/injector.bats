@@ -45,11 +45,14 @@ load _helpers
 
 # Clean up
 teardown() {
-  echo "helm/pvc teardown"
-  helm delete vault
-  kubectl delete --all pvc
-  kubectl delete secret test 
-  kubectl delete job pgdump
-  kubectl delete deployment postgres
-  kubectl delete namespace acceptance
+  if [[ ${CLEANUP:-true} == "true" ]]
+  then
+      echo "helm/pvc teardown"
+      helm delete vault
+      kubectl delete --all pvc
+      kubectl delete secret test 
+      kubectl delete job pgdump
+      kubectl delete deployment postgres
+      kubectl delete namespace acceptance
+  fi
 }

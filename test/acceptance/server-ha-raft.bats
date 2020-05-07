@@ -2,11 +2,12 @@
 
 load _helpers
 
-@test "server/ha: testing deployment" {
+@test "server/ha-raft: testing deployment" {
   cd `chart_dir`
 
   helm install "$(name_prefix)" \
-    --set='server.ha.enabled=true' .
+    --set='server.ha.enabled=true' \
+    --set='server.ha.raft.enabled=true' .
   wait_for_running $(name_prefix)-0
 
   # Sealed, not initialized
@@ -26,7 +27,7 @@ load _helpers
   # Volume Mounts
   local volumeCount=$(kubectl get statefulset "$(name_prefix)" --output json |
     jq -r '.spec.template.spec.containers[0].volumeMounts | length')
-  [ "${volumeCount}" == "1" ]
+  [ "${volumeCount}" == "2" ]
 
   # Volumes
   local volumeCount=$(kubectl get statefulset "$(name_prefix)" --output json |
@@ -59,19 +60,31 @@ load _helpers
   [ "${ports}" == "8201" ]
 
   # Vault Init
-  local token=$(kubectl exec -ti "$(name_prefix)-0" -- \
-    vault operator init -format=json -n 1 -t 1 | \
-    jq -r '.unseal_keys_b64[0]')
+  local init=$(kubectl exec -ti "$(name_prefix)-0" -- \
+    vault operator init -format=json -n 1 -t 1)
+
+  local token=$(echo ${init} | jq -r '.unseal_keys_b64[0]')
   [ "${token}" != "" ]
+  
+  local root=$(echo ${init} | jq -r '.root_token')
+  [ "${root}" != "" ]
+
+  kubectl exec -ti vault-0 -- vault operator unseal ${token}
+  wait_for_ready "$(name_prefix)-0"
+
+  sleep 5
 
   # Vault Unseal
   local pods=($(kubectl get pods --selector='app.kubernetes.io/name=vault' -o json | jq -r '.items[].metadata.name'))
   for pod in "${pods[@]}"
   do
-      kubectl exec -ti ${pod} -- vault operator unseal ${token}
+      if [[ ${pod?} != "$(name_prefix)-0" ]]
+      then
+          kubectl exec -ti ${pod} -- vault operator raft join http://$(name_prefix)-0.$(name_prefix)-internal:8200
+          kubectl exec -ti ${pod} -- vault operator unseal ${token}
+          wait_for_ready "${pod}"
+      fi
   done
-
-  wait_for_ready "$(name_prefix)-0"
 
   # Sealed, not initialized
   local sealed_status=$(kubectl exec "$(name_prefix)-0" -- vault status -format=json |
@@ -81,19 +94,18 @@ load _helpers
   local init_status=$(kubectl exec "$(name_prefix)-0" -- vault status -format=json |
     jq -r '.initialized')
   [ "${init_status}" == "true" ]
+
+  kubectl exec "$(name_prefix)-0" -- vault login ${root}
+
+  local raft_status=$(kubectl exec "$(name_prefix)-0" -- vault operator raft list-peers -format=json | 
+    jq -r '.data.config.servers | length')
+  [ "${raft_status}" == "3" ]
 }
 
-# setup a consul env
 setup() {
   kubectl delete namespace acceptance --ignore-not-found=true
   kubectl create namespace acceptance
   kubectl config set-context --current --namespace=acceptance
-
-  helm install consul \
-    https://github.com/hashicorp/consul-helm/archive/v0.16.2.tar.gz \
-    --set 'ui.enabled=false' \
-
-  wait_for_running_consul
 }
 
 #cleanup
@@ -101,7 +113,6 @@ teardown() {
   if [[ ${CLEANUP:-true} == "true" ]]
   then
       helm delete vault
-      helm delete consul
       kubectl delete --all pvc
       kubectl delete namespace acceptance --ignore-not-found=true
   fi

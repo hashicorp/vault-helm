@@ -69,3 +69,27 @@ load _helpers
       yq -r '.metadata.labels.traffic' | tee /dev/stderr)
   [ "${actual}" = "external" ]
 }
+
+@test "server/ingress: annotations added to object - string" {
+  cd `chart_dir`
+
+  local actual=$(helm template \
+      --show-only templates/server-ingress.yaml \
+      --set 'server.ingress.enabled=true' \
+      --set 'server.ingress.annotations=kubernetes.io/ingress.class: nginx' \
+      . | tee /dev/stderr |
+      yq -r '.metadata.annotations["kubernetes.io/ingress.class"]' | tee /dev/stderr)
+  [ "${actual}" = "nginx" ]
+}
+
+@test "server/ingress: annotations added to object - yaml" {
+  cd `chart_dir`
+
+  local actual=$(helm template \
+      --show-only templates/server-ingress.yaml \
+      --set 'server.ingress.enabled=true' \
+      --set server.ingress.annotations."kubernetes\.io/ingress\.class"=nginx \
+      . | tee /dev/stderr |
+      yq -r '.metadata.annotations["kubernetes.io/ingress.class"]' | tee /dev/stderr)
+  [ "${actual}" = "nginx" ]
+}
