@@ -12,4 +12,4 @@ sources:
   - https://github.com/hashicorp/vault-helm
   - https://github.com/hashicorp/vault-k8s
 engine: gotpl
-kubeVersion: ">=1.12.0-0"
+kubeVersion: ">=1.10.0-0"
