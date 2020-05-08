@@ -52,6 +52,10 @@ spec:
         fsGroup: {{ .Values.server.gid | default 1000 }}
       volumes:
         {{ template "vault.volumes" . }}
+      {{- if .Values.server.extraInitContainers }}
+      initContainers:
+        {{ toYaml .Values.server.extraInitContainers | nindent 8}}
+      {{- end }}
       containers:
         - name: vault
           {{ template "vault.resources" . }}

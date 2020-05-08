@@ -619,6 +619,74 @@ load _helpers
 }
 
 #--------------------------------------------------------------------
+# extraInitContainers
+
+@test "server/standalone-StatefulSet: adds extra init containers" {
+  cd `chart_dir`
+
+  # Test that it defines it
+  local object=$(helm template \
+      --show-only templates/server-statefulset.yaml  \
+      --set 'server.extraInitContainers[0].image=test-image' \
+      --set 'server.extraInitContainers[0].name=test-container' \
+      --set 'server.extraInitContainers[0].ports[0].name=test-port' \
+      --set 'server.extraInitContainers[0].ports[0].containerPort=9410' \
+      --set 'server.extraInitContainers[0].ports[0].protocol=TCP' \
+      --set 'server.extraInitContainers[0].env[0].name=TEST_ENV' \
+      --set 'server.extraInitContainers[0].env[0].value=test_env_value' \
+      . | tee /dev/stderr |
+      yq -r '.spec.template.spec.initContainers[] | select(.name == "test-container")' | tee /dev/stderr)
+
+  local actual=$(echo $object |
+      yq -r '.name' | tee /dev/stderr)
+  [ "${actual}" = "test-container" ]
+
+  local actual=$(echo $object |
+      yq -r '.image' | tee /dev/stderr)
+  [ "${actual}" = "test-image" ]
+
+  local actual=$(echo $object |
+      yq -r '.ports[0].name' | tee /dev/stderr)
+  [ "${actual}" = "test-port" ]
+
+  local actual=$(echo $object |
+      yq -r '.ports[0].containerPort' | tee /dev/stderr)
+  [ "${actual}" = "9410" ]
+
+  local actual=$(echo $object |
+      yq -r '.ports[0].protocol' | tee /dev/stderr)
+  [ "${actual}" = "TCP" ]
+
+  local actual=$(echo $object |
+      yq -r '.env[0].name' | tee /dev/stderr)
+  [ "${actual}" = "TEST_ENV" ]
+
+  local actual=$(echo $object |
+      yq -r '.env[0].value' | tee /dev/stderr)
+  [ "${actual}" = "test_env_value" ]
+
+}
+
+@test "server/standalone-StatefulSet: add two extra init containers" {
+  cd `chart_dir`
+
+  # Test that it defines it
+  local object=$(helm template \
+      --show-only templates/server-statefulset.yaml  \
+      --set 'server.extraInitContainers[0].image=test-image' \
+      --set 'server.extraInitContainers[0].name=test-container' \
+      --set 'server.extraInitContainers[1].image=test-image' \
+      --set 'server.extraInitContainers[1].name=test-container-2' \
+      . | tee /dev/stderr |
+      yq -r '.spec.template.spec.initContainers' | tee /dev/stderr)
+
+  local containers_count=$(echo $object |
+      yq -r 'length' | tee /dev/stderr)
+  [ "${containers_count}" = 2 ]
+
+}
+
+#--------------------------------------------------------------------
 # extraContainers
 
 @test "server/standalone-StatefulSet: adds extra containers" {
