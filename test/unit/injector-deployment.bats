@@ -425,3 +425,25 @@ load _helpers
       yq -r '.spec.template.spec.nodeSelector' | tee /dev/stderr)
   [ "${actual}" = "testing" ]
 }
+
+#--------------------------------------------------------------------
+# priorityClassName
+
+@test "injector/deployment: priorityClassName not set by default" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      --show-only templates/injector-deployment.yaml  \
+      . | tee /dev/stderr |
+      yq '.spec.template.spec | .priorityClassName? == null' | tee /dev/stderr)
+  [ "${actual}" = "true" ]
+}
+
+@test "injector/deployment: priorityClassName can be set" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      --show-only templates/injector-deployment.yaml  \
+      --set 'injector.priorityClassName=armaggeddon' \
+      . | tee /dev/stderr |
+      yq '.spec.template.spec | .priorityClassName == "armaggeddon"' | tee /dev/stderr)
+  [ "${actual}" = "true" ]
+}

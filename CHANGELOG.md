@@ -1,6 +1,7 @@
 ## Unreleased
 
 Features:
+* Added `extraInitContainers` to define init containers for the Vault cluster [GH-258](https://github.com/hashicorp/vault-helm/pull/258)
 
 Improvements:
 * Server configs can now be defined in YAML.  Multi-line string configs are still compatible [GH-213](https://github.com/hashicorp/vault-helm/pull/213)
@@ -8,6 +9,7 @@ Improvements:
 * Use port names that map to vault.scheme [[GH-223](https://github.com/hashicorp/vault-helm/pull/223)]
 * Allow both yaml and multi-line string annotations [[GH-272](https://github.com/hashicorp/vault-helm/pull/272)]
 * Added configurable to set the Raft node name to hostname [[GH-269](https://github.com/hashicorp/vault-helm/pull/269)]
+* Support setting priorityClassName on pods [[GH-282](https://github.com/hashicorp/vault-helm/pull/282)]
 
 Bugs:
 * Fixed default ingress path [[GH-224](https://github.com/hashicorp/vault-helm/pull/224)]

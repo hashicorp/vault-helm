@@ -27,13 +27,16 @@ spec:
       {{ template "injector.affinity" . }}
       {{ template "injector.tolerations" . }}
       {{ template "injector.nodeselector" . }}
+      {{- if .Values.injector.priorityClassName }}
+      priorityClassName: {{ .Values.injector.priorityClassName }}
+      {{- end }}
       serviceAccountName: "{{ template "vault.fullname" . }}-agent-injector"
-{{- if not .Values.openshift }}
+      {{- if not .Values.openshift }}
       securityContext:
         runAsNonRoot: true
         runAsGroup: {{ .Values.injector.gid | default 1000 }}
         runAsUser: {{ .Values.injector.uid | default 100 }}
-{{- end }}
+      {{- end }}
       containers:
         - name: sidecar-injector
           {{ template "injector.resources" . }}
