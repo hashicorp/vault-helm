@@ -1,7 +1,7 @@
 {{ template "vault.mode" . }}
 {{- if ne .mode "external" }}
 {{- if and (eq .mode "ha" ) (and (eq (.Values.server.service.enabled | toString) "true" ) (eq (.Values.global.enabled | toString) "true")) }}
-# Service for active Vault pod
+# Service for standby Vault pod
 apiVersion: v1
 kind: Service
 metadata:
