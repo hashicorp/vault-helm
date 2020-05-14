@@ -292,11 +292,11 @@ Sets extra ui service annotations
 {{/*
 Create the name of the service account to use
 */}}
-{{- define "vault.serviceAccountName" -}}
-{{- if .Values.serviceAccount.enabled -}}
-    {{ default (include "vault.fullname" .) .Values.serviceAccount.name }}
+{{- define "vault.serviceAccount.name" -}}
+{{- if .Values.server.serviceAccount.enabled -}}
+    {{ default (include "vault.fullname" .) .Values.server.serviceAccount.name }}
 {{- else -}}
-    {{ default "default" .Values.serviceAccount.name }}
+    {{ default "default" .Values.server.serviceAccount.name }}
 {{- end -}}
 {{- end -}}
 
