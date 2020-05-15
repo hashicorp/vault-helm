@@ -354,7 +354,7 @@ server:
         path = "/vault/data"
       }
 
-    # Use below config for listener if deploying to OpenShift 
+    # Use below config if deploying to OpenShift 
     # OpenShift CA generates TLS certificates for Vault Service which mounted after to Vault Pods
     # https://docs.openshift.com/container-platform/4.4/authentication/certificates/service-serving-certificate.html#add-service-certificate_service-serving-certificate
     #config: |
@@ -399,7 +399,6 @@ server:
       enabled: false
       # Set the Node Raft ID to the name of the pod
       setNodeId: false
-      # Use below config only if not deploying to OpenShift. An example configuration for OpenShift can be found after this example.
       config: |
         ui = true
 
@@ -414,25 +413,6 @@ server:
         }
 
         service_registration "kubernetes" {}
-
-    # Use the listener config below if deploying to OpenShift 
-    # OpenShift CA generates TLS certificates for Vault Service which mounted after to Vault Pods
-    # https://docs.openshift.com/container-platform/4.4/authentication/certificates/service-serving-certificate.html#add-service-certificate_service-serving-certificate
-      #config: |
-      #  ui = true
-
-      #  listener "tcp" {
-      #    address = "[::]:8200"
-      #    cluster_address = "[::]:8201"
-      #    tls_cert_file = "/var/run/secrets/kubernetes.io/certs/tls.crt"
-      #    tls_key_file = "/var/run/secrets/kubernetes.io/certs/tls.key"
-      #  }
-
-      #  storage "raft" {
-      #    path = "/vault/data"
-      #  }
-
-      #  service_registration "kubernetes" {}
 
     # config is a raw string of default configuration when using a Stateful
     # deployment. Default is to use a Consul for its HA storage backend.
@@ -454,7 +434,7 @@ server:
 
       service_registration "kubernetes" {}
 
-    # Use the below listener config if deploying to OpenShift 
+    # Use the below config if deploying to OpenShift 
     # OpenShift CA generates TLS certificates for Vault Service which mounted after to Vault Pods
     # https://docs.openshift.com/container-platform/4.4/authentication/certificates/service-serving-certificate.html#add-service-certificate_service-serving-certificate
     #config: |
