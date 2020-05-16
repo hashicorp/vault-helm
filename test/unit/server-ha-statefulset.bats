@@ -236,6 +236,10 @@ load _helpers
       yq -r '.configMap.secretName' | tee /dev/stderr)
   [ "${actual}" = "null" ]
 
+  local actual=$(echo $object |
+      yq -r '.configMap.emptyDir' | tee /dev/stderr)
+  [ "${actual}" = "null" ]
+
   # Test that it mounts it
   local object=$(helm template \
       --show-only templates/server-statefulset.yaml  \
@@ -282,7 +286,7 @@ load _helpers
   local object=$(helm template \
       --show-only templates/server-statefulset.yaml  \
       --set 'server.ha.enabled=true' \
-      --set 'server.extraVolumes[0].type=configMap' \
+      --set 'server.extraVolumes[0].type=secret' \
       --set 'server.extraVolumes[0].name=foo' \
       --set 'server.extraVolumes[0].path=/custom/path' \
       . | tee /dev/stderr |
@@ -317,11 +321,15 @@ load _helpers
       yq -r '.secret.secretName' | tee /dev/stderr)
   [ "${actual}" = "foo" ]
 
+  local actual=$(echo $object |
+      yq -r '.secret.emptyDir' | tee /dev/stderr)
+  [ "${actual}" = "null" ]  
+
   # Test that it mounts it
   local object=$(helm template \
       --show-only templates/server-statefulset.yaml  \
       --set 'server.ha.enabled=true' \
-      --set 'server.extraVolumes[0].type=configMap' \
+      --set 'server.extraVolumes[0].type=secret' \
       --set 'server.extraVolumes[0].name=foo' \
       . | tee /dev/stderr |
       yq -r '.spec.template.spec.containers[0].volumeMounts[] | select(.name == "userconfig-foo")' | tee /dev/stderr)
@@ -329,6 +337,71 @@ load _helpers
   local actual=$(echo $object |
       yq -r '.readOnly' | tee /dev/stderr)
   [ "${actual}" = "true" ]
+
+  local actual=$(echo $object |
+      yq -r '.mountPath' | tee /dev/stderr)
+  [ "${actual}" = "/vault/userconfig/foo" ]
+}
+
+#---
+@test "server/ha-StatefulSet: adds extra emptyDir volume custom mount path" {
+  cd `chart_dir`
+
+  # Test that it mounts it
+  local object=$(helm template \
+      --show-only templates/server-statefulset.yaml  \
+      --set 'server.ha.enabled=true' \
+      --set 'server.extraVolumes[0].type=emptyDir' \
+      --set 'server.extraVolumes[0].name=foo' \
+      --set 'server.extraVolumes[0].path=/custom/path' \
+      . | tee /dev/stderr |
+      yq -r '.spec.template.spec.containers[0].volumeMounts[] | select(.name == "userconfig-foo")' | tee /dev/stderr)
+
+  local actual=$(echo $object |
+      yq -r '.readOnly' | tee /dev/stderr)
+  [ "${actual}" = "false" ]
+
+  local actual=$(echo $object |
+      yq -r '.mountPath' | tee /dev/stderr)
+  [ "${actual}" = "/custom/path/foo" ]
+}
+
+@test "server/ha-StatefulSet: adds extra secret volume" {
+  cd `chart_dir`
+
+  # Test that it defines it
+  local object=$(helm template \
+      --show-only templates/server-statefulset.yaml  \
+      --set 'server.ha.enabled=true' \
+      --set 'server.extraVolumes[0].type=emptyDir' \
+      --set 'server.extraVolumes[0].name=foo' \
+      . | tee /dev/stderr |
+      yq -r '.spec.template.spec.volumes[] | select(.name == "userconfig-foo")' | tee /dev/stderr)
+
+  local actual=$(echo $object |
+      yq -r '.emptyDir' | tee /dev/stderr)
+  [ "${actual}" = "{}" ]
+
+  local actual=$(echo $object |
+      yq -r '.emptyDir.secretName' | tee /dev/stderr)
+  [ "${actual}" = "null" ]
+
+  local actual=$(echo $object |
+      yq -r '.emptyDir.name' | tee /dev/stderr)
+  [ "${actual}" = "null" ]  
+
+  # Test that it mounts it
+  local object=$(helm template \
+      --show-only templates/server-statefulset.yaml  \
+      --set 'server.ha.enabled=true' \
+      --set 'server.extraVolumes[0].type=emptyDir' \
+      --set 'server.extraVolumes[0].name=foo' \
+      . | tee /dev/stderr |
+      yq -r '.spec.template.spec.containers[0].volumeMounts[] | select(.name == "userconfig-foo")' | tee /dev/stderr)
+
+  local actual=$(echo $object |
+      yq -r '.readOnly' | tee /dev/stderr)
+  [ "${actual}" = "false" ]
 
   local actual=$(echo $object |
       yq -r '.mountPath' | tee /dev/stderr)
