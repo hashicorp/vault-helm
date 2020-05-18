@@ -121,7 +121,7 @@ server:
   # See https://kubernetes.io/docs/concepts/workloads/controllers/statefulset/#update-strategies
   updateStrategyType: "OnDelete"
 
-  resources:
+  resources: {}
   # resources:
   #   requests:
   #     memory: 256Mi
