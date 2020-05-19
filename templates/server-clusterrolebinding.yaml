@@ -16,7 +16,7 @@ roleRef:
   name: system:auth-delegator
 subjects:
 - kind: ServiceAccount
-  name: {{ template "vault.fullname" . }}
+  name: {{ template "vault.serviceAccount.name" . }}
   namespace: {{ .Release.Namespace }}
 {{ end }}
 {{ end }}
