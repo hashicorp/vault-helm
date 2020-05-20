@@ -171,6 +171,9 @@ server:
   # This is useful if Vault must be signaled, e.g. to send a SIGHUP for log rotation
   shareProcessNamespace: false
 
+  # extraCommands is a string containing additional commands before Vault server is started.
+  extraCommands: ""
+
   # extraArgs is a string containing additional Vault server arguments.
   extraArgs: ""
 

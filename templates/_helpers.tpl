@@ -119,8 +119,13 @@ for users looking to use this chart with Consul Helm.
 {{- define "vault.args" -}}
   {{ if or (eq .mode "standalone") (eq .mode "ha") }}
           - |
-            sed -E "s/HOST_IP/${HOST_IP?}/g" /vault/config/extraconfig-from-values.hcl > /tmp/storageconfig.hcl;
-            sed -Ei "s/POD_IP/${POD_IP?}/g" /tmp/storageconfig.hcl;
+            cp /vault/config/extraconfig-from-values.hcl /tmp/storageconfig.hcl;
+            [ -n "${HOST_IP}" ] && sed -Ei "s|HOST_IP|${HOST_IP?}|g" /tmp/storageconfig.hcl;
+            [ -n "${POD_IP}" ] && sed -Ei "s|POD_IP|${POD_IP?}|g" /tmp/storageconfig.hcl;
+            [ -n "${API_ADDR}" ] && sed -Ei "s|API_ADDR|${API_ADDR?}|g" /tmp/storageconfig.hcl;
+            [ -n "${TRANSIT_ADDR}" ] && sed -Ei "s|TRANSIT_ADDR|${TRANSIT_ADDR?}|g" /tmp/storageconfig.hcl;
+            [ -n "${RAFT_ADDR}" ] && (export VAULT_ADDR="https://127.0.0.1:8200" VAULT_SKIP_VERIFY=true; until vault operator raft join "${RAFT_ADDR}"; do vault operator raft join "${RAFT_ADDR}" 2>&1 | grep -q "raft storage is already initialized" && break; sleep 10; done &);
+            {{ .Values.server.extraCommands }}
             /usr/local/bin/docker-entrypoint.sh vault server -config=/tmp/storageconfig.hcl {{ .Values.server.extraArgs }}
   {{ end }}
 {{- end -}}
