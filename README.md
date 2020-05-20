@@ -10,9 +10,9 @@ use Vault with Kubernetes, please see the
 
 ## Prerequisites
 
-To use the charts here, [Helm](https://helm.sh/) must be installed in your
-Kubernetes cluster. Setting up Kubernetes and Helm and is outside the scope
-of this README. Please refer to the Kubernetes and Helm documentation.
+To use the charts here, [Helm](https://helm.sh/) must be configured for your
+Kubernetes cluster. Setting up Kubernetes and Helm and is outside the scope of
+this README. Please refer to the Kubernetes and Helm documentation.
 
 The versions required are:
 
@@ -24,15 +24,17 @@ The versions required are:
 
 ## Usage
 
-For now, we do not host a chart repository. To use the charts, you must
-download this repository and unpack it into a directory. Either
-[download a tagged release](https://github.com/hashicorp/vault-helm/releases) or
-use `git checkout` to a tagged release.
-Assuming this repository was unpacked into the directory `vault-helm`, the chart can
-then be installed directly:
+To install the latest version of this chart, add the Hashicorp helm repository
+and run `helm install`:
 
-    helm install ./vault-helm
+```console
+$ helm repo add hashicorp https://helm.releases.hashicorp.com
+"hashicorp" has been added to your repositories
 
-Please see the many options supported in the `values.yaml`
-file. These are also fully documented directly on the
-[Vault website](https://www.vaultproject.io/docs/platform/k8s/helm).
+$ helm install vault hashicorp/vault
+```
+
+Please see the many options supported in the `values.yaml` file. These are also
+fully documented directly on the [Vault
+website](https://www.vaultproject.io/docs/platform/k8s/helm) along with more
+detailed installation instructions.
