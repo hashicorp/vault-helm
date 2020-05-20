@@ -10,7 +10,7 @@ metadata:
     app.kubernetes.io/instance: {{ .Release.Name }}
     app.kubernetes.io/managed-by: {{ .Release.Service }}
 roleRef:
-  kind: ClusterRole
+  kind: Role
   name: {{ template "vault.fullname" . }}-psp
   apiGroup: rbac.authorization.k8s.io
 subjects:

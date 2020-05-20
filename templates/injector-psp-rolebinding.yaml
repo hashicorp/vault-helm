@@ -9,8 +9,8 @@ metadata:
     app.kubernetes.io/instance: {{ .Release.Name }}
     app.kubernetes.io/managed-by: {{ .Release.Service }}
 roleRef:
-  kind: ClusterRole
-  name: {{ template "vault.fullname" . }}-psp
+  kind: Role
+  name: {{ template "vault.fullname" . }}-agent-injector-psp
   apiGroup: rbac.authorization.k8s.io
 subjects:
   - kind: ServiceAccount
