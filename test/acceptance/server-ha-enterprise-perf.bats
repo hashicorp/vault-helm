@@ -35,7 +35,7 @@ load _helpers
   kubectl exec -ti "$(name_prefix)-east-0" -- vault operator unseal ${primary_token}
   wait_for_ready "$(name_prefix)-east-0"
 
-  sleep 10
+  sleep 30
 
   # Vault Unseal
   local pods=($(kubectl get pods --selector='app.kubernetes.io/name=vault' -o json | jq -r '.items[].metadata.name'))
@@ -103,7 +103,7 @@ load _helpers
   kubectl exec -ti "$(name_prefix)-west-0" -- vault operator unseal ${secondary_token}
   wait_for_ready "$(name_prefix)-west-0"
 
-  sleep 10
+  sleep 30
 
   # Vault Unseal
   local pods=($(kubectl get pods --selector='app.kubernetes.io/instance=vault-west' -o json | jq -r '.items[].metadata.name'))
@@ -134,7 +134,7 @@ load _helpers
 
   kubectl exec -ti "$(name_prefix)-west-0" -- vault write sys/replication/performance/secondary/enable token=${secondary_replica_token}
 
-  sleep 10
+  sleep 30
 
   local pods=($(kubectl get pods --selector='app.kubernetes.io/instance=vault-west' -o json | jq -r '.items[].metadata.name'))
   for pod in "${pods[@]}"

@@ -124,7 +124,7 @@ server:
   # See https://kubernetes.io/docs/concepts/workloads/controllers/statefulset/#update-strategies
   updateStrategyType: "OnDelete"
 
-  resources:
+  resources: {}
   # resources:
   #   requests:
   #     memory: 256Mi
@@ -174,12 +174,12 @@ server:
   authDelegator:
     enabled: true
 
-  # extraInitContainers is a list of init containers. Specified as a raw YAML string.
+  # extraInitContainers is a list of init containers. Specified as a YAML list.
   # This is useful if you need to run a script to provision TLS certificates or
   # write out configuration files in a dynamic way.
   extraInitContainers: null
 
-  # extraContainers is a list of sidecar containers. Specified as a raw YAML string.
+  # extraContainers is a list of sidecar containers. Specified as a YAML list.
   extraContainers: null
 
   # shareProcessNamespace enables process namespace sharing between Vault and the extraContainers
@@ -241,21 +241,20 @@ server:
   # Toleration Settings for server pods
   # This should be a multi-line string matching the Toleration array
   # in a PodSpec.
-  tolerations: {}
+  tolerations: null
 
   # nodeSelector labels for server pod assignment, formatted as a muli-line string.
   # ref: https://kubernetes.io/docs/concepts/configuration/assign-pod-node/#nodeselector
   # Example:
   # nodeSelector: |
   #   beta.kubernetes.io/arch: amd64
-  nodeSelector: {}
+  nodeSelector: null
 
   # Priority class for server pods
   priorityClassName: ""
 
   # Extra labels to attach to the server pods
-  # This should be a multi-line string mapping directly to the a map of
-  # the labels to apply to the server pods
+  # This should be a YAML map of the labels to apply to the server pods
   extraLabels: {}
 
   # Extra annotations to attach to the server pods

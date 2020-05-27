@@ -10,10 +10,12 @@ Improvements:
 * Allow both yaml and multi-line string annotations [[GH-272](https://github.com/hashicorp/vault-helm/pull/272)]
 * Added configurable to set the Raft node name to hostname [[GH-269](https://github.com/hashicorp/vault-helm/pull/269)]
 * Support setting priorityClassName on pods [[GH-282](https://github.com/hashicorp/vault-helm/pull/282)]
+* Add support for ingress apiVersion `networking.k8s.io/v1beta1` [[GH-310](https://github.com/hashicorp/vault-helm/pull/310)]
 
 Bugs:
 * Fixed default ingress path [[GH-224](https://github.com/hashicorp/vault-helm/pull/224)]
 * Fixed annotations for HA standby/active services [[GH-268](https://github.com/hashicorp/vault-helm/pull/268)]
+* Updated some value defaults to match their use in templates [[GH-309](https://github.com/hashicorp/vault-helm/pull/309)]
 
 ## 0.5.0 (April 9th, 2020)
 
