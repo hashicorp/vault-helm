@@ -671,6 +671,7 @@ load _helpers
   cd `chart_dir`
   local actual=$(helm template \
       --show-only templates/server-statefulset.yaml  \
+      --set 'global.openshift=true' \
       . | tee /dev/stderr |
       yq '.spec.template.spec.volumes[]|select(.name | contains("vault-cert"))|length >0' | tee /dev/stderr)
   [ "${actual}" = "true" ]
@@ -679,6 +680,7 @@ load _helpers
   cd `chart_dir`
   local actual=$(helm template \
       --show-only templates/server-statefulset.yaml  \
+      --set 'global.openshift=true' \
       . | tee /dev/stderr |
       yq '.spec.template.spec.containers[]|select(.name | contains("vault"))| .volumeMounts[]|select(.name |contains("vault-cert"))|length > 0' | tee /dev/stderr)
   [ "${actual}" = "true" ]
