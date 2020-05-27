@@ -1048,3 +1048,45 @@ load _helpers
       yq '.spec.template.spec | .priorityClassName == "armaggeddon"' | tee /dev/stderr)
   [ "${actual}" = "true" ]
 }
+
+#--------------------------------------------------------------------
+# OpenShift
+
+@test "server/standalone-StatefulSet: OpenShift - runAsUser disabled" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      --show-only templates/server-statefulset.yaml  \
+      --set 'global.openshift=true' \
+      . | tee /dev/stderr |
+      yq '.spec.template.spec.securityContext.runAsUser | length > 0' | tee /dev/stderr)
+  [ "${actual}" = "false" ]
+}
+
+@test "server/standalone-StatefulSet: OpenShift - runAsGroup disabled" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      --show-only templates/server-statefulset.yaml  \
+      --set 'global.openshift=true' \
+      . | tee /dev/stderr |
+      yq '.spec.template.spec.securityContext.runAsGroup | length > 0' | tee /dev/stderr)
+  [ "${actual}" = "false" ]
+}
+
+@test "server/standalone-StatefulSet: OpenShift - define vault-cert volume" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      --show-only templates/server-statefulset.yaml  \
+      --set 'global.openshift=true' \
+      . | tee /dev/stderr |
+      yq '.spec.template.spec.volumes[]|select(.name | contains("vault-cert"))|length >0' | tee /dev/stderr)
+  [ "${actual}" = "true" ]
+}
+@test "server/standalone-StatefulSet: OpenShift - define vault-cert volumeMount" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      --show-only templates/server-statefulset.yaml  \
+      --set 'global.openshift=true' \
+      . | tee /dev/stderr |
+      yq '.spec.template.spec.containers[]|select(.name | contains("vault"))| .volumeMounts[]|select(.name |contains("vault-cert"))|length > 0' | tee /dev/stderr)
+  [ "${actual}" = "true" ]
+}

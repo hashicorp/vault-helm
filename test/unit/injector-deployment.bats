@@ -447,3 +447,25 @@ load _helpers
       yq '.spec.template.spec | .priorityClassName == "armaggeddon"' | tee /dev/stderr)
   [ "${actual}" = "true" ]
 }
+#--------------------------------------------------------------------
+# OpenShift
+
+@test "injector/deployment: OpenShift - runAsUser disabled" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      --show-only templates/injector-deployment.yaml  \
+      --set 'global.openshift=true' \
+      . | tee /dev/stderr |
+      yq '.spec.template.spec.securityContext.runAsUser | length > 0' | tee /dev/stderr)
+  [ "${actual}" = "false" ]
+}
+
+@test "injector/deployment: OpenShift - runAsGroup disabled" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      --show-only templates/injector-deployment.yaml  \
+      --set 'global.openshift=true' \
+      . | tee /dev/stderr |
+      yq '.spec.template.spec.securityContext.runAsGroup | length > 0' | tee /dev/stderr)
+  [ "${actual}" = "false" ]
+}
