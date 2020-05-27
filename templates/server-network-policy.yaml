@@ -1,11 +1,11 @@
-{{- if .Values.openshift }}
+{{- if .Values.global.openshift }}
 apiVersion: networking.k8s.io/v1
 kind: NetworkPolicy
 metadata:
   name: vault
   labels:
-    app.kubernetes.io/name: vault
-    app.kubernetes.io/instance: vault
+    app.kubernetes.io/name: {{ template "vault.name" . }}
+    app.kubernetes.io/instance: {{ .Release.Name }}
 spec:
   podSelector:
     matchLabels:

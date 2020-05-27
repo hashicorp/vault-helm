@@ -1,5 +1,4 @@
-## In case of OpenShift deployment, a route will be deployed instead of ingress
-{{- if not .Values.openshift }}
+{{- if not .Values.global.openshift }}
 {{ template "vault.mode" . }}
 {{- if ne .mode "external" }}
 {{- if .Values.server.ingress.enabled -}}

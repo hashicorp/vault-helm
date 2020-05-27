@@ -45,7 +45,7 @@ spec:
       {{ if  .Values.server.shareProcessNamespace }}
       shareProcessNamespace: true
       {{ end }}
-      {{- if not .Values.openshift }}
+      {{- if not .Values.global.openshift }}
       securityContext:
         runAsNonRoot: true
         runAsGroup: {{ .Values.server.gid | default 1000 }}
@@ -54,7 +54,7 @@ spec:
       {{- end }}
       volumes:
         {{ template "vault.volumes" . }}
-      {{- if .Values.openshift }}
+      {{- if .Values.global.openshift }}
         - name: {{ .Release.Name }}-vault-cert
           secret:
             secretName: {{ .Release.Name }}-vault-cert
@@ -72,6 +72,8 @@ spec:
           command: {{ template "vault.command" . }}
           args: {{ template "vault.args" . }}
           env:
+            - name: VAULT_LOG_LEVEL
+              value: debug
             - name: HOST_IP
               valueFrom:
                 fieldRef:
@@ -113,7 +115,7 @@ spec:
             {{- include "vault.extraSecretEnvironmentVars" .Values.server | nindent 12 }}
           volumeMounts:
           {{ template "vault.mounts" . }}
-          {{- if .Values.openshift }}
+          {{- if .Values.global.openshift }}
             - name: {{ .Release.Name }}-vault-cert
               mountPath: /var/run/secrets/kubernetes.io/certs
           {{- end }}

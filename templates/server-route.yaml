@@ -1,4 +1,5 @@
-{{- if .Values.openshift }}
+{{- if .Values.global.openshift }}
+{{- if ne .mode "external" }}
 {{- if .Values.server.route.enabled -}}
 kind: Route
 apiVersion: route.openshift.io/v1
@@ -23,5 +24,6 @@ spec:
     targetPort: 8200
   tls:
     termination: reencrypt
-{{ end }}
+{{- end }}
+{{- end }}
 {{- end }}

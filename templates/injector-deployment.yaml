@@ -31,7 +31,7 @@ spec:
       priorityClassName: {{ .Values.injector.priorityClassName }}
       {{- end }}
       serviceAccountName: "{{ template "vault.fullname" . }}-agent-injector"
-      {{- if not .Values.openshift }}
+      {{- if not .Values.global.openshift }}
       securityContext:
         runAsNonRoot: true
         runAsGroup: {{ .Values.injector.gid | default 1000 }}

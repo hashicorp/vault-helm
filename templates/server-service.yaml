@@ -13,8 +13,8 @@ metadata:
     app.kubernetes.io/instance: {{ .Release.Name }}
     app.kubernetes.io/managed-by: {{ .Release.Service }}
   annotations:
-{{- if .Values.openshift }}
-    service.beta.openshift.io/serving-cert-secret-name: {{ .Release.Name }}-vault-cert
+{{- if .Values.global.openshift }}
+    service.alpha.openshift.io/serving-cert-secret-name: {{ .Release.Name }}-vault-cert
 {{- end }}
     # This must be set in addition to publishNotReadyAddresses due
     # to an open issue where it may not work:

@@ -10,9 +10,8 @@ global:
   #   - name: image-pull-secret
   # TLS for end-to-end encrypted transport
   tlsDisable: true
-
-# If deploying to OpenShift
-openshift: false
+  # If deploying to OpenShift
+  openshift: false
 
 injector:
   # True if you want to enable vault agent injection.
@@ -164,7 +163,7 @@ server:
   # Services are secured by OpenShift "service-ca" controller
   # https://docs.openshift.com/container-platform/4.4/authentication/certificates/service-serving-certificate.html#add-service-certificate_service-serving-certificate
   route:
-    enabled: true
+    enabled: false
     labels: {}
     annotations: {}
     host: chart-example.local
@@ -413,7 +412,6 @@ server:
         }
 
         service_registration "kubernetes" {}
-
     # config is a raw string of default configuration when using a Stateful
     # deployment. Default is to use a Consul for its HA storage backend.
     # This should be HCL.
