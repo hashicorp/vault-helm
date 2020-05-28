@@ -15,13 +15,21 @@ metadata:
   annotations:
 {{ template "vault.service.annotations" .}}
 spec:
-  type: ClusterIP
+  {{- if .Values.server.service.type}}
+  type: {{ .Values.server.service.type }}
+  {{- end}}
+  {{- if .Values.server.service.clusterIP }}
+  clusterIP: {{ .Values.server.service.clusterIP }}
+  {{- end }}
   publishNotReadyAddresses: true
   ports:
-    - name: http
-      port: 8200
-      targetPort: 8200
-    - name: internal
+    - name: {{ include "vault.scheme" . }}
+      port: {{ .Values.server.service.port }}
+      targetPort: {{ .Values.server.service.targetPort }}
+      {{- if and (.Values.server.service.nodePort) (eq (.Values.server.service.type | toString) "NodePort") }}
+      nodePort: {{ .Values.server.service.nodePort }}
+      {{- end }}
+    - name: https-internal
       port: 8201
       targetPort: 8201
   selector:
