@@ -188,6 +188,14 @@ server:
   # Used to set the sleep time during the preStop step
   preStopSleepSeconds: 5
 
+  # Used to define commands to run after the pod is ready.
+  # This can be used to automate processes such as initialization
+  # or boostrapping auth methods.
+  postStart: []
+  # - /bin/sh
+  # - -c
+  # - /vault/userconfig/myscript/run.sh
+
   # extraEnvironmentVars is a list of extra enviroment variables to set with the stateful set. These could be
   # used to include variables required for auto-unseal.
   extraEnvironmentVars: {}
