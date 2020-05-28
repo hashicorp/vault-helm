@@ -159,6 +159,14 @@ spec:
                   # to this pod while it's terminating
                   "sleep {{ .Values.server.preStopSleepSeconds }} && kill -SIGTERM $(pidof vault)",
                 ]
+            {{- if .Values.server.postStart }}
+            postStart:
+              exec:
+                command:
+                {{- range (.Values.server.postStart) }}
+                - {{ . | quote }}
+                {{- end }}
+            {{- end }}
         {{- if .Values.server.extraContainers }}
           {{ toYaml .Values.server.extraContainers | nindent 8}}
         {{- end }}

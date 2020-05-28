@@ -1048,3 +1048,24 @@ load _helpers
       yq '.spec.template.spec | .priorityClassName == "armaggeddon"' | tee /dev/stderr)
   [ "${actual}" = "true" ]
 }
+
+#--------------------------------------------------------------------
+# postStart
+@test "server/standalone-StatefulSet: postStart disabled by default" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      --show-only templates/server-statefulset.yaml  \
+      . | tee /dev/stderr |
+      yq -r '.spec.template.spec.containers[0].lifecycle.postStart' | tee /dev/stderr)
+  [ "${actual}" = "null" ]
+}
+
+@test "server/standalone-StatefulSet: postStart can be set" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      --show-only templates/server-statefulset.yaml  \
+      --set='server.postStart={/bin/sh,-c,sleep}' \
+      . | tee /dev/stderr |
+      yq -r '.spec.template.spec.containers[0].lifecycle.postStart.exec.command[0]' | tee /dev/stderr)
+  [ "${actual}" = "/bin/sh" ]
+}
