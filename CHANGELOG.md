@@ -16,6 +16,7 @@ Bugs:
 * Fixed default ingress path [[GH-224](https://github.com/hashicorp/vault-helm/pull/224)]
 * Fixed annotations for HA standby/active services [[GH-268](https://github.com/hashicorp/vault-helm/pull/268)]
 * Updated some value defaults to match their use in templates [[GH-309](https://github.com/hashicorp/vault-helm/pull/309)]
+* Use active service on ingress when ha [[GH-270](https://github.com/hashicorp/vault-helm/pull/270)]
 
 ## 0.5.0 (April 9th, 2020)
 
