@@ -191,7 +191,7 @@ server:
   # Used to define commands to run after the pod is ready.
   # This can be used to automate processes such as initialization
   # or boostrapping auth methods.
-  postStart: |
+  postStart: []
   # - /bin/sh
   # - -c
   # - /vault/userconfig/myscript/run.sh
