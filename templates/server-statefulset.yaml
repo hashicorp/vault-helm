@@ -72,8 +72,6 @@ spec:
           command: {{ template "vault.command" . }}
           args: {{ template "vault.args" . }}
           env:
-            - name: VAULT_LOG_LEVEL
-              value: debug
             - name: HOST_IP
               valueFrom:
                 fieldRef:
