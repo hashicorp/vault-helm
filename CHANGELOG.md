@@ -2,6 +2,7 @@
 
 Features:
 * Added `extraInitContainers` to define init containers for the Vault cluster [GH-258](https://github.com/hashicorp/vault-helm/pull/258)
+* Added `postStart` lifecycle hook allowing users to configure commands to run on the Vault pods after they're ready [GH-315](https://github.com/hashicorp/vault-helm/pull/315)
 
 Improvements:
 * Server configs can now be defined in YAML.  Multi-line string configs are still compatible [GH-213](https://github.com/hashicorp/vault-helm/pull/213)
