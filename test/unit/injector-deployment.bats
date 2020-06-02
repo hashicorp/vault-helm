@@ -322,6 +322,19 @@ load _helpers
   [ "${actual}" = "true" ]
 }
 
+@test "injector/deployment: disable security context when openshift enabled" {
+  cd `chart_dir`
+  local object=$(helm template \
+      --show-only templates/injector-deployment.yaml  \
+      --set 'global.openshift=true' \
+      . | tee /dev/stderr |
+      yq -r '.spec.template.spec.containers[0].env' | tee /dev/stderr)
+
+  local actual=$(echo $object |
+    yq -r '.[9].name' | tee /dev/stderr)
+  [ "${actual}" = "AGENT_INJECT_SET_SECURITY_CONTEXT" ]
+}
+
 #--------------------------------------------------------------------
 # extraEnvironmentVars
 

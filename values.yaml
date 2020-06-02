@@ -33,7 +33,7 @@ injector:
   # required.
   agentImage:
     repository: "vault"
-    tag: "1.4.0"
+    tag: "1.4.2"
 
   # Mount Path of the Vault Kubernetes Auth Method.
   authPath: "auth/kubernetes"
@@ -116,7 +116,7 @@ server:
 
   image:
     repository: "vault"
-    tag: "1.4.0"
+    tag: "1.4.2"
     # Overrides the default Image Pull Policy
     pullPolicy: IfNotPresent
 
@@ -158,7 +158,7 @@ server:
     #      - chart-example.local
 
   # OpenShift only - create a route to expose the service
-  # The created route will be of type reencrypt
+  # The created route will be of type passthrough
   # https://docs.openshift.com/container-platform/4.4/networking/routes/secured-routes.html#nw-ingress-creating-a-reencrypt-route-with-a-custom-certificate_secured-routes
   # Services are secured by OpenShift "service-ca" controller
   # https://docs.openshift.com/container-platform/4.4/authentication/certificates/service-serving-certificate.html#add-service-certificate_service-serving-certificate
@@ -360,22 +360,6 @@ server:
         path = "/vault/data"
       }
 
-    # Use below config if deploying to OpenShift 
-    # OpenShift CA generates TLS certificates for Vault Service which mounted after to Vault Pods
-    # https://docs.openshift.com/container-platform/4.4/authentication/certificates/service-serving-certificate.html#add-service-certificate_service-serving-certificate
-    #config: |
-    #  ui = true
-
-    #  listener "tcp" {
-    #    address = "[::]:8200"
-    #    cluster_address = "[::]:8201"
-    #    tls_cert_file = "/var/run/secrets/kubernetes.io/certs/tls.crt"
-    #    tls_key_file = "/var/run/secrets/kubernetes.io/certs/tls.key"
-    #  }
-    #  storage "file" {
-    #    path = "/vault/data"
-    #  }
-
       # Example configuration for using auto-unseal, using Google Cloud KMS. The
       # GKMS keys must already exist, and the cluster must have a service account
       # that is authorized to access GCP KMS.
@@ -438,24 +422,6 @@ server:
       }
 
       service_registration "kubernetes" {}
-
-    # Use the below config if deploying to OpenShift 
-    # OpenShift CA generates TLS certificates for Vault Service which mounted after to Vault Pods
-    # https://docs.openshift.com/container-platform/4.4/authentication/certificates/service-serving-certificate.html#add-service-certificate_service-serving-certificate
-    #config: |
-    #  ui = true
-
-    #  listener "tcp" {
-    #    address = "[::]:8200"
-    #    cluster_address = "[::]:8201"
-    #    tls_cert_file = "/var/run/secrets/kubernetes.io/certs/tls.crt"
-    #    tls_key_file = "/var/run/secrets/kubernetes.io/certs/tls.key"
-    #  }
-    #  storage "consul" {
-    #    path = "vault"
-    #    address = "HOST_IP:8500"
-    #  }
-    #  service_registration "kubernetes" {}
 
       # Example configuration for using auto-unseal, using Google Cloud KMS. The
       # GKMS keys must already exist, and the cluster must have a service account

@@ -23,7 +23,7 @@ spec:
   port:
     targetPort: 8200
   tls:
-    termination: reencrypt
+    termination: passthrough
 {{- end }}
 {{- end }}
 {{- end }}

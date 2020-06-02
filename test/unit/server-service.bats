@@ -410,14 +410,3 @@ load _helpers
       yq -r '.spec.ports | map(select(.port==8200)) | .[] .name' | tee /dev/stderr)
   [ "${actual}" = "https" ]
 }
-
-@test "server/Service: OpenShift - annotate service to generate TLS certs" {
-  cd `chart_dir`
-
-  local actual=$(helm template \
-      --show-only templates/server-service.yaml \
-      --set 'global.openshift=true' \
-      . | tee /dev/stderr |
-      yq -r '.metadata.annotations|keys|map(select(index("service.alpha.openshift.io/serving-cert-secret-name")))|length' | tee /dev/stderr)
-  [ "${actual}" = 1 ]
-}

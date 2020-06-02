@@ -54,12 +54,6 @@ spec:
       {{- end }}
       volumes:
         {{ template "vault.volumes" . }}
-      {{- if .Values.global.openshift }}
-        - name: {{ .Release.Name }}-vault-cert
-          secret:
-            secretName: {{ .Release.Name }}-vault-cert
-            defaultMode: 420
-      {{- end }}
       {{- if .Values.server.extraInitContainers }}
       initContainers:
         {{ toYaml .Values.server.extraInitContainers | nindent 8}}
@@ -113,10 +107,6 @@ spec:
             {{- include "vault.extraSecretEnvironmentVars" .Values.server | nindent 12 }}
           volumeMounts:
           {{ template "vault.mounts" . }}
-          {{- if .Values.global.openshift }}
-            - name: {{ .Release.Name }}-vault-cert
-              mountPath: /var/run/secrets/kubernetes.io/certs
-          {{- end }}
           ports:
             - containerPort: 8200
               name: {{ include "vault.scheme" . }}
