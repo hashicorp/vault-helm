@@ -22,7 +22,6 @@ injector:
   externalVaultAddr: ""
 
   # image sets the repo and tag of the vault-k8s image to use for the injector.
-  # image points to openlabred/vault-k8s repository, pending https://github.com/hashicorp/vault-k8s/pull/126
   image:
     repository: "hashicorp/vault-k8s"
     tag: "0.4.0"
