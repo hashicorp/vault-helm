@@ -1,6 +1,14 @@
 ## Unreleased
 
 Features:
+
+Improvements:
+
+Bugs:
+
+## 0.6.0 (June 3rd, 2020)
+
+Features:
 * Added `extraInitContainers` to define init containers for the Vault cluster [GH-258](https://github.com/hashicorp/vault-helm/pull/258)
 * Added `postStart` lifecycle hook allowing users to configure commands to run on the Vault pods after they're ready [GH-315](https://github.com/hashicorp/vault-helm/pull/315)
 * Beta: Added OpenShift support [GH-319](https://github.com/hashicorp/vault-helm/pull/319)
