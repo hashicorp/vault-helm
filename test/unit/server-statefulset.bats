@@ -384,19 +384,19 @@ load _helpers
       yq -r '.spec.template.spec.containers[0].env' | tee /dev/stderr)
 
   local actual=$(echo $object |
-     yq -r '.[10].name' | tee /dev/stderr)
+     yq -r '.[11].name' | tee /dev/stderr)
   [ "${actual}" = "FOO" ]
 
   local actual=$(echo $object |
-      yq -r '.[10].value' | tee /dev/stderr)
+      yq -r '.[11].value' | tee /dev/stderr)
   [ "${actual}" = "bar" ]
 
   local actual=$(echo $object |
-      yq -r '.[11].name' | tee /dev/stderr)
+      yq -r '.[12].name' | tee /dev/stderr)
   [ "${actual}" = "FOOBAR" ]
 
   local actual=$(echo $object |
-      yq -r '.[11].value' | tee /dev/stderr)
+      yq -r '.[12].value' | tee /dev/stderr)
   [ "${actual}" = "foobar" ]
 
   local object=$(helm template \
@@ -407,19 +407,19 @@ load _helpers
       yq -r '.spec.template.spec.containers[0].env' | tee /dev/stderr)
 
   local actual=$(echo $object |
-     yq -r '.[10].name' | tee /dev/stderr)
+     yq -r '.[11].name' | tee /dev/stderr)
   [ "${actual}" = "FOO" ]
 
   local actual=$(echo $object |
-      yq -r '.[10].value' | tee /dev/stderr)
+      yq -r '.[11].value' | tee /dev/stderr)
   [ "${actual}" = "bar" ]
 
   local actual=$(echo $object |
-      yq -r '.[11].name' | tee /dev/stderr)
+      yq -r '.[12].name' | tee /dev/stderr)
   [ "${actual}" = "FOOBAR" ]
 
   local actual=$(echo $object |
-      yq -r '.[11].value' | tee /dev/stderr)
+      yq -r '.[12].value' | tee /dev/stderr)
   [ "${actual}" = "foobar" ]
 }
 
@@ -1049,7 +1049,6 @@ load _helpers
   [ "${actual}" = "true" ]
 }
 
-#--------------------------------------------------------------------
 # postStart
 @test "server/standalone-StatefulSet: postStart disabled by default" {
   cd `chart_dir`
@@ -1068,4 +1067,27 @@ load _helpers
       . | tee /dev/stderr |
       yq -r '.spec.template.spec.containers[0].lifecycle.postStart.exec.command[0]' | tee /dev/stderr)
   [ "${actual}" = "/bin/sh" ]
+}
+
+#--------------------------------------------------------------------
+# OpenShift
+
+@test "server/standalone-StatefulSet: OpenShift - runAsUser disabled" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      --show-only templates/server-statefulset.yaml  \
+      --set 'global.openshift=true' \
+      . | tee /dev/stderr |
+      yq '.spec.template.spec.securityContext.runAsUser | length > 0' | tee /dev/stderr)
+  [ "${actual}" = "false" ]
+}
+
+@test "server/standalone-StatefulSet: OpenShift - runAsGroup disabled" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      --show-only templates/server-statefulset.yaml  \
+      --set 'global.openshift=true' \
+      . | tee /dev/stderr |
+      yq '.spec.template.spec.securityContext.runAsGroup | length > 0' | tee /dev/stderr)
+  [ "${actual}" = "false" ]
 }

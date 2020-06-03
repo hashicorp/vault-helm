@@ -349,19 +349,19 @@ load _helpers
       yq -r '.spec.template.spec.containers[0].env' | tee /dev/stderr)
 
   local actual=$(echo $object |
-     yq -r '.[10].name' | tee /dev/stderr)
+     yq -r '.[11].name' | tee /dev/stderr)
   [ "${actual}" = "FOO" ]
 
   local actual=$(echo $object |
-      yq -r '.[10].value' | tee /dev/stderr)
+      yq -r '.[11].value' | tee /dev/stderr)
   [ "${actual}" = "bar" ]
 
   local actual=$(echo $object |
-      yq -r '.[11].name' | tee /dev/stderr)
+      yq -r '.[12].name' | tee /dev/stderr)
   [ "${actual}" = "FOOBAR" ]
 
   local actual=$(echo $object |
-      yq -r '.[11].value' | tee /dev/stderr)
+      yq -r '.[12].value' | tee /dev/stderr)
   [ "${actual}" = "foobar" ]
 }
 
@@ -383,23 +383,23 @@ load _helpers
       yq -r '.spec.template.spec.containers[0].env' | tee /dev/stderr)
 
   local actual=$(echo $object |
-      yq -r '.[10].name' | tee /dev/stderr)
+      yq -r '.[11].name' | tee /dev/stderr)
   [ "${actual}" = "ENV_FOO_0" ]
   local actual=$(echo $object |
-      yq -r '.[10].valueFrom.secretKeyRef.name' | tee /dev/stderr)
+      yq -r '.[11].valueFrom.secretKeyRef.name' | tee /dev/stderr)
   [ "${actual}" = "secret_name_0" ]
   local actual=$(echo $object |
-      yq -r '.[10].valueFrom.secretKeyRef.key' | tee /dev/stderr)
+      yq -r '.[11].valueFrom.secretKeyRef.key' | tee /dev/stderr)
   [ "${actual}" = "secret_key_0" ]
 
   local actual=$(echo $object |
-      yq -r '.[11].name' | tee /dev/stderr)
+      yq -r '.[12].name' | tee /dev/stderr)
   [ "${actual}" = "ENV_FOO_1" ]
   local actual=$(echo $object |
-      yq -r '.[11].valueFrom.secretKeyRef.name' | tee /dev/stderr)
+      yq -r '.[12].valueFrom.secretKeyRef.name' | tee /dev/stderr)
   [ "${actual}" = "secret_name_1" ]
   local actual=$(echo $object |
-      yq -r '.[11].valueFrom.secretKeyRef.key' | tee /dev/stderr)
+      yq -r '.[12].valueFrom.secretKeyRef.key' | tee /dev/stderr)
   [ "${actual}" = "secret_key_1" ]
 }
 
@@ -642,4 +642,27 @@ load _helpers
       . | tee /dev/stderr |
       yq -r '.spec.template.spec.securityContext.fsGroup' | tee /dev/stderr)
   [ "${actual}" = "2000" ]
+}
+
+#--------------------------------------------------------------------
+# OpenShift
+
+@test "server/ha-statefulset: OpenShift - runAsUser disabled" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      --show-only templates/server-statefulset.yaml  \
+      --set 'global.openshift=true' \
+      . | tee /dev/stderr |
+      yq '.spec.template.spec.securityContext.runAsUser | length > 0' | tee /dev/stderr)
+  [ "${actual}" = "false" ]
+}
+
+@test "server/ha-statefulset: OpenShift - runAsGroup disabled" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      --show-only templates/server-statefulset.yaml  \
+      --set 'global.openshift=true' \
+      . | tee /dev/stderr |
+      yq '.spec.template.spec.securityContext.runAsGroup | length > 0' | tee /dev/stderr)
+  [ "${actual}" = "false" ]
 }

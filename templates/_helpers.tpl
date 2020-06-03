@@ -319,6 +319,21 @@ Sets extra ingress annotations
 {{- end -}}
 
 {{/*
+Sets extra route annotations
+*/}}
+{{- define "vault.route.annotations" -}}
+  {{- if .Values.server.route.annotations }}
+  annotations:
+    {{- $tp := typeOf .Values.server.route.annotations }}
+    {{- if eq $tp "string" }}
+      {{- tpl .Values.server.route.annotations . | nindent 4 }}
+    {{- else }}
+      {{- toYaml .Values.server.route.annotations | nindent 4 }}
+    {{- end }}
+  {{- end }}
+{{- end -}}
+
+{{/*
 Sets extra vault server Service annotations
 */}}
 {{- define "vault.service.annotations" -}}

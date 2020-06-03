@@ -10,6 +10,8 @@ global:
   #   - name: image-pull-secret
   # TLS for end-to-end encrypted transport
   tlsDisable: true
+  # Beta Feature: If deploying to OpenShift
+  openshift: false
 
 injector:
   # True if you want to enable vault agent injection.
@@ -22,7 +24,7 @@ injector:
   # image sets the repo and tag of the vault-k8s image to use for the injector.
   image:
     repository: "hashicorp/vault-k8s"
-    tag: "0.3.0"
+    tag: "0.4.0"
     pullPolicy: IfNotPresent
 
   # agentImage sets the repo and tag of the Vault image to use for the Vault Agent
@@ -30,7 +32,7 @@ injector:
   # required.
   agentImage:
     repository: "vault"
-    tag: "1.4.0"
+    tag: "1.4.2"
 
   # Mount Path of the Vault Kubernetes Auth Method.
   authPath: "auth/kubernetes"
@@ -113,7 +115,7 @@ server:
 
   image:
     repository: "vault"
-    tag: "1.4.0"
+    tag: "1.4.2"
     # Overrides the default Image Pull Policy
     pullPolicy: IfNotPresent
 
@@ -132,6 +134,8 @@ server:
 
   # Ingress allows ingress services to be created to allow external access
   # from Kubernetes to access Vault pods.
+  # If deployment is on OpenShift, the following block is ignored.
+  # In order to expose the service, use the route section below
   ingress:
     enabled: false
     labels: {}
@@ -152,6 +156,13 @@ server:
     #    hosts:
     #      - chart-example.local
 
+  # OpenShift only - create a route to expose the service
+  # The created route will be of type passthrough
+  route:
+    enabled: false
+    labels: {}
+    annotations: {}
+    host: chart-example.local
 
   # authDelegator enables a cluster role binding to be attached to the service
   # account.  This cluster role binding can be used to setup Kubernetes auth
