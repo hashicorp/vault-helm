@@ -54,6 +54,8 @@ spec:
       {{- end }}
       volumes:
         {{ template "vault.volumes" . }}
+        - name: home
+          emptyDir: {}
       {{- if .Values.server.extraInitContainers }}
       initContainers:
         {{ toYaml .Values.server.extraInitContainers | nindent 8}}
@@ -102,11 +104,15 @@ spec:
                 fieldRef:
                   fieldPath: metadata.name
             {{- end }}
+            - name: HOME
+              value: "/home/vault"
             {{ template "vault.envs" . }}
             {{- include "vault.extraEnvironmentVars" .Values.server | nindent 12 }}
             {{- include "vault.extraSecretEnvironmentVars" .Values.server | nindent 12 }}
           volumeMounts:
           {{ template "vault.mounts" . }}
+            - name: home
+              mountPath: /home/vault
           ports:
             - containerPort: 8200
               name: {{ include "vault.scheme" . }}

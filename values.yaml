@@ -10,7 +10,7 @@ global:
   #   - name: image-pull-secret
   # TLS for end-to-end encrypted transport
   tlsDisable: true
-  # If deploying to OpenShift
+  # Beta Feature: If deploying to OpenShift
   openshift: false
 
 injector:
@@ -159,9 +159,6 @@ server:
 
   # OpenShift only - create a route to expose the service
   # The created route will be of type passthrough
-  # https://docs.openshift.com/container-platform/4.4/networking/routes/secured-routes.html#nw-ingress-creating-a-reencrypt-route-with-a-custom-certificate_secured-routes
-  # Services are secured by OpenShift "service-ca" controller
-  # https://docs.openshift.com/container-platform/4.4/authentication/certificates/service-serving-certificate.html#add-service-certificate_service-serving-certificate
   route:
     enabled: false
     labels: {}

@@ -384,19 +384,19 @@ load _helpers
       yq -r '.spec.template.spec.containers[0].env' | tee /dev/stderr)
 
   local actual=$(echo $object |
-     yq -r '.[10].name' | tee /dev/stderr)
+     yq -r '.[11].name' | tee /dev/stderr)
   [ "${actual}" = "FOO" ]
 
   local actual=$(echo $object |
-      yq -r '.[10].value' | tee /dev/stderr)
+      yq -r '.[11].value' | tee /dev/stderr)
   [ "${actual}" = "bar" ]
 
   local actual=$(echo $object |
-      yq -r '.[11].name' | tee /dev/stderr)
+      yq -r '.[12].name' | tee /dev/stderr)
   [ "${actual}" = "FOOBAR" ]
 
   local actual=$(echo $object |
-      yq -r '.[11].value' | tee /dev/stderr)
+      yq -r '.[12].value' | tee /dev/stderr)
   [ "${actual}" = "foobar" ]
 
   local object=$(helm template \
@@ -407,19 +407,19 @@ load _helpers
       yq -r '.spec.template.spec.containers[0].env' | tee /dev/stderr)
 
   local actual=$(echo $object |
-     yq -r '.[10].name' | tee /dev/stderr)
+     yq -r '.[11].name' | tee /dev/stderr)
   [ "${actual}" = "FOO" ]
 
   local actual=$(echo $object |
-      yq -r '.[10].value' | tee /dev/stderr)
+      yq -r '.[11].value' | tee /dev/stderr)
   [ "${actual}" = "bar" ]
 
   local actual=$(echo $object |
-      yq -r '.[11].name' | tee /dev/stderr)
+      yq -r '.[12].name' | tee /dev/stderr)
   [ "${actual}" = "FOOBAR" ]
 
   local actual=$(echo $object |
-      yq -r '.[11].value' | tee /dev/stderr)
+      yq -r '.[12].value' | tee /dev/stderr)
   [ "${actual}" = "foobar" ]
 }
 

@@ -2,7 +2,7 @@
 apiVersion: networking.k8s.io/v1
 kind: NetworkPolicy
 metadata:
-  name: vault
+  name: {{ template "vault.fullname" . }}
   labels:
     app.kubernetes.io/name: {{ template "vault.name" . }}
     app.kubernetes.io/instance: {{ .Release.Name }}

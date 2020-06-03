@@ -2,10 +2,10 @@
 apiVersion: networking.k8s.io/v1
 kind: NetworkPolicy
 metadata:
-  name: vault-injector
+  name: {{ template "vault.fullname" . }}-agent-injector
   labels:
-    app.kubernetes.io/name: vault-injector
-    app.kubernetes.io/instance: vault
+    app.kubernetes.io/name: {{ template "vault.name" . }}-agent-injector
+    app.kubernetes.io/instance: {{ .Release.Name }}
 spec:
   podSelector:
     matchLabels:
