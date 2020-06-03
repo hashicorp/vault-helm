@@ -89,3 +89,28 @@ load _helpers
       yq -r '.metadata.annotations["kubernetes.io/route.class"]' | tee /dev/stderr)
   [ "${actual}" = "haproxy" ]
 }
+
+@test "server/route: OpenShift - route points to main service by default" {
+  cd `chart_dir`
+
+  local actual=$(helm template \
+      --show-only templates/server-route.yaml \
+      --set 'global.openshift=true' \
+      --set 'server.route.enabled=true' \
+      . | tee /dev/stderr |
+      yq -r '.spec.to.name' | tee /dev/stderr)
+  [ "${actual}" = "RELEASE-NAME-vault" ]
+}
+
+@test "server/route: OpenShift - route points to active service by when HA" {
+  cd `chart_dir`
+
+  local actual=$(helm template \
+      --show-only templates/server-route.yaml \
+      --set 'global.openshift=true' \
+      --set 'server.route.enabled=true' \
+      --set 'server.ha.enabled=true' \
+      . | tee /dev/stderr |
+      yq -r '.spec.to.name' | tee /dev/stderr)
+  [ "${actual}" = "RELEASE-NAME-vault-active" ]
+}

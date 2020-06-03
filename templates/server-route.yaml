@@ -1,6 +1,10 @@
 {{- if .Values.global.openshift }}
 {{- if ne .mode "external" }}
 {{- if .Values.server.route.enabled -}}
+{{- $serviceName := include "vault.fullname" . -}}
+{{- if eq .mode "ha" }}
+{{- $serviceName = printf "%s-%s" $serviceName "active" -}}
+{{- end }}
 kind: Route
 apiVersion: route.openshift.io/v1
 metadata:
@@ -18,7 +22,7 @@ spec:
   host: {{ .Values.server.route.host }}
   to:
     kind: Service
-    name: {{ template "vault.fullname" . }}
+    name: {{ $serviceName }}
     weight: 100
   port:
     targetPort: 8200
