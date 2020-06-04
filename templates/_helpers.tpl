@@ -96,6 +96,7 @@ extra volumes the user may have specified (such as a secret with TLS).
           {{- else if (eq .type "secret") }}
             secretName: {{ .name }}
           {{- end }}
+            defaultMode: {{ .defaultMode | default 420 }}
   {{- end }}
 {{- end -}}
 
