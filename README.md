@@ -1,5 +1,11 @@
 # Vault Helm Chart
 
+---
+**Please note**: We take Vault's security and our users' trust very seriously. If 
+you believe you have found a security issue in Vault Helm, _please responsibly disclose_ 
+by contacting us at [security@hashicorp.com](mailto:security@hashicorp.com).
+---
+
 This repository contains the official HashiCorp Helm chart for installing
 and configuring Vault on Kubernetes. This chart supports multiple use
 cases of Vault on Kubernetes depending on the values provided.
