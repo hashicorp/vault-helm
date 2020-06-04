@@ -12,6 +12,8 @@ global:
   tlsDisable: true
   # Create PodSecurityPolicy for pods
   pspEnable: false
+  # Beta Feature: If deploying to OpenShift
+  openshift: false
 
 injector:
   # True if you want to enable vault agent injection.
@@ -24,7 +26,7 @@ injector:
   # image sets the repo and tag of the vault-k8s image to use for the injector.
   image:
     repository: "hashicorp/vault-k8s"
-    tag: "0.3.0"
+    tag: "0.4.0"
     pullPolicy: IfNotPresent
 
   # agentImage sets the repo and tag of the Vault image to use for the Vault Agent
@@ -32,7 +34,7 @@ injector:
   # required.
   agentImage:
     repository: "vault"
-    tag: "1.4.0"
+    tag: "1.4.2"
 
   # Mount Path of the Vault Kubernetes Auth Method.
   authPath: "auth/kubernetes"
@@ -115,7 +117,7 @@ server:
 
   image:
     repository: "vault"
-    tag: "1.4.0"
+    tag: "1.4.2"
     # Overrides the default Image Pull Policy
     pullPolicy: IfNotPresent
 
@@ -123,7 +125,7 @@ server:
   # See https://kubernetes.io/docs/concepts/workloads/controllers/statefulset/#update-strategies
   updateStrategyType: "OnDelete"
 
-  resources:
+  resources: {}
   # resources:
   #   requests:
   #     memory: 256Mi
@@ -134,6 +136,8 @@ server:
 
   # Ingress allows ingress services to be created to allow external access
   # from Kubernetes to access Vault pods.
+  # If deployment is on OpenShift, the following block is ignored.
+  # In order to expose the service, use the route section below
   ingress:
     enabled: false
     labels: {}
@@ -154,6 +158,13 @@ server:
     #    hosts:
     #      - chart-example.local
 
+  # OpenShift only - create a route to expose the service
+  # The created route will be of type passthrough
+  route:
+    enabled: false
+    labels: {}
+    annotations: {}
+    host: chart-example.local
 
   # authDelegator enables a cluster role binding to be attached to the service
   # account.  This cluster role binding can be used to setup Kubernetes auth
@@ -161,7 +172,12 @@ server:
   authDelegator:
     enabled: true
 
-  # extraContainers is a list of sidecar containers. Specified as a raw YAML string.
+  # extraInitContainers is a list of init containers. Specified as a YAML list.
+  # This is useful if you need to run a script to provision TLS certificates or
+  # write out configuration files in a dynamic way.
+  extraInitContainers: null
+
+  # extraContainers is a list of sidecar containers. Specified as a YAML list.
   extraContainers: null
 
   # shareProcessNamespace enables process namespace sharing between Vault and the extraContainers
@@ -184,6 +200,14 @@ server:
 
   # Used to set the sleep time during the preStop step
   preStopSleepSeconds: 5
+
+  # Used to define commands to run after the pod is ready.
+  # This can be used to automate processes such as initialization
+  # or boostrapping auth methods.
+  postStart: []
+  # - /bin/sh
+  # - -c
+  # - /vault/userconfig/myscript/run.sh
 
   # extraEnvironmentVars is a list of extra enviroment variables to set with the stateful set. These could be
   # used to include variables required for auto-unseal.
@@ -223,21 +247,20 @@ server:
   # Toleration Settings for server pods
   # This should be a multi-line string matching the Toleration array
   # in a PodSpec.
-  tolerations: {}
+  tolerations: null
 
   # nodeSelector labels for server pod assignment, formatted as a muli-line string.
   # ref: https://kubernetes.io/docs/concepts/configuration/assign-pod-node/#nodeselector
   # Example:
   # nodeSelector: |
   #   beta.kubernetes.io/arch: amd64
-  nodeSelector: {}
+  nodeSelector: null
 
   # Priority class for server pods
   priorityClassName: ""
 
   # Extra labels to attach to the server pods
-  # This should be a multi-line string mapping directly to the a map of
-  # the labels to apply to the server pods
+  # This should be a YAML map of the labels to apply to the server pods
   extraLabels: {}
 
   # Extra annotations to attach to the server pods

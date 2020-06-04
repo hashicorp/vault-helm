@@ -384,19 +384,19 @@ load _helpers
       yq -r '.spec.template.spec.containers[0].env' | tee /dev/stderr)
 
   local actual=$(echo $object |
-     yq -r '.[10].name' | tee /dev/stderr)
+     yq -r '.[11].name' | tee /dev/stderr)
   [ "${actual}" = "FOO" ]
 
   local actual=$(echo $object |
-      yq -r '.[10].value' | tee /dev/stderr)
+      yq -r '.[11].value' | tee /dev/stderr)
   [ "${actual}" = "bar" ]
 
   local actual=$(echo $object |
-      yq -r '.[11].name' | tee /dev/stderr)
+      yq -r '.[12].name' | tee /dev/stderr)
   [ "${actual}" = "FOOBAR" ]
 
   local actual=$(echo $object |
-      yq -r '.[11].value' | tee /dev/stderr)
+      yq -r '.[12].value' | tee /dev/stderr)
   [ "${actual}" = "foobar" ]
 
   local object=$(helm template \
@@ -407,19 +407,19 @@ load _helpers
       yq -r '.spec.template.spec.containers[0].env' | tee /dev/stderr)
 
   local actual=$(echo $object |
-     yq -r '.[10].name' | tee /dev/stderr)
+     yq -r '.[11].name' | tee /dev/stderr)
   [ "${actual}" = "FOO" ]
 
   local actual=$(echo $object |
-      yq -r '.[10].value' | tee /dev/stderr)
+      yq -r '.[11].value' | tee /dev/stderr)
   [ "${actual}" = "bar" ]
 
   local actual=$(echo $object |
-      yq -r '.[11].name' | tee /dev/stderr)
+      yq -r '.[12].name' | tee /dev/stderr)
   [ "${actual}" = "FOOBAR" ]
 
   local actual=$(echo $object |
-      yq -r '.[11].value' | tee /dev/stderr)
+      yq -r '.[12].value' | tee /dev/stderr)
   [ "${actual}" = "foobar" ]
 }
 
@@ -616,6 +616,74 @@ load _helpers
       . | tee /dev/stderr |
       yq -r '.spec.template.spec.nodeSelector' | tee /dev/stderr)
   [ "${actual}" = "testing" ]
+}
+
+#--------------------------------------------------------------------
+# extraInitContainers
+
+@test "server/standalone-StatefulSet: adds extra init containers" {
+  cd `chart_dir`
+
+  # Test that it defines it
+  local object=$(helm template \
+      --show-only templates/server-statefulset.yaml  \
+      --set 'server.extraInitContainers[0].image=test-image' \
+      --set 'server.extraInitContainers[0].name=test-container' \
+      --set 'server.extraInitContainers[0].ports[0].name=test-port' \
+      --set 'server.extraInitContainers[0].ports[0].containerPort=9410' \
+      --set 'server.extraInitContainers[0].ports[0].protocol=TCP' \
+      --set 'server.extraInitContainers[0].env[0].name=TEST_ENV' \
+      --set 'server.extraInitContainers[0].env[0].value=test_env_value' \
+      . | tee /dev/stderr |
+      yq -r '.spec.template.spec.initContainers[] | select(.name == "test-container")' | tee /dev/stderr)
+
+  local actual=$(echo $object |
+      yq -r '.name' | tee /dev/stderr)
+  [ "${actual}" = "test-container" ]
+
+  local actual=$(echo $object |
+      yq -r '.image' | tee /dev/stderr)
+  [ "${actual}" = "test-image" ]
+
+  local actual=$(echo $object |
+      yq -r '.ports[0].name' | tee /dev/stderr)
+  [ "${actual}" = "test-port" ]
+
+  local actual=$(echo $object |
+      yq -r '.ports[0].containerPort' | tee /dev/stderr)
+  [ "${actual}" = "9410" ]
+
+  local actual=$(echo $object |
+      yq -r '.ports[0].protocol' | tee /dev/stderr)
+  [ "${actual}" = "TCP" ]
+
+  local actual=$(echo $object |
+      yq -r '.env[0].name' | tee /dev/stderr)
+  [ "${actual}" = "TEST_ENV" ]
+
+  local actual=$(echo $object |
+      yq -r '.env[0].value' | tee /dev/stderr)
+  [ "${actual}" = "test_env_value" ]
+
+}
+
+@test "server/standalone-StatefulSet: add two extra init containers" {
+  cd `chart_dir`
+
+  # Test that it defines it
+  local object=$(helm template \
+      --show-only templates/server-statefulset.yaml  \
+      --set 'server.extraInitContainers[0].image=test-image' \
+      --set 'server.extraInitContainers[0].name=test-container' \
+      --set 'server.extraInitContainers[1].image=test-image' \
+      --set 'server.extraInitContainers[1].name=test-container-2' \
+      . | tee /dev/stderr |
+      yq -r '.spec.template.spec.initContainers' | tee /dev/stderr)
+
+  local containers_count=$(echo $object |
+      yq -r 'length' | tee /dev/stderr)
+  [ "${containers_count}" = 2 ]
+
 }
 
 #--------------------------------------------------------------------
@@ -979,4 +1047,47 @@ load _helpers
       . | tee /dev/stderr |
       yq '.spec.template.spec | .priorityClassName == "armaggeddon"' | tee /dev/stderr)
   [ "${actual}" = "true" ]
+}
+
+# postStart
+@test "server/standalone-StatefulSet: postStart disabled by default" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      --show-only templates/server-statefulset.yaml  \
+      . | tee /dev/stderr |
+      yq -r '.spec.template.spec.containers[0].lifecycle.postStart' | tee /dev/stderr)
+  [ "${actual}" = "null" ]
+}
+
+@test "server/standalone-StatefulSet: postStart can be set" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      --show-only templates/server-statefulset.yaml  \
+      --set='server.postStart={/bin/sh,-c,sleep}' \
+      . | tee /dev/stderr |
+      yq -r '.spec.template.spec.containers[0].lifecycle.postStart.exec.command[0]' | tee /dev/stderr)
+  [ "${actual}" = "/bin/sh" ]
+}
+
+#--------------------------------------------------------------------
+# OpenShift
+
+@test "server/standalone-StatefulSet: OpenShift - runAsUser disabled" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      --show-only templates/server-statefulset.yaml  \
+      --set 'global.openshift=true' \
+      . | tee /dev/stderr |
+      yq '.spec.template.spec.securityContext.runAsUser | length > 0' | tee /dev/stderr)
+  [ "${actual}" = "false" ]
+}
+
+@test "server/standalone-StatefulSet: OpenShift - runAsGroup disabled" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      --show-only templates/server-statefulset.yaml  \
+      --set 'global.openshift=true' \
+      . | tee /dev/stderr |
+      yq '.spec.template.spec.securityContext.runAsGroup | length > 0' | tee /dev/stderr)
+  [ "${actual}" = "false" ]
 }

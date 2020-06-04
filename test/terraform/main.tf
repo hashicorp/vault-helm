@@ -1,8 +1,5 @@
 provider "google" {
   project = "${var.project}"
-  region  = "us-central1"
-
-  credentials = "${file("vault-helm-dev-creds.json")}"
 }
 
 resource "random_id" "suffix" {
@@ -16,20 +13,6 @@ data "google_container_engine_versions" "main" {
 
 data "google_service_account" "gcpapi" {
   account_id = "${var.gcp_service_account}"
-}
-
-resource "google_kms_key_ring" "keyring" {
-  name     = "vault-helm-unseal-kr"
-  location = "global"
-}
-
-resource "google_kms_crypto_key" "vault-helm-unseal-key" {
-  name            = "vault-helm-unseal-key"
-  key_ring        = "${google_kms_key_ring.keyring.self_link}"
-
-  lifecycle {
-    prevent_destroy = true
-  }
 }
 
 resource "google_container_cluster" "cluster" {
