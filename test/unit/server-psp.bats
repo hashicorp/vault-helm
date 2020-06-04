@@ -31,7 +31,7 @@ load _helpers
   local actual=$(helm template \
       --show-only templates/server-psp.yaml \
       --set 'server.dev.enabled=true' \
-      --set 'global.pspEnable=true' \
+      --set 'global.psp.enable=true' \
       . | tee /dev/stderr |
       yq 'length > 0' | tee /dev/stderr)
   [ "${actual}" = "true" ]
@@ -39,7 +39,7 @@ load _helpers
   local actual=$(helm template \
       --show-only templates/server-psp.yaml \
       --set 'server.ha.enabled=true' \
-      --set 'global.pspEnable=true' \
+      --set 'global.psp.enable=true' \
       . | tee /dev/stderr |
       yq 'length > 0' | tee /dev/stderr)
   [ "${actual}" = "true" ]
@@ -47,11 +47,39 @@ load _helpers
   local actual=$(helm template \
       --show-only templates/server-psp.yaml \
       --set 'server.standalone.enabled=true' \
-      --set 'global.pspEnable=true' \
+      --set 'global.psp.enable=true' \
       . | tee /dev/stderr |
       yq 'length > 0' | tee /dev/stderr)
   [ "${actual}" = "true" ]
 }
+
+@test "server/PodSecurityPolicy: PodSecurityPolicy annotations are templated correctly" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      --show-only templates/server-psp.yaml \
+      --set 'server.dev.enabled=true' \
+      --set 'global.psp.enable=true' \
+      . | tee /dev/stderr |
+      yq '.metadata.annotations | length == 4' | tee /dev/stderr)
+  [ "${actual}" = "true" ]
+
+  local actual=$(helm template \
+      --show-only templates/server-psp.yaml \
+      --set 'server.ha.enabled=true' \
+      --set 'global.psp.enable=true' \
+      . | tee /dev/stderr |
+      yq '.metadata.annotations | length == 4' | tee /dev/stderr)
+  [ "${actual}" = "true" ]
+
+  local actual=$(helm template \
+      --show-only templates/server-psp.yaml \
+      --set 'server.standalone.enabled=true' \
+      --set 'global.psp.enable=true' \
+      . | tee /dev/stderr |
+      yq '.metadata.annotations | length == 4' | tee /dev/stderr)
+  [ "${actual}" = "true" ]
+}
+
 
 @test "server/PodSecurityPolicy: disable with global.enabled false" {
   cd `chart_dir`
@@ -59,7 +87,7 @@ load _helpers
       --show-only templates/server-psp.yaml  \
       --set 'server.dev.enabled=true' \
       --set 'global.enabled=false' \
-      --set 'global.pspEnable=true' \
+      --set 'global.psp.enable=true' \
       . || echo "---") | tee /dev/stderr |
       yq 'length > 0' | tee /dev/stderr)
   [ "${actual}" = "false" ]
@@ -68,7 +96,7 @@ load _helpers
       --show-only templates/server-psp.yaml  \
       --set 'server.ha.enabled=true' \
       --set 'global.enabled=false' \
-      --set 'global.pspEnable=true' \
+      --set 'global.psp.enable=true' \
       . || echo "---") | tee /dev/stderr |
       yq 'length > 0' | tee /dev/stderr)
   [ "${actual}" = "false" ]
@@ -77,18 +105,18 @@ load _helpers
       --show-only templates/server-psp.yaml  \
       --set 'server.standalone.enabled=true' \
       --set 'global.enabled=false' \
-      --set 'global.pspEnable=true' \
+      --set 'global.psp.enable=true' \
       . || echo "---") | tee /dev/stderr |
       yq 'length > 0' | tee /dev/stderr)
   [ "${actual}" = "false" ]
 }
 
-@test "server/PodSecurityPolicy: disable with global.pspEnable false" {
+@test "server/PodSecurityPolicy: disable with global.psp.enable false" {
   cd `chart_dir`
   local actual=$( (helm template \
       --show-only templates/server-psp.yaml  \
       --set 'server.dev.enabled=true' \
-      --set 'global.pspEnable=false' \
+      --set 'global.psp.enable=false' \
       . || echo "---") | tee /dev/stderr |
       yq 'length > 0' | tee /dev/stderr)
   [ "${actual}" = "false" ]
@@ -96,7 +124,7 @@ load _helpers
   local actual=$( (helm template \
       --show-only templates/server-psp.yaml  \
       --set 'server.ha.enabled=true' \
-      --set 'global.pspEnable=false' \
+      --set 'global.psp.enable=false' \
       . || echo "---") | tee /dev/stderr |
       yq 'length > 0' | tee /dev/stderr)
   [ "${actual}" = "false" ]
@@ -104,19 +132,19 @@ load _helpers
   local actual=$( (helm template \
       --show-only templates/server-psp.yaml  \
       --set 'server.standalone.enabled=true' \
-      --set 'global.pspEnable=false' \
+      --set 'global.psp.enable=false' \
       . || echo "---") | tee /dev/stderr |
       yq 'length > 0' | tee /dev/stderr)
   [ "${actual}" = "false" ]
 }
 
-@test "server/PodSecurityPolicy: disable with global.enabled false global.pspEnable.enabled false" {
+@test "server/PodSecurityPolicy: disable with global.enabled false global.psp.enable.enabled false" {
   cd `chart_dir`
   local actual=$( (helm template \
       --show-only templates/server-psp.yaml  \
       --set 'server.dev.enabled=true' \
       --set 'global.enabled=false' \
-      --set 'global.pspEnable=true' \
+      --set 'global.psp.enable=true' \
       . || echo "---") | tee /dev/stderr |
       yq 'length > 0' | tee /dev/stderr)
   [ "${actual}" = "false" ]
@@ -125,7 +153,7 @@ load _helpers
       --show-only templates/server-psp.yaml  \
       --set 'server.ha.enabled=true' \
       --set 'global.enabled=false' \
-      --set 'global.pspEnable=true' \
+      --set 'global.psp.enable=true' \
       . || echo "---") | tee /dev/stderr |
       yq 'length > 0' | tee /dev/stderr)
   [ "${actual}" = "false" ]
@@ -134,7 +162,7 @@ load _helpers
       --show-only templates/server-psp.yaml  \
       --set 'server.standalone.enabled=true' \
       --set 'global.enabled=false' \
-      --set 'global.pspEnable=true' \
+      --set 'global.psp.enable=true' \
       . || echo "---") | tee /dev/stderr |
       yq 'length > 0' | tee /dev/stderr)
   [ "${actual}" = "false" ]
@@ -145,7 +173,7 @@ load _helpers
   local actual=$(helm template \
       --show-only templates/server-psp.yaml \
       --set 'server.dev.enabled=true' \
-      --set 'global.pspEnable=true' \
+      --set 'global.psp.enable=true' \
       . | tee /dev/stderr |
       yq '.spec.volumes | contains(["persistentVolumeClaim"])' | tee /dev/stderr)
   [ "${actual}" = "true" ]
@@ -153,7 +181,7 @@ load _helpers
   local actual=$(helm template \
       --show-only templates/server-psp.yaml \
       --set 'server.ha.enabled=true' \
-      --set 'global.pspEnable=true' \
+      --set 'global.psp.enable=true' \
       . | tee /dev/stderr |
       yq '.spec.volumes | contains(["persistentVolumeClaim"])' | tee /dev/stderr)
   [ "${actual}" = "true" ]
@@ -161,7 +189,7 @@ load _helpers
   local actual=$(helm template \
       --show-only templates/server-psp.yaml \
       --set 'server.standalone.enabled=true' \
-      --set 'global.pspEnable=true' \
+      --set 'global.psp.enable=true' \
       . | tee /dev/stderr |
       yq '.spec.volumes | contains(["persistentVolumeClaim"])' | tee /dev/stderr)
   [ "${actual}" = "true" ]
@@ -172,7 +200,7 @@ load _helpers
   local actual=$(helm template \
       --show-only templates/server-psp.yaml \
       --set 'server.dev.enabled=true' \
-      --set 'global.pspEnable=true' \
+      --set 'global.psp.enable=true' \
       --set 'server.dataStorage.enabled=true' \
       . | tee /dev/stderr |
       yq '.spec.volumes | contains(["persistentVolumeClaim"])' | tee /dev/stderr)
@@ -181,7 +209,7 @@ load _helpers
   local actual=$(helm template \
       --show-only templates/server-psp.yaml \
       --set 'server.ha.enabled=true' \
-      --set 'global.pspEnable=true' \
+      --set 'global.psp.enable=true' \
       --set 'server.dataStorage.enabled=true' \
       . | tee /dev/stderr |
       yq '.spec.volumes | contains(["persistentVolumeClaim"])' | tee /dev/stderr)
@@ -190,7 +218,7 @@ load _helpers
   local actual=$(helm template \
       --show-only templates/server-psp.yaml \
       --set 'server.standalone.enabled=true' \
-      --set 'global.pspEnable=true' \
+      --set 'global.psp.enable=true' \
       --set 'server.dataStorage.enabled=true' \
       . | tee /dev/stderr |
       yq '.spec.volumes | contains(["persistentVolumeClaim"])' | tee /dev/stderr)
@@ -202,7 +230,7 @@ load _helpers
   local actual=$(helm template \
       --show-only templates/server-psp.yaml \
       --set 'server.dev.enabled=true' \
-      --set 'global.pspEnable=true' \
+      --set 'global.psp.enable=true' \
       --set 'server.dataStorage.enabled=false' \
       . | tee /dev/stderr |
       yq '.spec.volumes | contains(["persistentVolumeClaim"])' | tee /dev/stderr)
@@ -211,7 +239,7 @@ load _helpers
   local actual=$(helm template \
       --show-only templates/server-psp.yaml \
       --set 'server.ha.enabled=true' \
-      --set 'global.pspEnable=true' \
+      --set 'global.psp.enable=true' \
       --set 'server.dataStorage.enabled=false' \
       . | tee /dev/stderr |
       yq '.spec.volumes | contains(["persistentVolumeClaim"])' | tee /dev/stderr)
@@ -220,7 +248,7 @@ load _helpers
   local actual=$(helm template \
       --show-only templates/server-psp.yaml \
       --set 'server.standalone.enabled=true' \
-      --set 'global.pspEnable=true' \
+      --set 'global.psp.enable=true' \
       --set 'server.dataStorage.enabled=false' \
       . | tee /dev/stderr |
       yq '.spec.volumes | contains(["persistentVolumeClaim"])' | tee /dev/stderr)

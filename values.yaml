@@ -10,10 +10,18 @@ global:
   #   - name: image-pull-secret
   # TLS for end-to-end encrypted transport
   tlsDisable: true
-  # Create PodSecurityPolicy for pods
-  pspEnable: false
   # Beta Feature: If deploying to OpenShift
   openshift: false
+  # Create PodSecurityPolicy for pods
+  psp:
+    enable: false
+    # Annotation for PodSecurityPolicy.
+    # This is a multi-line templated string map
+    annotations: |
+      seccomp.security.alpha.kubernetes.io/allowedProfileNames: docker/default,runtime/default
+      apparmor.security.beta.kubernetes.io/allowedProfileNames: runtime/default
+      seccomp.security.alpha.kubernetes.io/defaultProfileName:  runtime/default
+      apparmor.security.beta.kubernetes.io/defaultProfileName:  runtime/default
 
 injector:
   # True if you want to enable vault agent injection.

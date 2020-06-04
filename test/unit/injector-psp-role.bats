@@ -11,12 +11,12 @@ load _helpers
   [ "${actual}" = "false" ]
 }
 
-@test "injector/PodSecurityPolicy-Role: enable with injector.enabled and global.pspEnable" {
+@test "injector/PodSecurityPolicy-Role: enable with injector.enabled and global.psp.enable" {
   cd `chart_dir`
   local actual=$(helm template \
       --show-only templates/injector-psp-role.yaml  \
       --set 'injector.enabled=true' \
-      --set 'global.pspEnable=true' \
+      --set 'global.psp.enable=true' \
       . | tee /dev/stderr |
       yq 'length > 0' | tee /dev/stderr)
   [ "${actual}" = "true" ]
@@ -28,7 +28,7 @@ load _helpers
       --show-only templates/injector-psp-role.yaml  \
       --set 'global.enabled=false' \
       --set 'injector.enabled=true' \
-      --set 'global.pspEnable=true' \
+      --set 'global.psp.enable=true' \
       . || echo "---") | tee /dev/stderr |
       yq 'length > 0' | tee /dev/stderr)
   [ "${actual}" = "false" ]
