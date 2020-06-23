@@ -6,7 +6,7 @@ load _helpers
   cd `chart_dir`
 
   local actual=$(helm template \
-      -x templates/server-serviceaccount.yaml  \
+      --show-only templates/server-serviceaccount.yaml  \
       --set 'server.dev.enabled=true' \
       --set 'server.serviceAccount.enabled=false' \
       . | tee /dev/stderr |
@@ -14,7 +14,7 @@ load _helpers
   [ "${actual}" = "true" ]
 
   local actual=$(helm template \
-      -x templates/server-serviceaccount.yaml  \
+      --show-only templates/server-serviceaccount.yaml  \
       --set 'server.dev.enabled=true' \
       --set 'server.serviceAccount.name=user-defined-ksa' \
       . | tee /dev/stderr |
@@ -22,14 +22,14 @@ load _helpers
   [ "${actual}" = "user-defined-ksa" ]
 
   local actual=$(helm template \
-      -x templates/server-serviceaccount.yaml  \
+      --show-only templates/server-serviceaccount.yaml  \
       --set 'server.dev.enabled=true' \
       . | tee /dev/stderr |
       yq -r '.metadata.name' | tee /dev/stderr)
   [ "${actual}" = "release-name-vault" ]
 
   local actual=$(helm template \
-      -x templates/server-serviceaccount.yaml  \
+      --show-only templates/server-serviceaccount.yaml  \
       --set 'server.ha.enabled=true' \
       --set 'server.serviceAccount.annotations.iam\.gke\.io/gcp-service-account=user-defined-gsa@my-project.iam.gserviceaccount.com' \
       . | tee /dev/stderr |
