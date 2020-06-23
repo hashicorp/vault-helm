@@ -7,8 +7,7 @@ metadata:
     app.kubernetes.io/name: {{ include "vault.name" . }}
     app.kubernetes.io/instance: {{ .Release.Name }}
     app.kubernetes.io/managed-by: {{ .Release.Service }}
-  annotations:
-    {{ tpl .Values.global.psp.annotations . | nindent 4 | trim }}
+{{- template "vault.psp.annotations" . }}
 spec:
   privileged: false
   # Required to prevent escalations to root.

@@ -44,3 +44,27 @@ load _helpers
       yq '.metadata.annotations | length == 4' | tee /dev/stderr)
   [ "${actual}" = "true" ]
 }
+
+@test "injector/PodSecurityPolicy: annotations are added - string" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      --show-only templates/injector-psp.yaml  \
+      --set 'injector.enabled=true' \
+      --set 'global.psp.enable=true' \
+      --set 'global.psp.annotations=vault-is: amazing' \
+      . | tee /dev/stderr |
+      yq -r '.metadata.annotations["vault-is"]' | tee /dev/stderr)
+  [ "${actual}" = "amazing" ]
+}
+
+@test "injector/PodSecurityPolicy: annotations are added - object" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      --show-only templates/injector-psp.yaml  \
+      --set 'injector.enabled=true' \
+      --set 'global.psp.enable=true' \
+      --set 'global.psp.annotations.vault-is=amazing' \
+      . | tee /dev/stderr |
+      yq -r '.metadata.annotations["vault-is"]' | tee /dev/stderr)
+  [ "${actual}" = "amazing" ]
+}

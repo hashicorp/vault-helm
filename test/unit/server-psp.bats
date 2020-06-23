@@ -80,6 +80,65 @@ load _helpers
   [ "${actual}" = "true" ]
 }
 
+@test "server/PodSecurityPolicy: annotations are added - string" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      --show-only templates/server-psp.yaml  \
+      --set 'server.dev.enabled=true' \
+      --set 'global.psp.enable=true' \
+      --set 'global.psp.annotations=vault-is: amazing' \
+      . | tee /dev/stderr |
+      yq -r '.metadata.annotations["vault-is"]' | tee /dev/stderr)
+  [ "${actual}" = "amazing" ]
+
+  local actual=$(helm template \
+      --show-only templates/server-psp.yaml  \
+      --set 'server.ha.enabled=true' \
+      --set 'global.psp.enable=true' \
+      --set 'global.psp.annotations=vault-is: amazing' \
+      . | tee /dev/stderr |
+      yq -r '.metadata.annotations["vault-is"]' | tee /dev/stderr)
+  [ "${actual}" = "amazing" ]
+
+  local actual=$(helm template \
+      --show-only templates/server-psp.yaml  \
+      --set 'server.standalone.enabled=true' \
+      --set 'global.psp.enable=true' \
+      --set 'global.psp.annotations=vault-is: amazing' \
+      . | tee /dev/stderr |
+      yq -r '.metadata.annotations["vault-is"]' | tee /dev/stderr)
+  [ "${actual}" = "amazing" ]
+}
+
+@test "server/PodSecurityPolicy: annotations are added - object" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      --show-only templates/server-psp.yaml  \
+      --set 'server.dev.enabled=true' \
+      --set 'global.psp.enable=true' \
+      --set 'global.psp.annotations.vault-is=amazing' \
+      . | tee /dev/stderr |
+      yq -r '.metadata.annotations["vault-is"]' | tee /dev/stderr)
+  [ "${actual}" = "amazing" ]
+
+  local actual=$(helm template \
+      --show-only templates/server-psp.yaml  \
+      --set 'server.ha.enabled=true' \
+      --set 'global.psp.enable=true' \
+      --set 'global.psp.annotations.vault-is=amazing' \
+      . | tee /dev/stderr |
+      yq -r '.metadata.annotations["vault-is"]' | tee /dev/stderr)
+  [ "${actual}" = "amazing" ]
+
+  local actual=$(helm template \
+      --show-only templates/server-psp.yaml  \
+      --set 'server.standalone.enabled=true' \
+      --set 'global.psp.enable=true' \
+      --set 'global.psp.annotations.vault-is=amazing' \
+      . | tee /dev/stderr |
+      yq -r '.metadata.annotations["vault-is"]' | tee /dev/stderr)
+  [ "${actual}" = "amazing" ]
+}
 
 @test "server/PodSecurityPolicy: disable with global.enabled false" {
   cd `chart_dir`
