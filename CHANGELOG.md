@@ -3,6 +3,7 @@
 Features:
 
 Improvements:
+* Added `defaultMode` configurable to `extraVolumes`[GH-321](https://github.com/hashicorp/vault-helm/pull/321)
 
 Bugs:
 
