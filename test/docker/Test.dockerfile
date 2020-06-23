@@ -19,7 +19,6 @@ RUN apk update && apk add --no-cache --virtual .build-deps \
     tar \
     bash \
     openssl \
-    python \
     py-pip \
     git \
     make \
