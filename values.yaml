@@ -478,3 +478,14 @@ ui:
   # This can either be YAML or a YAML-formatted multi-line templated string map
   # of the annotations to apply to the ui service
   annotations: {}
+
+managedCertificate:
+  # True if you want to enabled ManagedCertificate
+  # In order to use the ManagedCertificate you will need to
+  #   annotate a service that supports it (gcp-ingress for example)
+  # Also, make sure the domains actually point to the exposed IP
+  #   otherwise the certificate won't be validated
+  enabled: false
+  # A list of domains the certificate will be generated for
+  domains: []
+  #   - my-domain.com

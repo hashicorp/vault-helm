@@ -1,0 +1,22 @@
+{{- if .Values.managedCertificate.enabled }}
+apiVersion: networking.gke.io/v1beta2
+kind: ManagedCertificate
+metadata:
+  name: {{ template "vault.fullname" . }}-cert
+  namespace: {{ .Release.Namespace }}
+  labels:
+    helm.sh/chart: {{ include "vault.chart" . }}
+    app.kubernetes.io/name: {{ include "vault.name" . }}-ui
+    app.kubernetes.io/instance: {{ .Release.Name }}
+    app.kubernetes.io/managed-by: {{ .Release.Service }}
+  {{- template "vault.ui.annotations" . }}
+spec:
+  selector:
+    app.kubernetes.io/name: {{ include "vault.name" . }}
+    app.kubernetes.io/instance: {{ .Release.Name }}
+    component: server
+  domains:
+      {{- range $domain := .Values.managedCertificate.domains }}
+      - {{ $domain }}
+      {{- end }}
+{{- end }}
