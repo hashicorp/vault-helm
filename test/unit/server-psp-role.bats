@@ -109,33 +109,3 @@ load _helpers
       yq 'length > 0' | tee /dev/stderr)
   [ "${actual}" = "false" ]
 }
-
-@test "server/PSP-Role: disable with global.enabled false global.psp.enable.enabled false" {
-  cd `chart_dir`
-  local actual=$( (helm template \
-      --show-only templates/server-psp-role.yaml  \
-      --set 'server.dev.enabled=true' \
-      --set 'global.enabled=false' \
-      --set 'global.psp.enable=true' \
-      . || echo "---") | tee /dev/stderr |
-      yq 'length > 0' | tee /dev/stderr)
-  [ "${actual}" = "false" ]
-
-  local actual=$(( helm template \
-      --show-only templates/server-psp-role.yaml  \
-      --set 'server.ha.enabled=true' \
-      --set 'global.enabled=false' \
-      --set 'global.psp.enable=true' \
-      . || echo "---") | tee /dev/stderr |
-      yq 'length > 0' | tee /dev/stderr)
-  [ "${actual}" = "false" ]
-
-  local actual=$((helm template \
-      --show-only templates/server-psp-role.yaml  \
-      --set 'server.standalone.enabled=true' \
-      --set 'global.enabled=false' \
-      --set 'global.psp.enable=true' \
-      . || echo "---") | tee /dev/stderr |
-      yq 'length > 0' | tee /dev/stderr)
-  [ "${actual}" = "false" ]
-}

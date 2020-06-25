@@ -197,36 +197,6 @@ load _helpers
   [ "${actual}" = "false" ]
 }
 
-@test "server/PodSecurityPolicy: disable with global.enabled false global.psp.enable.enabled false" {
-  cd `chart_dir`
-  local actual=$( (helm template \
-      --show-only templates/server-psp.yaml  \
-      --set 'server.dev.enabled=true' \
-      --set 'global.enabled=false' \
-      --set 'global.psp.enable=true' \
-      . || echo "---") | tee /dev/stderr |
-      yq 'length > 0' | tee /dev/stderr)
-  [ "${actual}" = "false" ]
-
-  local actual=$( (helm template \
-      --show-only templates/server-psp.yaml  \
-      --set 'server.ha.enabled=true' \
-      --set 'global.enabled=false' \
-      --set 'global.psp.enable=true' \
-      . || echo "---") | tee /dev/stderr |
-      yq 'length > 0' | tee /dev/stderr)
-  [ "${actual}" = "false" ]
-
-  local actual=$( (helm template \
-      --show-only templates/server-psp.yaml  \
-      --set 'server.standalone.enabled=true' \
-      --set 'global.enabled=false' \
-      --set 'global.psp.enable=true' \
-      . || echo "---") | tee /dev/stderr |
-      yq 'length > 0' | tee /dev/stderr)
-  [ "${actual}" = "false" ]
-}
-
 @test "server/PodSecurityPolicy: PodSecurityPolicy allows PVC by default" {
   cd `chart_dir`
   local actual=$(helm template \
