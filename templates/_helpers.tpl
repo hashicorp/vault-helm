@@ -349,6 +349,21 @@ Sets extra vault server Service annotations
 {{- end -}}
 
 {{/*
+Sets PodSecurityPolicy annotations
+*/}}
+{{- define "vault.psp.annotations" -}}
+  {{- if .Values.global.psp.annotations }}
+  annotations:
+    {{- $tp := typeOf .Values.global.psp.annotations }}
+    {{- if eq $tp "string" }}
+      {{- tpl .Values.global.psp.annotations . | nindent 4 }}
+    {{- else }}
+      {{- toYaml .Values.global.psp.annotations | nindent 4 }}
+    {{- end }}
+  {{- end }}
+{{- end -}}
+
+{{/*
 Set's the container resources if the user has set any.
 */}}
 {{- define "vault.resources" -}}

@@ -12,6 +12,16 @@ global:
   tlsDisable: true
   # Beta Feature: If deploying to OpenShift
   openshift: false
+  # Create PodSecurityPolicy for pods
+  psp:
+    enable: false
+    # Annotation for PodSecurityPolicy.
+    # This is a multi-line templated string map, and can also be set as YAML.
+    annotations: |
+      seccomp.security.alpha.kubernetes.io/allowedProfileNames: docker/default,runtime/default
+      apparmor.security.beta.kubernetes.io/allowedProfileNames: runtime/default
+      seccomp.security.alpha.kubernetes.io/defaultProfileName:  runtime/default
+      apparmor.security.beta.kubernetes.io/defaultProfileName:  runtime/default
 
 injector:
   # True if you want to enable vault agent injection.
