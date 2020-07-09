@@ -192,6 +192,9 @@ server:
   # This is useful if Vault must be signaled, e.g. to send a SIGHUP for log rotation
   shareProcessNamespace: false
 
+  # preCommands is a multi-line string of commands to run before the vault entry point.
+  preCommands: {}
+
   # extraArgs is a string containing additional Vault server arguments.
   extraArgs: ""
 
