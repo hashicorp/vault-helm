@@ -42,7 +42,7 @@ load _helpers
   [ "${actual}" = "\"foo\"" ]
 }
 
-@test "injector/MutatingWebhookConfiguration: caBundle is empty" {
+@test "injector/MutatingWebhookConfiguration: caBundle is empty string" {
   cd `chart_dir`
   local actual=$(helm template \
       --show-only templates/injector-mutating-webhook.yaml  \
@@ -50,7 +50,7 @@ load _helpers
       --namespace foo \
       . | tee /dev/stderr |
       yq '.webhooks[0].clientConfig.caBundle' | tee /dev/stderr)
-  [ "${actual}" = "null" ]
+  [ "${actual}" = "\"\"" ]
 }
 
 @test "injector/MutatingWebhookConfiguration: namespaceSelector empty by default" {
