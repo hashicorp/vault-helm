@@ -8,6 +8,7 @@ Improvements:
 
 Bugs:
 * Fix python dependency in test image [GH-337](https://github.com/hashicorp/vault-helm/pull/337)
+* Fix caBundle not being quoted causing validation issues with Helm 3 [GH-352](https://github.com/hashicorp/vault-helm/pull/352)
 
 ## 0.6.0 (June 3rd, 2020)
 
