@@ -98,6 +98,9 @@ extra volumes the user may have specified (such as a secret with TLS).
           {{- end }}
             defaultMode: {{ .defaultMode | default 420 }}
   {{- end }}
+  {{- if .Values.server.volumes }}
+    {{- toYaml .Values.server.volumes | nindent 8}}
+  {{- end }}
 {{- end -}}
 
 {{/*
@@ -159,6 +162,9 @@ based on the mode configured.
             - name: userconfig-{{ .name }}
               readOnly: true
               mountPath: {{ .path | default "/vault/userconfig" }}/{{ .name }}
+  {{- end }}
+  {{- if .Values.server.volumeMounts }}
+    {{- toYaml .Values.server.volumeMounts | nindent 12}}
   {{- end }}
 {{- end -}}
 

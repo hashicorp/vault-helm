@@ -225,7 +225,7 @@ load _helpers
 #--------------------------------------------------------------------
 # extraVolumes
 
-@test "server/standalone-StatefulSet: adds extra volume" {
+@test "server/standalone-StatefulSet: server.extraVolumes adds extra volume" {
   cd `chart_dir`
 
   # Test that it defines it
@@ -293,7 +293,7 @@ load _helpers
   [ "${actual}" = "/vault/userconfig/foo" ]
 }
 
-@test "server/standalone-StatefulSet: adds extra secret volume" {
+@test "server/standalone-StatefulSet: server.extraVolumes adds extra secret volume" {
   cd `chart_dir`
 
   # Test that it defines it
@@ -368,6 +368,49 @@ load _helpers
       --set 'server.auditStorage.enabled=true' \
       . | tee /dev/stderr |
       yq -r '.spec.template.spec.containers[0].volumeMounts[] | select(.name == "audit")' | tee /dev/stderr)
+}
+
+#--------------------------------------------------------------------
+# volumes
+
+@test "server/standalone-StatefulSet: server.volumes adds volume" {
+  cd `chart_dir`
+
+  # Test that it defines it
+  local object=$(helm template \
+      --show-only templates/server-statefulset.yaml  \
+      --set 'server.volumes[0].name=plugins' \
+      --set 'server.volumes[0].emptyDir=\{\}' \
+      . | tee /dev/stderr |
+      yq -r '.spec.template.spec.volumes[] | select(.name == "plugins")' | tee /dev/stderr)
+
+  local actual=$(echo $object |
+      yq -r '.emptyDir' | tee /dev/stderr)
+  [ "${actual}" = "{}" ]
+}
+
+#--------------------------------------------------------------------
+# volumeMounts
+
+@test "server/standalone-StatefulSet: server.volumeMounts adds volumeMount" {
+  cd `chart_dir`
+
+  # Test that it defines it
+  local object=$(helm template \
+      --show-only templates/server-statefulset.yaml  \
+      --set 'server.volumeMounts[0].name=plugins' \
+      --set 'server.volumeMounts[0].mountPath=/usr/local/libexec/vault' \
+      --set 'server.volumeMounts[0].readOnly=true' \
+      . | tee /dev/stderr |
+      yq -r '.spec.template.spec.containers[0].volumeMounts[] | select(.name == "plugins")' | tee /dev/stderr)
+
+  local actual=$(echo $object |
+      yq -r '.mountPath' | tee /dev/stderr)
+  [ "${actual}" = "/usr/local/libexec/vault" ]
+
+  local actual=$(echo $object |
+      yq -r '.readOnly' | tee /dev/stderr)
+  [ "${actual}" = "true" ]
 }
 
 #--------------------------------------------------------------------

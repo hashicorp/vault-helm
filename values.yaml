@@ -184,6 +184,20 @@ server:
   # This is useful if you need to run a script to provision TLS certificates or
   # write out configuration files in a dynamic way.
   extraInitContainers: null
+    # # This example installs a plugin pulled from github into the /usr/local/libexec/vault/oauthapp folder,
+    # # which is defined in the volumes value.
+    # - name: oauthapp
+    #   image: "alpine"
+    #   command: [sh, -c]
+    #   args:
+    #     - cd /tmp &&
+    #       wget https://github.com/puppetlabs/vault-plugin-secrets-oauthapp/releases/download/v1.2.0/vault-plugin-secrets-oauthapp-v1.2.0-linux-amd64.tar.xz -O oauthapp.xz &&
+    #       tar -xf oauthapp.xz &&
+    #       mv vault-plugin-secrets-oauthapp-v1.2.0-linux-amd64 /usr/local/libexec/vault/oauthapp &&
+    #       chmod +x /usr/local/libexec/vault/oauthapp
+    #   volumeMounts:
+    #     - name: plugins
+    #       mountPath: /usr/local/libexec/vault
 
   # extraContainers is a list of sidecar containers. Specified as a YAML list.
   extraContainers: null
@@ -238,6 +252,22 @@ server:
     # - type: secret (or "configMap")
     #   name: my-secret
     #   path: null # default is `/vault/userconfig`
+
+  # volumes is a list of volumes made available to all containers. These are rendered
+  # via toYaml rather than pre-processed like the extraVolumes value.
+  # The purpose is to make it easy to share volumes between containers.
+  volumes: null
+  #   - name: plugins
+  #     emptyDir: {}
+
+  # volumeMounts is a list of volumeMounts for the main server container. These are rendered
+  # via toYaml rather than pre-processed like the extraVolumes value.
+  # The purpose is to make it easy to share volumes between containers.
+  volumeMounts: null
+  #   - mountPath: /usr/local/libexec/vault
+  #     name: plugins
+  #     readOnly: true
+
 
   # Affinity Settings
   # Commenting out or setting as empty the affinity variable, will allow
