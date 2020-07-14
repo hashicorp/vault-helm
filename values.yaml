@@ -387,6 +387,11 @@ server:
     enabled: false
     replicas: 3
 
+    # Set the api_addr configuration for Vault HA
+    # See https://www.vaultproject.io/docs/configuration#api_addr
+    # If set to null, this will be set to the Pod IP Address
+    apiAddr: null
+
     # Enables Vault's integrated Raft storage.  Unlike the typical HA modes where
     # Vault's persistence is external (such as Consul), enabling Raft mode will create
     # persistent volumes for Vault to store data according to the configuration under server.dataStorage.
