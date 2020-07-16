@@ -18,7 +18,7 @@ spec:
     app.kubernetes.io/name: {{ include "vault.name" . }}
     app.kubernetes.io/instance: {{ .Release.Name }}
     component: server
-    {{- if .Values.ui.activeVaultPodOnly }}
+    {{- if and (.Values.ui.activeVaultPodOnly) (eq .mode "ha") }}
     vault-active: "true"
     {{- end }}
   publishNotReadyAddresses: {{ .Values.ui.publishNotReadyAddresses }}

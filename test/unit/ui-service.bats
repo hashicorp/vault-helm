@@ -280,12 +280,22 @@ load _helpers
   [ "${actual}" = "null" ]
 }
 
-@test "ui/Service: active pod only selector can be set" {
+@test "ui/Service: active pod only selector can be set on HA" {
   cd `chart_dir`
   local actual=$(helm template \
       --show-only templates/ui-service.yaml  \
       --set 'ui.enabled=true' \
       --set 'ui.activeVaultPodOnly=true' \
+      --set 'server.dev.enabled=true' \
+      . | tee /dev/stderr |
+      yq -r '.spec.selector["vault-active"]' | tee /dev/stderr)
+  [ "${actual}" = 'null' ]
+
+  local actual=$(helm template \
+      --show-only templates/ui-service.yaml  \
+      --set 'ui.enabled=true' \
+      --set 'ui.activeVaultPodOnly=true' \
+      --set 'server.ha.enabled=true' \
       . | tee /dev/stderr |
       yq -r '.spec.selector["vault-active"]' | tee /dev/stderr)
   [ "${actual}" = 'true' ]
