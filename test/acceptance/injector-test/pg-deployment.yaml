@@ -41,7 +41,7 @@ spec:
             - name: POSTGRES_PASSWORD
               value: password
           volumeMounts:
-            - mountPath: "/var/lib/postgresql/data"
+            - mountPath: "/var/lib/postgresql"
               name: "pgdata"
             - mountPath: "/docker-entrypoint-initdb.d"
               name: "pgconf"

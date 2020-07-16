@@ -19,7 +19,7 @@ load _helpers
   # Volume Mounts
   local volumeCount=$(kubectl get statefulset "$(name_prefix)" --output json |
     jq -r '.spec.template.spec.containers[0].volumeMounts | length')
-  [ "${volumeCount}" == "0" ]
+  [ "${volumeCount}" == "1" ]
 
   # Service
   local service=$(kubectl get service "$(name_prefix)" --output json |

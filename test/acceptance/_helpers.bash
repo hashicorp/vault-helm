@@ -65,7 +65,7 @@ wait_for_running_consul() {
     done
 
     echo "consul clients never became ready."
-    exit 1
+    return 1
 }
 
 # wait for a pod to be ready
@@ -96,7 +96,7 @@ wait_for_running() {
     done
 
     echo "${POD_NAME} never became ready."
-    exit 1
+    return 1
 }
 
 wait_for_ready() {
@@ -126,7 +126,7 @@ wait_for_ready() {
     done
 
     echo "${POD_NAME} never became ready."
-    exit 1
+    return 1
 }
 
 wait_for_complete_job() {
@@ -155,5 +155,5 @@ wait_for_complete_job() {
     done
 
     echo "${POD_NAME} never completed."
-    exit 1
+    return 1
 }

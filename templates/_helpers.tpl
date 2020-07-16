@@ -96,6 +96,10 @@ extra volumes the user may have specified (such as a secret with TLS).
           {{- else if (eq .type "secret") }}
             secretName: {{ .name }}
           {{- end }}
+            defaultMode: {{ .defaultMode | default 420 }}
+  {{- end }}
+  {{- if .Values.server.volumes }}
+    {{- toYaml .Values.server.volumes | nindent 8}}
   {{- end }}
 {{- end -}}
 
@@ -158,6 +162,9 @@ based on the mode configured.
             - name: userconfig-{{ .name }}
               readOnly: true
               mountPath: {{ .path | default "/vault/userconfig" }}/{{ .name }}
+  {{- end }}
+  {{- if .Values.server.volumeMounts }}
+    {{- toYaml .Values.server.volumeMounts | nindent 12}}
   {{- end }}
 {{- end -}}
 
@@ -319,6 +326,21 @@ Sets extra ingress annotations
 {{- end -}}
 
 {{/*
+Sets extra route annotations
+*/}}
+{{- define "vault.route.annotations" -}}
+  {{- if .Values.server.route.annotations }}
+  annotations:
+    {{- $tp := typeOf .Values.server.route.annotations }}
+    {{- if eq $tp "string" }}
+      {{- tpl .Values.server.route.annotations . | nindent 4 }}
+    {{- else }}
+      {{- toYaml .Values.server.route.annotations | nindent 4 }}
+    {{- end }}
+  {{- end }}
+{{- end -}}
+
+{{/*
 Sets extra vault server Service annotations
 */}}
 {{- define "vault.service.annotations" -}}
@@ -328,6 +350,21 @@ Sets extra vault server Service annotations
       {{- tpl .Values.server.service.annotations . | nindent 4 }}
     {{- else }}
       {{- toYaml .Values.server.service.annotations | nindent 4 }}
+    {{- end }}
+  {{- end }}
+{{- end -}}
+
+{{/*
+Sets PodSecurityPolicy annotations
+*/}}
+{{- define "vault.psp.annotations" -}}
+  {{- if .Values.global.psp.annotations }}
+  annotations:
+    {{- $tp := typeOf .Values.global.psp.annotations }}
+    {{- if eq $tp "string" }}
+      {{- tpl .Values.global.psp.annotations . | nindent 4 }}
+    {{- else }}
+      {{- toYaml .Values.global.psp.annotations | nindent 4 }}
     {{- end }}
   {{- end }}
 {{- end -}}

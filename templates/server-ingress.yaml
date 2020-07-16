@@ -1,9 +1,17 @@
+{{- if not .Values.global.openshift }}
 {{ template "vault.mode" . }}
 {{- if ne .mode "external" }}
 {{- if .Values.server.ingress.enabled -}}
 {{- $serviceName := include "vault.fullname" . -}}
+{{- if and (eq .mode "ha" ) (and (eq (.Values.server.service.enabled | toString) "true" ) (eq (.Values.global.enabled | toString) "true")) }}
+{{- $serviceName = printf "%s-%s" $serviceName "active" -}}
+{{- end }}
 {{- $servicePort := .Values.server.service.port -}}
+{{ if .Capabilities.APIVersions.Has "networking.k8s.io/v1beta1" }}
+apiVersion: networking.k8s.io/v1beta1
+{{ else }}
 apiVersion: extensions/v1beta1
+{{ end }}
 kind: Ingress
 metadata:
   name: {{ template "vault.fullname" . }}
@@ -40,5 +48,6 @@ spec:
               servicePort: {{ $servicePort }}
         {{- end }}
   {{- end }}
+{{- end }}
 {{- end }}
 {{- end }}

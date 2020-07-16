@@ -45,13 +45,21 @@ spec:
       {{ if  .Values.server.shareProcessNamespace }}
       shareProcessNamespace: true
       {{ end }}
+      {{- if not .Values.global.openshift }}
       securityContext:
         runAsNonRoot: true
         runAsGroup: {{ .Values.server.gid | default 1000 }}
         runAsUser: {{ .Values.server.uid | default 100 }}
         fsGroup: {{ .Values.server.gid | default 1000 }}
+      {{- end }}
       volumes:
         {{ template "vault.volumes" . }}
+        - name: home
+          emptyDir: {}
+      {{- if .Values.server.extraInitContainers }}
+      initContainers:
+        {{ toYaml .Values.server.extraInitContainers | nindent 8}}
+      {{- end }}
       containers:
         - name: vault
           {{ template "vault.resources" . }}
@@ -79,7 +87,11 @@ spec:
             - name: VAULT_ADDR
               value: "{{ include "vault.scheme" . }}://127.0.0.1:8200"
             - name: VAULT_API_ADDR
+              {{- if .Values.server.ha.apiAddr }}
+              value: {{ .Values.server.ha.apiAddr }}
+              {{- else }}
               value: "{{ include "vault.scheme" . }}://$(POD_IP):8200"
+              {{- end }}
             - name: SKIP_CHOWN
               value: "true"
             - name: SKIP_SETCAP
@@ -96,11 +108,15 @@ spec:
                 fieldRef:
                   fieldPath: metadata.name
             {{- end }}
+            - name: HOME
+              value: "/home/vault"
             {{ template "vault.envs" . }}
             {{- include "vault.extraEnvironmentVars" .Values.server | nindent 12 }}
             {{- include "vault.extraSecretEnvironmentVars" .Values.server | nindent 12 }}
           volumeMounts:
           {{ template "vault.mounts" . }}
+            - name: home
+              mountPath: /home/vault
           ports:
             - containerPort: 8200
               name: {{ include "vault.scheme" . }}
@@ -155,6 +171,14 @@ spec:
                   # to this pod while it's terminating
                   "sleep {{ .Values.server.preStopSleepSeconds }} && kill -SIGTERM $(pidof vault)",
                 ]
+            {{- if .Values.server.postStart }}
+            postStart:
+              exec:
+                command:
+                {{- range (.Values.server.postStart) }}
+                - {{ . | quote }}
+                {{- end }}
+            {{- end }}
         {{- if .Values.server.extraContainers }}
           {{ toYaml .Values.server.extraContainers | nindent 8}}
         {{- end }}
