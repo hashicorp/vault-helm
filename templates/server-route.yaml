@@ -3,7 +3,7 @@
 {{- if .Values.server.route.enabled -}}
 {{- $serviceName := include "vault.fullname" . -}}
 {{- if eq .mode "ha" }}
-{{- $serviceName = printf "%s-%s" $serviceName "active" -}}
+{{- $serviceName := printf "%s-%s" $serviceName "active" -}}
 {{- end }}
 kind: Route
 apiVersion: route.openshift.io/v1
