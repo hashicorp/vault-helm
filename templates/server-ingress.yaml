@@ -4,7 +4,7 @@
 {{- if .Values.server.ingress.enabled -}}
 {{- $serviceName := include "vault.fullname" . -}}
 {{- if and (eq .mode "ha" ) (and (eq (.Values.server.service.enabled | toString) "true" ) (eq (.Values.global.enabled | toString) "true")) }}
-{{- $serviceName = printf "%s-%s" $serviceName "active" -}}
+{{- $serviceName := printf "%s-%s" $serviceName "active" -}}
 {{- end }}
 {{- $servicePort := .Values.server.service.port -}}
 {{ if .Capabilities.APIVersions.Has "networking.k8s.io/v1beta1" }}
