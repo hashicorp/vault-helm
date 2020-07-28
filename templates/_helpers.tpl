@@ -179,7 +179,7 @@ storage might be desired by the user.
       {{- if and (eq (.Values.server.dataStorage.enabled | toString) "true") (or (eq .mode "standalone") (eq (.Values.server.ha.raft.enabled | toString ) "true" )) }}
     - metadata:
         name: data
-  {{- template "vault.dataVolumeClaim.annotations" . }}
+      {{- template "vault.dataVolumeClaim.annotations" . }}
       spec:
         accessModes:
           - {{ .Values.server.dataStorage.accessMode | default "ReadWriteOnce" }}
@@ -193,7 +193,7 @@ storage might be desired by the user.
       {{- if eq (.Values.server.auditStorage.enabled | toString) "true" }}
     - metadata:
         name: audit
-  {{- template "vault.auditVolumeClaim.annotations" . }}
+      {{- template "vault.auditVolumeClaim.annotations" . }}
       spec:
         accessModes:
           - {{ .Values.server.auditStorage.accessMode | default "ReadWriteOnce" }}
