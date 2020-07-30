@@ -143,32 +143,6 @@ load _helpers
   [ "${actual}" = "false" ]
 }
 
-# This can be seen as testing just what we put into the YAML raw, but
-# this is such an important part of making everything work we verify it here.
-@test "server/Service: tolerates unready endpoints" {
-  cd `chart_dir`
-  local actual=$(helm template \
-      --show-only templates/server-service.yaml \
-      --set 'server.dev.enabled=true' \
-      . | tee /dev/stderr |
-      yq -r '.metadata.annotations["service.alpha.kubernetes.io/tolerate-unready-endpoints"]' | tee /dev/stderr)
-  [ "${actual}" = "true" ]
-
-  local actual=$(helm template \
-      --show-only templates/server-service.yaml \
-      --set 'server.ha.enabled=true' \
-      . | tee /dev/stderr |
-      yq -r '.metadata.annotations["service.alpha.kubernetes.io/tolerate-unready-endpoints"]' | tee /dev/stderr)
-  [ "${actual}" = "true" ]
-
-  local actual=$(helm template \
-      --show-only templates/server-service.yaml \
-      --set 'server.standalone.enabled=true' \
-      . | tee /dev/stderr |
-      yq -r '.metadata.annotations["service.alpha.kubernetes.io/tolerate-unready-endpoints"]' | tee /dev/stderr)
-  [ "${actual}" = "true" ]
-}
-
 @test "server/Service: generic annotations" {
   cd `chart_dir`
   local actual=$(helm template \
