@@ -5,10 +5,10 @@ CLOUDSDK_CORE_PROJECT?=vault-helm-dev-246514
 ACCEPTANCE_TESTS?=acceptance
 
 test-image:
-	@docker build --rm -t '$(TEST_IMAGE)' -f $(CURDIR)/test/docker/Test.dockerfile $(CURDIR)
+	@docker build --rm -t $(TEST_IMAGE) -f $(CURDIR)/test/docker/Test.dockerfile $(CURDIR)
 
 test-unit:
-	@docker run -it -v ${PWD}:/helm-test vault-helm-test bats /helm-test/test/unit
+	@docker run -it -v ${PWD}:/helm-test $(TEST_IMAGE) bats /helm-test/test/unit
 
 test-bats: test-unit test-acceptance
 
@@ -62,4 +62,4 @@ provision-cluster:
 destroy-cluster:
 	terraform destroy -auto-approve
 
-.PHONY: test-docker
+.PHONY: test-image test-unit test-bats test test-acceptance test-destroy test-provision acceptance provision-cluster destroy-cluster
