@@ -5,13 +5,13 @@ load _helpers
 @test "server/ServiceAccount: specify service account name" {
   cd `chart_dir`
 
-  local actual=$(helm template \
+  local actual=$( (helm template \
       --show-only templates/server-serviceaccount.yaml  \
       --set 'server.dev.enabled=true' \
       --set 'server.serviceAccount.enabled=false' \
-      . | tee /dev/stderr |
-      yq 'length == 0' | tee /dev/stderr)
-  [ "${actual}" = "true" ]
+      . || echo "---") | tee /dev/stderr |
+      yq 'length > 0' | tee /dev/stderr)
+  [ "${actual}" = "false" ]
 
   local actual=$(helm template \
       --show-only templates/server-serviceaccount.yaml  \
@@ -26,7 +26,7 @@ load _helpers
       --set 'server.dev.enabled=true' \
       . | tee /dev/stderr |
       yq -r '.metadata.name' | tee /dev/stderr)
-  [ "${actual}" = "release-name-vault" ]
+  [ "${actual}" = "RELEASE-NAME-vault" ]
 
   local actual=$(helm template \
       --show-only templates/server-serviceaccount.yaml  \
