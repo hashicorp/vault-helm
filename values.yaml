@@ -501,7 +501,7 @@ server:
     # annotations to apply to the serviceAccount.
     annotations: {}
 
-  # Definition of the statefulSet used to run Vault.
+  # Settings for the statefulSet used to run Vault.
   statefulSet:
     annotations: {}
 
