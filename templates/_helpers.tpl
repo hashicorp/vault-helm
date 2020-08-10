@@ -375,7 +375,12 @@ Sets extra statefulset annotations
 {{- define "vault.statefulSet.annotations" -}}
   {{- if .Values.server.statefulSet.annotations }}
   annotations:
-    {{- toYaml .Values.server.statefulSet.annotations | nindent 4 }}
+    {{- $tp := typeOf .Values.server.statefulSet.annotations }}
+    {{- if eq $tp "string" }}
+      {{- tpl .Values.server.statefulSet.annotations . | nindent 4 }}
+    {{- else }}
+      {{- toYaml .Values.server.statefulSet.annotations | nindent 4 }}
+    {{- end }}
   {{- end }}
 {{- end -}}
 
