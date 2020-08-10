@@ -871,6 +871,16 @@ load _helpers
   [ "${actual}" = "bar" ]
 }
 
+@test "server/standalone-StatefulSet: specify statefulSet.annotations yaml string" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      --show-only templates/server-statefulset.yaml \
+      --set 'server.statefulSet.annotations=foo: bar' \
+      . | tee /dev/stderr |
+      yq -r '.metadata.annotations.foo' | tee /dev/stderr)
+  [ "${actual}" = "bar" ]
+}
+
 #--------------------------------------------------------------------
 # Security Contexts
 @test "server/standalone-StatefulSet: uid default" {
