@@ -861,7 +861,7 @@ load _helpers
   [ "${actual}" = "null" ]
 }
 
-@test "server/standalone-StatefulSet: specify statefulSet.annotations" {
+@test "server/standalone-StatefulSet: specify statefulSet.annotations yaml" {
   cd `chart_dir`
   local actual=$(helm template \
       --show-only templates/server-statefulset.yaml \
