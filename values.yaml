@@ -501,6 +501,13 @@ server:
     # annotations to apply to the serviceAccount.
     annotations: {}
 
+  # Settings for the statefulSet used to run Vault.
+  statefulSet:
+    # Extra annotations for the statefulSet. This can either be YAML or a
+    # YAML-formatted multi-line templated string map of the annotations to apply
+    # to the statefulSet.
+    annotations: {}
+
 # Vault UI
 ui:
   # True if you want to create a Service entry for the Vault UI.
