@@ -8,6 +8,7 @@ Improvements:
 * Option to install and use PodSecurityPolicy's for vault server and injector [GH-177](https://github.com/hashicorp/vault-helm/pull/177)
 * `VAULT_API_ADDR` is now configurable [GH-290](https://github.com/hashicorp/vault-helm/pull/290)
 * Removed deprecated tolerate unready endpoint annotations [GH-363](https://github.com/hashicorp/vault-helm/pull/363)
+* Add an option to set annotations on the StatefulSet [GH-199](https://github.com/hashicorp/vault-helm/pull/199)
 
 Bugs:
 * Fix python dependency in test image [GH-337](https://github.com/hashicorp/vault-helm/pull/337)
