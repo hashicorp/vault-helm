@@ -293,7 +293,7 @@ Sets extra ui service annotations
 Create the name of the service account to use
 */}}
 {{- define "vault.serviceAccount.name" -}}
-{{- if .Values.server.serviceAccount.enabled -}}
+{{- if .Values.server.serviceAccount.create -}}
     {{ default (include "vault.fullname" .) .Values.server.serviceAccount.name }}
 {{- else -}}
     {{ default "default" .Values.server.serviceAccount.name }}
