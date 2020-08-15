@@ -8,7 +8,7 @@ load _helpers
   local actual=$( (helm template \
       --show-only templates/server-serviceaccount.yaml  \
       --set 'server.dev.enabled=true' \
-      --set 'server.serviceAccount.enabled=false' \
+      --set 'server.serviceAccount.create=false' \
       . || echo "---") | tee /dev/stderr |
       yq 'length > 0' | tee /dev/stderr)
   [ "${actual}" = "false" ]
@@ -28,13 +28,6 @@ load _helpers
       yq -r '.metadata.name' | tee /dev/stderr)
   [ "${actual}" = "RELEASE-NAME-vault" ]
 
-  local actual=$(helm template \
-      --show-only templates/server-serviceaccount.yaml  \
-      --set 'server.ha.enabled=true' \
-      --set 'server.serviceAccount.annotations.iam\.gke\.io/gcp-service-account=user-defined-gsa@my-project.iam.gserviceaccount.com' \
-      . | tee /dev/stderr |
-      yq -r '.metadata.annotations["iam.gke.io/gcp-service-account"]' | tee /dev/stderr)
-  [ "${actual}" = "user-defined-gsa@my-project.iam.gserviceaccount.com" ]
 }
 
 @test "server/ServiceAccount: specify annotations" {
