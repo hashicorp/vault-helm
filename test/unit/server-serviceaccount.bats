@@ -2,6 +2,34 @@
 
 load _helpers
 
+@test "server/ServiceAccount: specify service account name" {
+  cd `chart_dir`
+
+  local actual=$( (helm template \
+      --show-only templates/server-serviceaccount.yaml  \
+      --set 'server.dev.enabled=true' \
+      --set 'server.serviceAccount.create=false' \
+      . || echo "---") | tee /dev/stderr |
+      yq 'length > 0' | tee /dev/stderr)
+  [ "${actual}" = "false" ]
+
+  local actual=$(helm template \
+      --show-only templates/server-serviceaccount.yaml  \
+      --set 'server.dev.enabled=true' \
+      --set 'server.serviceAccount.name=user-defined-ksa' \
+      . | tee /dev/stderr |
+      yq -r '.metadata.name' | tee /dev/stderr)
+  [ "${actual}" = "user-defined-ksa" ]
+
+  local actual=$(helm template \
+      --show-only templates/server-serviceaccount.yaml  \
+      --set 'server.dev.enabled=true' \
+      . | tee /dev/stderr |
+      yq -r '.metadata.name' | tee /dev/stderr)
+  [ "${actual}" = "RELEASE-NAME-vault" ]
+
+}
+
 @test "server/ServiceAccount: specify annotations" {
   cd `chart_dir`
   local actual=$(helm template \

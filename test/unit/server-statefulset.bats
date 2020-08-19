@@ -1164,3 +1164,46 @@ load _helpers
       yq '.spec.template.spec.securityContext.runAsGroup | length > 0' | tee /dev/stderr)
   [ "${actual}" = "false" ]
 }
+
+#--------------------------------------------------------------------
+# serviceAccount
+
+@test "server/standalone-StatefulSet: serviceAccount.name is set" {
+  cd `chart_dir`
+
+ local actual=$(helm template \
+      --show-only templates/server-statefulset.yaml  \
+      --set 'server.serviceAccount.create=false' \
+      --set 'server.serviceAccount.name=user-defined-ksa' \
+      . | tee /dev/stderr |
+      yq -r '.spec.template.spec.serviceAccountName' | tee /dev/stderr)
+  [ "${actual}" = "user-defined-ksa" ]
+
+ local actual=$(helm template \
+      --show-only templates/server-statefulset.yaml  \
+      --set 'server.serviceAccount.create=true' \
+      --set 'server.serviceAccount.name=user-defined-ksa' \
+      . | tee /dev/stderr |
+      yq -r '.spec.template.spec.serviceAccountName' | tee /dev/stderr)
+  [ "${actual}" = "user-defined-ksa" ]
+}
+
+@test "server/standalone-StatefulSet: serviceAccount.name is not set" {
+ cd `chart_dir`
+
+ local actual=$(helm template \
+      --show-only templates/server-statefulset.yaml  \
+      --set 'server.serviceAccount.create=false' \
+      . | tee /dev/stderr |
+      yq -r '.spec.template.spec.serviceAccountName' | tee /dev/stderr)
+  [ "${actual}" = "default" ]
+
+ local actual=$(helm template \
+      --show-only templates/server-statefulset.yaml  \
+      --set 'server.serviceAccount.create=true' \
+      . | tee /dev/stderr |
+      yq -r '.spec.template.spec.serviceAccountName' | tee /dev/stderr)
+  [ "${actual}" = "RELEASE-NAME-vault" ]
+
+
+}
