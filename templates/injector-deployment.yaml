@@ -76,6 +76,10 @@ spec:
             - name: AGENT_INJECT_SET_SECURITY_CONTEXT
               value: "false"
             {{- end }}
+            {{- if .Values.injector.metrics.enabled }}
+            - name: AGENT_INJECT_TELEMETRY_PATH
+              value: "/metrics"
+            {{- end }}
             {{- include "vault.extraEnvironmentVars" .Values.injector | nindent 12 }}
           args:
             - agent-inject
