@@ -27,6 +27,10 @@ injector:
   # True if you want to enable vault agent injection.
   enabled: true
 
+  # If true, will enable a node exporter metrics endpoint at /metrics.
+  metrics:
+    enabled: false
+
   # External vault server address for the injector to use. Setting this will
   # disable deployment of a vault server along with the injector.
   externalVaultAddr: ""
