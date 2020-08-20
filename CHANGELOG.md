@@ -2,6 +2,7 @@
 
 Features:
 * Added `volumes` and `volumeMounts` for mounting _any_ type of volume [GH-314](https://github.com/hashicorp/vault-helm/pull/314).
+* Added configurable to enable prometheus telemetery exporter for Vault Agent Injector [GH-372](https://github.com/hashicorp/vault-helm/pull/372)
 
 Improvements:
 * Added `defaultMode` configurable to `extraVolumes`[GH-321](https://github.com/hashicorp/vault-helm/pull/321)
