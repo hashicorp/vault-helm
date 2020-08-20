@@ -346,6 +346,8 @@ server:
     storageClass: null
     # Access Mode of the storage device being used for the PVC
     accessMode: ReadWriteOnce
+    # Annotations to apply to the PVC
+    annotations: {}
 
   # This configures the Vault Statefulset to create a PVC for audit
   # logs.  Once Vault is deployed, initialized and unseal, Vault must
@@ -361,6 +363,8 @@ server:
     storageClass: null
     # Access Mode of the storage device being used for the PVC
     accessMode: ReadWriteOnce
+    # Annotations to apply to the PVC
+    annotations: {}
 
   # Run Vault in "dev" mode. This requires no further setup, no state management,
   # and no initialization. This is useful for experimenting with Vault without

@@ -1090,6 +1090,50 @@ load _helpers
   [ "${actual}" = "true" ]
 }
 
+@test "server/standalone-StatefulSet: auditStorage volumeClaim annotations string" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      --show-only templates/server-statefulset.yaml \
+      --set 'server.auditStorage.enabled=true' \
+      --set 'server.auditStorage.annotations=vaultIsAwesome: true' \
+      . | tee /dev/stderr |
+      yq -r '.spec.volumeClaimTemplates[1].metadata.annotations["vaultIsAwesome"]' | tee /dev/stderr)
+  [ "${actual}" = "true" ]
+}
+
+@test "server/standalone-StatefulSet: dataStorage volumeClaim annotations string" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      --show-only templates/server-statefulset.yaml \
+      --set 'server.dataStorage.enabled=true' \
+      --set 'server.dataStorage.annotations=vaultIsAwesome: true' \
+      . | tee /dev/stderr |
+      yq -r '.spec.volumeClaimTemplates[0].metadata.annotations["vaultIsAwesome"]' | tee /dev/stderr)
+  [ "${actual}" = "true" ]
+}
+
+@test "server/standalone-StatefulSet: auditStorage volumeClaim annotations yaml" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      --show-only templates/server-statefulset.yaml \
+      --set 'server.auditStorage.enabled=true' \
+      --set 'server.auditStorage.annotations.vaultIsAwesome=true' \
+      . | tee /dev/stderr |
+      yq -r '.spec.volumeClaimTemplates[1].metadata.annotations["vaultIsAwesome"]' | tee /dev/stderr)
+  [ "${actual}" = "true" ]
+}
+
+@test "server/standalone-StatefulSet: dataStorage volumeClaim annotations yaml" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      --show-only templates/server-statefulset.yaml \
+      --set 'server.dataStorage.enabled=true' \
+      --set 'server.dataStorage.annotations.vaultIsAwesome=true' \
+      . | tee /dev/stderr |
+      yq -r '.spec.volumeClaimTemplates[0].metadata.annotations["vaultIsAwesome"]' | tee /dev/stderr)
+  [ "${actual}" = "true" ]
+}
+
 @test "server/ha-standby-Service: generic annotations yaml" {
   cd `chart_dir`
   local actual=$(helm template \
