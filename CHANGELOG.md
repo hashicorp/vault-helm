@@ -10,6 +10,7 @@ Improvements:
 * Removed deprecated tolerate unready endpoint annotations [GH-363](https://github.com/hashicorp/vault-helm/pull/363)
 * Add an option to set annotations on the StatefulSet [GH-199](https://github.com/hashicorp/vault-helm/pull/199)
 * Make the vault server serviceAccount name a configuration option [GH-367](https://github.com/hashicorp/vault-helm/pull/367)
+* Removed annotation striction from `dev` mode [GH-371](https://github.com/hashicorp/vault-helm/pull/371)
 
 Bugs:
 * Fix python dependency in test image [GH-337](https://github.com/hashicorp/vault-helm/pull/337)
