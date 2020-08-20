@@ -269,7 +269,7 @@ Sets the injector node selector for pod placement
 Sets extra pod annotations
 */}}
 {{- define "vault.annotations" -}}
-  {{- if and (ne .mode "dev") .Values.server.annotations }}
+  {{- if .Values.server.annotations }}
       annotations:
         {{- $tp := typeOf .Values.server.annotations }}
         {{- if eq $tp "string" }}
