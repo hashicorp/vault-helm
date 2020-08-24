@@ -10,7 +10,7 @@ global:
   #   - name: image-pull-secret
   # TLS for end-to-end encrypted transport
   tlsDisable: true
-  # Beta Feature: If deploying to OpenShift
+  # If deploying to OpenShift
   openshift: false
   # Create PodSecurityPolicy for pods
   psp:
@@ -38,7 +38,7 @@ injector:
   # image sets the repo and tag of the vault-k8s image to use for the injector.
   image:
     repository: "hashicorp/vault-k8s"
-    tag: "0.4.0"
+    tag: "0.5.0"
     pullPolicy: IfNotPresent
 
   # agentImage sets the repo and tag of the Vault image to use for the Vault Agent
@@ -46,7 +46,7 @@ injector:
   # required.
   agentImage:
     repository: "vault"
-    tag: "1.4.2"
+    tag: "1.5.2"
 
   # Mount Path of the Vault Kubernetes Auth Method.
   authPath: "auth/kubernetes"
@@ -129,7 +129,7 @@ server:
 
   image:
     repository: "vault"
-    tag: "1.4.2"
+    tag: "1.5.2"
     # Overrides the default Image Pull Policy
     pullPolicy: IfNotPresent
 
