@@ -36,13 +36,23 @@ jobs:
         JIRA_USER_EMAIL: ${{ secrets.JIRA_SYNC_USER_EMAIL }}
         JIRA_API_TOKEN: ${{ secrets.JIRA_SYNC_API_TOKEN }}
 
+    - name: Set ticket type
+      if: github.event.action == 'opened' && !steps.vault-team-role.outputs.role
+      id: set-ticket-type
+      run: |
+        if [[ "${{ github.event_name }}" == "pull_request_target" ]]; then
+          echo "::set-output name=type::PR"
+        else
+          echo "::set-output name=type::ISS"
+        fi
+
     - name: Create ticket
       if: github.event.action == 'opened' && !steps.vault-team-role.outputs.role
       uses: tomhjp/gh-action-jira-create@v0.1.0
       with:
         project: VAULT
         issuetype: "GH Issue"
-        summary: "${{ github.repository }}: ${{ github.event.issue.title || github.event.pull_request.title }} #${{ github.event.issue.number || github.event.pull_request.number }}"
+        summary: "${{ github.event.repository.name }} [${{ steps.set-ticket-type.outputs.type }} #${{ github.event.issue.number || github.event.pull_request.number }}]: ${{ github.event.issue.title || github.event.pull_request.title }}"
         description: "${{ github.event.issue.body || github.event.pull_request.body }}\n\n_Created from GitHub Action for ${{ github.event.issue.html_url || github.event.pull_request.html_url }}, from ${{ github.actor }}_"
         # customfield_10089 is Issue Link custom field
         # customfield_10091 is team custom field
