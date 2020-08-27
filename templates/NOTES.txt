@@ -10,5 +10,5 @@ https://www.vaultproject.io/docs/
 Your release is named {{ .Release.Name }}. To learn more about the release, try:
 
   $ helm status {{ .Release.Name }}
-  $ helm get {{ .Release.Name }}
+  $ helm get manifest {{ .Release.Name }}
 
