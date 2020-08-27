@@ -143,7 +143,7 @@ spec:
             {{- end }}
             failureThreshold: 2
             initialDelaySeconds: 5
-            periodSeconds: 3
+            periodSeconds: 6
             successThreshold: 1
             timeoutSeconds: 5
           {{- end }}
@@ -154,7 +154,7 @@ spec:
               port: 8200
               scheme: {{ include "vault.scheme" . | upper }}
             initialDelaySeconds: {{ .Values.server.livenessProbe.initialDelaySeconds }}
-            periodSeconds: 3
+            periodSeconds: 6
             successThreshold: 1
             timeoutSeconds: 5
           {{- end }}
