@@ -300,7 +300,7 @@ server:
 
   # Enables network policy for server pods
   networkPolicy:
-    enabled: true
+    enabled: false
 
   # Priority class for server pods
   priorityClassName: ""
