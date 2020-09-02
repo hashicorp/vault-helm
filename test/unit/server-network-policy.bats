@@ -2,7 +2,7 @@
 
 load _helpers
 
-@test "server/network-policy: OpenShift - disabled by default" {
+@test "server/network-policy: disabled by default" {
   cd `chart_dir`
   local actual=$( (helm template \
       --show-only templates/server-network-policy.yaml  \
@@ -11,10 +11,10 @@ load _helpers
   [ "${actual}" = "false" ]
 }
 
-@test "server/network-policy: OpenShift - enabled if OpenShift" {
+@test "server/network-policy: enabled by server.networkPolicy.enabled" {
   cd `chart_dir`
   local actual=$( (helm template \
-      --set 'global.openshift=true' \
+      --set 'server.networkPolicy.enabled=true' \
       --show-only templates/server-network-policy.yaml  \
       . || echo "---") | tee /dev/stderr |
       yq 'length > 0' | tee /dev/stderr)
