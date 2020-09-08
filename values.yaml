@@ -394,27 +394,28 @@ server:
     # such as passwords should be either mounted through extraSecretEnvironmentVars
     # or through a Kube secret.  For more information see: 
     # https://www.vaultproject.io/docs/platform/k8s/helm/run#protecting-sensitive-vault-configurations
-    config: |
-      ui = true
+    config: 
+      ui: true
 
-      listener "tcp" {
-        tls_disable = 1
-        address = "[::]:8200"
-        cluster_address = "[::]:8201"
-      }
-      storage "file" {
-        path = "/vault/data"
-      }
+      listener:
+        tcp:
+          tls_disable: 1
+          address: "[::]:8200"
+          cluster_address: "[::]:8201"
+      
+      storage:
+        file: 
+          path: "/vault/data"
 
       # Example configuration for using auto-unseal, using Google Cloud KMS. The
       # GKMS keys must already exist, and the cluster must have a service account
       # that is authorized to access GCP KMS.
-      #seal "gcpckms" {
-      #   project     = "vault-helm-dev"
-      #   region      = "global"
-      #   key_ring    = "vault-helm-unseal-kr"
-      #   crypto_key  = "vault-helm-unseal-key"
-      #}
+      #seal:
+      #  gcpckms: 
+      #    project:    "vault-helm-dev"
+      #    region:     "global"
+      #    key_ring:   "vault-helm-unseal-kr"
+      #    crypto_key: "vault-helm-unseal-key"
 
   # Run Vault in "HA" mode. There are no storage requirements unless audit log
   # persistence is required.  In HA mode Vault will configure itself to use Consul
@@ -445,20 +446,21 @@ server:
       # such as passwords should be either mounted through extraSecretEnvironmentVars
       # or through a Kube secret.  For more information see: 
       # https://www.vaultproject.io/docs/platform/k8s/helm/run#protecting-sensitive-vault-configurations
-      config: |
-        ui = true
+      config: 
+        ui: true
 
-        listener "tcp" {
-          tls_disable = 1
-          address = "[::]:8200"
-          cluster_address = "[::]:8201"
-        }
+        listener:
+          tcp: 
+            tls_disable: 1
+            address: "[::]:8200"
+            cluster_address: "[::]:8201"
 
-        storage "raft" {
-          path = "/vault/data"
-        }
+        storage:
+          raft: 
+            path: "/vault/data"
 
-        service_registration "kubernetes" {}
+        service_registration:
+          kubernetes: {}
    
     # config is a raw string of default configuration when using a Stateful
     # deployment. Default is to use a Consul for its HA storage backend.
@@ -468,30 +470,32 @@ server:
     # such as passwords should be either mounted through extraSecretEnvironmentVars
     # or through a Kube secret.  For more information see: 
     # https://www.vaultproject.io/docs/platform/k8s/helm/run#protecting-sensitive-vault-configurations
-    config: |
-      ui = true
+    config: 
+      ui: true
 
-      listener "tcp" {
-        tls_disable = 1
-        address = "[::]:8200"
-        cluster_address = "[::]:8201"
-      }
-      storage "consul" {
-        path = "vault"
-        address = "HOST_IP:8500"
-      }
+      listener: 
+        tcp: 
+          tls_disable: 1
+          address: "[::]:8200"
+          cluster_address: "[::]:8201"
 
-      service_registration "kubernetes" {}
+      storage:
+        consul: 
+        path: "vault"
+        address: "HOST_IP:8500"
+
+      service_registration:
+        kubernetes: {}
 
       # Example configuration for using auto-unseal, using Google Cloud KMS. The
       # GKMS keys must already exist, and the cluster must have a service account
       # that is authorized to access GCP KMS.
-      #seal "gcpckms" {
-      #   project     = "vault-helm-dev-246514"
-      #   region      = "global"
-      #   key_ring    = "vault-helm-unseal-kr"
-      #   crypto_key  = "vault-helm-unseal-key"
-      #}
+      #seal:
+      #  gcpckms: 
+      #    project:     "vault-helm-dev-246514"
+      #    region:      "global"
+      #    key_ring:    "vault-helm-unseal-kr"
+      #    crypto_key:  "vault-helm-unseal-key"
 
     # A disruption budget limits the number of pods of a replicated application
     # that are down simultaneously from voluntary disruptions
