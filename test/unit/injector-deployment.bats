@@ -168,7 +168,7 @@ load _helpers
   [ "${value}" = "RELEASE-NAME-vault-agent-injector-svc,RELEASE-NAME-vault-agent-injector-svc.${namespace:-default},RELEASE-NAME-vault-agent-injector-svc.${namespace:-default}.svc" ]
 }
 
-@test "injector/deployment: manual TLS adds volume mount" { 
+@test "injector/deployment: manual TLS adds volume mount" {
    cd `chart_dir`
    local object=$(helm template \
        --show-only templates/injector-deployment.yaml  \
@@ -507,6 +507,7 @@ load _helpers
       yq '.spec.template.spec | .priorityClassName == "armaggeddon"' | tee /dev/stderr)
   [ "${actual}" = "true" ]
 }
+
 #--------------------------------------------------------------------
 # OpenShift
 

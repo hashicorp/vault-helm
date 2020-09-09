@@ -41,6 +41,12 @@ injector:
       tag: "0.4"
     ttl: 60s
 
+  # podDisruptionBudget
+  pdb:
+    create: "false"
+    # minAvailable: "0"
+    # maxUnavailable: "1"
+
   # If true, will enable a node exporter metrics endpoint at /metrics.
   metrics:
     enabled: false
