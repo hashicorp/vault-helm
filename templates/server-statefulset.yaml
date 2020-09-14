@@ -141,11 +141,11 @@ spec:
             exec:
               command: ["/bin/sh", "-ec", "vault status -tls-skip-verify"]
             {{- end }}
-            failureThreshold: 2
-            initialDelaySeconds: 5
-            periodSeconds: 3
-            successThreshold: 1
-            timeoutSeconds: 5
+            failureThreshold: {{ .Values.server.readinessProbe.failureThreshold | default 2 }}
+            initialDelaySeconds: {{ .Values.server.readinessProbe.initialDelaySeconds | default 5 }}
+            periodSeconds: {{ .Values.server.readinessProbe.periodSeconds | default 3 }}
+            successThreshold: {{ .Values.server.readinessProbe.successThreshold | default 1 }}
+            timeoutSeconds: {{ .Values.server.readinessProbe.timeoutSeconds | default 5 }}
           {{- end }}
           {{- if .Values.server.livenessProbe.enabled }}
           livenessProbe:
@@ -153,10 +153,11 @@ spec:
               path: {{ .Values.server.livenessProbe.path | quote }}
               port: 8200
               scheme: {{ include "vault.scheme" . | upper }}
-            initialDelaySeconds: {{ .Values.server.livenessProbe.initialDelaySeconds }}
-            periodSeconds: 3
-            successThreshold: 1
-            timeoutSeconds: 5
+            failureThreshold: {{ .Values.server.livenessProbe.failureThreshold | default 2 }}
+            initialDelaySeconds: {{ .Values.server.livenessProbe.initialDelaySeconds | default 60 }}
+            periodSeconds: {{ .Values.server.livenessProbe.periodSeconds | default 3 }}
+            successThreshold: {{ .Values.server.livenessProbe.successThreshold | default 1 }}
+            timeoutSeconds: {{ .Values.server.livenessProbe.timeoutSeconds | default 5 }}
           {{- end }}
           lifecycle:
             # Vault container doesn't receive SIGTERM from Kubernetes

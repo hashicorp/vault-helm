@@ -962,6 +962,110 @@ load _helpers
   [ "${actual}" = "null" ]
 }
 
+@test "server/standalone-StatefulSet: readiness failureThreshold default" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      --show-only templates/server-statefulset.yaml \
+      --set 'server.readinessProbe.enabled=true' \
+      . | tee /dev/stderr |
+      yq -r '.spec.template.spec.containers[0].readinessProbe.failureThreshold' | tee /dev/stderr)
+  [ "${actual}" = "2" ]
+}
+
+@test "server/standalone-StatefulSet: readiness failureThreshold configurable" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      --show-only templates/server-statefulset.yaml \
+      --set 'server.readinessProbe.enabled=true' \
+      --set 'server.readinessProbe.failureThreshold=100' \
+      . | tee /dev/stderr |
+      yq -r '.spec.template.spec.containers[0].readinessProbe.failureThreshold' | tee /dev/stderr)
+  [ "${actual}" = "100" ]
+}
+
+@test "server/standalone-StatefulSet: readiness initialDelaySeconds default" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      --show-only templates/server-statefulset.yaml \
+      --set 'server.readinessProbe.enabled=true' \
+      . | tee /dev/stderr |
+      yq -r '.spec.template.spec.containers[0].readinessProbe.initialDelaySeconds' | tee /dev/stderr)
+  [ "${actual}" = "5" ]
+}
+
+@test "server/standalone-StatefulSet: readiness initialDelaySeconds configurable" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      --show-only templates/server-statefulset.yaml \
+      --set 'server.readinessProbe.enabled=true' \
+      --set 'server.readinessProbe.initialDelaySeconds=100' \
+      . | tee /dev/stderr |
+      yq -r '.spec.template.spec.containers[0].readinessProbe.initialDelaySeconds' | tee /dev/stderr)
+  [ "${actual}" = "100" ]
+}
+
+@test "server/standalone-StatefulSet: readiness periodSeconds default" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      --show-only templates/server-statefulset.yaml \
+      --set 'server.readinessProbe.enabled=true' \
+      . | tee /dev/stderr |
+      yq -r '.spec.template.spec.containers[0].readinessProbe.periodSeconds' | tee /dev/stderr)
+  [ "${actual}" = "3" ]
+}
+
+@test "server/standalone-StatefulSet: readiness periodSeconds configurable" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      --show-only templates/server-statefulset.yaml \
+      --set 'server.readinessProbe.enabled=true' \
+      --set 'server.readinessProbe.periodSeconds=100' \
+      . | tee /dev/stderr |
+      yq -r '.spec.template.spec.containers[0].readinessProbe.periodSeconds' | tee /dev/stderr)
+  [ "${actual}" = "100" ]
+}
+
+@test "server/standalone-StatefulSet: readiness successThreshold default" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      --show-only templates/server-statefulset.yaml \
+      --set 'server.readinessProbe.enabled=true' \
+      . | tee /dev/stderr |
+      yq -r '.spec.template.spec.containers[0].readinessProbe.successThreshold' | tee /dev/stderr)
+  [ "${actual}" = "1" ]
+}
+
+@test "server/standalone-StatefulSet: readiness successThreshold configurable" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      --show-only templates/server-statefulset.yaml \
+      --set 'server.readinessProbe.enabled=true' \
+      --set 'server.readinessProbe.successThreshold=100' \
+      . | tee /dev/stderr |
+      yq -r '.spec.template.spec.containers[0].readinessProbe.successThreshold' | tee /dev/stderr)
+  [ "${actual}" = "100" ]
+}
+
+@test "server/standalone-StatefulSet: readiness timeoutSeconds default" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      --show-only templates/server-statefulset.yaml \
+      --set 'server.readinessProbe.enabled=true' \
+      . | tee /dev/stderr |
+      yq -r '.spec.template.spec.containers[0].readinessProbe.timeoutSeconds' | tee /dev/stderr)
+  [ "${actual}" = "5" ]
+}
+
+@test "server/standalone-StatefulSet: readiness timeoutSeconds configurable" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      --show-only templates/server-statefulset.yaml \
+      --set 'server.readinessProbe.enabled=true' \
+      --set 'server.readinessProbe.timeoutSeconds=100' \
+      . | tee /dev/stderr |
+      yq -r '.spec.template.spec.containers[0].readinessProbe.timeoutSeconds' | tee /dev/stderr)
+  [ "${actual}" = "100" ]
+}
 
 @test "server/standalone-StatefulSet: livenessProbe default" {
   cd `chart_dir`
@@ -982,7 +1086,28 @@ load _helpers
   [ "${actual}" = "/v1/sys/health?standbyok=true" ]
 }
 
-@test "server/standalone-StatefulSet: livenessProbe initialDelaySeconds default" {
+@test "server/standalone-StatefulSet: liveness failureThreshold default" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      --show-only templates/server-statefulset.yaml \
+      --set 'server.livenessProbe.enabled=true' \
+      . | tee /dev/stderr |
+      yq -r '.spec.template.spec.containers[0].livenessProbe.failureThreshold' | tee /dev/stderr)
+  [ "${actual}" = "2" ]
+}
+
+@test "server/standalone-StatefulSet: liveness failureThreshold configurable" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      --show-only templates/server-statefulset.yaml \
+      --set 'server.livenessProbe.enabled=true' \
+      --set 'server.livenessProbe.failureThreshold=100' \
+      . | tee /dev/stderr |
+      yq -r '.spec.template.spec.containers[0].livenessProbe.failureThreshold' | tee /dev/stderr)
+  [ "${actual}" = "100" ]
+}
+
+@test "server/standalone-StatefulSet: liveness initialDelaySeconds default" {
   cd `chart_dir`
   local actual=$(helm template \
       --show-only templates/server-statefulset.yaml \
@@ -992,17 +1117,82 @@ load _helpers
   [ "${actual}" = "60" ]
 }
 
-@test "server/standalone-StatefulSet: livenessProbe initialDelaySeconds configurable" {
+@test "server/standalone-StatefulSet: liveness initialDelaySeconds configurable" {
   cd `chart_dir`
   local actual=$(helm template \
       --show-only templates/server-statefulset.yaml \
       --set 'server.livenessProbe.enabled=true' \
-      --set 'server.livenessProbe.initialDelaySeconds=30' \
+      --set 'server.livenessProbe.initialDelaySeconds=100' \
       . | tee /dev/stderr |
       yq -r '.spec.template.spec.containers[0].livenessProbe.initialDelaySeconds' | tee /dev/stderr)
-  [ "${actual}" = "30" ]
+  [ "${actual}" = "100" ]
 }
 
+@test "server/standalone-StatefulSet: liveness periodSeconds default" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      --show-only templates/server-statefulset.yaml \
+      --set 'server.livenessProbe.enabled=true' \
+      . | tee /dev/stderr |
+      yq -r '.spec.template.spec.containers[0].livenessProbe.periodSeconds' | tee /dev/stderr)
+  [ "${actual}" = "3" ]
+}
+
+@test "server/standalone-StatefulSet: liveness periodSeconds configurable" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      --show-only templates/server-statefulset.yaml \
+      --set 'server.livenessProbe.enabled=true' \
+      --set 'server.livenessProbe.periodSeconds=100' \
+      . | tee /dev/stderr |
+      yq -r '.spec.template.spec.containers[0].livenessProbe.periodSeconds' | tee /dev/stderr)
+  [ "${actual}" = "100" ]
+}
+
+@test "server/standalone-StatefulSet: liveness successThreshold default" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      --show-only templates/server-statefulset.yaml \
+      --set 'server.livenessProbe.enabled=true' \
+      . | tee /dev/stderr |
+      yq -r '.spec.template.spec.containers[0].livenessProbe.successThreshold' | tee /dev/stderr)
+  [ "${actual}" = "1" ]
+}
+
+@test "server/standalone-StatefulSet: liveness successThreshold configurable" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      --show-only templates/server-statefulset.yaml \
+      --set 'server.livenessProbe.enabled=true' \
+      --set 'server.livenessProbe.successThreshold=100' \
+      . | tee /dev/stderr |
+      yq -r '.spec.template.spec.containers[0].livenessProbe.successThreshold' | tee /dev/stderr)
+  [ "${actual}" = "100" ]
+}
+
+@test "server/standalone-StatefulSet: liveness timeoutSeconds default" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      --show-only templates/server-statefulset.yaml \
+      --set 'server.livenessProbe.enabled=true' \
+      . | tee /dev/stderr |
+      yq -r '.spec.template.spec.containers[0].livenessProbe.timeoutSeconds' | tee /dev/stderr)
+  [ "${actual}" = "5" ]
+}
+
+@test "server/standalone-StatefulSet: liveness timeoutSeconds configurable" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      --show-only templates/server-statefulset.yaml \
+      --set 'server.livenessProbe.enabled=true' \
+      --set 'server.livenessProbe.timeoutSeconds=100' \
+      . | tee /dev/stderr |
+      yq -r '.spec.template.spec.containers[0].livenessProbe.timeoutSeconds' | tee /dev/stderr)
+  [ "${actual}" = "100" ]
+}
+
+#--------------------------------------------------------------------
+# args
 @test "server/standalone-StatefulSet: add extraArgs" {
   cd `chart_dir`
   local actual=$(helm template \
