@@ -229,8 +229,6 @@ server:
     successThreshold: 1
     # Number of seconds after which the probe times out.
     timeoutSeconds: 5
-    # If you need to use a http path instead of the default exec
-    # path: /v1/sys/health?standbyok=true
   # Used to enable a livenessProbe for the pods
   livenessProbe:
     enabled: false
