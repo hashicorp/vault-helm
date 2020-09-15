@@ -1011,7 +1011,7 @@ load _helpers
       --set 'server.readinessProbe.enabled=true' \
       . | tee /dev/stderr |
       yq -r '.spec.template.spec.containers[0].readinessProbe.periodSeconds' | tee /dev/stderr)
-  [ "${actual}" = "3" ]
+  [ "${actual}" = "5" ]
 }
 
 @test "server/standalone-StatefulSet: readiness periodSeconds configurable" {
@@ -1053,7 +1053,7 @@ load _helpers
       --set 'server.readinessProbe.enabled=true' \
       . | tee /dev/stderr |
       yq -r '.spec.template.spec.containers[0].readinessProbe.timeoutSeconds' | tee /dev/stderr)
-  [ "${actual}" = "5" ]
+  [ "${actual}" = "3" ]
 }
 
 @test "server/standalone-StatefulSet: readiness timeoutSeconds configurable" {
@@ -1135,7 +1135,7 @@ load _helpers
       --set 'server.livenessProbe.enabled=true' \
       . | tee /dev/stderr |
       yq -r '.spec.template.spec.containers[0].livenessProbe.periodSeconds' | tee /dev/stderr)
-  [ "${actual}" = "3" ]
+  [ "${actual}" = "5" ]
 }
 
 @test "server/standalone-StatefulSet: liveness periodSeconds configurable" {
@@ -1177,7 +1177,7 @@ load _helpers
       --set 'server.livenessProbe.enabled=true' \
       . | tee /dev/stderr |
       yq -r '.spec.template.spec.containers[0].livenessProbe.timeoutSeconds' | tee /dev/stderr)
-  [ "${actual}" = "5" ]
+  [ "${actual}" = "3" ]
 }
 
 @test "server/standalone-StatefulSet: liveness timeoutSeconds configurable" {
