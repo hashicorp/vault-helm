@@ -1,4 +1,4 @@
-{{- if .Values.global.openshift }}
+{{- if eq (.Values.server.networkPolicy.enabled | toString) "true"  }}
 apiVersion: networking.k8s.io/v1
 kind: NetworkPolicy
 metadata:
