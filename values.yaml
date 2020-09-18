@@ -321,6 +321,7 @@ server:
   # Enables network policy for server pods
   networkPolicy:
     enabled: false
+    egress: false
 
   # Priority class for server pods
   priorityClassName: ""
