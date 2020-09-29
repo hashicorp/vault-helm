@@ -70,7 +70,7 @@ injector:
   #      sidecar-injector: enabled
   namespaceSelector: {}
 
-  # Configures failurePolicy of the webhook. By default webhook failures are ignored. 
+  # Configures failurePolicy of the webhook. By default webhook failures are ignored.
   # To block pod creation while webhook is unavailable, set the policy to `Fail` below.
   # See https://kubernetes.io/docs/reference/access-authn-authz/extensible-admission-controllers/#failure-policy
   #
@@ -229,7 +229,7 @@ server:
     enabled: true
     # If you need to use a http path instead of the default exec
     # path: /v1/sys/health?standbyok=true
-    
+
     # When a probe fails, Kubernetes will try failureThreshold times before giving up
     failureThreshold: 2
     # Number of seconds after the container has started before probe initiates
@@ -429,9 +429,9 @@ server:
     # and store data there. This is only used when using a Replica count of 1, and
     # using a stateful set. This should be HCL.
 
-    # Note: Configuration files are stored in ConfigMaps so sensitive data 
+    # Note: Configuration files are stored in ConfigMaps so sensitive data
     # such as passwords should be either mounted through extraSecretEnvironmentVars
-    # or through a Kube secret.  For more information see: 
+    # or through a Kube secret.  For more information see:
     # https://www.vaultproject.io/docs/platform/k8s/helm/run#protecting-sensitive-vault-configurations
     config: |
       ui = true
@@ -479,10 +479,10 @@ server:
       enabled: false
       # Set the Node Raft ID to the name of the pod
       setNodeId: false
-    
-      # Note: Configuration files are stored in ConfigMaps so sensitive data 
+
+      # Note: Configuration files are stored in ConfigMaps so sensitive data
       # such as passwords should be either mounted through extraSecretEnvironmentVars
-      # or through a Kube secret.  For more information see: 
+      # or through a Kube secret.  For more information see:
       # https://www.vaultproject.io/docs/platform/k8s/helm/run#protecting-sensitive-vault-configurations
       config: |
         ui = true
@@ -498,14 +498,14 @@ server:
         }
 
         service_registration "kubernetes" {}
-   
+
     # config is a raw string of default configuration when using a Stateful
     # deployment. Default is to use a Consul for its HA storage backend.
     # This should be HCL.
-    
-    # Note: Configuration files are stored in ConfigMaps so sensitive data 
+
+    # Note: Configuration files are stored in ConfigMaps so sensitive data
     # such as passwords should be either mounted through extraSecretEnvironmentVars
-    # or through a Kube secret.  For more information see: 
+    # or through a Kube secret.  For more information see:
     # https://www.vaultproject.io/docs/platform/k8s/helm/run#protecting-sensitive-vault-configurations
     config: |
       ui = true
@@ -542,6 +542,8 @@ server:
       maxUnavailable: null
 
   # Definition of the serviceAccount used to run Vault.
+  # These options are also used when using an external Vault server to validate
+  # Kubernetes tokens.
   serviceAccount:
     # Specifies whether a service account should be created
     create: true
