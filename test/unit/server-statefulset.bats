@@ -225,7 +225,7 @@ load _helpers
 #--------------------------------------------------------------------
 # extraVolumes
 
-@test "server/standalone-StatefulSet: adds extra volume" {
+@test "server/standalone-StatefulSet: server.extraVolumes adds extra volume" {
   cd `chart_dir`
 
   # Test that it defines it
@@ -293,7 +293,7 @@ load _helpers
   [ "${actual}" = "/vault/userconfig/foo" ]
 }
 
-@test "server/standalone-StatefulSet: adds extra secret volume" {
+@test "server/standalone-StatefulSet: server.extraVolumes adds extra secret volume" {
   cd `chart_dir`
 
   # Test that it defines it
@@ -368,6 +368,49 @@ load _helpers
       --set 'server.auditStorage.enabled=true' \
       . | tee /dev/stderr |
       yq -r '.spec.template.spec.containers[0].volumeMounts[] | select(.name == "audit")' | tee /dev/stderr)
+}
+
+#--------------------------------------------------------------------
+# volumes
+
+@test "server/standalone-StatefulSet: server.volumes adds volume" {
+  cd `chart_dir`
+
+  # Test that it defines it
+  local object=$(helm template \
+      --show-only templates/server-statefulset.yaml  \
+      --set 'server.volumes[0].name=plugins' \
+      --set 'server.volumes[0].emptyDir=\{\}' \
+      . | tee /dev/stderr |
+      yq -r '.spec.template.spec.volumes[] | select(.name == "plugins")' | tee /dev/stderr)
+
+  local actual=$(echo $object |
+      yq -r '.emptyDir' | tee /dev/stderr)
+  [ "${actual}" = "{}" ]
+}
+
+#--------------------------------------------------------------------
+# volumeMounts
+
+@test "server/standalone-StatefulSet: server.volumeMounts adds volumeMount" {
+  cd `chart_dir`
+
+  # Test that it defines it
+  local object=$(helm template \
+      --show-only templates/server-statefulset.yaml  \
+      --set 'server.volumeMounts[0].name=plugins' \
+      --set 'server.volumeMounts[0].mountPath=/usr/local/libexec/vault' \
+      --set 'server.volumeMounts[0].readOnly=true' \
+      . | tee /dev/stderr |
+      yq -r '.spec.template.spec.containers[0].volumeMounts[] | select(.name == "plugins")' | tee /dev/stderr)
+
+  local actual=$(echo $object |
+      yq -r '.mountPath' | tee /dev/stderr)
+  [ "${actual}" = "/usr/local/libexec/vault" ]
+
+  local actual=$(echo $object |
+      yq -r '.readOnly' | tee /dev/stderr)
+  [ "${actual}" = "true" ]
 }
 
 #--------------------------------------------------------------------
@@ -807,6 +850,36 @@ load _helpers
   [ "${actual}" = "bar" ]
 }
 
+# extra annotations
+
+@test "server/standalone-StatefulSet: default statefulSet.annotations" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      --show-only templates/server-statefulset.yaml \
+      . | tee /dev/stderr |
+      yq -r '.metadata.annotations' | tee /dev/stderr)
+  [ "${actual}" = "null" ]
+}
+
+@test "server/standalone-StatefulSet: specify statefulSet.annotations yaml" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      --show-only templates/server-statefulset.yaml \
+      --set 'server.statefulSet.annotations.foo=bar' \
+      . | tee /dev/stderr |
+      yq -r '.metadata.annotations.foo' | tee /dev/stderr)
+  [ "${actual}" = "bar" ]
+}
+
+@test "server/standalone-StatefulSet: specify statefulSet.annotations yaml string" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      --show-only templates/server-statefulset.yaml \
+      --set 'server.statefulSet.annotations=foo: bar' \
+      . | tee /dev/stderr |
+      yq -r '.metadata.annotations.foo' | tee /dev/stderr)
+  [ "${actual}" = "bar" ]
+}
 
 #--------------------------------------------------------------------
 # Security Contexts
@@ -889,6 +962,110 @@ load _helpers
   [ "${actual}" = "null" ]
 }
 
+@test "server/standalone-StatefulSet: readiness failureThreshold default" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      --show-only templates/server-statefulset.yaml \
+      --set 'server.readinessProbe.enabled=true' \
+      . | tee /dev/stderr |
+      yq -r '.spec.template.spec.containers[0].readinessProbe.failureThreshold' | tee /dev/stderr)
+  [ "${actual}" = "2" ]
+}
+
+@test "server/standalone-StatefulSet: readiness failureThreshold configurable" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      --show-only templates/server-statefulset.yaml \
+      --set 'server.readinessProbe.enabled=true' \
+      --set 'server.readinessProbe.failureThreshold=100' \
+      . | tee /dev/stderr |
+      yq -r '.spec.template.spec.containers[0].readinessProbe.failureThreshold' | tee /dev/stderr)
+  [ "${actual}" = "100" ]
+}
+
+@test "server/standalone-StatefulSet: readiness initialDelaySeconds default" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      --show-only templates/server-statefulset.yaml \
+      --set 'server.readinessProbe.enabled=true' \
+      . | tee /dev/stderr |
+      yq -r '.spec.template.spec.containers[0].readinessProbe.initialDelaySeconds' | tee /dev/stderr)
+  [ "${actual}" = "5" ]
+}
+
+@test "server/standalone-StatefulSet: readiness initialDelaySeconds configurable" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      --show-only templates/server-statefulset.yaml \
+      --set 'server.readinessProbe.enabled=true' \
+      --set 'server.readinessProbe.initialDelaySeconds=100' \
+      . | tee /dev/stderr |
+      yq -r '.spec.template.spec.containers[0].readinessProbe.initialDelaySeconds' | tee /dev/stderr)
+  [ "${actual}" = "100" ]
+}
+
+@test "server/standalone-StatefulSet: readiness periodSeconds default" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      --show-only templates/server-statefulset.yaml \
+      --set 'server.readinessProbe.enabled=true' \
+      . | tee /dev/stderr |
+      yq -r '.spec.template.spec.containers[0].readinessProbe.periodSeconds' | tee /dev/stderr)
+  [ "${actual}" = "5" ]
+}
+
+@test "server/standalone-StatefulSet: readiness periodSeconds configurable" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      --show-only templates/server-statefulset.yaml \
+      --set 'server.readinessProbe.enabled=true' \
+      --set 'server.readinessProbe.periodSeconds=100' \
+      . | tee /dev/stderr |
+      yq -r '.spec.template.spec.containers[0].readinessProbe.periodSeconds' | tee /dev/stderr)
+  [ "${actual}" = "100" ]
+}
+
+@test "server/standalone-StatefulSet: readiness successThreshold default" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      --show-only templates/server-statefulset.yaml \
+      --set 'server.readinessProbe.enabled=true' \
+      . | tee /dev/stderr |
+      yq -r '.spec.template.spec.containers[0].readinessProbe.successThreshold' | tee /dev/stderr)
+  [ "${actual}" = "1" ]
+}
+
+@test "server/standalone-StatefulSet: readiness successThreshold configurable" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      --show-only templates/server-statefulset.yaml \
+      --set 'server.readinessProbe.enabled=true' \
+      --set 'server.readinessProbe.successThreshold=100' \
+      . | tee /dev/stderr |
+      yq -r '.spec.template.spec.containers[0].readinessProbe.successThreshold' | tee /dev/stderr)
+  [ "${actual}" = "100" ]
+}
+
+@test "server/standalone-StatefulSet: readiness timeoutSeconds default" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      --show-only templates/server-statefulset.yaml \
+      --set 'server.readinessProbe.enabled=true' \
+      . | tee /dev/stderr |
+      yq -r '.spec.template.spec.containers[0].readinessProbe.timeoutSeconds' | tee /dev/stderr)
+  [ "${actual}" = "3" ]
+}
+
+@test "server/standalone-StatefulSet: readiness timeoutSeconds configurable" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      --show-only templates/server-statefulset.yaml \
+      --set 'server.readinessProbe.enabled=true' \
+      --set 'server.readinessProbe.timeoutSeconds=100' \
+      . | tee /dev/stderr |
+      yq -r '.spec.template.spec.containers[0].readinessProbe.timeoutSeconds' | tee /dev/stderr)
+  [ "${actual}" = "100" ]
+}
 
 @test "server/standalone-StatefulSet: livenessProbe default" {
   cd `chart_dir`
@@ -909,7 +1086,28 @@ load _helpers
   [ "${actual}" = "/v1/sys/health?standbyok=true" ]
 }
 
-@test "server/standalone-StatefulSet: livenessProbe initialDelaySeconds default" {
+@test "server/standalone-StatefulSet: liveness failureThreshold default" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      --show-only templates/server-statefulset.yaml \
+      --set 'server.livenessProbe.enabled=true' \
+      . | tee /dev/stderr |
+      yq -r '.spec.template.spec.containers[0].livenessProbe.failureThreshold' | tee /dev/stderr)
+  [ "${actual}" = "2" ]
+}
+
+@test "server/standalone-StatefulSet: liveness failureThreshold configurable" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      --show-only templates/server-statefulset.yaml \
+      --set 'server.livenessProbe.enabled=true' \
+      --set 'server.livenessProbe.failureThreshold=100' \
+      . | tee /dev/stderr |
+      yq -r '.spec.template.spec.containers[0].livenessProbe.failureThreshold' | tee /dev/stderr)
+  [ "${actual}" = "100" ]
+}
+
+@test "server/standalone-StatefulSet: liveness initialDelaySeconds default" {
   cd `chart_dir`
   local actual=$(helm template \
       --show-only templates/server-statefulset.yaml \
@@ -919,17 +1117,82 @@ load _helpers
   [ "${actual}" = "60" ]
 }
 
-@test "server/standalone-StatefulSet: livenessProbe initialDelaySeconds configurable" {
+@test "server/standalone-StatefulSet: liveness initialDelaySeconds configurable" {
   cd `chart_dir`
   local actual=$(helm template \
       --show-only templates/server-statefulset.yaml \
       --set 'server.livenessProbe.enabled=true' \
-      --set 'server.livenessProbe.initialDelaySeconds=30' \
+      --set 'server.livenessProbe.initialDelaySeconds=100' \
       . | tee /dev/stderr |
       yq -r '.spec.template.spec.containers[0].livenessProbe.initialDelaySeconds' | tee /dev/stderr)
-  [ "${actual}" = "30" ]
+  [ "${actual}" = "100" ]
 }
 
+@test "server/standalone-StatefulSet: liveness periodSeconds default" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      --show-only templates/server-statefulset.yaml \
+      --set 'server.livenessProbe.enabled=true' \
+      . | tee /dev/stderr |
+      yq -r '.spec.template.spec.containers[0].livenessProbe.periodSeconds' | tee /dev/stderr)
+  [ "${actual}" = "5" ]
+}
+
+@test "server/standalone-StatefulSet: liveness periodSeconds configurable" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      --show-only templates/server-statefulset.yaml \
+      --set 'server.livenessProbe.enabled=true' \
+      --set 'server.livenessProbe.periodSeconds=100' \
+      . | tee /dev/stderr |
+      yq -r '.spec.template.spec.containers[0].livenessProbe.periodSeconds' | tee /dev/stderr)
+  [ "${actual}" = "100" ]
+}
+
+@test "server/standalone-StatefulSet: liveness successThreshold default" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      --show-only templates/server-statefulset.yaml \
+      --set 'server.livenessProbe.enabled=true' \
+      . | tee /dev/stderr |
+      yq -r '.spec.template.spec.containers[0].livenessProbe.successThreshold' | tee /dev/stderr)
+  [ "${actual}" = "1" ]
+}
+
+@test "server/standalone-StatefulSet: liveness successThreshold configurable" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      --show-only templates/server-statefulset.yaml \
+      --set 'server.livenessProbe.enabled=true' \
+      --set 'server.livenessProbe.successThreshold=100' \
+      . | tee /dev/stderr |
+      yq -r '.spec.template.spec.containers[0].livenessProbe.successThreshold' | tee /dev/stderr)
+  [ "${actual}" = "100" ]
+}
+
+@test "server/standalone-StatefulSet: liveness timeoutSeconds default" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      --show-only templates/server-statefulset.yaml \
+      --set 'server.livenessProbe.enabled=true' \
+      . | tee /dev/stderr |
+      yq -r '.spec.template.spec.containers[0].livenessProbe.timeoutSeconds' | tee /dev/stderr)
+  [ "${actual}" = "3" ]
+}
+
+@test "server/standalone-StatefulSet: liveness timeoutSeconds configurable" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      --show-only templates/server-statefulset.yaml \
+      --set 'server.livenessProbe.enabled=true' \
+      --set 'server.livenessProbe.timeoutSeconds=100' \
+      . | tee /dev/stderr |
+      yq -r '.spec.template.spec.containers[0].livenessProbe.timeoutSeconds' | tee /dev/stderr)
+  [ "${actual}" = "100" ]
+}
+
+#--------------------------------------------------------------------
+# args
 @test "server/standalone-StatefulSet: add extraArgs" {
   cd `chart_dir`
   local actual=$(helm template \
@@ -1017,6 +1280,50 @@ load _helpers
   [ "${actual}" = "true" ]
 }
 
+@test "server/standalone-StatefulSet: auditStorage volumeClaim annotations string" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      --show-only templates/server-statefulset.yaml \
+      --set 'server.auditStorage.enabled=true' \
+      --set 'server.auditStorage.annotations=vaultIsAwesome: true' \
+      . | tee /dev/stderr |
+      yq -r '.spec.volumeClaimTemplates[1].metadata.annotations["vaultIsAwesome"]' | tee /dev/stderr)
+  [ "${actual}" = "true" ]
+}
+
+@test "server/standalone-StatefulSet: dataStorage volumeClaim annotations string" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      --show-only templates/server-statefulset.yaml \
+      --set 'server.dataStorage.enabled=true' \
+      --set 'server.dataStorage.annotations=vaultIsAwesome: true' \
+      . | tee /dev/stderr |
+      yq -r '.spec.volumeClaimTemplates[0].metadata.annotations["vaultIsAwesome"]' | tee /dev/stderr)
+  [ "${actual}" = "true" ]
+}
+
+@test "server/standalone-StatefulSet: auditStorage volumeClaim annotations yaml" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      --show-only templates/server-statefulset.yaml \
+      --set 'server.auditStorage.enabled=true' \
+      --set 'server.auditStorage.annotations.vaultIsAwesome=true' \
+      . | tee /dev/stderr |
+      yq -r '.spec.volumeClaimTemplates[1].metadata.annotations["vaultIsAwesome"]' | tee /dev/stderr)
+  [ "${actual}" = "true" ]
+}
+
+@test "server/standalone-StatefulSet: dataStorage volumeClaim annotations yaml" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      --show-only templates/server-statefulset.yaml \
+      --set 'server.dataStorage.enabled=true' \
+      --set 'server.dataStorage.annotations.vaultIsAwesome=true' \
+      . | tee /dev/stderr |
+      yq -r '.spec.volumeClaimTemplates[0].metadata.annotations["vaultIsAwesome"]' | tee /dev/stderr)
+  [ "${actual}" = "true" ]
+}
+
 @test "server/ha-standby-Service: generic annotations yaml" {
   cd `chart_dir`
   local actual=$(helm template \
@@ -1090,4 +1397,57 @@ load _helpers
       . | tee /dev/stderr |
       yq '.spec.template.spec.securityContext.runAsGroup | length > 0' | tee /dev/stderr)
   [ "${actual}" = "false" ]
+}
+
+#--------------------------------------------------------------------
+# serviceAccount
+
+@test "server/standalone-StatefulSet: serviceAccount.name is set" {
+  cd `chart_dir`
+
+ local actual=$(helm template \
+      --show-only templates/server-statefulset.yaml  \
+      --set 'server.serviceAccount.create=false' \
+      --set 'server.serviceAccount.name=user-defined-ksa' \
+      . | tee /dev/stderr |
+      yq -r '.spec.template.spec.serviceAccountName' | tee /dev/stderr)
+  [ "${actual}" = "user-defined-ksa" ]
+
+ local actual=$(helm template \
+      --show-only templates/server-statefulset.yaml  \
+      --set 'server.serviceAccount.create=true' \
+      --set 'server.serviceAccount.name=user-defined-ksa' \
+      . | tee /dev/stderr |
+      yq -r '.spec.template.spec.serviceAccountName' | tee /dev/stderr)
+  [ "${actual}" = "user-defined-ksa" ]
+}
+
+@test "server/standalone-StatefulSet: serviceAccount.name is not set" {
+ cd `chart_dir`
+
+ local actual=$(helm template \
+      --show-only templates/server-statefulset.yaml  \
+      --set 'server.serviceAccount.create=false' \
+      . | tee /dev/stderr |
+      yq -r '.spec.template.spec.serviceAccountName' | tee /dev/stderr)
+  [ "${actual}" = "default" ]
+
+ local actual=$(helm template \
+      --show-only templates/server-statefulset.yaml  \
+      --set 'server.serviceAccount.create=true' \
+      . | tee /dev/stderr |
+      yq -r '.spec.template.spec.serviceAccountName' | tee /dev/stderr)
+  [ "${actual}" = "RELEASE-NAME-vault" ]
+
+
+}
+
+@test "server/standalone-StatefulSet: preCommands can be set" {
+  cd `chart_dir`
+  actual=$(helm template \
+      --show-only templates/server-statefulset.yaml  \
+      --set='server.preCommands=/bin/sh testPreCommands.sh' \
+      . | tee /dev/stderr |
+      yq -r '.spec.template.spec.containers[0].args'[0] | head -n1 | tee /dev/stderr)
+  [ "${actual}" = "/bin/sh testPreCommands.sh" ]
 }

@@ -2,11 +2,6 @@
 {{- if ne .mode "external" }}
 {{- if and (ne .mode "") (eq (.Values.global.enabled | toString) "true") }}
 {{- if eq (.Values.ui.enabled | toString) "true" }}
-# Headless service for Vault server DNS entries. This service should only
-# point to Vault servers. For access to an agent, one should assume that
-# the agent is installed locally on the node and the NODE_IP should be used.
-# If the node can't run a Vault agent, then this service can be used to
-# communicate directly to a server agent.
 apiVersion: v1
 kind: Service
 metadata:
@@ -23,7 +18,10 @@ spec:
     app.kubernetes.io/name: {{ include "vault.name" . }}
     app.kubernetes.io/instance: {{ .Release.Name }}
     component: server
-  publishNotReadyAddresses: true
+    {{- if and (.Values.ui.activeVaultPodOnly) (eq .mode "ha") }}
+    vault-active: "true"
+    {{- end }}
+  publishNotReadyAddresses: {{ .Values.ui.publishNotReadyAddresses }}
   ports:
     - name: {{ include "vault.scheme" . }}
       port: {{ .Values.ui.externalPort }}
@@ -43,5 +41,5 @@ spec:
   {{- end }}
 {{- end -}}
 
-{{ end }}
-{{ end }}
+{{- end }}
+{{- end }}

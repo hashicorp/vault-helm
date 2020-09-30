@@ -404,6 +404,44 @@ load _helpers
 }
 
 #--------------------------------------------------------------------
+# VAULT_API_ADDR renders
+
+@test "server/ha-StatefulSet: api addr renders to Pod IP by default" {
+  cd `chart_dir`
+  local object=$(helm template \
+      --show-only templates/server-statefulset.yaml  \
+      --set 'server.ha.enabled=true' \
+      . | tee /dev/stderr |
+      yq -r '.spec.template.spec.containers[0].env' | tee /dev/stderr)
+
+  local actual=$(echo $object |
+     yq -r '.[5].name' | tee /dev/stderr)
+  [ "${actual}" = "VAULT_API_ADDR" ]
+
+  local actual=$(echo $object |
+     yq -r '.[5].value' | tee /dev/stderr)
+  [ "${actual}" = 'http://$(POD_IP):8200' ]
+}
+
+@test "server/ha-StatefulSet: api addr can be overriden" {
+  cd `chart_dir`
+  local object=$(helm template \
+      --show-only templates/server-statefulset.yaml  \
+      --set 'server.ha.enabled=true' \
+      --set 'server.ha.apiAddr="https://example.com:8200"' \
+      . | tee /dev/stderr |
+      yq -r '.spec.template.spec.containers[0].env' | tee /dev/stderr)
+
+  local actual=$(echo $object |
+     yq -r '.[5].name' | tee /dev/stderr)
+  [ "${actual}" = "VAULT_API_ADDR" ]
+
+  local actual=$(echo $object |
+     yq -r '.[5].value' | tee /dev/stderr)
+  [ "${actual}" = 'https://example.com:8200' ]
+}
+
+#--------------------------------------------------------------------
 # VAULT_CLUSTER_ADDR renders
 
 @test "server/ha-StatefulSet: cluster addr renders" {

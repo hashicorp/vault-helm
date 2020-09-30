@@ -10,7 +10,7 @@ global:
   #   - name: image-pull-secret
   # TLS for end-to-end encrypted transport
   tlsDisable: true
-  # Beta Feature: If deploying to OpenShift
+  # If deploying to OpenShift
   openshift: false
   # Create PodSecurityPolicy for pods
   psp:
@@ -27,6 +27,10 @@ injector:
   # True if you want to enable vault agent injection.
   enabled: true
 
+  # If true, will enable a node exporter metrics endpoint at /metrics.
+  metrics:
+    enabled: false
+
   # External vault server address for the injector to use. Setting this will
   # disable deployment of a vault server along with the injector.
   externalVaultAddr: ""
@@ -34,7 +38,7 @@ injector:
   # image sets the repo and tag of the vault-k8s image to use for the injector.
   image:
     repository: "hashicorp/vault-k8s"
-    tag: "0.4.0"
+    tag: "0.5.0"
     pullPolicy: IfNotPresent
 
   # agentImage sets the repo and tag of the Vault image to use for the Vault Agent
@@ -42,7 +46,7 @@ injector:
   # required.
   agentImage:
     repository: "vault"
-    tag: "1.4.2"
+    tag: "1.5.2"
 
   # Mount Path of the Vault Kubernetes Auth Method.
   authPath: "auth/kubernetes"
@@ -125,7 +129,7 @@ server:
 
   image:
     repository: "vault"
-    tag: "1.4.2"
+    tag: "1.5.2"
     # Overrides the default Image Pull Policy
     pullPolicy: IfNotPresent
 
@@ -184,6 +188,20 @@ server:
   # This is useful if you need to run a script to provision TLS certificates or
   # write out configuration files in a dynamic way.
   extraInitContainers: null
+    # # This example installs a plugin pulled from github into the /usr/local/libexec/vault/oauthapp folder,
+    # # which is defined in the volumes value.
+    # - name: oauthapp
+    #   image: "alpine"
+    #   command: [sh, -c]
+    #   args:
+    #     - cd /tmp &&
+    #       wget https://github.com/puppetlabs/vault-plugin-secrets-oauthapp/releases/download/v1.2.0/vault-plugin-secrets-oauthapp-v1.2.0-linux-amd64.tar.xz -O oauthapp.xz &&
+    #       tar -xf oauthapp.xz &&
+    #       mv vault-plugin-secrets-oauthapp-v1.2.0-linux-amd64 /usr/local/libexec/vault/oauthapp &&
+    #       chmod +x /usr/local/libexec/vault/oauthapp
+    #   volumeMounts:
+    #     - name: plugins
+    #       mountPath: /usr/local/libexec/vault
 
   # extraContainers is a list of sidecar containers. Specified as a YAML list.
   extraContainers: null
@@ -193,7 +211,8 @@ server:
   shareProcessNamespace: false
 
   # preCommands is a multi-line string of commands to run before the vault entry point.
-  preCommands: {}
+  preCommands: ""
+
 
   # extraArgs is a string containing additional Vault server arguments.
   extraArgs: ""
@@ -203,11 +222,31 @@ server:
     enabled: true
     # If you need to use a http path instead of the default exec
     # path: /v1/sys/health?standbyok=true
+    
+    # When a probe fails, Kubernetes will try failureThreshold times before giving up
+    failureThreshold: 2
+    # Number of seconds after the container has started before probe initiates
+    initialDelaySeconds: 5
+    # How often (in seconds) to perform the probe
+    periodSeconds: 5
+    # Minimum consecutive successes for the probe to be considered successful after having failed
+    successThreshold: 1
+    # Number of seconds after which the probe times out.
+    timeoutSeconds: 3
   # Used to enable a livenessProbe for the pods
   livenessProbe:
     enabled: false
     path: "/v1/sys/health?standbyok=true"
+    # When a probe fails, Kubernetes will try failureThreshold times before giving up
+    failureThreshold: 2
+    # Number of seconds after the container has started before probe initiates
     initialDelaySeconds: 60
+    # How often (in seconds) to perform the probe
+    periodSeconds: 5
+    # Minimum consecutive successes for the probe to be considered successful after having failed
+    successThreshold: 1
+    # Number of seconds after which the probe times out.
+    timeoutSeconds: 3
 
   # Used to set the sleep time during the preStop step
   preStopSleepSeconds: 5
@@ -242,6 +281,22 @@ server:
     #   name: my-secret
     #   path: null # default is `/vault/userconfig`
 
+  # volumes is a list of volumes made available to all containers. These are rendered
+  # via toYaml rather than pre-processed like the extraVolumes value.
+  # The purpose is to make it easy to share volumes between containers.
+  volumes: null
+  #   - name: plugins
+  #     emptyDir: {}
+
+  # volumeMounts is a list of volumeMounts for the main server container. These are rendered
+  # via toYaml rather than pre-processed like the extraVolumes value.
+  # The purpose is to make it easy to share volumes between containers.
+  volumeMounts: null
+  #   - mountPath: /usr/local/libexec/vault
+  #     name: plugins
+  #     readOnly: true
+
+
   # Affinity Settings
   # Commenting out or setting as empty the affinity variable, will allow
   # deployment to single node services such as Minikube
@@ -266,6 +321,10 @@ server:
   # nodeSelector: |
   #   beta.kubernetes.io/arch: amd64
   nodeSelector: null
+
+  # Enables network policy for server pods
+  networkPolicy:
+    enabled: false
 
   # Priority class for server pods
   priorityClassName: ""
@@ -319,6 +378,8 @@ server:
     storageClass: null
     # Access Mode of the storage device being used for the PVC
     accessMode: ReadWriteOnce
+    # Annotations to apply to the PVC
+    annotations: {}
 
   # This configures the Vault Statefulset to create a PVC for audit
   # logs.  Once Vault is deployed, initialized and unseal, Vault must
@@ -334,6 +395,8 @@ server:
     storageClass: null
     # Access Mode of the storage device being used for the PVC
     accessMode: ReadWriteOnce
+    # Annotations to apply to the PVC
+    annotations: {}
 
   # Run Vault in "dev" mode. This requires no further setup, no state management,
   # and no initialization. This is useful for experimenting with Vault without
@@ -389,6 +452,11 @@ server:
   ha:
     enabled: false
     replicas: 3
+
+    # Set the api_addr configuration for Vault HA
+    # See https://www.vaultproject.io/docs/configuration#api_addr
+    # If set to null, this will be set to the Pod IP Address
+    apiAddr: null
 
     # Enables Vault's integrated Raft storage.  Unlike the typical HA modes where
     # Vault's persistence is external (such as Consul), enabling Raft mode will create
@@ -464,9 +532,21 @@ server:
 
   # Definition of the serviceAccount used to run Vault.
   serviceAccount:
+    # Specifies whether a service account should be created
+    create: true
+    # The name of the service account to use.
+    # If not set and create is true, a name is generated using the fullname template
+    name: ""
     # Extra annotations for the serviceAccount definition. This can either be
     # YAML or a YAML-formatted multi-line templated string map of the
     # annotations to apply to the serviceAccount.
+    annotations: {}
+
+  # Settings for the statefulSet used to run Vault.
+  statefulSet:
+    # Extra annotations for the statefulSet. This can either be YAML or a
+    # YAML-formatted multi-line templated string map of the annotations to apply
+    # to the statefulSet.
     annotations: {}
 
 # Vault UI
@@ -477,6 +557,9 @@ ui:
   # example, setting this to "LoadBalancer" will create an external load
   # balancer (for supported K8S installations) to access the UI.
   enabled: false
+  publishNotReadyAddresses: true
+  # The service should only contain selectors for active Vault pod
+  activeVaultPodOnly: false
   serviceType: "ClusterIP"
   serviceNodePort: null
   externalPort: 8200
