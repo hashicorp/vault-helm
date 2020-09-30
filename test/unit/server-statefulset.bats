@@ -1441,3 +1441,13 @@ load _helpers
 
 
 }
+
+@test "server/standalone-StatefulSet: preCommands can be set" {
+  cd `chart_dir`
+  actual=$(helm template \
+      --show-only templates/server-statefulset.yaml  \
+      --set='server.preCommands=/bin/sh testPreCommands.sh' \
+      . | tee /dev/stderr |
+      yq -r '.spec.template.spec.containers[0].args'[0] | head -n1 | tee /dev/stderr)
+  [ "${actual}" = "/bin/sh testPreCommands.sh" ]
+}
