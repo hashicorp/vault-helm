@@ -146,12 +146,12 @@ based on the mode configured.
 {{- define "vault.mounts" -}}
   {{ if eq (.Values.server.auditStorage.enabled | toString) "true" }}
             - name: audit
-              mountPath: /vault/audit
+              mountPath: {{ .Values.server.auditStorage.mountPath }}
   {{ end }}
   {{ if or (eq .mode "standalone") (and (eq .mode "ha") (eq (.Values.server.ha.raft.enabled | toString) "true"))  }}
     {{ if eq (.Values.server.dataStorage.enabled | toString) "true" }}
             - name: data
-              mountPath: /vault/data
+              mountPath: {{ .Values.server.dataStorage.mountPath }}
     {{ end }}
   {{ end }}
   {{ if and (ne .mode "dev") (or (.Values.server.standalone.config)  (.Values.server.ha.config)) }}
