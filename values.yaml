@@ -122,6 +122,11 @@ injector:
   # Priority class for injector pods
   priorityClassName: ""
 
+  # Extra annotations to attach to the injector pods
+  # This can either be YAML or a YAML-formatted multi-line templated string map
+  # of the annotations to apply to the injector pods
+  annotations: {}
+
 server:
   # Resource requests, limits, etc. for the server cluster placement. This
   # should map directly to the value of the resources field for a PodSpec.
