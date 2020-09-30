@@ -124,6 +124,7 @@ for users looking to use this chart with Consul Helm.
   {{ if or (eq .mode "standalone") (eq .mode "ha") }}
           - |
             {{- if .Values.server.preCommands -}}
+
               {{- tpl .Values.server.preCommands . | nindent 12 }}
             {{- end }}
             sed -E "s/HOST_IP/${HOST_IP?}/g" /vault/config/extraconfig-from-values.hcl > /tmp/storageconfig.hcl;

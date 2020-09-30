@@ -213,6 +213,7 @@ server:
   # preCommands is a multi-line string of commands to run before the vault entry point.
   preCommands: ""
 
+
   # extraArgs is a string containing additional Vault server arguments.
   extraArgs: ""
 
