@@ -211,7 +211,7 @@ server:
   shareProcessNamespace: false
 
   # preCommands is a multi-line string of commands to run before the vault entry point.
-  preCommands: {}
+  preCommands: ""
 
   # extraArgs is a string containing additional Vault server arguments.
   extraArgs: ""
