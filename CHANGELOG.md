@@ -3,6 +3,7 @@
 Improvements:
 * Make server NetworkPolicy independent of OpenShift [GH-381](https://github.com/hashicorp/vault-helm/pull/381)
 * Added configurables for all probe values [GH-387](https://github.com/hashicorp/vault-helm/pull/387)
+* MountPath for audit and data storage is now configurable [GH-393](https://github.com/hashicorp/vault-helm/pull/393)
 
 ## 0.7.0 (August 24th, 2020)
 
