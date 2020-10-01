@@ -604,6 +604,56 @@ load _helpers
   [ "${actual}" = "0" ]
 }
 
+@test "server/standalone-StatefulSet: default audit storage mount path" {
+  cd `chart_dir`
+  local object=$(helm template \
+      --show-only templates/server-statefulset.yaml  \
+      --set 'server.auditStorage.enabled=true' \
+      . | tee /dev/stderr |
+      yq -r '.spec.template.spec.containers[0].volumeMounts[] | select(.name == "audit")' | tee /dev/stderr)
+
+  local actual=$(echo $object | yq -r '.mountPath' | tee /dev/stderr)
+  [ "${actual}" = "/vault/audit" ]
+}
+
+@test "server/standalone-StatefulSet: can configure audit storage mount path" {
+  cd `chart_dir`
+  local object=$(helm template \
+      --show-only templates/server-statefulset.yaml  \
+      --set 'server.auditStorage.enabled=true' \
+      --set 'server.auditStorage.mountPath=/var/log/vault' \
+      . | tee /dev/stderr |
+      yq -r '.spec.template.spec.containers[0].volumeMounts[] | select(.name == "audit")' | tee /dev/stderr)
+
+  local actual=$(echo $object | yq -r '.mountPath' | tee /dev/stderr)
+  [ "${actual}" = "/var/log/vault" ]
+}
+
+@test "server/standalone-StatefulSet: default data storage mount path" {
+  cd `chart_dir`
+  local object=$(helm template \
+      --show-only templates/server-statefulset.yaml  \
+      --set 'server.dataStorage.enabled=true' \
+      . | tee /dev/stderr |
+      yq -r '.spec.template.spec.containers[0].volumeMounts[] | select(.name == "data")' | tee /dev/stderr)
+
+  local actual=$(echo $object | yq -r '.mountPath' | tee /dev/stderr)
+  [ "${actual}" = "/vault/data" ]
+}
+
+@test "server/standalone-StatefulSet: can configure data storage mount path" {
+  cd `chart_dir`
+  local object=$(helm template \
+      --show-only templates/server-statefulset.yaml  \
+      --set 'server.dataStorage.enabled=true' \
+      --set 'server.dataStorage.mountPath=/opt/vault' \
+      . | tee /dev/stderr |
+      yq -r '.spec.template.spec.containers[0].volumeMounts[] | select(.name == "data")' | tee /dev/stderr)
+
+  local actual=$(echo $object | yq -r '.mountPath' | tee /dev/stderr)
+  [ "${actual}" = "/opt/vault" ]
+}
+
 @test "server/standalone-StatefulSet: affinity is set by default" {
   cd `chart_dir`
   local actual=$(helm template \
