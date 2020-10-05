@@ -25,9 +25,9 @@ load _helpers
   cd `chart_dir`
   local actual=$(helm template \
       --set 'server.networkPolicy.enabled=true' \
-      --set 'global.networkPolicy.egress[0].to[0].ipBlock.cidr=10.0.0.0/24' \
-      --set 'global.networkPolicy.egress[0].ports[0].protocol=TCP' \
-      --set 'global.networkPolicy.egress[0].ports[0].port=443' \
+      --set 'server.networkPolicy.egress[0].to[0].ipBlock.cidr=10.0.0.0/24' \
+      --set 'server.networkPolicy.egress[0].ports[0].protocol=TCP' \
+      --set 'server.networkPolicy.egress[0].ports[0].port=443' \
       --show-only templates/server-network-policy.yaml  \
       . | tee /dev/stderr |
       yq -r '.spec.egress[0].to[0].ipBlock.cidr=10.0.0.0/24' | tee /dev/stderr)
