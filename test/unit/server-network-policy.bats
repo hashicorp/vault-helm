@@ -30,6 +30,6 @@ load _helpers
       --set 'global.networkPolicy.egress[0].ports[0].port=443' \
       --show-only templates/server-network-policy.yaml  \
       . | tee /dev/stderr |
-      yq -r '.spec.egress[0]' | tee /dev/stderr)
-  [ "${actual}" = "{}" ]
+      yq -r '.spec.egress[0].to[0].ipBlock.cidr=10.0.0.0/24' | tee /dev/stderr)
+  [ "${actual}" = "10.0.0.0/24" ]
 }
