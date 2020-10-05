@@ -6,6 +6,9 @@ Improvements:
 * MountPath for audit and data storage is now configurable [GH-393](https://github.com/hashicorp/vault-helm/pull/393)
 * Annotations can now be added to the Injector pods [GH-394](https://github.com/hashicorp/vault-helm/pull/394)
 
+Bugs:
+* Fixed install output using Helm V2 command [GH-378](https://github.com/hashicorp/vault-helm/pull/378)
+
 ## 0.7.0 (August 24th, 2020)
 
 Features:
