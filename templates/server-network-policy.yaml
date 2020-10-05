@@ -21,6 +21,6 @@ spec:
         protocol: TCP
   {{- if .Values.server.networkPolicy.egress }}
   egress:
-    - {}
+  {{- toYaml .Values.server.networkPolicy.egress | nindent 4 }}
   {{ end }}
 {{ end }}
