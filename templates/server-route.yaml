@@ -27,7 +27,7 @@ spec:
   port:
     targetPort: 8200
   tls:
-    termination: passthrough
+    {{- toYaml .Values.server.route.tls | nindent  4 }}
 {{- end }}
 {{- end }}
 {{- end }}
