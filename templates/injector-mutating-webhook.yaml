@@ -24,4 +24,7 @@ webhooks:
     namespaceSelector:
 {{ toYaml .Values.injector.namespaceSelector | indent 6}}
 {{ end }}
+{{- with .Values.injector.failurePolicy }}
+    failurePolicy: {{.}}
+{{ end }}
 {{ end }}
