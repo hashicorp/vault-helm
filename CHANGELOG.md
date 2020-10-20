@@ -1,5 +1,6 @@
 ## Unreleased
-##  0.8.0 (October 20th, 2020)
+
+## 0.8.0 (October 20th, 2020)
 
 Improvements:
 * Make server NetworkPolicy independent of OpenShift [GH-381](https://github.com/hashicorp/vault-helm/pull/381)
