@@ -7,7 +7,7 @@ load _helpers
 
   helm install "$(name_prefix)-east" \
     --set='server.image.repository=hashicorp/vault-enterprise' \
-    --set='server.image.tag=1.5.2_ent' \
+    --set='server.image.tag=1.5.4_ent' \
     --set='injector.enabled=false' \
     --set='server.ha.enabled=true' \
     --set='server.ha.raft.enabled=true' .
@@ -28,7 +28,7 @@ load _helpers
 
   local primary_token=$(echo ${init} | jq -r '.unseal_keys_b64[0]')
   [ "${primary_token}" != "" ]
-  
+
   local primary_root=$(echo ${init} | jq -r '.root_token')
   [ "${primary_root}" != "" ]
 
@@ -60,7 +60,7 @@ load _helpers
 
   kubectl exec "$(name_prefix)-east-0" -- vault login ${primary_root}
 
-  local raft_status=$(kubectl exec "$(name_prefix)-east-0" -- vault operator raft list-peers -format=json | 
+  local raft_status=$(kubectl exec "$(name_prefix)-east-0" -- vault operator raft list-peers -format=json |
     jq -r '.data.config.servers | length')
   [ "${raft_status}" == "3" ]
 
@@ -76,7 +76,7 @@ load _helpers
   helm install "$(name_prefix)-west" \
     --set='injector.enabled=false' \
     --set='server.image.repository=hashicorp/vault-enterprise' \
-    --set='server.image.tag=1.5.2_ent' \
+    --set='server.image.tag=1.5.4_ent' \
     --set='server.ha.enabled=true' \
     --set='server.ha.raft.enabled=true' .
   wait_for_running "$(name_prefix)-west-0"
