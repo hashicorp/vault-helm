@@ -7,6 +7,7 @@ Improvements:
 * Annotations can now be added to the Injector pods [GH-394](https://github.com/hashicorp/vault-helm/pull/394)
 * The injector can now be configured with a failurePolicy [GH-400](https://github.com/hashicorp/vault-helm/pull/400)
 * Added additional environment variables for rendering within Vault config [GH-398](https://github.com/hashicorp/vault-helm/pull/398)
+* Service account for Vault K8s auth is automatically created when `injector.externalVaultAddr` is set [GH-392](https://github.com/hashicorp/vault-helm/pull/392)
 
 Bugs:
 * Fixed install output using Helm V2 command [GH-378](https://github.com/hashicorp/vault-helm/pull/378)
