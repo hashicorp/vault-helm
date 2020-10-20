@@ -103,7 +103,7 @@ injector:
   #     memory: 256Mi
   #     cpu: 250m
 
-  # extraEnvironmentVars is a list of extra enviroment variables to set in the
+  # extraEnvironmentVars is a list of extra environment variables to set in the
   # injector deployment.
   extraEnvironmentVars: {}
     # KUBERNETES_SERVICE_HOST: kubernetes.default.svc
@@ -266,14 +266,14 @@ server:
   # - -c
   # - /vault/userconfig/myscript/run.sh
 
-  # extraEnvironmentVars is a list of extra enviroment variables to set with the stateful set. These could be
+  # extraEnvironmentVars is a list of extra environment variables to set with the stateful set. These could be
   # used to include variables required for auto-unseal.
   extraEnvironmentVars: {}
     # GOOGLE_REGION: global
     # GOOGLE_PROJECT: myproject
     # GOOGLE_APPLICATION_CREDENTIALS: /vault/userconfig/myproject/myproject-creds.json
 
-  # extraSecretEnvironmentVars is a list of extra enviroment variables to set with the stateful set.
+  # extraSecretEnvironmentVars is a list of extra environment variables to set with the stateful set.
   # These variables take value from existing Secret objects.
   extraSecretEnvironmentVars: []
     # - envName: AWS_SECRET_ACCESS_KEY
