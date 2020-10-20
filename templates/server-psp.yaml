@@ -22,7 +22,14 @@ spec:
     {{- if eq (.Values.server.dataStorage.enabled | toString) "true" }}
     - persistentVolumeClaim
     {{- end }}
+  {{- if .Values.server.hostNetwork }}
+  hostNetwork: {{ .Values.server.hostNetwork }}
+  hostPorts:
+    - min: 8200
+      max: 8202
+  {{- else }}
   hostNetwork: false
+  {{- end }}
   hostIPC: false
   hostPID: false
   runAsUser:

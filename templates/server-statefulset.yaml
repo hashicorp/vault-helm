@@ -41,6 +41,9 @@ spec:
       {{- if .Values.server.priorityClassName }}
       priorityClassName: {{ .Values.server.priorityClassName }}
       {{- end }}
+      {{- if .Values.server.hostNetwork }}
+      hostNetwork: {{ .Values.server.hostNetwork }}
+      {{- end }}
       terminationGracePeriodSeconds: 10
       serviceAccountName: {{ template "vault.serviceAccount.name" . }}
       {{ if  .Values.server.shareProcessNamespace }}

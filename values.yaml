@@ -541,6 +541,9 @@ server:
     # replicas. If you'd like a custom value, you can specify an override here.
       maxUnavailable: null
 
+  # hostNetwork defines whether to run the pods in the pod network or in the host network.
+  hostNetwork: false
+
   # Definition of the serviceAccount used to run Vault.
   serviceAccount:
     # Specifies whether a service account should be created
