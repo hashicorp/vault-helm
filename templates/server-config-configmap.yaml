@@ -15,7 +15,11 @@ metadata:
 data:
   extraconfig-from-values.hcl: |-
   {{- if or (eq .mode "ha") (eq .mode "standalone") }}
+  {{- if eq (.Values.server.ha.raft.enabled | toString) "true" }}
+  {{- $type := typeOf .Values.server.ha.raft.config }}
+  {{- else }}
   {{- $type := typeOf (index .Values.server .mode).config }}
+  {{- endif }}
   {{- if eq $type "string" }}
     disable_mlock = true
   {{- if eq .mode "standalone" }}
