@@ -1,5 +1,9 @@
 {{- if and (eq (.Values.injector.enabled | toString) "true" ) (eq (.Values.global.enabled | toString) "true") }}
+{{- if .Capabilities.APIVersions.Has "admissionregistration.k8s.io/v1" -}}
+apiVersion: admissionregistration.k8s.io/v1
+{{- else }}
 apiVersion: admissionregistration.k8s.io/v1beta1
+{{- end }}
 kind: MutatingWebhookConfiguration
 metadata:
   name: {{ template "vault.fullname" . }}-agent-injector-cfg
