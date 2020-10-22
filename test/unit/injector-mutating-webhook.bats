@@ -98,14 +98,3 @@ load _helpers
 
   [ "${actual}" = "\"Fail\"" ]
 }
-
-@test "injector/MutatingWebhookConfiguration: sets v1 APIVersion when supported" {
-  cd `chart_dir`
-  local actual=$(helm template \
-      --show-only templates/injector-mutating-webhook.yaml  \
-      --set 'injector.enabled=true' \
-      --namespace foo \
-      . | tee /dev/stderr |
-      yq '.webhooks[0].failurePolicy' | tee /dev/stderr)
-  [ "${actual}" = "\"Ignore\"" ]
-}
