@@ -70,11 +70,12 @@ injector:
   #      sidecar-injector: enabled
   namespaceSelector: {}
 
-  # Configures failurePolicy of the webhook. By default webhook failures are ignored.
+  # Configures failurePolicy of the webhook. The "unspecified" default behaviour deoends on the
+  # API Version of the WebHook.
   # To block pod creation while webhook is unavailable, set the policy to `Fail` below.
   # See https://kubernetes.io/docs/reference/access-authn-authz/extensible-admission-controllers/#failure-policy
   #
-  # failurePolcy: Fail
+  failurePolicy: Ignore
 
   certs:
     # secretName is the name of the secret that has the TLS certificate and
