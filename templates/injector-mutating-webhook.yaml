@@ -13,6 +13,10 @@ metadata:
     app.kubernetes.io/managed-by: {{ .Release.Service }}
 webhooks:
   - name: vault.hashicorp.com
+    sideEffects: None
+    admissionReviewVersions:
+    - "v1beta1"
+    - "v1"
     clientConfig:
       service:
         name: {{ template "vault.fullname" . }}-agent-injector-svc
