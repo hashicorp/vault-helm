@@ -468,6 +468,7 @@ server:
     # See https://www.vaultproject.io/docs/configuration#api_addr
     # If set to null, this will be set to the Pod IP Address
     apiAddr: null
+    clusterAddr: null
 
     # Enables Vault's integrated Raft storage.  Unlike the typical HA modes where
     # Vault's persistence is external (such as Consul), enabling Raft mode will create
