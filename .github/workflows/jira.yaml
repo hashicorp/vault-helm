@@ -5,7 +5,6 @@ on:
     types: [opened, closed, reopened]
   issue_comment: # Also triggers when commenting on a PR from the conversation view
     types: [created]
-  workflow_dispatch:
 
 name: Jira Sync
 
@@ -36,9 +35,9 @@ jobs:
         JIRA_USER_EMAIL: ${{ secrets.JIRA_SYNC_USER_EMAIL }}
         JIRA_API_TOKEN: ${{ secrets.JIRA_SYNC_API_TOKEN }}
 
-    - name: Set ticket type
-      if: github.event.action == 'opened' && !steps.vault-team-role.outputs.role
-      id: set-ticket-type
+    - name: Preprocess
+      if: github.event.action == 'opened' || github.event.action == 'created'
+      id: preprocess
       run: |
         if [[ "${{ github.event_name }}" == "pull_request_target" ]]; then
           echo "::set-output name=type::PR"
@@ -48,15 +47,15 @@ jobs:
 
     - name: Create ticket
       if: github.event.action == 'opened' && !steps.vault-team-role.outputs.role
-      uses: tomhjp/gh-action-jira-create@v0.1.3
+      uses: tomhjp/gh-action-jira-create@v0.2.0
       with:
         project: VAULT
         issuetype: "GH Issue"
-        summary: "${{ github.event.repository.name }} [${{ steps.set-ticket-type.outputs.type }} #${{ github.event.issue.number || github.event.pull_request.number }}]: ${{ github.event.issue.title || github.event.pull_request.title }}"
+        summary: "${{ github.event.repository.name }} [${{ steps.preprocess.outputs.type }} #${{ github.event.issue.number || github.event.pull_request.number }}]: ${{ github.event.issue.title || github.event.pull_request.title }}"
         description: "${{ github.event.issue.body || github.event.pull_request.body }}\n\n_Created from GitHub Action for ${{ github.event.issue.html_url || github.event.pull_request.html_url }} from ${{ github.actor }}_"
         # customfield_10089 is Issue Link custom field
         # customfield_10091 is team custom field
-        extraFields: '{"fixVersions": [{"name": "TBD"}], "customfield_10091": ["ecosystem"], "customfield_10089": "${{ github.event.issue.html_url || github.event.pull_request.html_url }}"}'
+        extraFields: '{"fixVersions": [{"name": "TBD"}], "customfield_10091": ["ecosystem", "runtime"], "customfield_10089": "${{ github.event.issue.html_url || github.event.pull_request.html_url }}"}'
 
     - name: Search
       if: github.event.action != 'opened'
@@ -68,7 +67,7 @@ jobs:
 
     - name: Sync comment
       if: github.event.action == 'created' && steps.search.outputs.issue
-      uses: tomhjp/gh-action-jira-comment@v0.1.0
+      uses: tomhjp/gh-action-jira-comment@v0.2.0
       with:
         issue: ${{ steps.search.outputs.issue }}
         comment: "${{ github.actor }} ${{ github.event.review.state || 'commented' }}:\n\n${{ github.event.comment.body || github.event.review.body }}\n\n${{ github.event.comment.html_url || github.event.review.html_url }}"
