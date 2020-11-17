@@ -1,6 +1,6 @@
 apiVersion: v2
 name: vault
-version: 0.8.0
+version: 0.8.1
 appVersion: 1.5.4
 description: Official HashiCorp Vault Chart
 home: https://www.vaultproject.io

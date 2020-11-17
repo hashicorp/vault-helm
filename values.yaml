@@ -175,6 +175,14 @@ server:
     hosts:
       - host: chart-example.local
         paths: []
+        # Allow adding extra backend sections. This allows us to make use of
+        # the annotations required to do https redirection using AWS
+        # Application Load Balancers.
+        # See <https://github.com/hashicorp/vault-helm/issues/361>.
+        # extraBackends:
+        #   - path: /*
+        #     serviceName: ssl-redirect
+        #     servicePort: use-annotation
 
     tls: []
     #  - secretName: chart-example-tls

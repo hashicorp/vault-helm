@@ -41,6 +41,12 @@ spec:
     - host: {{ .host | quote }}
       http:
         paths:
+        {{- range .extraBackends }}
+          - path: {{ .path }}
+            backend:
+              serviceName: {{ .serviceName }}
+              servicePort: {{ .servicePort }}
+        {{- end }}
         {{- range (.paths | default (list "/")) }}
           - path: {{ . }}
             backend:

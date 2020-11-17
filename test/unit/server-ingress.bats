@@ -121,3 +121,20 @@ load _helpers
       yq -r '.spec.rules[0].http.paths[0].backend.serviceName' | tee /dev/stderr)
   [ "${actual}" = "RELEASE-NAME-vault" ]
 }
+
+@test "server/ingress: adds extra backend workaround for ALB https redirection - yaml" {
+  cd `chart_dir`
+
+  local actual=$(helm template \
+      --show-only templates/server-ingress.yaml \
+      --set 'server.ingress.enabled=true' \
+      --set 'server.ingress.hosts[0].host=test.com' \
+      --set 'server.ingress.hosts[0].paths[0]=/' \
+      --set 'server.ingress.hosts[0].extraBackends[0].path=/' \
+      --set 'server.ingress.hosts[0].extraBackends[0].serviceName=ssl-redirect' \
+      --set 'server.ingress.hosts[0].extraBackends[0].servicePort=use-annotation' \
+      --set 'server.service.enabled=true' \
+      . | tee /dev/stderr |
+      yq -r '.spec.rules[0].http.paths[0].backend.serviceName' | tee /dev/stderr)
+  [ "${actual}" = "ssl-redirect" ]
+}
