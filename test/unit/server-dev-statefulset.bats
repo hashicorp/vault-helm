@@ -249,7 +249,7 @@ load _helpers
       yq -r '.spec.template.spec.containers[0].env' | tee /dev/stderr)
 
   local actual=$(echo $object |
-r   yq -r '.[11].name' | tee /dev/stderr)
+      yq -r '.[11].name' | tee /dev/stderr)
   [ "${actual}" = "FOO" ]
 
   local actual=$(echo $object |
