@@ -6,14 +6,14 @@ jobs:
   bats-unit-test:
     docker:
       # This image is built from test/docker/Test.dockerfile
-      - image: hashicorpdev/vault-helm-test:0.1.0
+      - image: docker.mirror.hashicorp.services/hashicorpdev/vault-helm-test:0.1.0
     steps:
       - checkout
       - run: bats ./test/unit -t
   acceptance:
     docker:
       # This image is build from test/docker/Test.dockerfile
-      - image: hashicorpdev/vault-helm-test:0.1.0
+      - image: docker.mirror.hashicorp.services/hashicorpdev/vault-helm-test:0.1.0
 
     steps:
       - checkout
@@ -35,7 +35,7 @@ jobs:
           when: always
   update-helm-charts-index:
     docker:
-      - image: circleci/golang:latest
+      - image: docker.mirror.hashicorp.services/circleci/golang:1.15.3
     steps:
       - checkout
       - run:
