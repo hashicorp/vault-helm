@@ -417,7 +417,7 @@ server:
   dev:
     enabled: false
 
-    # Overrides default root token which is by default set to "root"
+    # Overrides dev root token value which by default is set to "root"
     #devRootToken: "root"
 
   # Run Vault in "standalone" mode. This is the default mode that will deploy if
