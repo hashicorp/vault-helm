@@ -135,6 +135,14 @@ for users looking to use this chart with Consul Helm.
 {{- end -}}
 
 {{/*
+Set's additional environment variables based on the mode.
+*/}}
+{{- define "vault.envs" -}}
+  {{ if eq .mode "dev" }}
+            - name: VAULT_DEV_ROOT_TOKEN_ID
+              value: {{ .Values.server.dev.devRootToken | default "root" }}
+  {{ end }}
+{{- end -}}
 
 {{/*
 Set's which additional volumes should be mounted to the container
