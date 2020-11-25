@@ -403,3 +403,14 @@ load _helpers
       yq -r '.spec.template.spec.securityContext.fsGroup' | tee /dev/stderr)
   [ "${actual}" = "2000" ]
 }
+
+@test "server/dev-StatefulSet: add extraArgs" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      --show-only templates/server-statefulset.yaml \
+      --set 'server.dev.enabled=true' \
+      --set 'server.extraArgs=foobar' \
+      . | tee /dev/stderr |
+       yq -r '.spec.template.spec.containers[0].args[0]' | tee /dev/stderr)
+  [[ "${actual}" = *"foobar"* ]]
+}
