@@ -236,6 +236,44 @@ load _helpers
 }
 
 #--------------------------------------------------------------------
+# devRootToken
+
+@test "server/dev-StatefulSet: set default devRootToken" {
+  cd `chart_dir`
+  local object=$(helm template \
+      --show-only templates/server-statefulset.yaml  \
+      --set 'server.dev.enabled=true' \
+      . | tee /dev/stderr |
+      yq -r '.spec.template.spec.containers[0].env' | tee /dev/stderr)
+
+  local actual=$(echo $object |
+      yq -r '.[11].name' | tee /dev/stderr)
+  [ "${actual}" = "VAULT_DEV_ROOT_TOKEN_ID" ]
+
+  local actual=$(echo $object |
+      yq -r '.[11].value' | tee /dev/stderr)
+  [ "${actual}" = "root" ]
+}
+
+@test "server/dev-StatefulSet: set custom devRootToken" {
+  cd `chart_dir`
+  local object=$(helm template \
+      --show-only templates/server-statefulset.yaml  \
+      --set 'server.dev.enabled=true' \
+      --set 'server.dev.devRootToken=customtoken' \
+      . | tee /dev/stderr |
+      yq -r '.spec.template.spec.containers[0].env' | tee /dev/stderr)
+
+  local actual=$(echo $object |
+      yq -r '.[11].name' | tee /dev/stderr)
+  [ "${actual}" = "VAULT_DEV_ROOT_TOKEN_ID" ]
+
+  local actual=$(echo $object |
+      yq -r '.[11].value' | tee /dev/stderr)
+  [ "${actual}" = "customtoken" ]
+}
+
+#--------------------------------------------------------------------
 # extraEnvironmentVars
 
 @test "server/dev-StatefulSet: set extraEnvironmentVars" {

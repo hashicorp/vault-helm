@@ -418,7 +418,7 @@ server:
     enabled: false
 
     # Overrides dev root token value which by default is set to "root"
-    #devRootToken: "root"
+    devRootToken: "root"
 
   # Run Vault in "standalone" mode. This is the default mode that will deploy if
   # no arguments are given to helm. This requires a PVC for data storage to use
