@@ -66,7 +66,9 @@ spec:
           {{ template "vault.resources" . }}
           image: {{ .Values.server.image.repository }}:{{ .Values.server.image.tag | default "latest" }}
           imagePullPolicy: {{ .Values.server.image.pullPolicy }}
-          command: {{ template "vault.command" . }}
+          command:
+          - "/bin/sh"
+          - "-ec"
           args: {{ template "vault.args" . }}
           env:
             - name: HOST_IP

@@ -104,18 +104,6 @@ extra volumes the user may have specified (such as a secret with TLS).
 {{- end -}}
 
 {{/*
-Set's a command to override the entrypoint defined in the image
-so we can make the user experience nicer.  This works in with
-"vault.args" to specify what commands /bin/sh should run.
-*/}}
-{{- define "vault.command" -}}
-  {{ if or (eq .mode "standalone") (eq .mode "ha") }}
-          - "/bin/sh"
-          - "-ec"
-  {{ end }}
-{{- end -}}
-
-{{/*
 Set's the args for custom command to render the Vault configuration
 file with IP addresses to make the out of box experience easier
 for users looking to use this chart with Consul Helm.
@@ -131,6 +119,9 @@ for users looking to use this chart with Consul Helm.
             [ -n "${TRANSIT_ADDR}" ] && sed -Ei "s|TRANSIT_ADDR|${TRANSIT_ADDR?}|g" /tmp/storageconfig.hcl;
             [ -n "${RAFT_ADDR}" ] && sed -Ei "s|RAFT_ADDR|${RAFT_ADDR?}|g" /tmp/storageconfig.hcl;
             /usr/local/bin/docker-entrypoint.sh vault server -config=/tmp/storageconfig.hcl {{ .Values.server.extraArgs }}
+   {{ else if eq .mode "dev" }}
+          - |
+            /usr/local/bin/docker-entrypoint.sh vault server -dev {{ .Values.server.extraArgs }}
   {{ end }}
 {{- end -}}
 
