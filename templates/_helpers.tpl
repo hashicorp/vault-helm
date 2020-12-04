@@ -294,6 +294,21 @@ Sets extra injector pod annotations
 {{- end -}}
 
 {{/*
+Sets extra injector service annotations
+*/}}
+{{- define "injector.service.annotations" -}}
+  {{- if .Values.injector.service.annotations }}
+  annotations:
+    {{- $tp := typeOf .Values.injector.service.annotations }}
+    {{- if eq $tp "string" }}
+      {{- tpl .Values.injector.service.annotations . | nindent 4 }}
+    {{- else }}
+      {{- toYaml .Values.injector.service.annotations | nindent 4 }}
+    {{- end }}
+  {{- end }}
+{{- end -}}
+
+{{/*
 Sets extra ui service annotations
 */}}
 {{- define "vault.ui.annotations" -}}

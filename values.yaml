@@ -133,6 +133,11 @@ injector:
   # of the annotations to apply to the injector pods
   annotations: {}
 
+  # Injector service specific config
+  service:
+    # Extra annotations to attach to the injector service
+    annotations: {}
+
 server:
   # Resource requests, limits, etc. for the server cluster placement. This
   # should map directly to the value of the resources field for a PodSpec.
