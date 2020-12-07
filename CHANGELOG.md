@@ -5,7 +5,8 @@ Improvements:
 * Dev mode root token is now configurable with `server.dev.devRootToken` [GH-415](https://github.com/hashicorp/vault-helm/pull/415)
 * ClusterRoleBinding updated to `v1` [GH-395](https://github.com/hashicorp/vault-helm/pull/395)
 * MutatingWebhook updated to `v1` [GH-408](https://github.com/hashicorp/vault-helm/pull/408)
-* Injector service now supports `injector.service.annotations`  [425](https://github.com/hashicorp/vault-helm/pull/425)
+* Injector service now supports `injector.service.annotations` [425](https://github.com/hashicorp/vault-helm/pull/425)
+* Injector now supports `injector.extraLabels` [428](https://github.com/hashicorp/vault-helm/pull/428)
 
 ## 0.8.0 (October 20th, 2020)
 
