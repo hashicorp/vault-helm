@@ -2,6 +2,7 @@
 
 Improvements:
 * Dev mode now supports `server.extraArgs` [GH-421](https://github.com/hashicorp/vault-helm/pull/421)
+* ClusterRoleBinding updated to `v1` [GH-395](https://github.com/hashicorp/vault-helm/pull/395)
 
 ## 0.8.0 (October 20th, 2020)
 
