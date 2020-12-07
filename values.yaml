@@ -134,6 +134,10 @@ injector:
   # of the annotations to apply to the injector pods
   annotations: {}
 
+  # Extra labels to attach to the agent-injector
+  # This should be a YAML map of the labels to apply to the injector
+  extraLabels: {}
+
   # Injector service specific config
   service:
     # Extra annotations to attach to the injector service

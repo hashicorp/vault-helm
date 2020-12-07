@@ -531,3 +531,15 @@ load _helpers
       yq '.spec.template.spec.securityContext.runAsGroup | length > 0' | tee /dev/stderr)
   [ "${actual}" = "false" ]
 }
+#--------------------------------------------------------------------
+# extra labels
+
+@test "injector/deployment: specify extraLabels" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      --show-only templates/injector-deployment.yaml \
+      --set 'injector.extraLabels.foo=bar' \
+      . | tee /dev/stderr |
+      yq -r '.spec.template.metadata.labels.foo' | tee /dev/stderr)
+  [ "${actual}" = "bar" ]
+}
