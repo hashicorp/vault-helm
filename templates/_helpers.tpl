@@ -131,7 +131,7 @@ Set's additional environment variables based on the mode.
 {{- define "vault.envs" -}}
   {{ if eq .mode "dev" }}
             - name: VAULT_DEV_ROOT_TOKEN_ID
-              value: "root"
+              value: {{ .Values.server.dev.devRootToken }}
   {{ end }}
 {{- end -}}
 
@@ -290,6 +290,21 @@ Sets extra injector pod annotations
         {{- else }}
           {{- toYaml .Values.injector.annotations | nindent 8 }}
         {{- end }}
+  {{- end }}
+{{- end -}}
+
+{{/*
+Sets extra injector service annotations
+*/}}
+{{- define "injector.service.annotations" -}}
+  {{- if .Values.injector.service.annotations }}
+  annotations:
+    {{- $tp := typeOf .Values.injector.service.annotations }}
+    {{- if eq $tp "string" }}
+      {{- tpl .Values.injector.service.annotations . | nindent 4 }}
+    {{- else }}
+      {{- toYaml .Values.injector.service.annotations | nindent 4 }}
+    {{- end }}
   {{- end }}
 {{- end -}}
 

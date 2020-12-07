@@ -8,6 +8,7 @@ metadata:
     app.kubernetes.io/name: {{ include "vault.name" . }}-agent-injector
     app.kubernetes.io/instance: {{ .Release.Name }}
     app.kubernetes.io/managed-by: {{ .Release.Service }}
+  {{ template "injector.service.annotations" . }}
 spec:
   ports:
   - port: 443

@@ -70,11 +70,12 @@ injector:
   #      sidecar-injector: enabled
   namespaceSelector: {}
 
-  # Configures failurePolicy of the webhook. By default webhook failures are ignored.
+  # Configures failurePolicy of the webhook. The "unspecified" default behaviour deoends on the
+  # API Version of the WebHook.
   # To block pod creation while webhook is unavailable, set the policy to `Fail` below.
   # See https://kubernetes.io/docs/reference/access-authn-authz/extensible-admission-controllers/#failure-policy
   #
-  # failurePolcy: Fail
+  failurePolicy: Ignore
 
   certs:
     # secretName is the name of the secret that has the TLS certificate and
@@ -136,6 +137,11 @@ injector:
   # Extra labels to attach to the agent-injector
   # This should be a YAML map of the labels to apply to the injector
   extraLabels: {}
+
+  # Injector service specific config
+  service:
+    # Extra annotations to attach to the injector service
+    annotations: {}
 
 server:
   # Resource requests, limits, etc. for the server cluster placement. This
@@ -420,6 +426,9 @@ server:
   # See https://www.vaultproject.io/docs/concepts/dev-server.html to know more
   dev:
     enabled: false
+
+    # Set VAULT_DEV_ROOT_TOKEN_ID value
+    devRootToken: "root"
 
   # Run Vault in "standalone" mode. This is the default mode that will deploy if
   # no arguments are given to helm. This requires a PVC for data storage to use
