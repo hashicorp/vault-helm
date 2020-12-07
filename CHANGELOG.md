@@ -2,6 +2,7 @@
 
 Improvements:
 * Dev mode now supports `server.extraArgs` [GH-421](https://github.com/hashicorp/vault-helm/pull/421)
+* Dev mode root token is now configurable with `server.dev.devRootToken` [GH-415](https://github.com/hashicorp/vault-helm/pull/415)
 * ClusterRoleBinding updated to `v1` [GH-395](https://github.com/hashicorp/vault-helm/pull/395)
 
 ## 0.8.0 (October 20th, 2020)
