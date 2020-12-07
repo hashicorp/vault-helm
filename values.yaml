@@ -417,6 +417,9 @@ server:
   dev:
     enabled: false
 
+    # Set VAULT_DEV_ROOT_TOKEN_ID value
+    devRootToken: "root"
+
   # Run Vault in "standalone" mode. This is the default mode that will deploy if
   # no arguments are given to helm. This requires a PVC for data storage to use
   # the "file" backend.  This mode is not highly available and should not be scaled
