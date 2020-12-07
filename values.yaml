@@ -133,6 +133,10 @@ injector:
   # of the annotations to apply to the injector pods
   annotations: {}
 
+  # Extra labels to attach to the agent-injector
+  # This should be a YAML map of the labels to apply to the injector
+  extraLabels: {}
+
 server:
   # Resource requests, limits, etc. for the server cluster placement. This
   # should map directly to the value of the resources field for a PodSpec.
