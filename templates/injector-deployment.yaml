@@ -23,6 +23,9 @@ spec:
         app.kubernetes.io/name: {{ template "vault.name" . }}-agent-injector
         app.kubernetes.io/instance: {{ .Release.Name }}
         component: webhook
+        {{- if  .Values.injector.extraLabels -}}
+          {{- toYaml .Values.injector.extraLabels | nindent 8 -}}
+        {{- end -}}
       {{ template "injector.annotations" . }}
     spec:
       {{ template "injector.affinity" . }}
