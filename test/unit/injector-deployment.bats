@@ -538,7 +538,7 @@ load _helpers
   cd `chart_dir`
   local actual=$(helm template \
       --show-only templates/injector-deployment.yaml \
-      --set 'server.extraLabels.foo=bar' \
+      --set 'injector.extraLabels.foo=bar' \
       . | tee /dev/stderr |
       yq -r '.spec.template.metadata.labels.foo' | tee /dev/stderr)
   [ "${actual}" = "bar" ]
