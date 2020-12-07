@@ -1,7 +1,11 @@
 {{ template "vault.mode" . }}
 {{- if ne .mode "external" }}
 {{- if and (eq .mode "ha" ) (eq (.Values.global.enabled | toString) "true") }}
+{{- if .Capabilities.APIVersions.Has "rbac.authorization.k8s.io/v1" -}}
+apiVersion: rbac.authorization.k8s.io/v1
+{{- else }}
 apiVersion: rbac.authorization.k8s.io/v1beta1
+{{- end }}
 kind: RoleBinding
 metadata:
   name: {{ template "vault.fullname" . }}-discovery-rolebinding
