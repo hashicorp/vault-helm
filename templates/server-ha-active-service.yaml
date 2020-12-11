@@ -1,6 +1,5 @@
 {{ template "vault.mode" . }}
-{{- if ne .mode "external" }}
-{{- if and (eq .mode "ha" ) (and (eq (.Values.server.service.enabled | toString) "true" ) (eq (.Values.global.enabled | toString) "true")) }}
+{{- if and (eq .mode "ha" ) (eq (.Values.server.service.enabled | toString) "true" ) (eq (.Values.global.enabled | toString) "true") }}
 # Service for active Vault pod
 apiVersion: v1
 kind: Service
@@ -37,5 +36,4 @@ spec:
     app.kubernetes.io/instance: {{ .Release.Name }}
     component: server
     vault-active: "true"
-{{- end }}
 {{- end }}

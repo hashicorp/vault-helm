@@ -1,10 +1,10 @@
 {{ template "vault.mode" . }}
-{{- if and (eq .mode "ha" ) (eq (.Values.server.service.enabled | toString) "true" ) (eq (.Values.global.enabled | toString) "true") }}
-# Service for standby Vault pod
+{{- if and (eq .mode "ha" ) (eq (.Values.server.service.enabled | toString) "true" ) (eq (.Values.global.enabled | toString) "true") (eq (.Values.server.ha.lb.enabled | toString) "true") }}
+# LoadBalancer for active Vault pod
 apiVersion: v1
-kind: Service
+kind: LoadBalancer
 metadata:
-  name: {{ template "vault.fullname" . }}-standby
+  name: {{ template "vault.fullname" . }}-lb
   namespace: {{ .Release.Namespace }}
   labels:
     helm.sh/chart: {{ include "vault.chart" . }}
@@ -19,6 +19,11 @@ spec:
   {{- end}}
   {{- if .Values.server.service.clusterIP }}
   clusterIP: {{ .Values.server.service.clusterIP }}
+  {{- end }}
+  {{- if .Values.server.ha.local }}
+  externalTrafficPolicy: Local
+  {{- else }}
+  externalTrafficPolicy: Cluster
   {{- end }}
   publishNotReadyAddresses: true
   ports:
@@ -35,5 +40,5 @@ spec:
     app.kubernetes.io/name: {{ include "vault.name" . }}
     app.kubernetes.io/instance: {{ .Release.Name }}
     component: server
-    vault-active: "false"
+    vault-active: "true"
 {{- end }}
