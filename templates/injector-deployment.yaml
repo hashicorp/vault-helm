@@ -11,7 +11,7 @@ metadata:
     app.kubernetes.io/managed-by: {{ .Release.Service }}
     component: webhook
 spec:
-  replicas: 1
+  replicas: {{ .Values.injector.replicas }}
   selector:
     matchLabels:
       app.kubernetes.io/name: {{ template "vault.name" . }}-agent-injector
@@ -42,6 +42,14 @@ spec:
         runAsUser: {{ .Values.injector.uid | default 100 }}
       {{- end }}
       containers:
+        {{- if gt (.Values.injector.replicas | int) 1 }}
+        - name: leader-elector
+          image: gcr.io/google_containers/leader-elector:0.4
+          args:
+            - --election="{{ template "vault.fullname" . }}-agent-injector-leader"
+            - --election-namespace={{ .Release.Namespace }}
+            - --http=0.0.0.0:4040
+        {{- end }}
         - name: sidecar-injector
           {{ template "injector.resources" . }}
           image: "{{ .Values.injector.image.repository }}:{{ .Values.injector.image.tag }}"

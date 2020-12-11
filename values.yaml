@@ -27,6 +27,8 @@ injector:
   # True if you want to enable vault agent injection.
   enabled: true
 
+  replicas: 1
+
   # If true, will enable a node exporter metrics endpoint at /metrics.
   metrics:
     enabled: false
