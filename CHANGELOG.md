@@ -7,6 +7,7 @@ Improvements:
 * MutatingWebhook updated to `v1` [GH-408](https://github.com/hashicorp/vault-helm/pull/408)
 * Injector service now supports `injector.service.annotations` [425](https://github.com/hashicorp/vault-helm/pull/425)
 * Injector now supports `injector.extraLabels` [428](https://github.com/hashicorp/vault-helm/pull/428)
+* Added `allowPrivilegeEscalation: false` to Vault and Injector containers [429](https://github.com/hashicorp/vault-helm/pull/429)
 
 ## 0.8.0 (October 20th, 2020)
 
