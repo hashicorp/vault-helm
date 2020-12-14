@@ -132,6 +132,59 @@ load _helpers
   [ "${actual}" = "8200" ]
 }
 
+@test "server/ha-lb-Service: https-internal port and targetPort will be 8201" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      --show-only templates/server-ha-lb.yaml \
+      --set 'server.ha.enabled=true' \
+      --set 'server.ha.lb.enabled=true' \
+      . | tee /dev/stderr |
+      yq -r '.spec.ports[1].name' | tee /dev/stderr)
+  [ "${actual}" = "https-internal" ]
+  local actual=$(helm template \
+      --show-only templates/server-ha-lb.yaml \
+      --set 'server.ha.enabled=true' \
+      --set 'server.ha.lb.enabled=true' \
+      . | tee /dev/stderr |
+      yq -r '.spec.ports[1].port' | tee /dev/stderr)
+  [ "${actual}" = "8201" ]
+
+  local actual=$(helm template \
+      --show-only templates/server-ha-lb.yaml \
+      --set 'server.ha.enabled=true' \
+      --set 'server.ha.lb.enabled=true' \
+      . | tee /dev/stderr |
+      yq -r '.spec.ports[1].targetPort' | tee /dev/stderr)
+  [ "${actual}" = "8201" ]
+}
+
+@test "server/ha-lb-Service: https-rep port and targetPort will be 8202" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      --show-only templates/server-ha-lb.yaml \
+      --set 'server.ha.enabled=true' \
+      --set 'server.ha.lb.enabled=true' \
+      --set 'global.tlsDisable=false' \
+      . | tee /dev/stderr |
+      yq -r '.spec.ports[2].name' | tee /dev/stderr)
+  [ "${actual}" = "https-rep" ]
+  local actual=$(helm template \
+      --show-only templates/server-ha-lb.yaml \
+      --set 'server.ha.enabled=true' \
+      --set 'server.ha.lb.enabled=true' \
+      . | tee /dev/stderr |
+      yq -r '.spec.ports[2].port' | tee /dev/stderr)
+  [ "${actual}" = "8202" ]
+
+  local actual=$(helm template \
+      --show-only templates/server-ha-lb.yaml \
+      --set 'server.ha.enabled=true' \
+      --set 'server.ha.lb.enabled=true' \
+      . | tee /dev/stderr |
+      yq -r '.spec.ports[2].targetPort' | tee /dev/stderr)
+  [ "${actual}" = "8202" ]
+}
+
 @test "server/ha-lb-Service: port and targetPort can be set" {
   cd `chart_dir`
   local actual=$(helm template \
@@ -151,31 +204,6 @@ load _helpers
       . | tee /dev/stderr |
       yq -r '.spec.ports[0].targetPort' | tee /dev/stderr)
   [ "${actual}" = "80" ]
-}
-
-@test "server/ha-lb-Service: nodeport can be set" {
-  cd `chart_dir`
-  local actual=$(helm template \
-      --show-only templates/server-ha-lb.yaml \
-      --set 'server.ha.enabled=true' \
-      --set 'server.ha.lb.enabled=true' \
-      --set 'server.service.type=NodePort' \
-      --set 'server.service.nodePort=30009' \
-      . | tee /dev/stderr |
-      yq -r '.spec.ports[0].nodePort' | tee /dev/stderr)
-  [ "${actual}" = "30009" ]
-}
-
-@test "server/ha-lb-Service: nodeport can't set when type isn't NodePort" {
-  cd `chart_dir`
-  local actual=$(helm template \
-      --show-only templates/server-ha-lb.yaml \
-      --set 'server.ha.enabled=true' \
-      --set 'server.ha.lb.enabled=true' \
-      --set 'server.service.nodePort=30009' \
-      . | tee /dev/stderr |
-      yq -r '.spec.ports[0].nodePort' | tee /dev/stderr)
-  [ "${actual}" = "null" ]
 }
 
 @test "server/ha-lb-Service: vault port name is http, when tlsDisable is true" {
