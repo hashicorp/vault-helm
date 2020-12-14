@@ -481,10 +481,19 @@ server:
     # cross-cluster replication, but it may be useful for other cases too.
     lb:
       enabled: false
-      # Set the externalTrafficPolicy to "Local". Local preserves the client source
-      # IP and avoids a second hop for LoadBalancer and Nodeport type services, but
-      # risks potentially imbalanced traffic spreading
-      #local: true
+      
+      # Local preserves the client source IP and avoids a second hop for
+      # LoadBalancer services, but risks potentially imbalanced traffic spreading.
+      externalTrafficPolicy: Local
+
+      # publishNotReadyAddresses indicates that any agent which deals with endpoints
+      # for this Service should disregard any indications of ready/not-ready.
+      publishNotReadyAddresses: false
+
+      # Extra annotations for the service definition. This can either be YAML or a
+      # YAML-formatted multi-line templated string map of the annotations to apply
+      # to the service.
+      annotations: {}
 
     # Set the api_addr configuration for Vault HA
     # See https://www.vaultproject.io/docs/configuration#api_addr

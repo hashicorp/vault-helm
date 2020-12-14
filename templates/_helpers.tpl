@@ -394,6 +394,20 @@ Sets extra vault server Service annotations
 {{- end -}}
 
 {{/*
+Sets extra vault server LoadBalancer annotations
+*/}}
+{{- define "vault.lb.annotations" -}}
+  {{- if .Values.server.ha.lb.annotations }}
+    {{- $tp := typeOf .Values.server.ha.lb.annotations }}
+    {{- if eq $tp "string" }}
+      {{- tpl .Values.server.ha.lb.annotations . | nindent 4 }}
+    {{- else }}
+      {{- toYaml .Values.server.ha.lb.annotations | nindent 4 }}
+    {{- end }}
+  {{- end }}
+{{- end -}}
+
+{{/*
 Sets PodSecurityPolicy annotations
 */}}
 {{- define "vault.psp.annotations" -}}

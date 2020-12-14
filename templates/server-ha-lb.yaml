@@ -12,20 +12,11 @@ metadata:
     app.kubernetes.io/instance: {{ .Release.Name }}
     app.kubernetes.io/managed-by: {{ .Release.Service }}
   annotations:
-{{ template "vault.service.annotations" .}}
+{{ template "vault.lb.annotations" .}}
 spec:
-  {{- if .Values.server.service.type}}
-  type: {{ .Values.server.service.type }}
-  {{- end}}
-  {{- if .Values.server.service.clusterIP }}
-  clusterIP: {{ .Values.server.service.clusterIP }}
-  {{- end }}
-  {{- if .Values.server.ha.local }}
-  externalTrafficPolicy: Local
-  {{- else }}
-  externalTrafficPolicy: Cluster
-  {{- end }}
-  publishNotReadyAddresses: true
+  type: LoadBalancer
+  externalTrafficPolicy: {{ .Values.server.ha.lb.externalTrafficPolicy }}
+  publishNotReadyAddresses: {{ .Values.server.ha.lb.publishNotReadyAddresses }}
   ports:
     - name: {{ include "vault.scheme" . }}
       port: {{ .Values.server.service.port }}
