@@ -70,8 +70,10 @@ spec:
           - "/bin/sh"
           - "-ec"
           args: {{ template "vault.args" . }}
+          {{- if not .Values.global.openshift }}
           securityContext:
             allowPrivilegeEscalation: false
+          {{- end }}
           env:
             - name: HOST_IP
               valueFrom:
