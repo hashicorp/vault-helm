@@ -2,7 +2,7 @@
 {{- if and (eq .mode "ha" ) (eq (.Values.server.service.enabled | toString) "true" ) (eq (.Values.global.enabled | toString) "true") (eq (.Values.server.ha.lb.enabled | toString) "true") }}
 # LoadBalancer for active Vault pod
 apiVersion: v1
-kind: LoadBalancer
+kind: Service
 metadata:
   name: {{ template "vault.fullname" . }}-lb
   namespace: {{ .Release.Namespace }}
