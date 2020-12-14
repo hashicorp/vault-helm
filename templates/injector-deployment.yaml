@@ -46,6 +46,10 @@ spec:
           {{ template "injector.resources" . }}
           image: "{{ .Values.injector.image.repository }}:{{ .Values.injector.image.tag }}"
           imagePullPolicy: "{{ .Values.injector.image.pullPolicy }}"
+          {{- if not .Values.global.openshift }}
+          securityContext:
+            allowPrivilegeEscalation: false
+          {{- end }}
           env:
             - name: AGENT_INJECT_LISTEN
               value: ":8080"
