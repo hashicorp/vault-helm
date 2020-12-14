@@ -21,12 +21,12 @@ spec:
     - name: {{ include "vault.scheme" . }}
       port: {{ .Values.server.service.port }}
       targetPort: {{ .Values.server.service.targetPort }}
-      {{- if and (.Values.server.service.nodePort) (eq (.Values.server.service.type | toString) "NodePort") }}
-      nodePort: {{ .Values.server.service.nodePort }}
-      {{- end }}
     - name: https-internal
       port: 8201
       targetPort: 8201
+    - name: {{ include "vault.scheme" . }}-rep
+      port: 8202
+      targetPort: 8202
   selector:
     app.kubernetes.io/name: {{ include "vault.name" . }}
     app.kubernetes.io/instance: {{ .Release.Name }}
