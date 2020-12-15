@@ -1,6 +1,7 @@
+{{- $route := .Values.server.route -}}
 {{- if .Values.global.openshift }}
 {{- if ne .mode "external" }}
-{{- if .Values.server.route.enabled -}}
+{{- if $route.enabled -}}
 {{- $serviceName := include "vault.fullname" . -}}
 {{- if eq .mode "ha" }}
 {{- $serviceName = printf "%s-%s" $serviceName "active" -}}
@@ -14,20 +15,25 @@ metadata:
     app.kubernetes.io/name: {{ include "vault.name" . }}
     app.kubernetes.io/instance: {{ .Release.Name }}
     app.kubernetes.io/managed-by: {{ .Release.Service }}
-    {{- with .Values.server.route.labels }}
+    {{- with $route.labels }}
       {{- toYaml . | nindent 4 }}
     {{- end }}
   {{- template "vault.route.annotations" . }}
 spec:
-  host: {{ .Values.server.route.host }}
+{{- if $route.host }}
+  host: {{ $route.host }}
+{{- end }}
   to:
     kind: Service
     name: {{ $serviceName }}
     weight: 100
   port:
     targetPort: 8200
+  {{- if $route.tls.enabled }}
   tls:
-    termination: passthrough
+    insecureEdgeTerminationPolicy: {{ $route.tls.insecureEdgeTerminationPolicy }}
+    termination: {{ $route.tls.termination }}
+  {{- end }}
 {{- end }}
 {{- end }}
 {{- end }}

@@ -195,9 +195,17 @@ server:
   # The created route will be of type passthrough
   route:
     enabled: false
-    labels: {}
     annotations: {}
-    host: chart-example.local
+    labels: {}
+    # Host name for the Route
+    host: ""
+    tls:
+      # If `true`, TLS is enabled for the Route
+      enabled: true
+      # Insecure edge termination policy of the Route. Can be `None`, `Redirect`, or `Allow`
+      insecureEdgeTerminationPolicy: Redirect
+      # TLS termination of the route. Can be `edge`, `passthrough`, or `reencrypt`
+      termination: edge
 
   # authDelegator enables a cluster role binding to be attached to the service
   # account.  This cluster role binding can be used to setup Kubernetes auth
