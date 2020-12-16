@@ -42,13 +42,33 @@ spec:
         runAsUser: {{ .Values.injector.uid | default 100 }}
       {{- end }}
       containers:
-        {{- if gt (.Values.injector.replicas | int) 1 }}
+        {{- if and (eq (.Values.injector.leaderElector.enabled | toString) "true") (gt (.Values.injector.replicas | int) 1) }}
         - name: leader-elector
-          image: gcr.io/google_containers/leader-elector:0.4
+          image: {{ .Values.injector.leaderElector.image }}
           args:
             - --election="{{ template "vault.fullname" . }}-agent-injector-leader"
             - --election-namespace={{ .Release.Namespace }}
             - --http=0.0.0.0:4040
+          livenessProbe:
+            httpGet:
+              path: /
+              port: 4040
+              scheme: HTTP
+            failureThreshold: 2
+            initialDelaySeconds: 1
+            periodSeconds: 2
+            successThreshold: 1
+            timeoutSeconds: 5
+          readinessProbe:
+            httpGet:
+              path: /
+              port: 4040
+              scheme: HTTP
+            failureThreshold: 2
+            initialDelaySeconds: 2
+            periodSeconds: 2
+            successThreshold: 1
+            timeoutSeconds: 5
         {{- end }}
         - name: sidecar-injector
           {{ template "injector.resources" . }}
