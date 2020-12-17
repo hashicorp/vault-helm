@@ -33,7 +33,9 @@ injector:
   # will be created so that only one injector attempts to create TLS certificates.
   leaderElector:
     enabled: true
-    image: "gcr.io/google_containers/leader-elector:0.4"
+    image:
+      repository: "gcr.io/google_containers/leader-elector"
+      tag: "0.4"
 
   # If true, will enable a node exporter metrics endpoint at /metrics.
   metrics:

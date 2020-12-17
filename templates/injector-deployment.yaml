@@ -118,7 +118,7 @@ spec:
             timeoutSeconds: 5
         {{- if and (eq (.Values.injector.leaderElector.enabled | toString) "true") (gt (.Values.injector.replicas | int) 1) }}
         - name: leader-elector
-          image: {{ .Values.injector.leaderElector.image }}
+          image: {{ .Values.injector.leaderElector.image.repository }}:{{ .Values.injector.leaderElector.image.tag }}
           args:
             - --election={{ template "vault.fullname" . }}-agent-injector-leader
             - --election-namespace={{ .Release.Namespace }}

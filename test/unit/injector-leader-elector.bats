@@ -44,10 +44,11 @@ load _helpers
   local actual=$(helm template \
       --show-only templates/injector-deployment.yaml \
       --set "injector.replicas=2" \
-      --set "injector.leaderElector.image=SomeOtherImage" \
+      --set "injector.leaderElector.image.repository=SomeOtherImage" \
+      --set "injector.leaderElector.image.tag=SomeOtherTag" \
       . | tee /dev/stderr |
       yq -r '.spec.template.spec.containers[1].image' | tee /dev/stderr)
-  [ "${actual}" = "SomeOtherImage" ]
+  [ "${actual}" = "SomeOtherImage:SomeOtherTag" ]
 }
 
 @test "injector/deployment: leader elector configuration for sidecar-injector" {

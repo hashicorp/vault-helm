@@ -16,14 +16,14 @@ load _helpers
   pods=($(kubectl get pods -l app.kubernetes.io/name=vault-agent-injector -o json | jq -r '.items[] | .metadata.name'))
   [ "${#pods[@]}" == 3 ]
 
-  leader="$(echo "$(kubectl exec ${pods[0]} -c sidecar-injector -- curl --silent localhost:4040)" | jq -r .name)"
+  leader="$(echo "$(kubectl exec ${pods[0]} -c sidecar-injector -- wget --quiet --output-document - localhost:4040)" | jq -r .name)"
   # Check the leader name is valid - i.e. one of the 3 pods
   [[ " ${pods[@]} " =~ " ${leader} " ]]
 
   # Check every pod agrees on who the leader is
   for pod in "${pods[@]}"
   do
-    pod_leader="$(echo "$(kubectl exec $pod -c sidecar-injector -- curl --silent localhost:4040)" | jq -r .name)"
+    pod_leader="$(echo "$(kubectl exec $pod -c sidecar-injector -- wget --quiet --output-document - localhost:4040)" | jq -r .name)"
     [ "${pod_leader}" == "${leader}" ]
   done
 }
