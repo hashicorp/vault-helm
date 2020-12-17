@@ -1,5 +1,7 @@
 ## Unreleased
 
+## 0.9.0 (December 17th, 2020)
+
 Improvements:
 * Dev mode now supports `server.extraArgs` [GH-421](https://github.com/hashicorp/vault-helm/pull/421)
 * Dev mode root token is now configurable with `server.dev.devRootToken` [GH-415](https://github.com/hashicorp/vault-helm/pull/415)

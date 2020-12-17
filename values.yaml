@@ -38,7 +38,7 @@ injector:
   # image sets the repo and tag of the vault-k8s image to use for the injector.
   image:
     repository: "hashicorp/vault-k8s"
-    tag: "0.6.0"
+    tag: "0.7.0"
     pullPolicy: IfNotPresent
 
   # agentImage sets the repo and tag of the Vault image to use for the Vault Agent
@@ -46,7 +46,7 @@ injector:
   # required.
   agentImage:
     repository: "vault"
-    tag: "1.5.4"
+    tag: "1.6.1"
 
   # Mount Path of the Vault Kubernetes Auth Method.
   authPath: "auth/kubernetes"
@@ -150,7 +150,7 @@ server:
 
   image:
     repository: "vault"
-    tag: "1.5.4"
+    tag: "1.6.1"
     # Overrides the default Image Pull Policy
     pullPolicy: IfNotPresent
 
