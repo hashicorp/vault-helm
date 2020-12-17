@@ -10,7 +10,7 @@ metadata:
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: Role
-  name: {{ template "vault.fullname" . }}-agent-injector-role
+  name: {{ template "vault.fullname" . }}-agent-injector-leader-elector-role
 subjects:
   - kind: ServiceAccount
     name: {{ template "vault.fullname" . }}-agent-injector

@@ -11,7 +11,7 @@ rules:
   - apiGroups: [""]
     resources: ["endpoints", "secrets"]
     verbs:
-      - "create" # TODO: Maybe not needed
+      - "create"
       - "get"
       - "watch"
       - "list"
