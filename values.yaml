@@ -461,6 +461,10 @@ server:
         tls_disable = 1
         address = "[::]:8200"
         cluster_address = "[::]:8201"
+        # Enable unauthenticated metrics access (necessary for Prometheus Operator)
+        #telemetry {
+        #  unauthenticated_metrics_access = "true"
+        #}
       }
       storage "file" {
         path = "/vault/data"
@@ -476,14 +480,9 @@ server:
       #   crypto_key  = "vault-helm-unseal-key"
       #}
 
-      # Example configuration for enabling Prometheus metrics without
-      # authentication. If you are using Prometheus Operator you can enable
-      # a ServiceMonitor resource below.
-      #listener "tcp" {
-      #  telemetry {
-      #    unauthenticated_metrics_access = "true"
-      #  }
-      #}
+      # Example configuration for enabling Prometheus metrics.
+      # If you are using Prometheus Operator you can enable a ServiceMonitor resource below.
+      # You may wish to enable unauthenticated metrics in the listener block above.
       #telemetry {
       #  prometheus_retention_time = "30s",
       #  disable_hostname = true
@@ -525,6 +524,10 @@ server:
           tls_disable = 1
           address = "[::]:8200"
           cluster_address = "[::]:8201"
+          # Enable unauthenticated metrics access (necessary for Prometheus Operator)
+          #telemetry {
+          #  unauthenticated_metrics_access = "true"
+          #}
         }
 
         storage "raft" {
@@ -566,14 +569,9 @@ server:
       #   crypto_key  = "vault-helm-unseal-key"
       #}
 
-      # Example configuration for enabling Prometheus metrics without
-      # authentication. If you are using Prometheus Operator you can enable
-      # a ServiceMonitor resource below.
-      #listener "tcp" {
-      #  telemetry {
-      #    unauthenticated_metrics_access = "true"
-      #  }
-      #}
+      # Example configuration for enabling Prometheus metrics.
+      # If you are using Prometheus Operator you can enable a ServiceMonitor resource below.
+      # You may wish to enable unauthenticated metrics in the listener block above.
       #telemetry {
       #  prometheus_retention_time = "30s",
       #  disable_hostname = true
