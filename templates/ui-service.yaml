@@ -25,7 +25,7 @@ spec:
   ports:
     - name: {{ include "vault.scheme" . }}
       port: {{ .Values.ui.externalPort }}
-      targetPort: 8200
+      targetPort: {{ .Values.ui.targetPort }}
       {{- if .Values.ui.serviceNodePort }}
       nodePort: {{ .Values.ui.serviceNodePort }}
       {{- end }}
