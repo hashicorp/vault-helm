@@ -53,14 +53,14 @@ load _helpers
   [ "${actual}" = "60s" ]
 }
 
-@test "prometheus/ServiceMonitor: default interval is 10s" {
+@test "prometheus/ServiceMonitor: default interval is 30s" {
   cd `chart_dir`
   local actual=$( (helm template \
       --show-only templates/prometheus-servicemonitor.yaml \
       --set 'prometheus.operator.enabled=true' \
       . || echo "---") | tee /dev/stderr |
       yq -r '.spec.endpoints[0].interval' | tee /dev/stderr)
-  [ "${actual}" = "10s" ]
+  [ "${actual}" = "30s" ]
 }
 
 @test "prometheus/ServiceMonitor: specifying prometheus.operator.serviceMonitor.interval changes interval" {
