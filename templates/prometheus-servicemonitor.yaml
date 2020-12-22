@@ -1,3 +1,4 @@
+{{ template "vault.mode" . }}
 {{ if .Values.prometheus.operator.enabled }}
 apiVersion: monitoring.coreos.com/v1
 kind: ServiceMonitor
@@ -15,7 +16,9 @@ spec:
       app.kubernetes.io/name: {{ template "vault.name" . }}
       app.kubernetes.io/instance: {{ .Release.Name }}
       {{- if eq .mode "ha" }}
-      vault-active: true
+      vault-active: "true"
+      {{- else }}
+      vault-internal: "true"
       {{- end }}
   endpoints:
   - port: http

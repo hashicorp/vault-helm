@@ -643,12 +643,12 @@ prometheus:
 
     serviceMonitor:
       ## Additional labels to add to the ServiceMonitor so it is picked up by the operator.
-      ## If using the [Helm Chart](https://github.com/helm/charts/tree/master/stable/prometheus-operator) this is the name of the Helm release.
+      ## If using the [Helm Chart](https://github.com/prometheus-community/helm-charts/tree/main/charts/kube-prometheus-stack) this is the name of the Helm release.
       selector:
         release: prometheus
 
       ## Interval at which Prometheus scrapes metrics
-      interval: 10s
+      interval: 30s
 
       ## Timeout at which Prometheus timeouts scrape run
       scrapeTimeout: 10s
@@ -658,10 +658,10 @@ prometheus:
       enabled: false
 
       ## Additional labels to add to the PrometheusRule so it is picked up by the operator.
-      ## If using the [Helm Chart](https://github.com/helm/charts/tree/master/stable/prometheus-operator) this is the name of the Helm release and 'app: prometheus-operator'
+      ## If using the [Helm Chart](https://github.com/prometheus-community/helm-charts/tree/main/charts/kube-prometheus-stack) this is the name of the Helm release and 'app: kube-prometheus-stack'
       selector:
-        app: prometheus-operator
         release: prometheus
+        app: kube-prometheus-stack
 
       ## Some example rules.
       rules: {}
