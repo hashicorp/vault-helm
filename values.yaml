@@ -36,6 +36,7 @@ injector:
     image:
       repository: "gcr.io/google_containers/leader-elector"
       tag: "0.4"
+    ttl: 60s
 
   # If true, will enable a node exporter metrics endpoint at /metrics.
   metrics:

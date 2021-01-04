@@ -123,6 +123,7 @@ spec:
             - --election={{ template "vault.fullname" . }}-agent-injector-leader
             - --election-namespace={{ .Release.Namespace }}
             - --http=0.0.0.0:4040
+            - --ttl={{ .Values.injector.leaderElector.ttl }}
           livenessProbe:
             httpGet:
               path: /

@@ -80,6 +80,26 @@ load _helpers
   [ "${actual}" = "metadata.namespace" ]
 }
 
+@test "injector/deployment: leader elector TTL is configurable" {
+  cd `chart_dir`
+  # Default value 60s
+  local actual=$(helm template \
+      --show-only templates/injector-deployment.yaml \
+      --set "injector.replicas=2" \
+      . | tee /dev/stderr |
+      yq -r '.spec.template.spec.containers[1].args[3]' | tee /dev/stderr)
+  [ "${actual}" = "--ttl=60s" ]
+
+  # Configured to 30s
+  local actual=$(helm template \
+      --show-only templates/injector-deployment.yaml \
+      --set "injector.replicas=2" \
+      --set "injector.leaderElector.ttl=30s" \
+      . | tee /dev/stderr |
+      yq -r '.spec.template.spec.containers[1].args[3]' | tee /dev/stderr)
+  [ "${actual}" = "--ttl=30s" ]
+}
+
 #--------------------------------------------------------------------
 # Resource creation
 
