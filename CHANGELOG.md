@@ -9,6 +9,7 @@ Improvements:
 * Injector now supports `injector.extraLabels` [428](https://github.com/hashicorp/vault-helm/pull/428)
 * Added `allowPrivilegeEscalation: false` to Vault and Injector containers [429](https://github.com/hashicorp/vault-helm/pull/429)
 * Network Policy now supports `server.networkPolicy.egress` [389](https://github.com/hashicorp/vault-helm/pull/389)
+* Injector now supports multiple replicas with leader elections for setting up auto TLS [GH-436](https://github.com/hashicorp/vault-helm/pull/436)
 
 ## 0.8.0 (October 20th, 2020)
 
