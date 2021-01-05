@@ -1,5 +1,7 @@
 ## Unreleased
 
+## 0.9.0 (January 5th, 2021)
+
 Features:
 * Injector now supports configurable number of replicas [GH-436](https://github.com/hashicorp/vault-helm/pull/436)
 * Injector now supports auto TLS for multiple replicas using leader elections [GH-436](https://github.com/hashicorp/vault-helm/pull/436)
