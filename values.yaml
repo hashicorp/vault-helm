@@ -27,6 +27,17 @@ injector:
   # True if you want to enable vault agent injection.
   enabled: true
 
+  replicas: 1
+
+  # If multiple replicas are specified, by default a leader-elector side-car
+  # will be created so that only one injector attempts to create TLS certificates.
+  leaderElector:
+    enabled: true
+    image:
+      repository: "gcr.io/google_containers/leader-elector"
+      tag: "0.4"
+    ttl: 60s
+
   # If true, will enable a node exporter metrics endpoint at /metrics.
   metrics:
     enabled: false
@@ -112,7 +123,17 @@ injector:
   # Affinity Settings for injector pods
   # This should be a multi-line string matching the affinity section of a
   # PodSpec.
-  affinity: null
+  # Commenting out or setting as empty the affinity variable, will allow
+  # deployment of multiple replicas to single node services such as Minikube.
+  affinity: |
+    podAntiAffinity:
+      requiredDuringSchedulingIgnoredDuringExecution:
+        - labelSelector:
+            matchLabels:
+              app.kubernetes.io/name: {{ template "vault.name" . }}
+              app.kubernetes.io/instance: "{{ .Release.Name }}"
+              component: injector
+          topologyKey: kubernetes.io/hostname
 
   # Toleration Settings for injector pods
   # This should be a multi-line string matching the Toleration array
