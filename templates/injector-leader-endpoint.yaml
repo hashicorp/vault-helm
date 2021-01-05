@@ -1,0 +1,12 @@
+{{- if and (eq (.Values.injector.enabled | toString) "true" ) (eq (.Values.global.enabled | toString) "true") (eq (.Values.injector.leaderElector.enabled | toString) "true") (gt (.Values.injector.replicas | int) 1) }}
+# This is created here so it can be cleaned up easily, since if
+# the endpoint is left around the leader won't expire for about a minute.
+apiVersion: v1
+kind: Endpoints
+metadata:
+  name: {{ template "vault.fullname" . }}-agent-injector-leader
+  labels:
+    app.kubernetes.io/name: {{ include "vault.name" . }}-agent-injector
+    app.kubernetes.io/instance: {{ .Release.Name }}
+    app.kubernetes.io/managed-by: {{ .Release.Service }}
+{{- end }}
