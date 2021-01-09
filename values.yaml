@@ -132,7 +132,7 @@ injector:
             matchLabels:
               app.kubernetes.io/name: {{ template "vault.name" . }}
               app.kubernetes.io/instance: "{{ .Release.Name }}"
-              component: injector
+              component: webhook
           topologyKey: kubernetes.io/hostname
 
   # Toleration Settings for injector pods
