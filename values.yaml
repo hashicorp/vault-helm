@@ -130,7 +130,7 @@ injector:
       requiredDuringSchedulingIgnoredDuringExecution:
         - labelSelector:
             matchLabels:
-              app.kubernetes.io/name: {{ template "vault.name" . }}
+              app.kubernetes.io/name: {{ template "vault.name" . }}-agent-injector
               app.kubernetes.io/instance: "{{ .Release.Name }}"
               component: webhook
           topologyKey: kubernetes.io/hostname
