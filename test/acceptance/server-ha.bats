@@ -90,7 +90,7 @@ setup() {
   kubectl config set-context --current --namespace=acceptance
 
   helm install consul \
-    https://github.com/hashicorp/consul-helm/archive/v0.16.2.tar.gz \
+    https://github.com/hashicorp/consul-helm/archive/v0.28.0.tar.gz \
     --set 'ui.enabled=false' \
 
   wait_for_running_consul
