@@ -1,7 +1,7 @@
 ## Unreleased
 
 Bugs:
-* Injector: fix component label for default anti-affinity rule [GH-441](https://github.com/hashicorp/vault-helm/pull/441)
+* Injector: fix labels for default anti-affinity rule [GH-441](https://github.com/hashicorp/vault-helm/pull/441), [GH-442](https://github.com/hashicorp/vault-helm/pull/442)
 
 ## 0.9.0 (January 5th, 2021)
 
