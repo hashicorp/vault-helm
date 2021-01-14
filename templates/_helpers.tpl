@@ -476,6 +476,16 @@ Sets the container resources if the user has set any.
 {{- end -}}
 
 {{/*
+Sets the container resources if the user has set any.
+*/}}
+{{- define "csi.resources" -}}
+  {{- if .Values.csi.resources -}}
+          resources:
+{{ toYaml .Values.csi.resources | indent 12}}
+  {{ end }}
+{{- end -}}
+
+{{/*
 Inject extra environment vars in the format key:value, if populated
 */}}
 {{- define "vault.extraEnvironmentVars" -}}
