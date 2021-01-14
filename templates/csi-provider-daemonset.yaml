@@ -1,0 +1,50 @@
+{{- if and (eq (.Values.csi.enabled | toString) "true" ) (eq (.Values.global.enabled | toString) "true") }}
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: {{ template "vault.fullname" . }}-csi-secrets-store-provider
+  namespace: {{ .Release.Namespace }}
+  labels:
+    app.kubernetes.io/name: {{ include "vault.name" . }}-csi-secrets-store-provider
+    app.kubernetes.io/instance: {{ .Release.Name }}
+    app.kubernetes.io/managed-by: {{ .Release.Service }}
+spec:
+  updateStrategy:
+    type: RollingUpdate
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: {{ include "vault.name" . }}-csi-secrets-store-provider
+      app.kubernetes.io/instance: {{ .Release.Name }}
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: {{ template "vault.name" . }}-csi-secrets-store-provider
+        app.kubernetes.io/instance: {{ .Release.Name }}
+    spec:
+      serviceAccountName: {{ include "vault.name" . }}-secrets-store-csi-provider
+      securityContext:
+        runAsNonRoot: true
+        runAsGroup: {{ .Values.csi.gid | default 1000 }}
+        runAsUser: {{ .Values.csi.uid | default 100 }}
+      containers:
+        - name: {{ include "vault.name" . }}-csi-secrets-store-provider
+          {{ template "csi.resources" . }}
+          image: "{{ .Values.csi.image.repository }}:{{ .Values.csi.image.tag }}"
+          imagePullPolicy: {{ .Values.csi.image.pullPolicy }}
+          args:
+            - --endpoint=/provider/vault.sock
+            - --debug={{ .Values.csi.debug }}
+          volumeMounts:
+            - name: providervol
+              mountPath: "/provider"
+            - name: mountpoint-dir
+              mountPath: /var/lib/kubelet/pods
+              mountPropagation: HostToContainer
+      volumes:
+        - name: providervol
+          hostPath:
+            path: "/etc/kubernetes/secrets-store-csi-providers"
+        - name: mountpoint-dir
+          hostPath:
+            path: /var/lib/kubelet/pods
+{{- end }}
