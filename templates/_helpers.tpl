@@ -132,6 +132,8 @@ Set's additional environment variables based on the mode.
   {{ if eq .mode "dev" }}
             - name: VAULT_DEV_ROOT_TOKEN_ID
               value: {{ .Values.server.dev.devRootToken }}
+            - name: VAULT_DEV_LISTEN_ADDRESS
+              value: "[::]:8200"
   {{ end }}
 {{- end -}}
 

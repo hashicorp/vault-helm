@@ -274,6 +274,35 @@ load _helpers
 }
 
 #--------------------------------------------------------------------
+# dev listen address
+
+@test "server/dev-StatefulSet: set dev listen address in dev mode" {
+  cd `chart_dir`
+  local objects=$(helm template \
+      --show-only templates/server-statefulset.yaml  \
+      --set 'server.dev.enabled=true' \
+      . | tee /dev/stderr |
+      yq -r '.spec.template.spec.containers[0].env' | tee /dev/stderr)
+
+  local value=$(echo $objects |
+      yq -r 'map(select(.name=="VAULT_DEV_LISTEN_ADDRESS")) | .[] .value' | tee /dev/stderr)
+  [ "${value}" = "[::]:8200" ]
+}
+
+@test "server/dev-StatefulSet: dev listen address isn't set in non-dev mode" {
+  cd `chart_dir`
+  local objects=$(helm template \
+      --show-only templates/server-statefulset.yaml  \
+      --set 'server.dev.enabled=false' \
+      . | tee /dev/stderr |
+      yq -r '.spec.template.spec.containers[0].env' | tee /dev/stderr)
+
+  local name=$(echo $objects |
+      yq -r 'map(select(.name=="VAULT_DEV_LISTEN_ADDRESS")) | .[] .name' | tee /dev/stderr)
+  [ "${name}" = "" ]
+}
+
+#--------------------------------------------------------------------
 # extraEnvironmentVars
 
 @test "server/dev-StatefulSet: set extraEnvironmentVars" {
@@ -286,21 +315,13 @@ load _helpers
       . | tee /dev/stderr |
       yq -r '.spec.template.spec.containers[0].env' | tee /dev/stderr)
 
-  local actual=$(echo $object |
-      yq -r '.[12].name' | tee /dev/stderr)
-  [ "${actual}" = "FOO" ]
+  local value=$(echo $object |
+      yq -r 'map(select(.name=="FOO")) | .[] .value' | tee /dev/stderr)
+  [ "${value}" = "bar" ]
 
-  local actual=$(echo $object |
-      yq -r '.[12].value' | tee /dev/stderr)
-  [ "${actual}" = "bar" ]
-
-  local actual=$(echo $object |
-      yq -r '.[13].name' | tee /dev/stderr)
-  [ "${actual}" = "FOOBAR" ]
-
-  local actual=$(echo $object |
-      yq -r '.[13].value' | tee /dev/stderr)
-  [ "${actual}" = "foobar" ]
+  local value=$(echo $object |
+      yq -r 'map(select(.name=="FOOBAR")) | .[] .value' | tee /dev/stderr)
+  [ "${value}" = "foobar" ]
 }
 
 #--------------------------------------------------------------------
