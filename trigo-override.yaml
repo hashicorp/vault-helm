@@ -1,0 +1,36 @@
+global:
+  tlsDisable: true
+  openshift: true
+
+server:
+  route:
+    enabled: true
+    host: vault.apps.ocp.trigo.cloud
+  standalone:
+    enabled: false
+  ha:
+    enabled: true
+    replicas: 3
+
+    raft:
+
+      # Enables Raft integrated storage
+      enabled: true
+
+  dataStorage:
+    enabled: true
+    # Size of the PVC created
+    size: 5Gi
+    # Location where the PVC will be mounted.
+    mountPath: "/vault/data"
+
+  auditStorage:
+    enabled: true
+    # Size of the PVC created
+    size: 10Gi
+    # Location where the PVC will be mounted.
+    mountPath: "/vault/audit"
+
+
+# this is optional for the disaster recovery VM vault insert address here :
+externalVaultAddr: ""
