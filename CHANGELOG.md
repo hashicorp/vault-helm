@@ -1,5 +1,7 @@
 ## Unreleased
 
+## 0.9.1 (February 2nd, 2021)
+
 Bugs:
 * Injector: fix labels for default anti-affinity rule [GH-441](https://github.com/hashicorp/vault-helm/pull/441), [GH-442](https://github.com/hashicorp/vault-helm/pull/442)
 * Set VAULT_DEV_LISTEN_ADDRESS in dev mode [GH-446](https://github.com/hashicorp/vault-helm/pull/446)
