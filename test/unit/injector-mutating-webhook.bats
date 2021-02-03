@@ -76,6 +76,29 @@ load _helpers
   [ "${actual}" = "true" ]
 }
 
+@test "injector/MutatingWebhookConfiguration: objectSelector empty by default" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      --show-only templates/injector-mutating-webhook.yaml  \
+      --set 'injector.enabled=true' \
+      --namespace foo \
+      . | tee /dev/stderr |
+      yq '.webhooks[0].objectSelector' | tee /dev/stderr)
+  [ "${actual}" = "null" ]
+}
+
+@test "injector/MutatingWebhookConfiguration: can set objectSelector" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      --show-only templates/injector-mutating-webhook.yaml  \
+      --set 'injector.enabled=true' \
+      --set 'injector.objectSelector.matchLabels.injector=true' \
+      . | tee /dev/stderr |
+      yq '.webhooks[0].objectSelector.matchLabels.injector' | tee /dev/stderr)
+
+  [ "${actual}" = "true" ]
+}
+
 @test "injector/MutatingWebhookConfiguration: failurePolicy 'Ignore' by default" {
   cd `chart_dir`
   local actual=$(helm template \
