@@ -506,6 +506,12 @@ server:
     enabled: false
     replicas: 3
 
+    service:
+      # Configures the service type for the main HA Active Vault service.
+      type: ClusterIP
+      # Extra annotations to attach to the active service
+      annotations: {}
+
     # Set the api_addr configuration for Vault HA
     # See https://www.vaultproject.io/docs/configuration#api_addr
     # If set to null, this will be set to the Pod IP Address

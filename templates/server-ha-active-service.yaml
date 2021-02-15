@@ -14,9 +14,10 @@ metadata:
     app.kubernetes.io/managed-by: {{ .Release.Service }}
   annotations:
 {{ template "vault.service.annotations" .}}
+{{ template "vault.service.ha.annotations" .}}
 spec:
-  {{- if .Values.server.service.type}}
-  type: {{ .Values.server.service.type }}
+  {{- if .Values.server.ha.service.type}}
+  type: {{ .Values.server.ha.service.type }}
   {{- end}}
   {{- if .Values.server.service.clusterIP }}
   clusterIP: {{ .Values.server.service.clusterIP }}
