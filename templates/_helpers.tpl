@@ -281,22 +281,6 @@ Sets extra pod annotations
 {{- end -}}
 
 {{/*
-Sets extra annotations for ha active service
-*/}}
-{{- define "vault.service.ha.annotations" -}}
-  {{- if .Values.server.annotations }}
-      annotations:
-        {{- $tp := typeOf .Values.server.annotations }}
-        {{- if eq $tp "string" }}
-          {{- tpl .Values.server.annotations . | nindent 8 }}
-        {{- else }}
-          {{- toYaml .Values.server.annotations | nindent 8 }}
-        {{- end }}
-  {{- end }}
-{{- end -}}
-
-
-{{/*
 Sets extra injector pod annotations
 */}}
 {{- define "injector.annotations" -}}
