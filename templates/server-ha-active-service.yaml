@@ -13,7 +13,6 @@ metadata:
     app.kubernetes.io/instance: {{ .Release.Name }}
     app.kubernetes.io/managed-by: {{ .Release.Service }}
   annotations:
-{{ template "vault.service.annotations" .}}
 {{ template "vault.service.ha.annotations" .}}
 spec:
   {{- if .Values.server.ha.service.type}}
