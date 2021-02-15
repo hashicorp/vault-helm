@@ -108,7 +108,8 @@ spec:
                 fieldRef:
                   fieldPath: metadata.name
             - name: VAULT_CLUSTER_ADDR
-              value: "https://$(HOSTNAME).{{ template "vault.fullname" . }}-internal:8201"
+              #value: "https://$(HOSTNAME).{{ template "vault.fullname" . }}-internal:8201"
+              value: "{{ include "vault.scheme" . }}://$(POD_IP):8201"
             {{- if and (eq (.Values.server.ha.raft.enabled | toString) "true") (eq (.Values.server.ha.raft.setNodeId | toString) "true") }}
             - name: VAULT_RAFT_NODE_ID
               valueFrom:
