@@ -21,7 +21,7 @@ spec:
         app.kubernetes.io/name: {{ template "vault.name" . }}-csi-provider
         app.kubernetes.io/instance: {{ .Release.Name }}
     spec:
-      serviceAccountName: {{ include "vault.name" . }}-secrets-store-csi-provider
+      serviceAccountName: {{ include "vault.name" . }}-csi-provider
       containers:
         - name: {{ include "vault.name" . }}-csi-provider
           {{ template "csi.resources" . }}
