@@ -51,47 +51,6 @@ load _helpers
   [ "${actual}" = "SomePullPolicy" ]
 }
 
-# Resources
-# Security context
-@test "csi/daemonset: security context configuration" {
-  cd `chart_dir`
-  # Defaults.
-  local actual=$(helm template \
-      --show-only templates/csi-daemonset.yaml \
-      --set "csi.enabled=true" \
-      . | tee /dev/stderr |
-      yq -r '.spec.template.spec.securityContext.runAsNonRoot' | tee /dev/stderr)
-  [ "${actual}" = "true" ]
-  local actual=$(helm template \
-      --show-only templates/csi-daemonset.yaml \
-      --set "csi.enabled=true" \
-      . | tee /dev/stderr |
-      yq -r '.spec.template.spec.securityContext.runAsGroup' | tee /dev/stderr)
-  [ "${actual}" = "1000" ]
-  local actual=$(helm template \
-      --show-only templates/csi-daemonset.yaml \
-      --set "csi.enabled=true" \
-      . | tee /dev/stderr |
-      yq -r '.spec.template.spec.securityContext.runAsUser' | tee /dev/stderr)
-  [ "${actual}" = "100" ]
-
-  # Configurable.
-  local actual=$(helm template \
-      --show-only templates/csi-daemonset.yaml \
-      --set "csi.enabled=true" \
-      --set "csi.gid=2000" \
-      . | tee /dev/stderr |
-      yq -r '.spec.template.spec.securityContext.runAsGroup' | tee /dev/stderr)
-  [ "${actual}" = "2000" ]
-  local actual=$(helm template \
-      --show-only templates/csi-daemonset.yaml \
-      --set "csi.enabled=true" \
-      --set "csi.uid=200" \
-      . | tee /dev/stderr |
-      yq -r '.spec.template.spec.securityContext.runAsUser' | tee /dev/stderr)
-  [ "${actual}" = "200" ]
-}
-
 # Debug arg
 @test "csi/daemonset: debug arg is configurable" {
   cd `chart_dir`
