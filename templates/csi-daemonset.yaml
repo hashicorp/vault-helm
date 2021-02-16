@@ -36,6 +36,11 @@ spec:
             - name: mountpoint-dir
               mountPath: /var/lib/kubelet/pods
               mountPropagation: HostToContainer
+            {{- range .Values.csi.extraVolumes }}
+            - name: userconfig-{{ .name }}
+              mountPath: {{ .path | default "/vault/userconfig" }}/{{ .name }}
+              readOnly: true
+            {{- end }}
       volumes:
         - name: providervol
           hostPath:
@@ -43,4 +48,14 @@ spec:
         - name: mountpoint-dir
           hostPath:
             path: /var/lib/kubelet/pods
+        {{- range .Values.csi.extraVolumes }}
+        - name: userconfig-{{ .name }}
+          {{ .type }}:
+          {{- if (eq .type "configMap") }}
+            name: {{ .name }}
+          {{- else if (eq .type "secret") }}
+            secretName: {{ .name }}
+          {{- end }}
+            defaultMode: {{ .defaultMode | default 420 }}
+        {{- end }}
 {{- end }}
