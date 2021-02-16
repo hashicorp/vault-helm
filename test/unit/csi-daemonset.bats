@@ -37,10 +37,10 @@ load _helpers
       --show-only templates/csi-daemonset.yaml \
       --set "csi.enabled=true" \
       --set "csi.image.repository=SomeOtherImage" \
-      --set "csi.image.tag=SomeOtherTag" \
+      --set "csi.image.tag=0.0.1" \
       . | tee /dev/stderr |
       yq -r '.spec.template.spec.containers[0].image' | tee /dev/stderr)
-  [ "${actual}" = "SomeOtherImage:SomeOtherTag" ]
+  [ "${actual}" = "SomeOtherImage:0.0.1" ]
 
   local actual=$(helm template \
       --show-only templates/csi-daemonset.yaml \
