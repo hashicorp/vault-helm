@@ -57,6 +57,43 @@ load _helpers
 
 }
 
+@test "server/ingress: extra paths prepend host configuration" {
+  cd `chart_dir`
+
+  local actual=$(helm template \
+      --show-only templates/server-ingress.yaml \
+      --set 'server.ingress.enabled=true' \
+      --set 'server.ingress.hosts[0].host=test.com' \
+      --set 'server.ingress.hosts[0].paths[0]=/' \
+      --set 'server.ingress.extraPaths[0].path=/annotation-service' \
+      --set 'server.ingress.extraPaths[0].backend.serviceName=ssl-redirect' \
+      . | tee /dev/stderr |
+      yq  -r '.spec.rules[0].http.paths[0].backend.serviceName' | tee /dev/stderr)
+  [ "${actual}" = 'ssl-redirect' ]
+
+  local actual=$(helm template \
+      --show-only templates/server-ingress.yaml \
+      --set 'server.ingress.enabled=true' \
+      --set 'server.ingress.hosts[0].host=test.com' \
+      --set 'server.ingress.hosts[0].paths[0]=/' \
+      --set 'server.ingress.extraPaths[0].path=/annotation-service' \
+      --set 'server.ingress.extraPaths[0].backend.serviceName=ssl-redirect' \
+      . | tee /dev/stderr |
+      yq  -r '.spec.rules[0].http.paths[0].path' | tee /dev/stderr)
+  [ "${actual}" = '/annotation-service' ]
+
+  local actual=$(helm template \
+      --show-only templates/server-ingress.yaml \
+      --set 'server.ingress.enabled=true' \
+      --set 'server.ingress.hosts[0].host=test.com' \
+      --set 'server.ingress.hosts[0].paths[0]=/' \
+      --set 'server.ingress.extraPaths[0].path=/annotation-service' \
+      --set 'server.ingress.extraPaths[0].backend.serviceName=ssl-redirect' \
+      . | tee /dev/stderr |
+      yq  -r '.spec.rules[0].http.paths[1].path' | tee /dev/stderr)
+  [ "${actual}" = '/' ]
+}
+
 @test "server/ingress: labels gets added to object" {
   cd `chart_dir`
 
