@@ -410,7 +410,7 @@ server:
     # Extra annotations for the service definition. This can either be YAML or a
     # YAML-formatted multi-line templated string map of the annotations to apply
     # to the service.
-    annotations: {}
+    annotations: { }
 
   # This configures the Vault Statefulset to create a PVC for data
   # storage when using the file or raft backend storage engines.
@@ -503,14 +503,16 @@ server:
   # Helm project by default.  It is possible to manually configure Vault to use a
   # different HA backend.
   ha:
-    enabled: false
+    enabled: true
     replicas: 3
 
     service:
-      # Configures the service type for the main HA Active Vault service.
-      type: ClusterIP
-      # Extra annotations to attach to the active service
-      annotations: {}
+      type: "ClusterIP"
+#      type: "LoadBalancer"
+#      annotations: {
+#        cloud.google.com/load-balancer-type: "Internal",
+#        networking.gke.io/internal-load-balancer-allow-global-access: "true"
+#      }
 
     # Set the api_addr configuration for Vault HA
     # See https://www.vaultproject.io/docs/configuration#api_addr
