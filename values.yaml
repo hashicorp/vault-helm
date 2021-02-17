@@ -507,7 +507,7 @@ server:
   # Helm project by default.  It is possible to manually configure Vault to use a
   # different HA backend.
   ha:
-    enabled: true
+    enabled: false
     replicas: 3
 
     # vault-standby and vault-active services get these values instead of the same ones used on server.service
