@@ -400,7 +400,6 @@ Sets extra vault ha active service annotations
 */}}
 {{- define "vault.service.ha.annotations" -}}
   {{- if .Values.server.ha.service.annotations }}
-      annotations:
         {{- $tp := typeOf .Values.server.ha.service.annotations }}
         {{- if eq $tp "string" }}
           {{- tpl .Values.server.ha.service.annotations . | nindent 4 }}

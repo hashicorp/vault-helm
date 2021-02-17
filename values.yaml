@@ -398,6 +398,7 @@ server:
     # Configures the service type for the main Vault service.  Can be ClusterIP
     # or NodePort.
     #type: ClusterIP
+    #type: "LoadBalancer"
 
     # If type is set to "NodePort", a specific nodePort value can be configured,
     # will be random if left blank.
@@ -410,7 +411,10 @@ server:
     # Extra annotations for the service definition. This can either be YAML or a
     # YAML-formatted multi-line templated string map of the annotations to apply
     # to the service.
-    annotations: { }
+    #annotations: {
+    #  cloud.google.com/load-balancer-type: "Internal",
+    #  networking.gke.io/internal-load-balancer-allow-global-access: "true"
+    #}
 
   # This configures the Vault Statefulset to create a PVC for data
   # storage when using the file or raft backend storage engines.
@@ -506,13 +510,10 @@ server:
     enabled: true
     replicas: 3
 
+    # vault-standby and vault-active services get these values instead of the same ones used on server.service
     service:
       type: "ClusterIP"
-#      type: "LoadBalancer"
-#      annotations: {
-#        cloud.google.com/load-balancer-type: "Internal",
-#        networking.gke.io/internal-load-balancer-allow-global-access: "true"
-#      }
+      annotations: { }
 
     # Set the api_addr configuration for Vault HA
     # See https://www.vaultproject.io/docs/configuration#api_addr
