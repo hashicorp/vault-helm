@@ -396,15 +396,15 @@ Sets extra vault server Service annotations
 {{- end -}}
 
 {{/*
-Sets extra vault ha active service annotations
+Sets vault ha replicate service annotations
 */}}
-{{- define "vault.service.ha.annotations" -}}
-  {{- if .Values.server.ha.service.annotations }}
-        {{- $tp := typeOf .Values.server.ha.service.annotations }}
+{{- define "vault.ha.replicate.annotations" -}}
+  {{- if .Values.server.ha.replicate.annotations }}
+        {{- $tp := typeOf .Values.server.ha.replicate.annotations }}
         {{- if eq $tp "string" }}
-          {{- tpl .Values.server.ha.service.annotations . | nindent 4 }}
+          {{- tpl .Values.server.ha.replicate.annotations . | nindent 4 }}
         {{- else }}
-          {{- toYaml .Values.server.ha.service.annotations | nindent 4 }}
+          {{- toYaml .Values.server.ha.replicate.annotations | nindent 4 }}
         {{- end }}
   {{- end }}
 {{- end -}}

@@ -398,7 +398,6 @@ server:
     # Configures the service type for the main Vault service.  Can be ClusterIP
     # or NodePort.
     #type: ClusterIP
-    #type: "LoadBalancer"
 
     # If type is set to "NodePort", a specific nodePort value can be configured,
     # will be random if left blank.
@@ -411,10 +410,7 @@ server:
     # Extra annotations for the service definition. This can either be YAML or a
     # YAML-formatted multi-line templated string map of the annotations to apply
     # to the service.
-    #annotations: {
-    #  cloud.google.com/load-balancer-type: "Internal",
-    #  networking.gke.io/internal-load-balancer-allow-global-access: "true"
-    #}
+    annotations: {}
 
   # This configures the Vault Statefulset to create a PVC for data
   # storage when using the file or raft backend storage engines.
@@ -510,10 +506,22 @@ server:
     enabled: false
     replicas: 3
 
-    # vault-standby and vault-active services get these values instead of the same ones used on server.service
-    service:
-      type: "ClusterIP"
-      annotations: { }
+    # vault-replicate services get these values, only uses port 8201
+    replicate:
+    # Configures the service type for the Vault replicate service. 
+      type: LoadBalancer
+    # clusterIP controls whether a Cluster IP address is attached to the
+    # Vault service within Kubernetes.  By default the Vault service will
+    # be given a Cluster IP address, set to None to disable.  When disabled
+    # Kubernetes will create a "headless" service.  Headless services can be
+    # used to communicate with pods directly through DNS instead of a round robin
+    # load balancer.
+    # clusterIP: None
+    #  annotations: { }
+      annotations: {
+       cloud.google.com/load-balancer-type: "Internal",
+       networking.gke.io/internal-load-balancer-allow-global-access: "true"
+      }
 
     # Set the api_addr configuration for Vault HA
     # See https://www.vaultproject.io/docs/configuration#api_addr

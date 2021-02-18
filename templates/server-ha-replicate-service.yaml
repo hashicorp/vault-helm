@@ -1,0 +1,35 @@
+{{ template "vault.mode" . }}
+{{- if ne .mode "external" }}
+{{- if and (eq .mode "ha" ) (and (eq (.Values.server.service.enabled | toString) "true" ) (eq (.Values.global.enabled | toString) "true")) }}
+# Service for replicate Vault pod
+# only 8021 internal port
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ template "vault.fullname" . }}-replicate
+  namespace: {{ .Release.Namespace }}
+  labels:
+    helm.sh/chart: {{ include "vault.chart" . }}
+    app.kubernetes.io/name: {{ include "vault.name" . }}
+    app.kubernetes.io/instance: {{ .Release.Name }}
+    app.kubernetes.io/managed-by: {{ .Release.Service }}
+  annotations:
+{{ template "vault.ha.replicate.annotations" .}}
+spec:
+  {{- if .Values.server.ha.replicate.type}}
+  type: {{ .Values.server.ha.replicate.type }}
+  {{- end}}
+  {{- if .Values.server.ha.replicate.clusterIP }}
+  clusterIP: {{ .Values.server.ha.replicate.clusterIP }}
+  {{- end }}
+  publishNotReadyAddresses: true
+  ports:
+    - name: https-internal
+      port: 8201
+      targetPort: 8201
+  selector:
+    app.kubernetes.io/name: {{ include "vault.name" . }}
+    app.kubernetes.io/instance: {{ .Release.Name }}
+    component: server
+{{- end }}
+{{- end }}
