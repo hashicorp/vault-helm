@@ -1,5 +1,8 @@
 ## Unreleased
 
+Improvements:
+* `objectSelector` can now be set on the mutating admission webhook [GH-456](https://github.com/hashicorp/vault-helm/pull/456)
+
 ## 0.9.1 (February 2nd, 2021)
 
 Bugs:
