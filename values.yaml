@@ -664,5 +664,26 @@ csi:
   #     cpu: 50m
   #     memory: 128Mi
 
+  # Settings for the daemonSet used to run the provider.
+  daemonSet:
+    updateStrategy:
+      type: RollingUpdate
+      maxUnavailable: ""
+    # Extra annotations for the daemonSet. This can either be YAML or a
+    # YAML-formatted multi-line templated string map of the annotations to apply
+    # to the daemonSet.
+    annotations: {}
+  pod:
+    # Extra annotations for the provider pods. This can either be YAML or a
+    # YAML-formatted multi-line templated string map of the annotations to apply
+    # to the pod.
+    annotations: {}
+
+  serviceAccount:
+    # Extra annotations for the serviceAccount definition. This can either be
+    # YAML or a YAML-formatted multi-line templated string map of the
+    # annotations to apply to the serviceAccount.
+    annotations: {}
+
   # Enables debug logging.
   debug: false

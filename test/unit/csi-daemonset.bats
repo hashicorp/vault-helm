@@ -70,6 +70,102 @@ load _helpers
   [ "${actual}" = "--debug=true" ]
 }
 
+# updateStrategy
+@test "csi/daemonset: updateStrategy is configurable" {
+  cd `chart_dir`
+  # Default
+  local actual=$(helm template \
+      --show-only templates/csi-daemonset.yaml \
+      --set "csi.enabled=true" \
+      . | tee /dev/stderr |
+      yq -r '.spec.updateStrategy.type' | tee /dev/stderr)
+  [ "${actual}" = "RollingUpdate" ]
+
+  # OnDelete
+  local actual=$(helm template \
+      --show-only templates/csi-daemonset.yaml \
+      --set "csi.enabled=true" \
+      --set "csi.daemonSet.updateStrategy.type=OnDelete" \
+      . | tee /dev/stderr |
+      yq -r '.spec.updateStrategy.type' | tee /dev/stderr)
+  [ "${actual}" = "OnDelete" ]
+
+  # Max unavailable
+  local actual=$(helm template \
+      --show-only templates/csi-daemonset.yaml \
+      --set "csi.enabled=true" \
+      --set "csi.daemonSet.updateStrategy.maxUnavailable=25%" \
+      . | tee /dev/stderr |
+      yq -r '.spec.updateStrategy.rollingUpdate.maxUnavailable' | tee /dev/stderr)
+  [ "${actual}" = "25%" ]
+}
+
+#--------------------------------------------------------------------
+# Extra annotations
+@test "csi/daemonset: default csi.daemonSet.annotations" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      --show-only templates/csi-daemonset.yaml \
+      --set 'csi.enabled=true' \
+      . | tee /dev/stderr |
+      yq -r '.metadata.annotations' | tee /dev/stderr)
+  [ "${actual}" = "null" ]
+}
+
+@test "csi/daemonset: specify csi.daemonSet.annotations yaml" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      --show-only templates/csi-daemonset.yaml \
+      --set 'csi.enabled=true' \
+      --set 'csi.daemonSet.annotations.foo=bar' \
+      . | tee /dev/stderr |
+      yq -r '.metadata.annotations.foo' | tee /dev/stderr)
+  [ "${actual}" = "bar" ]
+}
+
+@test "csi/daemonset: specify csi.daemonSet.annotations yaml string" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      --show-only templates/csi-daemonset.yaml \
+      --set 'csi.enabled=true' \
+      --set 'csi.daemonSet.annotations=foo: bar' \
+      . | tee /dev/stderr |
+      yq -r '.metadata.annotations.foo' | tee /dev/stderr)
+  [ "${actual}" = "bar" ]
+}
+
+@test "csi/daemonset: default csi.pod.annotations" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      --show-only templates/csi-daemonset.yaml \
+      --set 'csi.enabled=true' \
+      . | tee /dev/stderr |
+      yq -r '.spec.template.metadata.annotations' | tee /dev/stderr)
+  [ "${actual}" = "null" ]
+}
+
+@test "csi/daemonset: specify csi.pod.annotations yaml" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      --show-only templates/csi-daemonset.yaml \
+      --set 'csi.enabled=true' \
+      --set 'csi.pod.annotations.foo=bar' \
+      . | tee /dev/stderr |
+      yq -r '.spec.template.metadata.annotations.foo' | tee /dev/stderr)
+  [ "${actual}" = "bar" ]
+}
+
+@test "csi/daemonset: specify csi.pod.annotations yaml string" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      --show-only templates/csi-daemonset.yaml \
+      --set 'csi.enabled=true' \
+      --set 'csi.pod.annotations=foo: bar' \
+      . | tee /dev/stderr |
+      yq -r '.spec.template.metadata.annotations.foo' | tee /dev/stderr)
+  [ "${actual}" = "bar" ]
+}
+
 #--------------------------------------------------------------------
 # extraVolumes
 

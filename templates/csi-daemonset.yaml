@@ -8,9 +8,14 @@ metadata:
     app.kubernetes.io/name: {{ include "vault.name" . }}-csi-provider
     app.kubernetes.io/instance: {{ .Release.Name }}
     app.kubernetes.io/managed-by: {{ .Release.Service }}
+  {{ template "csi.daemonSet.annotations" . }}
 spec:
   updateStrategy:
-    type: RollingUpdate
+    type: {{ .Values.csi.daemonSet.updateStrategy.type }}
+    {{- if .Values.csi.daemonSet.updateStrategy.maxUnavailable }}
+    rollingUpdate:
+      maxUnavailable: {{ .Values.csi.daemonSet.updateStrategy.maxUnavailable }}
+    {{- end }}
   selector:
     matchLabels:
       app.kubernetes.io/name: {{ include "vault.name" . }}-csi-provider
@@ -20,6 +25,7 @@ spec:
       labels:
         app.kubernetes.io/name: {{ template "vault.name" . }}-csi-provider
         app.kubernetes.io/instance: {{ .Release.Name }}
+      {{ template "csi.pod.annotations" . }}
     spec:
       serviceAccountName: {{ include "vault.name" . }}-csi-provider
       containers:
