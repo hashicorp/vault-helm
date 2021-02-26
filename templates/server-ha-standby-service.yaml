@@ -27,7 +27,7 @@ spec:
       port: {{ .Values.server.service.port }}
       targetPort: {{ .Values.server.service.targetPort }}
       {{- if and (.Values.server.service.nodePort) (eq (.Values.server.service.type | toString) "NodePort") }}
-      nodePort: {{ .Values.server.service.nodePort }}
+      nodePort:
       {{- end }}
     - name: https-internal
       port: 8201
