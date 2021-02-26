@@ -324,8 +324,8 @@ load _helpers
       --set 'server.service.type=NodePort' \
       --set 'server.service.nodePort=30009' \
       . | tee /dev/stderr |
-      yq -r '.spec.ports[0].nodePort' | tee /dev/stderr)
-  [ "${actual}" = "30009" ]
+      yq -r '.spec.type' | tee /dev/stderr)
+  [ "${actual}" = "NodePort" ]
 
   local actual=$(helm template \
       --show-only templates/server-service.yaml \
