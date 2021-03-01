@@ -384,3 +384,58 @@ load _helpers
       yq -r '.spec.ports | map(select(.port==8200)) | .[] .name' | tee /dev/stderr)
   [ "${actual}" = "https" ]
 }
+
+@test "server/Service: vault externalTrafficPolicy set to Local lowercase" {
+  cd `chart_dir`
+
+  local actual=$(helm template \
+      --show-only templates/server-service.yaml \
+      --set 'server.service.externalTrafficPolicy=local' \
+      . | tee /dev/stderr |
+      yq -r '.spec.externalTrafficPolicy | tee /dev/stderr)
+  [ "${actual}" = "Local" ]
+}
+
+@test "server/Service: vault externalTrafficPolicy set to Local uppercase" {
+  cd `chart_dir`
+
+  local actual=$(helm template \
+      --show-only templates/server-service.yaml \
+      --set 'server.service.externalTrafficPolicy=LOCAL' \
+      . | tee /dev/stderr |
+      yq -r '.spec.externalTrafficPolicy | tee /dev/stderr)
+  [ "${actual}" = "Local" ]
+}
+
+@test "server/Service: vault externalTrafficPolicy set to Cluster lowercase" {
+  cd `chart_dir`
+
+  local actual=$(helm template \
+      --show-only templates/server-service.yaml \
+      --set 'server.service.externalTrafficPolicy=cluster' \
+      . | tee /dev/stderr |
+      yq -r '.spec.externalTrafficPolicy | tee /dev/stderr)
+  [ "${actual}" = "Local" ]
+}
+
+@test "server/Service: vault externalTrafficPolicy set to Cluster uppercase" {
+  cd `chart_dir`
+
+  local actual=$(helm template \
+      --show-only templates/server-service.yaml \
+      --set 'server.service.externalTrafficPolicy=CLUSTER' \
+      . | tee /dev/stderr |
+      yq -r '.spec.externalTrafficPolicy | tee /dev/stderr)
+  [ "${actual}" = "Local" ]
+}
+
+@test "server/Service: vault externalTrafficPolicy set to wrong values, fallback to Cluster" {
+  cd `chart_dir`
+
+  local actual=$(helm template \
+      --show-only templates/server-service.yaml \
+      --set 'server.service.externalTrafficPolicy=vault' \
+      . | tee /dev/stderr |
+      yq -r '.spec.externalTrafficPolicy | tee /dev/stderr)
+  [ "${actual}" = "Cluster" ]
+}

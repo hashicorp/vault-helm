@@ -157,3 +157,63 @@ load _helpers
       yq -r '.spec.ports | map(select(.port==8200)) | .[] .name' | tee /dev/stderr)
   [ "${actual}" = "https" ]
 }
+
+@test "server/ha-active-Service: vault externalTrafficPolicy set to Local lowercase" {
+  cd `chart_dir`
+
+  local actual=$(helm template \
+      --show-only templates/server-ha-active-service.yaml \
+      --set 'server.service.externalTrafficPolicy=local' \
+      --set 'server.ha.enabled=true' \
+      . | tee /dev/stderr |
+      yq -r '.spec.externalTrafficPolicy | tee /dev/stderr)
+  [ "${actual}" = "Local" ]
+}
+
+@test "server/ha-active-Service: vault externalTrafficPolicy set to Local uppercase" {
+  cd `chart_dir`
+
+  local actual=$(helm template \
+      --show-only templates/server-ha-active-service.yaml \
+      --set 'server.service.externalTrafficPolicy=LOCAL' \
+      --set 'server.ha.enabled=true'
+      . | tee /dev/stderr |
+      yq -r '.spec.externalTrafficPolicy | tee /dev/stderr)
+  [ "${actual}" = "Local" ]
+}
+
+@test "server/ha-active-Service: vault externalTrafficPolicy set to Cluster lowercase" {
+  cd `chart_dir`
+
+  local actual=$(helm template \
+      --show-only templates/server-ha-active-service.yaml \
+      --set 'server.service.externalTrafficPolicy=cluster' \
+      --set 'server.ha.enabled=true'
+      . | tee /dev/stderr |
+      yq -r '.spec.externalTrafficPolicy | tee /dev/stderr)
+  [ "${actual}" = "Local" ]
+}
+
+@test "server/ha-active-Service: vault externalTrafficPolicy set to Cluster uppercase" {
+  cd `chart_dir`
+
+  local actual=$(helm template \
+      --show-only templates/server-ha-active-service.yaml \
+      --set 'server.service.externalTrafficPolicy=CLUSTER' \
+      --set 'server.ha.enabled=true'
+      . | tee /dev/stderr |
+      yq -r '.spec.externalTrafficPolicy | tee /dev/stderr)
+  [ "${actual}" = "Local" ]
+}
+
+@test "server/ha-active-Service: vault externalTrafficPolicy set to wrong values, fallback to Cluster" {
+  cd `chart_dir`
+
+  local actual=$(helm template \
+      --show-only templates/server-ha-active-service.yaml \
+      --set 'server.service.externalTrafficPolicy=vault' \
+      --set 'server.ha.enabled=true'
+      . | tee /dev/stderr |
+      yq -r '.spec.externalTrafficPolicy | tee /dev/stderr)
+  [ "${actual}" = "Cluster" ]
+}

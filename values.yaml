@@ -170,6 +170,7 @@ injector:
 
   # Injector service specific config
   service:
+    externalTrafficPolicy: "Cluster"
     # Extra annotations to attach to the injector service
     annotations: {}
 
