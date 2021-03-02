@@ -392,7 +392,7 @@ load _helpers
       --show-only templates/server-service.yaml \
       --set 'server.service.externalTrafficPolicy=local' \
       . | tee /dev/stderr |
-      yq -r '.spec.externalTrafficPolicy | tee /dev/stderr)
+      yq -r '.spec.externalTrafficPolicy' | tee /dev/stderr)
   [ "${actual}" = "Local" ]
 }
 
@@ -403,7 +403,7 @@ load _helpers
       --show-only templates/server-service.yaml \
       --set 'server.service.externalTrafficPolicy=LOCAL' \
       . | tee /dev/stderr |
-      yq -r '.spec.externalTrafficPolicy | tee /dev/stderr)
+      yq -r '.spec.externalTrafficPolicy' | tee /dev/stderr)
   [ "${actual}" = "Local" ]
 }
 
@@ -414,7 +414,7 @@ load _helpers
       --show-only templates/server-service.yaml \
       --set 'server.service.externalTrafficPolicy=cluster' \
       . | tee /dev/stderr |
-      yq -r '.spec.externalTrafficPolicy | tee /dev/stderr)
+      yq -r '.spec.externalTrafficPolicy' | tee /dev/stderr)
   [ "${actual}" = "Local" ]
 }
 
@@ -425,7 +425,7 @@ load _helpers
       --show-only templates/server-service.yaml \
       --set 'server.service.externalTrafficPolicy=CLUSTER' \
       . | tee /dev/stderr |
-      yq -r '.spec.externalTrafficPolicy | tee /dev/stderr)
+      yq -r '.spec.externalTrafficPolicy' | tee /dev/stderr)
   [ "${actual}" = "Local" ]
 }
 
@@ -436,6 +436,6 @@ load _helpers
       --show-only templates/server-service.yaml \
       --set 'server.service.externalTrafficPolicy=vault' \
       . | tee /dev/stderr |
-      yq -r '.spec.externalTrafficPolicy | tee /dev/stderr)
+      yq -r '.spec.externalTrafficPolicy' | tee /dev/stderr)
   [ "${actual}" = "Cluster" ]
 }
