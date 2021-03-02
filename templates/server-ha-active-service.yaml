@@ -15,7 +15,7 @@ metadata:
   annotations:
 {{ template "vault.service.annotations" .}}
 spec:
-  {{- if .Values.server.service.externalTrafficPolicy | title | eq "Local" }}
+  {{- if and (.Values.server.service.externalTrafficPolicy ) (print .Values.server.service.externalTrafficPolicy | title | eq "Local"  )}}
   externalTrafficPolicy: {{ .Values.server.service.externalTrafficPolicy| title | quote }}
   {{- else }}
   externalTrafficPolicy: {{ default "Cluster" | quote }}
