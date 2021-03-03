@@ -415,7 +415,7 @@ load _helpers
       --set 'server.service.externalTrafficPolicy=cluster' \
       . | tee /dev/stderr |
       yq -r '.spec.externalTrafficPolicy' | tee /dev/stderr)
-  [ "${actual}" = "Local" ]
+  [ "${actual}" = "Cluster" ]
 }
 
 @test "server/Service: vault externalTrafficPolicy set to Cluster uppercase" {
@@ -426,7 +426,7 @@ load _helpers
       --set 'server.service.externalTrafficPolicy=CLUSTER' \
       . | tee /dev/stderr |
       yq -r '.spec.externalTrafficPolicy' | tee /dev/stderr)
-  [ "${actual}" = "Local" ]
+  [ "${actual}" = "Cluster" ]
 }
 
 @test "server/Service: vault externalTrafficPolicy set to wrong values, fallback to Cluster" {
