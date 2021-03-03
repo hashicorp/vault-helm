@@ -166,7 +166,7 @@ load _helpers
       --set 'server.service.externalTrafficPolicy=local' \
       --set 'server.ha.enabled=true' \
       . | tee /dev/stderr |
-      yq -r '.spec.externalTrafficPolicy | tee /dev/stderr)
+      yq -r '.spec.externalTrafficPolicy' | tee /dev/stderr)
   [ "${actual}" = "Local" ]
 }
 
@@ -176,9 +176,9 @@ load _helpers
   local actual=$(helm template \
       --show-only templates/server-ha-active-service.yaml \
       --set 'server.service.externalTrafficPolicy=LOCAL' \
-      --set 'server.ha.enabled=true'
+      --set 'server.ha.enabled=true' \
       . | tee /dev/stderr |
-      yq -r '.spec.externalTrafficPolicy | tee /dev/stderr)
+      yq -r '.spec.externalTrafficPolicy' | tee /dev/stderr)
   [ "${actual}" = "Local" ]
 }
 
@@ -188,10 +188,10 @@ load _helpers
   local actual=$(helm template \
       --show-only templates/server-ha-active-service.yaml \
       --set 'server.service.externalTrafficPolicy=cluster' \
-      --set 'server.ha.enabled=true'
+      --set 'server.ha.enabled=true' \
       . | tee /dev/stderr |
-      yq -r '.spec.externalTrafficPolicy | tee /dev/stderr)
-  [ "${actual}" = "Local" ]
+      yq -r '.spec.externalTrafficPolicy' | tee /dev/stderr)
+  [ "${actual}" = "Cluster" ]
 }
 
 @test "server/ha-active-Service: vault externalTrafficPolicy set to Cluster uppercase" {
@@ -200,10 +200,10 @@ load _helpers
   local actual=$(helm template \
       --show-only templates/server-ha-active-service.yaml \
       --set 'server.service.externalTrafficPolicy=CLUSTER' \
-      --set 'server.ha.enabled=true'
+      --set 'server.ha.enabled=true' \
       . | tee /dev/stderr |
-      yq -r '.spec.externalTrafficPolicy | tee /dev/stderr)
-  [ "${actual}" = "Local" ]
+      yq -r '.spec.externalTrafficPolicy' | tee /dev/stderr)
+  [ "${actual}" = "Cluster" ]
 }
 
 @test "server/ha-active-Service: vault externalTrafficPolicy set to wrong values, fallback to Cluster" {
@@ -212,8 +212,8 @@ load _helpers
   local actual=$(helm template \
       --show-only templates/server-ha-active-service.yaml \
       --set 'server.service.externalTrafficPolicy=vault' \
-      --set 'server.ha.enabled=true'
+      --set 'server.ha.enabled=true' \
       . | tee /dev/stderr |
-      yq -r '.spec.externalTrafficPolicy | tee /dev/stderr)
+      yq -r '.spec.externalTrafficPolicy' | tee /dev/stderr)
   [ "${actual}" = "Cluster" ]
 }
