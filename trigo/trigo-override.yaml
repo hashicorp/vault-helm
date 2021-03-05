@@ -1,36 +1,60 @@
+# standard settings for trigo openshift vault.
+# our standard setup includes: tls being enabled (default would be disabled) and openshift set to true (default would be vanilla kubernetes and therefore false)
+# data storage set to 10GB and Audit log storage to 5GB per replica for 3 replicas using "raft" as replicated storage backend in a high availability setup.
+# the config settings are directly applied to the vault server settings and allow for the secondary vault on our VM to perform a auto unseal action when the vault pods get restarted
+# the agent injector will be disabled as secrets should get to the pods in the form of external secrets 
 global:
-  tlsDisable: true
+  tlsDisable: false
   openshift: true
 
 server:
-  route:
+  dataStorage:
     enabled: true
-    host: vault.apps.ocp.trigo.cloud
-  standalone:
-    enabled: false
+    size: 10Gi
+    mountPath: "/vault/data"
+    storageClass: null
+    accessMode: ReadWriteOnce
+    annotations: {}
+  auditStorage:
+    enabled: true
+    size: 5Gi
+    mountPath: "/vault/audit"
+    storageClass: null
+    accessMode: ReadWriteOnce
+    annotations: {}
+
   ha:
     enabled: true
     replicas: 3
-
+    apiAddr: null
     raft:
-
-      # Enables Raft integrated storage
       enabled: true
+    config: |
+      listener "tcp" {
+        tls_disable = 1
+        address = "[::]:8200"
+        cluster_address = "[::]:8201"
+      }
+      storage "file" {
+        path = "/vault/data"
+      }
 
-  dataStorage:
-    enabled: true
-    # Size of the PVC created
-    size: 5Gi
-    # Location where the PVC will be mounted.
-    mountPath: "/vault/data"
+      }
+      seal "transit" {
+      address = "http://10.0.1.37:8200"
+      disable_renewal = "false"
+      key_name = "autounseal"
+      mount_path = "transit/"
+      tls_skip_verify = "true"
+      token = "s.ljOifLcwFP5tmOMz5qOnrHLB"
+      }
 
-  auditStorage:
-    enabled: true
-    # Size of the PVC created
-    size: 10Gi
-    # Location where the PVC will be mounted.
-    mountPath: "/vault/audit"
-
-
-# this is optional for the disaster recovery VM vault insert address here :
-externalVaultAddr: ""
+      ui = true
+      listener "tcp" {
+        address = "[::]:8200"
+        cluster_address = "[::]:8201"
+        tls_cert_file = "/var/run/secrets/kubernetes.io/certs/tls.crt"
+        tls_key_file = "/var/run/secrets/kubernetes.io/certs/tls.key"
+      }
+injector:
+  enabled: false
