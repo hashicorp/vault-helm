@@ -156,6 +156,10 @@ injector:
   #   beta.kubernetes.io/arch: amd64
   nodeSelector: null
 
+  # Enables network policy for injector pods
+  networkPolicy:
+    enabled: false
+
   # Priority class for injector pods
   priorityClassName: ""
 
