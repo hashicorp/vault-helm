@@ -47,6 +47,24 @@ spec:
               mountPath: {{ .path | default "/vault/userconfig" }}/{{ .name }}
               readOnly: true
             {{- end }}
+          livenessProbe:
+            httpGet:
+              path: /health/ready
+              port: 8080
+            failureThreshold: 2
+            initialDelaySeconds: 5
+            periodSeconds: 5
+            successThreshold: 1
+            timeoutSeconds: 3
+          readinessProbe:
+            httpGet:
+              path: /health/ready
+              port: 8080
+            failureThreshold: 2
+            initialDelaySeconds: 5
+            periodSeconds: 5
+            successThreshold: 1
+            timeoutSeconds: 3
       volumes:
         - name: providervol
           hostPath:
