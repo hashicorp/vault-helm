@@ -168,6 +168,10 @@ injector:
   # This should be a YAML map of the labels to apply to the injector
   extraLabels: {}
 
+  # Should the injector pods run on the host network (useful when using
+  # an alternate CNI in EKS)
+  hostNetwork: false
+
   # Injector service specific config
   service:
     # Extra annotations to attach to the injector service
