@@ -244,3 +244,116 @@ load _helpers
       yq -r '.mountPath' | tee /dev/stderr)
   [ "${actual}" = "/vault/userconfig/foo" ]
 }
+
+#--------------------------------------------------------------------
+# Readiness/liveness probes
+
+@test "csi/daemonset: csi.livenessProbe is configurable" {
+  cd `chart_dir`
+
+  # Test the defaults
+  local object=$(helm template \
+      --show-only templates/csi-daemonset.yaml  \
+      --set 'csi.enabled=true' \
+      . | tee /dev/stderr |
+      yq -r '.spec.template.spec.containers[0].livenessProbe' | tee /dev/stderr)
+
+  local actual=$(echo $object |
+      yq -r '.failureThreshold' | tee /dev/stderr)
+  [ "${actual}" = "2" ]
+  local actual=$(echo $object |
+      yq -r '.initialDelaySeconds' | tee /dev/stderr)
+  [ "${actual}" = "5" ]
+  local actual=$(echo $object |
+      yq -r '.periodSeconds' | tee /dev/stderr)
+  [ "${actual}" = "5" ]
+  local actual=$(echo $object |
+      yq -r '.successThreshold' | tee /dev/stderr)
+  [ "${actual}" = "1" ]
+  local actual=$(echo $object |
+      yq -r '.timeoutSeconds' | tee /dev/stderr)
+  [ "${actual}" = "3" ]
+
+  # Test it is configurable
+  local object=$(helm template \
+      --show-only templates/csi-daemonset.yaml  \
+      --set 'csi.enabled=true' \
+      --set 'csi.livenessProbe.failureThreshold=10' \
+      --set 'csi.livenessProbe.initialDelaySeconds=11' \
+      --set 'csi.livenessProbe.periodSeconds=12' \
+      --set 'csi.livenessProbe.successThreshold=13' \
+      --set 'csi.livenessProbe.timeoutSeconds=14' \
+      . | tee /dev/stderr |
+      yq -r '.spec.template.spec.containers[0].livenessProbe' | tee /dev/stderr)
+
+  local actual=$(echo $object |
+      yq -r '.failureThreshold' | tee /dev/stderr)
+  [ "${actual}" = "10" ]
+  local actual=$(echo $object |
+      yq -r '.initialDelaySeconds' | tee /dev/stderr)
+  [ "${actual}" = "11" ]
+  local actual=$(echo $object |
+      yq -r '.periodSeconds' | tee /dev/stderr)
+  [ "${actual}" = "12" ]
+  local actual=$(echo $object |
+      yq -r '.successThreshold' | tee /dev/stderr)
+  [ "${actual}" = "13" ]
+  local actual=$(echo $object |
+      yq -r '.timeoutSeconds' | tee /dev/stderr)
+  [ "${actual}" = "14" ]
+}
+
+@test "csi/daemonset: csi.readinessProbe is configurable" {
+  cd `chart_dir`
+
+  # Test the defaults
+  local object=$(helm template \
+      --show-only templates/csi-daemonset.yaml  \
+      --set 'csi.enabled=true' \
+      . | tee /dev/stderr |
+      yq -r '.spec.template.spec.containers[0].readinessProbe' | tee /dev/stderr)
+
+  local actual=$(echo $object |
+      yq -r '.failureThreshold' | tee /dev/stderr)
+  [ "${actual}" = "2" ]
+  local actual=$(echo $object |
+      yq -r '.initialDelaySeconds' | tee /dev/stderr)
+  [ "${actual}" = "5" ]
+  local actual=$(echo $object |
+      yq -r '.periodSeconds' | tee /dev/stderr)
+  [ "${actual}" = "5" ]
+  local actual=$(echo $object |
+      yq -r '.successThreshold' | tee /dev/stderr)
+  [ "${actual}" = "1" ]
+  local actual=$(echo $object |
+      yq -r '.timeoutSeconds' | tee /dev/stderr)
+  [ "${actual}" = "3" ]
+
+  # Test it is configurable
+  local object=$(helm template \
+      --show-only templates/csi-daemonset.yaml  \
+      --set 'csi.enabled=true' \
+      --set 'csi.readinessProbe.failureThreshold=10' \
+      --set 'csi.readinessProbe.initialDelaySeconds=11' \
+      --set 'csi.readinessProbe.periodSeconds=12' \
+      --set 'csi.readinessProbe.successThreshold=13' \
+      --set 'csi.readinessProbe.timeoutSeconds=14' \
+      . | tee /dev/stderr |
+      yq -r '.spec.template.spec.containers[0].readinessProbe' | tee /dev/stderr)
+
+  local actual=$(echo $object |
+      yq -r '.failureThreshold' | tee /dev/stderr)
+  [ "${actual}" = "10" ]
+  local actual=$(echo $object |
+      yq -r '.initialDelaySeconds' | tee /dev/stderr)
+  [ "${actual}" = "11" ]
+  local actual=$(echo $object |
+      yq -r '.periodSeconds' | tee /dev/stderr)
+  [ "${actual}" = "12" ]
+  local actual=$(echo $object |
+      yq -r '.successThreshold' | tee /dev/stderr)
+  [ "${actual}" = "13" ]
+  local actual=$(echo $object |
+      yq -r '.timeoutSeconds' | tee /dev/stderr)
+  [ "${actual}" = "14" ]
+}

@@ -51,20 +51,20 @@ spec:
             httpGet:
               path: /health/ready
               port: 8080
-            failureThreshold: 2
-            initialDelaySeconds: 5
-            periodSeconds: 5
-            successThreshold: 1
-            timeoutSeconds: 3
+            failureThreshold: {{ .Values.csi.livenessProbe.failureThreshold | default 2 }}
+            initialDelaySeconds: {{ .Values.csi.livenessProbe.initialDelaySeconds | default 5 }}
+            periodSeconds: {{ .Values.csi.livenessProbe.periodSeconds | default 5 }}
+            successThreshold: {{ .Values.csi.livenessProbe.successThreshold | default 1 }}
+            timeoutSeconds: {{ .Values.csi.livenessProbe.timeoutSeconds | default 3 }}
           readinessProbe:
             httpGet:
               path: /health/ready
               port: 8080
-            failureThreshold: 2
-            initialDelaySeconds: 5
-            periodSeconds: 5
-            successThreshold: 1
-            timeoutSeconds: 3
+            failureThreshold: {{ .Values.csi.readinessProbe.failureThreshold | default 2 }}
+            initialDelaySeconds: {{ .Values.csi.readinessProbe.initialDelaySeconds | default 5 }}
+            periodSeconds: {{ .Values.csi.readinessProbe.periodSeconds | default 5 }}
+            successThreshold: {{ .Values.csi.readinessProbe.successThreshold | default 1 }}
+            timeoutSeconds: {{ .Values.csi.readinessProbe.timeoutSeconds | default 3 }}
       volumes:
         - name: providervol
           hostPath:
