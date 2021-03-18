@@ -685,10 +685,20 @@ csi:
     # annotations to apply to the serviceAccount.
     annotations: {}
 
-  # Used to define custom readinessProbe settings
-  readinessProbe: {}
-  # Used to enable a livenessProbe for the pods.
-  livenessProbe: {}
+  # Used to configure readinessProbe for the pods.
+  readinessProbe:
+    failureThreshold: 2
+    initialDelaySeconds: 5
+    periodSeconds: 5
+    successThreshold: 1
+    timeoutSeconds: 3
+  # Used to configure livenessProbe for the pods.
+  livenessProbe:
+    failureThreshold: 2
+    initialDelaySeconds: 5
+    periodSeconds: 5
+    successThreshold: 1
+    timeoutSeconds: 3
 
   # Enables debug logging.
   debug: false
