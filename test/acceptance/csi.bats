@@ -51,7 +51,8 @@ teardown() {
   if [[ ${CLEANUP:-true} == "true" ]]
   then
       echo "helm/pvc teardown"
-      helm delete vault
+      helm --namespace=acceptance delete vault
+      helm --namespace=acceptance delete secrets-store-csi-driver
       kubectl delete --all pvc
       kubectl delete namespace acceptance
   fi
