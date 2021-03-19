@@ -248,6 +248,23 @@ load _helpers
 #--------------------------------------------------------------------
 # Readiness/liveness probes
 
+@test "csi/daemonset: csi.livenessProbe and csi.readinessProbe default to disabled" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      --show-only templates/csi-daemonset.yaml \
+      --set 'csi.enabled=true' \
+      . | tee /dev/stderr |
+      yq -r '.spec.template.spec.containers[0].livenessProbe' | tee /dev/stderr)
+  [ "${actual}" = "null" ]
+
+  local actual=$(helm template \
+      --show-only templates/csi-daemonset.yaml \
+      --set 'csi.enabled=true' \
+      . | tee /dev/stderr |
+      yq -r '.spec.template.spec.containers[0].readinessProbe' | tee /dev/stderr)
+  [ "${actual}" = "null" ]
+}
+
 @test "csi/daemonset: csi.livenessProbe is configurable" {
   cd `chart_dir`
 
@@ -255,6 +272,7 @@ load _helpers
   local object=$(helm template \
       --show-only templates/csi-daemonset.yaml  \
       --set 'csi.enabled=true' \
+      --set 'csi.livenessProbe.enabled=true' \
       . | tee /dev/stderr |
       yq -r '.spec.template.spec.containers[0].livenessProbe' | tee /dev/stderr)
 
@@ -278,6 +296,7 @@ load _helpers
   local object=$(helm template \
       --show-only templates/csi-daemonset.yaml  \
       --set 'csi.enabled=true' \
+      --set 'csi.livenessProbe.enabled=true' \
       --set 'csi.livenessProbe.failureThreshold=10' \
       --set 'csi.livenessProbe.initialDelaySeconds=11' \
       --set 'csi.livenessProbe.periodSeconds=12' \
@@ -310,6 +329,7 @@ load _helpers
   local object=$(helm template \
       --show-only templates/csi-daemonset.yaml  \
       --set 'csi.enabled=true' \
+      --set 'csi.readinessProbe.enabled=true' \
       . | tee /dev/stderr |
       yq -r '.spec.template.spec.containers[0].readinessProbe' | tee /dev/stderr)
 
@@ -333,6 +353,7 @@ load _helpers
   local object=$(helm template \
       --show-only templates/csi-daemonset.yaml  \
       --set 'csi.enabled=true' \
+      --set 'csi.readinessProbe.enabled=true' \
       --set 'csi.readinessProbe.failureThreshold=10' \
       --set 'csi.readinessProbe.initialDelaySeconds=11' \
       --set 'csi.readinessProbe.periodSeconds=12' \

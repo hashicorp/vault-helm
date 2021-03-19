@@ -687,6 +687,8 @@ csi:
 
   # Used to configure readinessProbe for the pods.
   readinessProbe:
+  # Vault CSI provider does not support a readiness probe in versions <= 0.7.0
+    enabled: false
     failureThreshold: 2
     initialDelaySeconds: 5
     periodSeconds: 5
@@ -694,6 +696,8 @@ csi:
     timeoutSeconds: 3
   # Used to configure livenessProbe for the pods.
   livenessProbe:
+    # Vault CSI provider does not support a liveness probe in versions <= 0.7.0
+    enabled: false
     failureThreshold: 2
     initialDelaySeconds: 5
     periodSeconds: 5
