@@ -476,6 +476,61 @@ Sets the container resources if the user has set any.
 {{- end -}}
 
 {{/*
+Sets the container resources if the user has set any.
+*/}}
+{{- define "csi.resources" -}}
+  {{- if .Values.csi.resources -}}
+          resources:
+{{ toYaml .Values.csi.resources | indent 12}}
+  {{ end }}
+{{- end -}}
+
+{{/*
+Sets extra CSI daemonset annotations
+*/}}
+{{- define "csi.daemonSet.annotations" -}}
+  {{- if .Values.csi.daemonSet.annotations }}
+  annotations:
+    {{- $tp := typeOf .Values.csi.daemonSet.annotations }}
+    {{- if eq $tp "string" }}
+      {{- tpl .Values.csi.daemonSet.annotations . | nindent 4 }}
+    {{- else }}
+      {{- toYaml .Values.csi.daemonSet.annotations | nindent 4 }}
+    {{- end }}
+  {{- end }}
+{{- end -}}
+
+{{/*
+Sets extra CSI provider pod annotations
+*/}}
+{{- define "csi.pod.annotations" -}}
+  {{- if .Values.csi.pod.annotations }}
+      annotations:
+      {{- $tp := typeOf .Values.csi.pod.annotations }}
+      {{- if eq $tp "string" }}
+        {{- tpl .Values.csi.pod.annotations . | nindent 8 }}
+      {{- else }}
+        {{- toYaml .Values.csi.pod.annotations | nindent 8 }}
+      {{- end }}
+  {{- end }}
+{{- end -}}
+
+{{/*
+Sets extra CSI service account annotations
+*/}}
+{{- define "csi.serviceAccount.annotations" -}}
+  {{- if .Values.csi.serviceAccount.annotations }}
+  annotations:
+    {{- $tp := typeOf .Values.csi.serviceAccount.annotations }}
+    {{- if eq $tp "string" }}
+      {{- tpl .Values.csi.serviceAccount.annotations . | nindent 4 }}
+    {{- else }}
+      {{- toYaml .Values.csi.serviceAccount.annotations | nindent 4 }}
+    {{- end }}
+  {{- end }}
+{{- end -}}
+
+{{/*
 Inject extra environment vars in the format key:value, if populated
 */}}
 {{- define "vault.extraEnvironmentVars" -}}

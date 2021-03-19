@@ -1,0 +1,89 @@
+{{- if and (eq (.Values.csi.enabled | toString) "true" ) (eq (.Values.global.enabled | toString) "true") }}
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: {{ template "vault.fullname" . }}-csi-provider
+  namespace: {{ .Release.Namespace }}
+  labels:
+    app.kubernetes.io/name: {{ include "vault.name" . }}-csi-provider
+    app.kubernetes.io/instance: {{ .Release.Name }}
+    app.kubernetes.io/managed-by: {{ .Release.Service }}
+  {{ template "csi.daemonSet.annotations" . }}
+spec:
+  updateStrategy:
+    type: {{ .Values.csi.daemonSet.updateStrategy.type }}
+    {{- if .Values.csi.daemonSet.updateStrategy.maxUnavailable }}
+    rollingUpdate:
+      maxUnavailable: {{ .Values.csi.daemonSet.updateStrategy.maxUnavailable }}
+    {{- end }}
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: {{ include "vault.name" . }}-csi-provider
+      app.kubernetes.io/instance: {{ .Release.Name }}
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: {{ template "vault.name" . }}-csi-provider
+        app.kubernetes.io/instance: {{ .Release.Name }}
+      {{ template "csi.pod.annotations" . }}
+    spec:
+      serviceAccountName: {{ include "vault.name" . }}-csi-provider
+      containers:
+        - name: {{ include "vault.name" . }}-csi-provider
+          {{ template "csi.resources" . }}
+          image: "{{ .Values.csi.image.repository }}:{{ .Values.csi.image.tag }}"
+          imagePullPolicy: {{ .Values.csi.image.pullPolicy }}
+          args:
+            - --endpoint=/provider/vault.sock
+            - --debug={{ .Values.csi.debug }}
+          volumeMounts:
+            - name: providervol
+              mountPath: "/provider"
+            - name: mountpoint-dir
+              mountPath: /var/lib/kubelet/pods
+              mountPropagation: HostToContainer
+            {{- range .Values.csi.extraVolumes }}
+            - name: userconfig-{{ .name }}
+              mountPath: {{ .path | default "/vault/userconfig" }}/{{ .name }}
+              readOnly: true
+            {{- end }}
+          {{- if .Values.csi.livenessProbe.enabled }}
+          livenessProbe:
+            httpGet:
+              path: /health/ready
+              port: 8080
+            failureThreshold: {{ .Values.csi.livenessProbe.failureThreshold }}
+            initialDelaySeconds: {{ .Values.csi.livenessProbe.initialDelaySeconds }}
+            periodSeconds: {{ .Values.csi.livenessProbe.periodSeconds }}
+            successThreshold: {{ .Values.csi.livenessProbe.successThreshold }}
+            timeoutSeconds: {{ .Values.csi.livenessProbe.timeoutSeconds }}
+          {{- end }}
+          {{- if .Values.csi.readinessProbe.enabled }}
+          readinessProbe:
+            httpGet:
+              path: /health/ready
+              port: 8080
+            failureThreshold: {{ .Values.csi.readinessProbe.failureThreshold }}
+            initialDelaySeconds: {{ .Values.csi.readinessProbe.initialDelaySeconds }}
+            periodSeconds: {{ .Values.csi.readinessProbe.periodSeconds }}
+            successThreshold: {{ .Values.csi.readinessProbe.successThreshold }}
+            timeoutSeconds: {{ .Values.csi.readinessProbe.timeoutSeconds }}
+          {{- end }}
+      volumes:
+        - name: providervol
+          hostPath:
+            path: "/etc/kubernetes/secrets-store-csi-providers"
+        - name: mountpoint-dir
+          hostPath:
+            path: /var/lib/kubelet/pods
+        {{- range .Values.csi.extraVolumes }}
+        - name: userconfig-{{ .name }}
+          {{ .type }}:
+          {{- if (eq .type "configMap") }}
+            name: {{ .name }}
+          {{- else if (eq .type "secret") }}
+            secretName: {{ .name }}
+          {{- end }}
+            defaultMode: {{ .defaultMode | default 420 }}
+        {{- end }}
+{{- end }}

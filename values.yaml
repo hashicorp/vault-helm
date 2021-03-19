@@ -638,3 +638,80 @@ ui:
   # This can either be YAML or a YAML-formatted multi-line templated string map
   # of the annotations to apply to the ui service
   annotations: {}
+
+# secrets-store-csi-driver-provider-vault
+csi:
+  # True if you want to install a secrets-store-csi-driver-provider-vault daemonset.
+  #
+  # Requires installing the secrets-store-csi-driver separately, see:
+  # https://github.com/kubernetes-sigs/secrets-store-csi-driver#install-the-secrets-store-csi-driver
+  #
+  # With the driver and provider installed, you can mount Vault secrets into volumes
+  # similar to the Vault Agent injector, and you can also sync those secrets into
+  # Kubernetes secrets.
+  enabled: false
+
+  image:
+    repository: "hashicorp/secrets-store-csi-driver-provider-vault"
+    tag: "0.0.7"
+    pullPolicy: IfNotPresent
+
+  # extraVolumes is a list of extra volumes to mount. These will be exposed
+  # to Vault in the path `/vault/userconfig/<name>/`. The value below is
+  # an array of objects, examples are shown below.
+  extraVolumes: []
+    # - type: secret (or "configMap")
+    #   name: my-secret
+    #   path: null # default is `/vault/userconfig`
+
+  resources: {}
+  # resources:
+  #   requests:
+  #     cpu: 50m
+  #     memory: 128Mi
+  #   limits:
+  #     cpu: 50m
+  #     memory: 128Mi
+
+  # Settings for the daemonSet used to run the provider.
+  daemonSet:
+    updateStrategy:
+      type: RollingUpdate
+      maxUnavailable: ""
+    # Extra annotations for the daemonSet. This can either be YAML or a
+    # YAML-formatted multi-line templated string map of the annotations to apply
+    # to the daemonSet.
+    annotations: {}
+  pod:
+    # Extra annotations for the provider pods. This can either be YAML or a
+    # YAML-formatted multi-line templated string map of the annotations to apply
+    # to the pod.
+    annotations: {}
+
+  serviceAccount:
+    # Extra annotations for the serviceAccount definition. This can either be
+    # YAML or a YAML-formatted multi-line templated string map of the
+    # annotations to apply to the serviceAccount.
+    annotations: {}
+
+  # Used to configure readinessProbe for the pods.
+  readinessProbe:
+  # Vault CSI provider does not support a readiness probe in versions <= 0.7.0
+    enabled: false
+    failureThreshold: 2
+    initialDelaySeconds: 5
+    periodSeconds: 5
+    successThreshold: 1
+    timeoutSeconds: 3
+  # Used to configure livenessProbe for the pods.
+  livenessProbe:
+    # Vault CSI provider does not support a liveness probe in versions <= 0.7.0
+    enabled: false
+    failureThreshold: 2
+    initialDelaySeconds: 5
+    periodSeconds: 5
+    successThreshold: 1
+    timeoutSeconds: 3
+
+  # Enables debug logging.
+  debug: false
