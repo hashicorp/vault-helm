@@ -1,5 +1,8 @@
 ## Unreleased
 
+Features:
+* Add support for Vault CSI provider [GH-461](https://github.com/hashicorp/vault-helm/pull/461)
+
 Improvements:
 * `objectSelector` can now be set on the mutating admission webhook [GH-456](https://github.com/hashicorp/vault-helm/pull/456)
 
