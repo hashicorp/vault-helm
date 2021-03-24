@@ -1,7 +1,3 @@
-path "sys/mounts" {
-  capabilities = ["read"]
-}
-
-path "secret/*" {
+path "secret/data/kv1" {
   capabilities = ["read"]
 }

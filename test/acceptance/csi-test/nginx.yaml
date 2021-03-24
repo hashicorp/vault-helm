@@ -10,6 +10,7 @@ metadata:
   name: nginx
 spec:
   terminationGracePeriodSeconds: 0
+  serviceAccountName: nginx
   containers:
   - image: docker.mirror.hashicorp.services/nginx
     name: nginx
