@@ -177,7 +177,7 @@ load _helpers
       --set 'server.service.externalTrafficPolicy=local' \
       --set 'server.ha.enabled=true' \
       . | tee /dev/stderr |
-      yq -r '.spec.externalTrafficPolicy | tee /dev/stderr)
+      yq -r '.spec.externalTrafficPolicy' | tee /dev/stderr)
   [ "${actual}" = "Local" ]
 }
 
@@ -189,7 +189,7 @@ load _helpers
       --set 'server.service.externalTrafficPolicy=LOCAL' \
       --set 'server.ha.enabled=true' \
       . | tee /dev/stderr |
-      yq -r '.spec.externalTrafficPolicy | tee /dev/stderr)
+      yq -r '.spec.externalTrafficPolicy' | tee /dev/stderr)
   [ "${actual}" = "Local" ]
 }
 
@@ -201,7 +201,7 @@ load _helpers
       --set 'server.service.externalTrafficPolicy=cluster' \
       --set 'server.ha.enabled=true' \
       . | tee /dev/stderr |
-      yq -r '.spec.externalTrafficPolicy | tee /dev/stderr)
+      yq -r '.spec.externalTrafficPolicy' | tee /dev/stderr)
   [ "${actual}" = "Cluster" ]
 }
 
@@ -213,7 +213,7 @@ load _helpers
       --set 'server.service.externalTrafficPolicy=CLUSTER' \
       --set 'server.ha.enabled=true' \
       . | tee /dev/stderr |
-      yq -r '.spec.externalTrafficPolicy | tee /dev/stderr)
+      yq -r '.spec.externalTrafficPolicy' | tee /dev/stderr)
   [ "${actual}" = "Cluster" ]
 }
 
@@ -225,6 +225,6 @@ load _helpers
       --set 'server.service.externalTrafficPolicy=vault' \
       --set 'server.ha.enabled=true' \
       . | tee /dev/stderr |
-      yq -r '.spec.externalTrafficPolicy | tee /dev/stderr)
+      yq -r '.spec.externalTrafficPolicy' | tee /dev/stderr)
   [ "${actual}" = "Cluster" ]
 }
