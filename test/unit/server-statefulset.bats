@@ -1024,12 +1024,19 @@ load _helpers
 
 @test "server/standalone-StatefulSet: specify extraLabels" {
   cd `chart_dir`
-  local actual=$(helm template \
+  local object=$(helm template \
       --show-only templates/server-statefulset.yaml \
       --set 'server.extraLabels.foo=bar' \
       . | tee /dev/stderr |
+      yq -r '.' | tee /dev/stderr)
+
+  local value=$(echo $object |
       yq -r '.spec.template.metadata.labels.foo' | tee /dev/stderr)
-  [ "${actual}" = "bar" ]
+  [ "${value}" = "bar" ]
+
+  local value=$(echo $object |
+      yq -r '.metadata.labels.foo' | tee /dev/stderr)
+  [ "${value}" = "bar" ]
 }
 
 # extra annotations

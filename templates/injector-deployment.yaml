@@ -10,6 +10,9 @@ metadata:
     app.kubernetes.io/instance: {{ .Release.Name }}
     app.kubernetes.io/managed-by: {{ .Release.Service }}
     component: webhook
+    {{- if .Values.injector.extraLabels -}}
+      {{- toYaml .Values.injector.extraLabels | nindent 4 -}}
+    {{- end }}
 spec:
   replicas: {{ .Values.injector.replicas }}
   selector:
@@ -24,7 +27,7 @@ spec:
         app.kubernetes.io/name: {{ template "vault.name" . }}-agent-injector
         app.kubernetes.io/instance: {{ .Release.Name }}
         component: webhook
-        {{- if  .Values.injector.extraLabels -}}
+        {{- if .Values.injector.extraLabels -}}
           {{- toYaml .Values.injector.extraLabels | nindent 8 -}}
         {{- end -}}
       {{ template "injector.annotations" . }}
