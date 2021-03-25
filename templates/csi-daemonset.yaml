@@ -42,10 +42,8 @@ spec:
             - name: mountpoint-dir
               mountPath: /var/lib/kubelet/pods
               mountPropagation: HostToContainer
-            {{- range .Values.csi.extraVolumes }}
-            - name: userconfig-{{ .name }}
-              mountPath: {{ .path | default "/vault/userconfig" }}/{{ .name }}
-              readOnly: true
+            {{- if .Values.csi.volumeMounts }}
+              {{- toYaml .Values.csi.volumeMounts | nindent 12}}
             {{- end }}
           livenessProbe:
             httpGet:
@@ -72,14 +70,7 @@ spec:
         - name: mountpoint-dir
           hostPath:
             path: /var/lib/kubelet/pods
-        {{- range .Values.csi.extraVolumes }}
-        - name: userconfig-{{ .name }}
-          {{ .type }}:
-          {{- if (eq .type "configMap") }}
-            name: {{ .name }}
-          {{- else if (eq .type "secret") }}
-            secretName: {{ .name }}
-          {{- end }}
-            defaultMode: {{ .defaultMode | default 420 }}
-        {{- end }}
+       {{- if .Values.csi.volumes }}
+         {{- toYaml .Values.csi.volumes | nindent 8}}
+       {{- end }}
 {{- end }}
