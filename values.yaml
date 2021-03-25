@@ -662,14 +662,15 @@ csi:
   # The purpose is to make it easy to share volumes between containers.
   volumes: null
   # - name: tls
-  #   emptyDir: {}
+  #   secret:
+  #     secretName: vault-tls
 
   # volumeMounts is a list of volumeMounts for the main server container. These are rendered
   # via toYaml rather than pre-processed like the extraVolumes value.
   # The purpose is to make it easy to share volumes between containers.
   volumeMounts: null
-  # - mountPath: /vault/tls
-  #   name: tls
+  # - name: tls
+  #   mountPath: "/vault/tls"
   #   readOnly: true
 
   resources: {}
