@@ -7,7 +7,7 @@ load _helpers
 
   helm install "$(name_prefix)-east" \
     --set='server.image.repository=hashicorp/vault-enterprise' \
-    --set='server.image.tag=1.6.2_ent' \
+    --set='server.image.tag=1.7.0_ent' \
     --set='injector.enabled=false' \
     --set='server.ha.enabled=true' \
     --set='server.ha.raft.enabled=true' .
