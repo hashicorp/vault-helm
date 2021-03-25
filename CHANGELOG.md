@@ -1,4 +1,4 @@
-## Unreleased
+## 0.10.0 (March 25th, 2021)
 
 Features:
 * Add support for Vault CSI provider [GH-461](https://github.com/hashicorp/vault-helm/pull/461)

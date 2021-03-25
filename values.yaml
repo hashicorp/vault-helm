@@ -49,7 +49,7 @@ injector:
   # image sets the repo and tag of the vault-k8s image to use for the injector.
   image:
     repository: "hashicorp/vault-k8s"
-    tag: "0.8.0"
+    tag: "0.9.0"
     pullPolicy: IfNotPresent
 
   # agentImage sets the repo and tag of the Vault image to use for the Vault Agent
@@ -57,7 +57,7 @@ injector:
   # required.
   agentImage:
     repository: "vault"
-    tag: "1.6.2"
+    tag: "1.7.0"
 
   # Mount Path of the Vault Kubernetes Auth Method.
   authPath: "auth/kubernetes"
@@ -180,7 +180,7 @@ server:
 
   image:
     repository: "vault"
-    tag: "1.6.2"
+    tag: "1.7.0"
     # Overrides the default Image Pull Policy
     pullPolicy: IfNotPresent
 
@@ -696,17 +696,27 @@ csi:
 
   # Used to configure readinessProbe for the pods.
   readinessProbe:
+    # When a probe fails, Kubernetes will try failureThreshold times before giving up
     failureThreshold: 2
+    # Number of seconds after the container has started before probe initiates
     initialDelaySeconds: 5
+    # How often (in seconds) to perform the probe
     periodSeconds: 5
+    # Minimum consecutive successes for the probe to be considered successful after having failed
     successThreshold: 1
+    # Number of seconds after which the probe times out.
     timeoutSeconds: 3
   # Used to configure livenessProbe for the pods.
-  livenessProbe:
+  ilivenessProbe:
+    # When a probe fails, Kubernetes will try failureThreshold times before giving up
     failureThreshold: 2
+    # Number of seconds after the container has started before probe initiates
     initialDelaySeconds: 5
+    # How often (in seconds) to perform the probe
     periodSeconds: 5
+    # Minimum consecutive successes for the probe to be considered successful after having failed
     successThreshold: 1
+    # Number of seconds after which the probe times out.
     timeoutSeconds: 3
 
   # Enables debug logging.
