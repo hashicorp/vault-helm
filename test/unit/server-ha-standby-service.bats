@@ -175,6 +175,7 @@ load _helpers
   local actual=$(helm template \
       --show-only templates/server-ha-standby-service.yaml \
       --set 'server.service.externalTrafficPolicy=local' \
+      --set 'server.service.type=NodePort' \
       --set 'server.ha.enabled=true' \
       . | tee /dev/stderr |
       yq -r '.spec.externalTrafficPolicy' | tee /dev/stderr)
@@ -187,6 +188,7 @@ load _helpers
   local actual=$(helm template \
       --show-only templates/server-ha-standby-service.yaml \
       --set 'server.service.externalTrafficPolicy=LOCAL' \
+      --set 'server.service.type=NodePort' \
       --set 'server.ha.enabled=true' \
       . | tee /dev/stderr |
       yq -r '.spec.externalTrafficPolicy' | tee /dev/stderr)

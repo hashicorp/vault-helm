@@ -391,6 +391,7 @@ load _helpers
   local actual=$(helm template \
       --show-only templates/server-service.yaml \
       --set 'server.service.externalTrafficPolicy=local' \
+      --set 'server.service.type=NodePort' \
       . | tee /dev/stderr |
       yq -r '.spec.externalTrafficPolicy' | tee /dev/stderr)
   [ "${actual}" = "Local" ]
@@ -402,6 +403,7 @@ load _helpers
   local actual=$(helm template \
       --show-only templates/server-service.yaml \
       --set 'server.service.externalTrafficPolicy=LOCAL' \
+      --set 'server.service.type=NodePort' \
       . | tee /dev/stderr |
       yq -r '.spec.externalTrafficPolicy' | tee /dev/stderr)
   [ "${actual}" = "Local" ]
