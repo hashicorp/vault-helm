@@ -167,82 +167,48 @@ load _helpers
 }
 
 #--------------------------------------------------------------------
-# extraVolumes
+# volumes
 
-@test "csi/daemonset: csi.extraVolumes adds extra volume" {
+@test "csi/daemonset: csi.volumes adds volume" {
   cd `chart_dir`
 
   # Test that it defines it
   local object=$(helm template \
       --show-only templates/csi-daemonset.yaml  \
       --set 'csi.enabled=true' \
-      --set 'csi.extraVolumes[0].type=configMap' \
-      --set 'csi.extraVolumes[0].name=foo' \
+      --set 'csi.volumes[0].name=plugins' \
+      --set 'csi.volumes[0].emptyDir=\{\}' \
       . | tee /dev/stderr |
-      yq -r '.spec.template.spec.volumes[] | select(.name == "userconfig-foo")' | tee /dev/stderr)
+      yq -r '.spec.template.spec.volumes[] | select(.name == "plugins")' | tee /dev/stderr)
 
   local actual=$(echo $object |
-      yq -r '.configMap.name' | tee /dev/stderr)
-  [ "${actual}" = "foo" ]
-
-  local actual=$(echo $object |
-      yq -r '.configMap.secretName' | tee /dev/stderr)
-  [ "${actual}" = "null" ]
-
-  # Test that it mounts it
-  local object=$(helm template \
-      --show-only templates/csi-daemonset.yaml  \
-      --set 'csi.enabled=true' \
-      --set 'csi.extraVolumes[0].type=configMap' \
-      --set 'csi.extraVolumes[0].name=foo' \
-      . | tee /dev/stderr |
-      yq -r '.spec.template.spec.containers[0].volumeMounts[] | select(.name == "userconfig-foo")' | tee /dev/stderr)
-
-  local actual=$(echo $object |
-      yq -r '.readOnly' | tee /dev/stderr)
-  [ "${actual}" = "true" ]
-
-  local actual=$(echo $object |
-      yq -r '.mountPath' | tee /dev/stderr)
-  [ "${actual}" = "/vault/userconfig/foo" ]
+      yq -r '.emptyDir' | tee /dev/stderr)
+  [ "${actual}" = "{}" ]
 }
 
-@test "csi/daemonset: csi.extraVolumes adds extra secret volume" {
+#--------------------------------------------------------------------
+# volumeMounts
+
+@test "csi/daemonset: csi.volumeMounts adds volume mounts" {
   cd `chart_dir`
 
   # Test that it defines it
   local object=$(helm template \
       --show-only templates/csi-daemonset.yaml  \
       --set 'csi.enabled=true' \
-      --set 'csi.extraVolumes[0].type=secret' \
-      --set 'csi.extraVolumes[0].name=foo' \
+      --set 'csi.volumeMounts[0].name=plugins' \
+      --set 'csi.volumeMounts[0].mountPath=/usr/local/libexec/vault' \
+      --set 'csi.volumeMounts[0].readOnly=true' \
       . | tee /dev/stderr |
-      yq -r '.spec.template.spec.volumes[] | select(.name == "userconfig-foo")' | tee /dev/stderr)
+      yq -r '.spec.template.spec.containers[0].volumeMounts[] | select(.name == "plugins")' | tee /dev/stderr)
 
   local actual=$(echo $object |
-      yq -r '.secret.name' | tee /dev/stderr)
-  [ "${actual}" = "null" ]
-
-  local actual=$(echo $object |
-      yq -r '.secret.secretName' | tee /dev/stderr)
-  [ "${actual}" = "foo" ]
-
-  # Test that it mounts it
-  local object=$(helm template \
-      --show-only templates/csi-daemonset.yaml  \
-      --set 'csi.enabled=true' \
-      --set 'csi.extraVolumes[0].type=configMap' \
-      --set 'csi.extraVolumes[0].name=foo' \
-      . | tee /dev/stderr |
-      yq -r '.spec.template.spec.containers[0].volumeMounts[] | select(.name == "userconfig-foo")' | tee /dev/stderr)
+      yq -r '.mountPath' | tee /dev/stderr)
+  [ "${actual}" = "/usr/local/libexec/vault" ]
 
   local actual=$(echo $object |
       yq -r '.readOnly' | tee /dev/stderr)
   [ "${actual}" = "true" ]
-
-  local actual=$(echo $object |
-      yq -r '.mountPath' | tee /dev/stderr)
-  [ "${actual}" = "/vault/userconfig/foo" ]
 }
 
 #--------------------------------------------------------------------

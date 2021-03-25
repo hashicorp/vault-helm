@@ -320,6 +320,7 @@ server:
     #   secretName: vault
     #   secretKey: AWS_SECRET_ACCESS_KEY
 
+  # Deprecated: please use 'volumes' instead.
   # extraVolumes is a list of extra volumes to mount. These will be exposed
   # to Vault in the path `/vault/userconfig/<name>/`. The value below is
   # an array of objects, examples are shown below.
@@ -656,13 +657,21 @@ csi:
     tag: "0.1.0"
     pullPolicy: IfNotPresent
 
-  # extraVolumes is a list of extra volumes to mount. These will be exposed
-  # to Vault in the path `/vault/userconfig/<name>/`. The value below is
-  # an array of objects, examples are shown below.
-  extraVolumes: []
-    # - type: secret (or "configMap")
-    #   name: my-secret
-    #   path: null # default is `/vault/userconfig`
+  # volumes is a list of volumes made available to all containers. These are rendered
+  # via toYaml rather than pre-processed like the extraVolumes value.
+  # The purpose is to make it easy to share volumes between containers.
+  volumes: null
+  # - name: tls
+  #   secret:
+  #     secretName: vault-tls
+
+  # volumeMounts is a list of volumeMounts for the main server container. These are rendered
+  # via toYaml rather than pre-processed like the extraVolumes value.
+  # The purpose is to make it easy to share volumes between containers.
+  volumeMounts: null
+  # - name: tls
+  #   mountPath: "/vault/tls"
+  #   readOnly: true
 
   resources: {}
   # resources:
