@@ -47,7 +47,6 @@ spec:
               mountPath: {{ .path | default "/vault/userconfig" }}/{{ .name }}
               readOnly: true
             {{- end }}
-          {{- if .Values.csi.livenessProbe.enabled }}
           livenessProbe:
             httpGet:
               path: /health/ready
@@ -57,8 +56,6 @@ spec:
             periodSeconds: {{ .Values.csi.livenessProbe.periodSeconds }}
             successThreshold: {{ .Values.csi.livenessProbe.successThreshold }}
             timeoutSeconds: {{ .Values.csi.livenessProbe.timeoutSeconds }}
-          {{- end }}
-          {{- if .Values.csi.readinessProbe.enabled }}
           readinessProbe:
             httpGet:
               path: /health/ready
@@ -68,7 +65,6 @@ spec:
             periodSeconds: {{ .Values.csi.readinessProbe.periodSeconds }}
             successThreshold: {{ .Values.csi.readinessProbe.successThreshold }}
             timeoutSeconds: {{ .Values.csi.readinessProbe.timeoutSeconds }}
-          {{- end }}
       volumes:
         - name: providervol
           hostPath:
