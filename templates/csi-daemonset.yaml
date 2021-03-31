@@ -27,7 +27,7 @@ spec:
         app.kubernetes.io/instance: {{ .Release.Name }}
       {{ template "csi.pod.annotations" . }}
     spec:
-      serviceAccountName: {{ include "vault.name" . }}-csi-provider
+      serviceAccountName: {{ template "vault.fullname" . }}-csi-provider
       containers:
         - name: {{ include "vault.name" . }}-csi-provider
           {{ template "csi.resources" . }}
