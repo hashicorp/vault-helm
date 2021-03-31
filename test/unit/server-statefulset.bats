@@ -414,6 +414,78 @@ load _helpers
 }
 
 #--------------------------------------------------------------------
+# log level
+
+@test "server/standalone-StatefulSet: default log level to info" {
+  cd `chart_dir`
+  local object=$(helm template \
+      --show-only templates/server-statefulset.yaml  \
+      . | tee /dev/stderr |
+      yq -r '.spec.template.spec.containers[0].env' | tee /dev/stderr)
+
+  local actual=$(echo $object |
+     yq -r '.[11].name' | tee /dev/stderr)
+  [ "${actual}" = "VAULT_LOG_LEVEL" ]
+
+  local actual=$(echo $object |
+      yq -r '.[11].value' | tee /dev/stderr)
+  [ "${actual}" = "info" ]
+}
+
+@test "server/standalone-StatefulSet: log level can be changed" {
+  cd `chart_dir`
+  local object=$(helm template \
+      --show-only templates/server-statefulset.yaml  \
+      --set='server.logLevel=debug' \
+      . | tee /dev/stderr |
+      yq -r '.spec.template.spec.containers[0].env' | tee /dev/stderr)
+
+  local actual=$(echo $object |
+     yq -r '.[11].name' | tee /dev/stderr)
+  [ "${actual}" = "VAULT_LOG_LEVEL" ]
+
+  local actual=$(echo $object |
+      yq -r '.[11].value' | tee /dev/stderr)
+  [ "${actual}" = "debug" ]
+}
+
+#--------------------------------------------------------------------
+# log format
+
+@test "server/standalone-StatefulSet: default log format to standard" {
+  cd `chart_dir`
+  local object=$(helm template \
+      --show-only templates/server-statefulset.yaml  \
+      . | tee /dev/stderr |
+      yq -r '.spec.template.spec.containers[0].env' | tee /dev/stderr)
+
+  local actual=$(echo $object |
+     yq -r '.[12].name' | tee /dev/stderr)
+  [ "${actual}" = "VAULT_LOG_FORMAT" ]
+
+  local actual=$(echo $object |
+      yq -r '.[12].value' | tee /dev/stderr)
+  [ "${actual}" = "standard" ]
+}
+
+@test "server/standalone-StatefulSet: default log format to standard" {
+  cd `chart_dir`
+  local object=$(helm template \
+      --show-only templates/server-statefulset.yaml  \
+      --set='server.logFormat=json' \
+      . | tee /dev/stderr |
+      yq -r '.spec.template.spec.containers[0].env' | tee /dev/stderr)
+
+  local actual=$(echo $object |
+     yq -r '.[12].name' | tee /dev/stderr)
+  [ "${actual}" = "VAULT_LOG_FORMAT" ]
+
+  local actual=$(echo $object |
+      yq -r '.[12].value' | tee /dev/stderr)
+  [ "${actual}" = "json" ]
+}
+
+#--------------------------------------------------------------------
 # extraEnvironmentVars
 
 @test "server/standalone-StatefulSet: set extraEnvironmentVars" {
