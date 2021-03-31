@@ -53,7 +53,7 @@ template logic.
 {{- define "vault.mode" -}}
   {{- if .Values.injector.externalVaultAddr -}}
     {{- $_ := set . "mode" "external" -}}
-  {{- else if eq (.Values.server.enabled | toString) "false" -}}
+  {{- else if ne (.Values.server.enabled | toString) "true" -}}
     {{- $_ := set . "mode" "external" -}}
   {{- else if eq (.Values.server.dev.enabled | toString) "true" -}}
     {{- $_ := set . "mode" "dev" -}}
