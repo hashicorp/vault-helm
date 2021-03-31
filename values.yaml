@@ -188,6 +188,14 @@ server:
   # See https://kubernetes.io/docs/concepts/workloads/controllers/statefulset/#update-strategies
   updateStrategyType: "OnDelete"
 
+  # Configure the logging verbosity for the Vault server.
+  # Supported log levels include: trace, debug, error, warn, info
+  logLevel: "info"
+
+  # Configure the logging format for the Vault server.
+  # Supported log formats include: standard, json
+  logFormat: "standard"
+
   resources: {}
   # resources:
   #   requests:
