@@ -21,6 +21,17 @@ load _helpers
   [ "${actual}" = "true" ]
 }
 
+# serviceAccountName reference name
+@test "csi/daemonset: serviceAccountName name" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      --show-only templates/csi-serviceaccount.yaml \
+      --set "csi.enabled=true" \
+      . | tee /dev/stderr |
+      yq -r '.metadata.name' | tee /dev/stderr)
+  [ "${actual}" = "RELEASE-NAME-vault-csi-provider" ]
+}
+
 @test "csi/serviceAccount: specify annotations" {
   cd `chart_dir`
   local actual=$(helm template \

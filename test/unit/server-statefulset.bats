@@ -2,6 +2,16 @@
 
 load _helpers
 
+@test "server/standalone-StatefulSet: disabled server.enabled" {
+  cd `chart_dir`
+  local actual=$( (helm template \
+      --show-only templates/server-statefulset.yaml  \
+      --set 'server.enabled=false' \
+      . || echo "---") | tee /dev/stderr |
+      yq 'length > 0' | tee /dev/stderr)
+  [ "${actual}" = "false" ]
+}
+
 @test "server/standalone-StatefulSet: default server.standalone.enabled" {
   cd `chart_dir`
   local actual=$(helm template \

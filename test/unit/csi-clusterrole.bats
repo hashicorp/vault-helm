@@ -20,3 +20,14 @@ load _helpers
       yq 'length > 0' | tee /dev/stderr)
   [ "${actual}" = "true" ]
 }
+
+# ClusterRole name
+@test "csi/ClusterRole: name" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      --show-only templates/csi-clusterrole.yaml \
+      --set "csi.enabled=true" \
+      . | tee /dev/stderr |
+      yq -r '.metadata.name' | tee /dev/stderr)
+  [ "${actual}" = "RELEASE-NAME-vault-csi-provider-clusterrole" ]
+}
