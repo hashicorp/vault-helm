@@ -264,6 +264,12 @@ server:
   # extraArgs is a string containing additional Vault server arguments.
   extraArgs: ""
 
+  # logLevel specifies the log verbosity level. Supported values (in order of
+  # detail) are "trace", "debug", "info", "warn", and "err". Vault defaults to
+  # "info" if not specified.
+  # If server.extraArgs also specifies -log-level, that value takes precedence.
+  logLevel: ""
+
   # Used to define custom readinessProbe settings
   readinessProbe:
     enabled: true

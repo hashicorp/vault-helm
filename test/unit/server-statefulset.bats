@@ -1253,6 +1253,37 @@ load _helpers
   [[ "${actual}" = *"foobar"* ]]
 }
 
+@test "server/standalone-StatefulSet: -log-level arg empty default" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      --show-only templates/server-statefulset.yaml \
+      . | tee /dev/stderr |
+       yq -r '.spec.template.spec.containers[0].args[0]' | tee /dev/stderr)
+  [[ "${actual}" != *"-log-level"* ]]
+}
+
+@test "server/standalone-StatefulSet: -log-level arg settable" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      --show-only templates/server-statefulset.yaml \
+      --set 'server.logLevel=debug' \
+      . | tee /dev/stderr |
+       yq -r '.spec.template.spec.containers[0].args[0]' | tee /dev/stderr)
+  [[ "${actual}" = *" -log-level=debug "* ]]
+}
+
+@test "server/standalone-StatefulSet: -log-level arg appears before server.extraArgs" {
+  cd `chart_dir`
+  # extraArgs value should be second, which ensures it takes precedence.
+  local actual=$(helm template \
+      --show-only templates/server-statefulset.yaml \
+      --set 'server.logLevel=debug' \
+      --set 'server.extraArgs=-log-level=err' \
+      . | tee /dev/stderr |
+       yq -r '.spec.template.spec.containers[0].args[0]' | tee /dev/stderr)
+  [[ "${actual}" = *" -log-level=debug "*"-log-level=err"* ]]
+}
+
 #--------------------------------------------------------------------
 # preStop
 @test "server/standalone-StatefulSet: preStop sleep duration default" {

@@ -118,10 +118,10 @@ for users looking to use this chart with Consul Helm.
             [ -n "${API_ADDR}" ] && sed -Ei "s|API_ADDR|${API_ADDR?}|g" /tmp/storageconfig.hcl;
             [ -n "${TRANSIT_ADDR}" ] && sed -Ei "s|TRANSIT_ADDR|${TRANSIT_ADDR?}|g" /tmp/storageconfig.hcl;
             [ -n "${RAFT_ADDR}" ] && sed -Ei "s|RAFT_ADDR|${RAFT_ADDR?}|g" /tmp/storageconfig.hcl;
-            /usr/local/bin/docker-entrypoint.sh vault server -config=/tmp/storageconfig.hcl {{ .Values.server.extraArgs }}
+            /usr/local/bin/docker-entrypoint.sh vault server -config=/tmp/storageconfig.hcl {{ if .Values.server.logLevel }}-log-level={{ .Values.server.logLevel }}{{ end }} {{ .Values.server.extraArgs }}
    {{ else if eq .mode "dev" }}
           - |
-            /usr/local/bin/docker-entrypoint.sh vault server -dev {{ .Values.server.extraArgs }}
+            /usr/local/bin/docker-entrypoint.sh vault server -dev {{ if .Values.server.logLevel }}-log-level={{ .Values.server.logLevel }}{{ end }} {{ .Values.server.extraArgs }}
   {{ end }}
 {{- end -}}
 
