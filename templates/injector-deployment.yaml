@@ -52,7 +52,7 @@ spec:
           {{- end }}
           env:
             - name: AGENT_INJECT_LISTEN
-              value: ":8080"
+              value: {{ printf ":%v" .Values.injector.port | default ":8080" }}
             - name: AGENT_INJECT_LOG_LEVEL
               value: {{ .Values.injector.logLevel | default "info" }}
             - name: AGENT_INJECT_VAULT_ADDR
