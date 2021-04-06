@@ -2,6 +2,41 @@
 
 load _helpers
 
+#--------------------------------------------------------------------
+# disable / enable server deployment
+
+@test "server/StatefulSet: disabled server.enabled" {
+  cd `chart_dir`
+  local actual=$( (helm template \
+      --show-only templates/server-statefulset.yaml  \
+      --set 'server.enabled=false' \
+      . || echo "---") | tee /dev/stderr |
+      yq 'length > 0' | tee /dev/stderr)
+  [ "${actual}" = "false" ]
+}
+
+@test "server/StatefulSet: disabled server.enabled random string" {
+  cd `chart_dir`
+  local actual=$( (helm template \
+      --show-only templates/server-statefulset.yaml  \
+      --set 'server.enabled=blabla' \
+      . || echo "---") | tee /dev/stderr |
+      yq 'length > 0' | tee /dev/stderr)
+  [ "${actual}" = "false" ]
+}
+
+@test "server/StatefulSet: enabled server.enabled explicit true" {
+  cd `chart_dir`
+  local actual=$( (helm template \
+      --show-only templates/server-statefulset.yaml  \
+      --set 'server.enabled=true' \
+      . || echo "---") | tee /dev/stderr |
+      yq 'length > 0' | tee /dev/stderr)
+  [ "${actual}" = "true" ]
+}
+
+#--------------------------------------------------------------------
+
 @test "server/standalone-StatefulSet: default server.standalone.enabled" {
   cd `chart_dir`
   local actual=$(helm template \
