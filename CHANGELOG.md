@@ -1,5 +1,11 @@
 ## Unreleased
 
+Features:
+* Set `server.enabled=false` to skip installing a Vault server [GH-486](https://github.com/hashicorp/vault-helm/pull/486)
+
+Bugs:
+* CSI: Fix ClusterRole name and DaemonSet's service account to properly match deployment name [GH-486](https://github.com/hashicorp/vault-helm/pull/486)
+
 ## 0.10.0 (March 25th, 2021)
 
 Features:
