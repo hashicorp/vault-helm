@@ -9,7 +9,7 @@
 FROM docker.mirror.hashicorp.services/alpine:latest
 WORKDIR /root
 
-ENV BATS_VERSION "1.1.0"
+ENV BATS_VERSION "1.3.0"
 ENV TERRAFORM_VERSION "0.12.10"
 
 # base packages

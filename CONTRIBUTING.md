@@ -72,6 +72,10 @@ execute tests
 ```shell
 docker run -it --rm -v "${PWD}:/test" vault-helm-test bats /test/test/unit
 ```
+if you contribute to specific part, for example `injector` only, run only the tests matching a regular expression:
+```shell
+docker run -it --rm -v "${PWD}:/test" vault-helm-test bats /test/test/unit -f "injector"
+```
 
 ### Test Manually
 #### Prequisites
