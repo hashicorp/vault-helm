@@ -29,7 +29,7 @@ injector:
 
   replicas: 1
 
-  # Configures the port the agent should listen on
+  # Configures the port the injector should listen on
   port: 8080
 
   # If multiple replicas are specified, by default a leader-elector side-car
