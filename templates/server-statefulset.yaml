@@ -117,10 +117,14 @@ spec:
             {{- end }}
             - name: HOME
               value: "/home/vault"
+            {{- if .Values.server.logLevel }}
             - name: VAULT_LOG_LEVEL
               value: "{{ .Values.server.logLevel }}"
+            {{- end }}
+            {{- if .Values.server.logFormat }}
             - name: VAULT_LOG_FORMAT
               value: "{{ .Values.server.logFormat }}"
+            {{- end }}
             {{ template "vault.envs" . }}
             {{- include "vault.extraEnvironmentVars" .Values.server | nindent 12 }}
             {{- include "vault.extraSecretEnvironmentVars" .Values.server | nindent 12 }}

@@ -191,11 +191,11 @@ server:
 
   # Configure the logging verbosity for the Vault server.
   # Supported log levels include: trace, debug, info, warn, error
-  logLevel: "info"
+  logLevel: ""
 
   # Configure the logging format for the Vault server.
   # Supported log formats include: standard, json
-  logFormat: "standard"
+  logFormat: ""
 
   resources: {}
   # resources:
