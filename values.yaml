@@ -62,7 +62,8 @@ injector:
   # Mount Path of the Vault Kubernetes Auth Method.
   authPath: "auth/kubernetes"
 
-  # Configures the log verbosity of the injector. Supported log levels: Trace, Debug, Error, Warn, Info
+  # Configures the log verbosity of the injector.
+  # Supported log levels include: trace, debug, warn, info, error
   logLevel: "info"
 
   # Configures the log format of the injector. Supported log formats: "standard", "json".
@@ -189,7 +190,7 @@ server:
   updateStrategyType: "OnDelete"
 
   # Configure the logging verbosity for the Vault server.
-  # Supported log levels include: trace, debug, error, warn, info
+  # Supported log levels include: trace, debug, warn, info, error
   logLevel: "info"
 
   # Configure the logging format for the Vault server.
