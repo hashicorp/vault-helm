@@ -444,7 +444,7 @@ load _helpers
 #--------------------------------------------------------------------
 # log format
 
-@test "server/standalone-StatefulSet: default log format to standard" {
+@test "server/standalone-StatefulSet: default log format to empty" {
   cd `chart_dir`
   local objects=$(helm template \
       --show-only templates/server-statefulset.yaml  \
