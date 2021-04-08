@@ -543,3 +543,25 @@ load _helpers
       yq -r '.spec.template.metadata.labels.foo' | tee /dev/stderr)
   [ "${actual}" = "bar" ]
 }
+
+#--------------------------------------------------------------------
+# hostNetwork
+
+@test "injector/deployment: injector.hostNetwork not set" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      --show-only templates/injector-deployment.yaml \
+      . | tee /dev/stderr |
+      yq -r '.spec.template.spec.hostNetwork' | tee /dev/stderr)
+  [ "${actual}" = "false" ]
+}
+
+@test "injector/deployment: injector.hostNetwork is set" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      --show-only templates/injector-deployment.yaml \
+      --set 'injector.hostNetwork=true' \
+      . | tee /dev/stderr |
+      yq -r '.spec.template.spec.hostNetwork' | tee /dev/stderr)
+  [ "${actual}" = "true" ]
+}

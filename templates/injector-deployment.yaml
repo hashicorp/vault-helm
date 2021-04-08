@@ -36,6 +36,7 @@ spec:
       {{- end }}
       serviceAccountName: "{{ template "vault.fullname" . }}-agent-injector"
       {{- if not .Values.global.openshift }}
+      hostNetwork: {{ .Values.injector.hostNetwork }}
       securityContext:
         runAsNonRoot: true
         runAsGroup: {{ .Values.injector.gid | default 1000 }}
