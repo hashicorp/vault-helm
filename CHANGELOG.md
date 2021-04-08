@@ -3,6 +3,7 @@
 Features:
 * Added `server.enabled` to explicitly skip installing a Vault server [GH-486](https://github.com/hashicorp/vault-helm/pull/486)
 * Injector now supports enabling host network [GH-471](https://github.com/hashicorp/vault-helm/pull/471)
+* Extra paths can now be added to the Vault ingress service [GH-460](https://github.com/hashicorp/vault-helm/pull/460)
 
 Bugs:
 * CSI: Fix ClusterRole name and DaemonSet's service account to properly match deployment name [GH-486](https://github.com/hashicorp/vault-helm/pull/486)
