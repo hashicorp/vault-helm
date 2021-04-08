@@ -416,7 +416,7 @@ load _helpers
 #--------------------------------------------------------------------
 # log level
 
-@test "server/standalone-StatefulSet: default log level to info" {
+@test "server/standalone-StatefulSet: default log level to empty" {
   cd `chart_dir`
   local objects=$(helm template \
       --show-only templates/server-statefulset.yaml  \
