@@ -103,7 +103,7 @@ spec:
           livenessProbe:
             httpGet:
               path: /health/ready
-              port: 8080
+              port: {{ .Values.injector.port }}
               scheme: HTTPS
             failureThreshold: 2
             initialDelaySeconds: 5
@@ -113,7 +113,7 @@ spec:
           readinessProbe:
             httpGet:
               path: /health/ready
-              port: 8080
+              port: {{ .Values.injector.port }}
               scheme: HTTPS
             failureThreshold: 2
             initialDelaySeconds: 5

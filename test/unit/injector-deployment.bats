@@ -423,6 +423,42 @@ load _helpers
 }
 
 #--------------------------------------------------------------------
+# agent port
+
+@test "injector/deployment: default agentPort" {
+  cd `chart_dir`
+  local object=$(helm template \
+      --show-only templates/injector-deployment.yaml  \
+      . | tee /dev/stderr |
+      yq -r '.spec.template.spec.containers[0].env' | tee /dev/stderr)
+
+  local actual=$(echo $object |
+     yq -r '.[0].name' | tee /dev/stderr)
+  [ "${actual}" = "AGENT_INJECT_LISTEN" ]
+
+  local actual=$(echo $object |
+      yq -r '.[0].value' | tee /dev/stderr)
+  [ "${actual}" = ":8080" ]
+}
+
+@test "injector/deployment: custom agentPort" {
+  cd `chart_dir`
+  local object=$(helm template \
+      --show-only templates/injector-deployment.yaml  \
+      --set 'injector.port=8443' \
+      . | tee /dev/stderr |
+      yq -r '.spec.template.spec.containers[0].env' | tee /dev/stderr)
+
+  local actual=$(echo $object |
+     yq -r '.[0].name' | tee /dev/stderr)
+  [ "${actual}" = "AGENT_INJECT_LISTEN" ]
+
+  local actual=$(echo $object |
+      yq -r '.[0].value' | tee /dev/stderr)
+  [ "${actual}" = ":8443" ]
+}
+
+#--------------------------------------------------------------------
 # affinity
 
 @test "injector/deployment: affinity set by default" {
