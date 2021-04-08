@@ -70,14 +70,11 @@ load _helpers
       . | tee /dev/stderr |
       yq -r '.spec.template.spec.containers[0].env' | tee /dev/stderr)
 
-  local actual=$(echo $object |
-     yq -r '.[4].name' | tee /dev/stderr)
-  [ "${actual}" = "VAULT_ADDR" ]
-
-  local actual=$(echo $object |
-     yq -r '.[4].value' | tee /dev/stderr)
-  [ "${actual}" = "http://127.0.0.1:8200" ]
+  local value=$(echo $object |
+      yq -r 'map(select(.name=="VAULT_ADDR")) | .[] .value' | tee /dev/stderr)
+  [ "${value}" = "http://127.0.0.1:8200" ]
 }
+
 @test "server/ha-StatefulSet: tls enabled" {
   cd `chart_dir`
   local object=$(helm template \
@@ -86,13 +83,9 @@ load _helpers
       . | tee /dev/stderr |
       yq -r '.spec.template.spec.containers[0].env' | tee /dev/stderr)
 
-  local actual=$(echo $object |
-     yq -r '.[4].name' | tee /dev/stderr)
-  [ "${actual}" = "VAULT_ADDR" ]
-
-  local actual=$(echo $object |
-     yq -r '.[4].value' | tee /dev/stderr)
-  [ "${actual}" = "https://127.0.0.1:8200" ]
+  local value=$(echo $object |
+      yq -r 'map(select(.name=="VAULT_ADDR")) | .[] .value' | tee /dev/stderr)
+  [ "${value}" = "https://127.0.0.1:8200" ]
 }
 
 #--------------------------------------------------------------------
@@ -348,21 +341,13 @@ load _helpers
       . | tee /dev/stderr |
       yq -r '.spec.template.spec.containers[0].env' | tee /dev/stderr)
 
-  local actual=$(echo $object |
-     yq -r '.[11].name' | tee /dev/stderr)
-  [ "${actual}" = "FOO" ]
+  local value=$(echo $object |
+      yq -r 'map(select(.name=="FOO")) | .[] .value' | tee /dev/stderr)
+  [ "${value}" = "bar" ]
 
-  local actual=$(echo $object |
-      yq -r '.[11].value' | tee /dev/stderr)
-  [ "${actual}" = "bar" ]
-
-  local actual=$(echo $object |
-      yq -r '.[12].name' | tee /dev/stderr)
-  [ "${actual}" = "FOOBAR" ]
-
-  local actual=$(echo $object |
-      yq -r '.[12].value' | tee /dev/stderr)
-  [ "${actual}" = "foobar" ]
+  local value=$(echo $object |
+      yq -r 'map(select(.name=="FOOBAR")) | .[] .value' | tee /dev/stderr)
+  [ "${value}" = "foobar" ]
 }
 
 #--------------------------------------------------------------------
@@ -382,25 +367,21 @@ load _helpers
       . | tee /dev/stderr |
       yq -r '.spec.template.spec.containers[0].env' | tee /dev/stderr)
 
-  local actual=$(echo $object |
-      yq -r '.[11].name' | tee /dev/stderr)
-  [ "${actual}" = "ENV_FOO_0" ]
-  local actual=$(echo $object |
-      yq -r '.[11].valueFrom.secretKeyRef.name' | tee /dev/stderr)
-  [ "${actual}" = "secret_name_0" ]
-  local actual=$(echo $object |
-      yq -r '.[11].valueFrom.secretKeyRef.key' | tee /dev/stderr)
-  [ "${actual}" = "secret_key_0" ]
+  local value=$(echo $object |
+      yq -r 'map(select(.name=="ENV_FOO_0")) | .[] .valueFrom.secretKeyRef.name' | tee /dev/stderr)
+  [ "${value}" = "secret_name_0" ]
 
-  local actual=$(echo $object |
-      yq -r '.[12].name' | tee /dev/stderr)
-  [ "${actual}" = "ENV_FOO_1" ]
-  local actual=$(echo $object |
-      yq -r '.[12].valueFrom.secretKeyRef.name' | tee /dev/stderr)
-  [ "${actual}" = "secret_name_1" ]
-  local actual=$(echo $object |
-      yq -r '.[12].valueFrom.secretKeyRef.key' | tee /dev/stderr)
-  [ "${actual}" = "secret_key_1" ]
+  local value=$(echo $object |
+      yq -r 'map(select(.name=="ENV_FOO_0")) | .[] .valueFrom.secretKeyRef.key' | tee /dev/stderr)
+  [ "${value}" = "secret_key_0" ]
+
+  local value=$(echo $object |
+      yq -r 'map(select(.name=="ENV_FOO_1")) | .[] .valueFrom.secretKeyRef.name' | tee /dev/stderr)
+  [ "${value}" = "secret_name_1" ]
+
+  local value=$(echo $object |
+      yq -r 'map(select(.name=="ENV_FOO_1")) | .[] .valueFrom.secretKeyRef.key' | tee /dev/stderr)
+  [ "${value}" = "secret_key_1" ]
 }
 
 #--------------------------------------------------------------------
@@ -414,16 +395,12 @@ load _helpers
       . | tee /dev/stderr |
       yq -r '.spec.template.spec.containers[0].env' | tee /dev/stderr)
 
-  local actual=$(echo $object |
-     yq -r '.[5].name' | tee /dev/stderr)
-  [ "${actual}" = "VAULT_API_ADDR" ]
-
-  local actual=$(echo $object |
-     yq -r '.[5].value' | tee /dev/stderr)
-  [ "${actual}" = 'http://$(POD_IP):8200' ]
+  local value=$(echo $object |
+      yq -r 'map(select(.name=="VAULT_API_ADDR")) | .[] .value' | tee /dev/stderr)
+  [ "${value}" = 'http://$(POD_IP):8200' ]
 }
 
-@test "server/ha-StatefulSet: api addr can be overriden" {
+@test "server/ha-StatefulSet: api addr is configurable" {
   cd `chart_dir`
   local object=$(helm template \
       --show-only templates/server-statefulset.yaml  \
@@ -432,13 +409,9 @@ load _helpers
       . | tee /dev/stderr |
       yq -r '.spec.template.spec.containers[0].env' | tee /dev/stderr)
 
-  local actual=$(echo $object |
-     yq -r '.[5].name' | tee /dev/stderr)
-  [ "${actual}" = "VAULT_API_ADDR" ]
-
-  local actual=$(echo $object |
-     yq -r '.[5].value' | tee /dev/stderr)
-  [ "${actual}" = 'https://example.com:8200' ]
+  local value=$(echo $object |
+      yq -r 'map(select(.name=="VAULT_API_ADDR")) | .[] .value' | tee /dev/stderr)
+  [ "${value}" = "https://example.com:8200" ]
 }
 
 #--------------------------------------------------------------------
@@ -453,13 +426,9 @@ load _helpers
       . | tee /dev/stderr |
       yq -r '.spec.template.spec.containers[0].env' | tee /dev/stderr)
 
-  local actual=$(echo $object |
-     yq -r '.[9].name' | tee /dev/stderr)
-  [ "${actual}" = "VAULT_CLUSTER_ADDR" ]
-
-  local actual=$(echo $object |
-     yq -r '.[9].value' | tee /dev/stderr)
-  [ "${actual}" = 'https://$(HOSTNAME).RELEASE-NAME-vault-internal:8201' ]
+  local value=$(echo $object |
+      yq -r 'map(select(.name=="VAULT_CLUSTER_ADDR")) | .[] .value' | tee /dev/stderr)
+  [ "${value}" = 'https://$(HOSTNAME).RELEASE-NAME-vault-internal:8201' ]
 }
 
 #--------------------------------------------------------------------
@@ -475,13 +444,9 @@ load _helpers
       . | tee /dev/stderr |
       yq -r '.spec.template.spec.containers[0].env' | tee /dev/stderr)
 
-  local actual=$(echo $object |
-     yq -r '.[10].name' | tee /dev/stderr)
-  [ "${actual}" = "VAULT_RAFT_NODE_ID" ]
-
-  local actual=$(echo $object |
-     yq -r '.[10].valueFrom.fieldRef.fieldPath' | tee /dev/stderr)
-  [ "${actual}" = 'metadata.name' ]
+  local value=$(echo $object |
+      yq -r 'map(select(.name=="VAULT_RAFT_NODE_ID")) | .[] .valueFrom.fieldRef.fieldPath' | tee /dev/stderr)
+  [ "${value}" = "metadata.name" ]
 }
 
 #--------------------------------------------------------------------

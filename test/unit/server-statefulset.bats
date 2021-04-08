@@ -449,6 +449,62 @@ load _helpers
 }
 
 #--------------------------------------------------------------------
+# log level
+
+@test "server/standalone-StatefulSet: default log level to empty" {
+  cd `chart_dir`
+  local objects=$(helm template \
+      --show-only templates/server-statefulset.yaml  \
+      . | tee /dev/stderr |
+      yq -r '.spec.template.spec.containers[0].env' | tee /dev/stderr)
+
+  local value=$(echo $objects |
+      yq -r 'map(select(.name=="VAULT_LOG_LEVEL")) | .[] .name' | tee /dev/stderr)
+  [ "${value}" = "" ]
+}
+
+@test "server/standalone-StatefulSet: log level can be changed" {
+  cd `chart_dir`
+  local objects=$(helm template \
+      --show-only templates/server-statefulset.yaml  \
+      --set='server.logLevel=debug' \
+      . | tee /dev/stderr |
+      yq -r '.spec.template.spec.containers[0].env' | tee /dev/stderr)
+
+  local value=$(echo $objects |
+      yq -r 'map(select(.name=="VAULT_LOG_LEVEL")) | .[] .value' | tee /dev/stderr)
+  [ "${value}" = "debug" ]
+}
+
+#--------------------------------------------------------------------
+# log format
+
+@test "server/standalone-StatefulSet: default log format to empty" {
+  cd `chart_dir`
+  local objects=$(helm template \
+      --show-only templates/server-statefulset.yaml  \
+      . | tee /dev/stderr |
+      yq -r '.spec.template.spec.containers[0].env' | tee /dev/stderr)
+
+  local value=$(echo $objects |
+      yq -r 'map(select(.name=="VAULT_LOG_FORMAT")) | .[] .name' | tee /dev/stderr)
+  [ "${value}" = "" ]
+}
+
+@test "server/standalone-StatefulSet: can set log format" {
+  cd `chart_dir`
+  local objects=$(helm template \
+      --show-only templates/server-statefulset.yaml  \
+      --set='server.logFormat=json' \
+      . | tee /dev/stderr |
+      yq -r '.spec.template.spec.containers[0].env' | tee /dev/stderr)
+
+  local value=$(echo $objects |
+      yq -r 'map(select(.name=="VAULT_LOG_FORMAT")) | .[] .value' | tee /dev/stderr)
+  [ "${value}" = "json" ]
+}
+
+#--------------------------------------------------------------------
 # extraEnvironmentVars
 
 @test "server/standalone-StatefulSet: set extraEnvironmentVars" {
@@ -461,21 +517,13 @@ load _helpers
       . | tee /dev/stderr |
       yq -r '.spec.template.spec.containers[0].env' | tee /dev/stderr)
 
-  local actual=$(echo $object |
-     yq -r '.[11].name' | tee /dev/stderr)
-  [ "${actual}" = "FOO" ]
+  local name=$(echo $object |
+      yq -r 'map(select(.name=="FOO")) | .[] .value' | tee /dev/stderr)
+  [ "${name}" = "bar" ]
 
-  local actual=$(echo $object |
-      yq -r '.[11].value' | tee /dev/stderr)
-  [ "${actual}" = "bar" ]
-
-  local actual=$(echo $object |
-      yq -r '.[12].name' | tee /dev/stderr)
-  [ "${actual}" = "FOOBAR" ]
-
-  local actual=$(echo $object |
-      yq -r '.[12].value' | tee /dev/stderr)
-  [ "${actual}" = "foobar" ]
+  local name=$(echo $object |
+      yq -r 'map(select(.name=="FOOBAR")) | .[] .value' | tee /dev/stderr)
+  [ "${name}" = "foobar" ]
 
   local object=$(helm template \
       --show-only templates/server-statefulset.yaml  \
@@ -484,21 +532,13 @@ load _helpers
       . | tee /dev/stderr |
       yq -r '.spec.template.spec.containers[0].env' | tee /dev/stderr)
 
-  local actual=$(echo $object |
-     yq -r '.[11].name' | tee /dev/stderr)
-  [ "${actual}" = "FOO" ]
+  local name=$(echo $object |
+      yq -r 'map(select(.name=="FOO")) | .[] .value' | tee /dev/stderr)
+  [ "${name}" = "bar" ]
 
-  local actual=$(echo $object |
-      yq -r '.[11].value' | tee /dev/stderr)
-  [ "${actual}" = "bar" ]
-
-  local actual=$(echo $object |
-      yq -r '.[12].name' | tee /dev/stderr)
-  [ "${actual}" = "FOOBAR" ]
-
-  local actual=$(echo $object |
-      yq -r '.[12].value' | tee /dev/stderr)
-  [ "${actual}" = "foobar" ]
+  local name=$(echo $object |
+      yq -r 'map(select(.name=="FOOBAR")) | .[] .value' | tee /dev/stderr)
+  [ "${name}" = "foobar" ]
 }
 
 #--------------------------------------------------------------------
