@@ -59,6 +59,19 @@ injector:
     repository: "vault"
     tag: "1.7.0"
 
+  # The default values for the injected Vault Agent containers.
+  agentDefaults:
+    # For more information on configuring resources, see the K8s documentation:
+    # https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/
+    cpuLimit: "500m"
+    cpuRequest: "250m"
+    memLimit: "128Mi"
+    memRequest: "64Mi"
+
+    # Default template type for secrets when no custom template is specified.
+    # Possible values include: "json" and "map".
+    template: "map"
+
   # Mount Path of the Vault Kubernetes Auth Method.
   authPath: "auth/kubernetes"
 

@@ -97,6 +97,16 @@ spec:
                 fieldRef:
                   fieldPath: metadata.namespace
             {{- end }}
+            - name: AGENT_INJECT_CPU_REQUEST
+              value: "{{ .Values.injector.agentDefaults.cpuRequest }}"
+            - name: AGENT_INJECT_CPU_LIMIT
+              value: "{{ .Values.injector.agentDefaults.cpuLimit }}"
+            - name: AGENT_INJECT_MEM_REQUEST
+              value: "{{ .Values.injector.agentDefaults.memRequest }}"
+            - name: AGENT_INJECT_MEM_LIMIT
+              value: "{{ .Values.injector.agentDefaults.memLimit }}"
+            - name: AGENT_INJECT_DEFAULT_TEMPLATE
+              value: "{{ .Values.injector.agentDefaults.template }}"
             {{- include "vault.extraEnvironmentVars" .Values.injector | nindent 12 }}
           args:
             - agent-inject
