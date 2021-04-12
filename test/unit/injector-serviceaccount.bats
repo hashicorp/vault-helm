@@ -15,21 +15,43 @@ load _helpers
   cd `chart_dir`
   local actual=$(helm template \
       --show-only templates/injector-serviceaccount.yaml  \
-      --set 'injector.serviceAccount.name=foobar' \
+      --set 'injector.serviceAccount.name=user-account' \
       . | tee /dev/stderr |
       yq '.metadata.name' | tee /dev/stderr)
-  [ "${actual}" = "foobar" ]
+  [ "${actual}" = "user-account" ]
+
+
+  local actual=$(helm template \
+      --show-only templates/injector-serviceaccount.yaml  \
+      --set 'injector.serviceAccount.create=true' \
+      . | tee /dev/stderr |
+      yq -r '.metadata.name' | tee /dev/stderr)
+  [ "${actual}" = "RELEASE-NAME-vault-agent-injector" ]
 }
 
 @test "injector/ServiceAccount: set annotations" {
   cd `chart_dir`
     local actual=$(helm template \
         --show-only templates/injector-serviceaccount.yaml  \
-        --set 'injector.serviceAccount.annotations=foo=bar' \
+        --set 'injector.serviceAccount.annotations.foo=bar' \
         . | tee /dev/stderr |
         yq '.metadata.annotations["foo"]' | tee /dev/stderr)
     [ "${actual}" = "bar" ]
+
+    local actual=$(helm template \
+        --show-only templates/injector-serviceaccount.yaml  \
+        . | tee /dev/stderr |
+        yq -r '.metadata.annotations["foo"]' | tee /dev/stderr)
+    [ "${actual}" = "null" ]
+
+     local actual=$(helm template \
+         --show-only templates/injector-serviceaccount.yaml  \
+         --set 'injector.serviceAccount.annotations=foo: bar' \
+         . | tee /dev/stderr |
+         yq -r '.metadata.annotations["foo"]' | tee /dev/stderr)
+     [ "${actual}" = "bar" ]
 }
+
 
 @test "injector/ServiceAccount: disable with serviceAccount.create" {
   cd `chart_dir`
