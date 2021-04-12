@@ -17,7 +17,7 @@ load _helpers
       --show-only templates/injector-serviceaccount.yaml  \
       --set 'injector.serviceAccount.name=user-account' \
       . | tee /dev/stderr |
-      yq '.metadata.name' | tee /dev/stderr)
+      yq -r '.metadata.name' | tee /dev/stderr)
   [ "${actual}" = "user-account" ]
 
 
@@ -35,7 +35,7 @@ load _helpers
         --show-only templates/injector-serviceaccount.yaml  \
         --set 'injector.serviceAccount.annotations.foo=bar' \
         . | tee /dev/stderr |
-        yq '.metadata.annotations["foo"]' | tee /dev/stderr)
+        yq -r '.metadata.annotations["foo"]' | tee /dev/stderr)
     [ "${actual}" = "bar" ]
 
     local actual=$(helm template \
