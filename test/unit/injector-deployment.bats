@@ -160,8 +160,8 @@ load _helpers
   [ "${value}" = "RELEASE-NAME-vault-agent-injector-cfg" ]
 
   local value=$(echo $object |
-      yq -r 'map(select(.name=="AGENT_INJECT_TLS_AUTO_HOSTS")) | .[] .name' | tee /dev/stderr)
-  [ "${value}" = "AGENT_INJECT_TLS_AUTO_HOSTS" ]
+      yq -r 'map(select(.name=="AGENT_INJECT_TLS_AUTO_HOSTS")) | .[] .value' | tee /dev/stderr)
+  [ "${value}" = "RELEASE-NAME-vault-agent-injector-svc,RELEASE-NAME-vault-agent-injector-svc.default,RELEASE-NAME-vault-agent-injector-svc.default.svc" ]
 }
 
 @test "injector/deployment: with externalVaultAddr" {
