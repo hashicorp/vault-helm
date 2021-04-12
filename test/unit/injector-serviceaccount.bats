@@ -23,13 +23,6 @@ load _helpers
 
 @test "injector/ServiceAccount: set annotations" {
   cd `chart_dir`
-  local actual=$(helm template \
-      --show-only templates/injector-serviceaccount.yaml  \
-      --set 'injector.serviceAccount.annotations=foo: bar' \
-      . | tee /dev/stderr |
-      yq '.metadata.annotations["foo"]' | tee /dev/stderr)
-  [ "${actual}" = "null" ]
-
     local actual=$(helm template \
         --show-only templates/injector-serviceaccount.yaml  \
         --set 'injector.serviceAccount.annotations=foo=bar' \
@@ -38,11 +31,11 @@ load _helpers
     [ "${actual}" = "bar" ]
 }
 
-@test "injector/ServiceAccount: disable with global.enabled" {
+@test "injector/ServiceAccount: disable with serviceAccount.create" {
   cd `chart_dir`
   local actual=$( (helm template \
       --show-only templates/injector-serviceaccount.yaml  \
-      --set 'global.enabled=false' \
+      --set 'injector.serviceAccount.create=false' \
       . || echo "---") | tee /dev/stderr |
       yq 'length > 0' | tee /dev/stderr)
   [ "${actual}" = "false" ]
