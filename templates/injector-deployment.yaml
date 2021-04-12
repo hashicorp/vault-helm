@@ -36,6 +36,7 @@ spec:
       {{- end }}
       serviceAccountName: {{ template "vault.injector.serviceAccount.name" . }}
       {{- if not .Values.global.openshift }}
+      hostNetwork: {{ .Values.injector.hostNetwork }}
       securityContext:
         runAsNonRoot: true
         runAsGroup: {{ .Values.injector.gid | default 1000 }}
@@ -52,7 +53,7 @@ spec:
           {{- end }}
           env:
             - name: AGENT_INJECT_LISTEN
-              value: ":8080"
+              value: {{ printf ":%v" .Values.injector.port  }}
             - name: AGENT_INJECT_LOG_LEVEL
               value: {{ .Values.injector.logLevel | default "info" }}
             - name: AGENT_INJECT_VAULT_ADDR
@@ -96,6 +97,16 @@ spec:
                 fieldRef:
                   fieldPath: metadata.namespace
             {{- end }}
+            - name: AGENT_INJECT_CPU_REQUEST
+              value: "{{ .Values.injector.agentDefaults.cpuRequest }}"
+            - name: AGENT_INJECT_CPU_LIMIT
+              value: "{{ .Values.injector.agentDefaults.cpuLimit }}"
+            - name: AGENT_INJECT_MEM_REQUEST
+              value: "{{ .Values.injector.agentDefaults.memRequest }}"
+            - name: AGENT_INJECT_MEM_LIMIT
+              value: "{{ .Values.injector.agentDefaults.memLimit }}"
+            - name: AGENT_INJECT_DEFAULT_TEMPLATE
+              value: "{{ .Values.injector.agentDefaults.template }}"
             {{- include "vault.extraEnvironmentVars" .Values.injector | nindent 12 }}
           args:
             - agent-inject
@@ -103,7 +114,7 @@ spec:
           livenessProbe:
             httpGet:
               path: /health/ready
-              port: 8080
+              port: {{ .Values.injector.port }}
               scheme: HTTPS
             failureThreshold: 2
             initialDelaySeconds: 5
@@ -113,7 +124,7 @@ spec:
           readinessProbe:
             httpGet:
               path: /health/ready
-              port: 8080
+              port: {{ .Values.injector.port }}
               scheme: HTTPS
             failureThreshold: 2
             initialDelaySeconds: 5

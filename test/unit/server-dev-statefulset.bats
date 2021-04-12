@@ -246,13 +246,9 @@ load _helpers
       . | tee /dev/stderr |
       yq -r '.spec.template.spec.containers[0].env' | tee /dev/stderr)
 
-  local actual=$(echo $object |
-      yq -r '.[11].name' | tee /dev/stderr)
-  [ "${actual}" = "VAULT_DEV_ROOT_TOKEN_ID" ]
-
-  local actual=$(echo $object |
-      yq -r '.[11].value' | tee /dev/stderr)
-  [ "${actual}" = "root" ]
+  local name=$(echo $object |
+      yq -r 'map(select(.name=="VAULT_DEV_ROOT_TOKEN_ID")) | .[] .value' | tee /dev/stderr)
+  [ "${name}" = "root" ]
 }
 
 @test "server/dev-StatefulSet: set custom devRootToken" {
@@ -264,13 +260,9 @@ load _helpers
       . | tee /dev/stderr |
       yq -r '.spec.template.spec.containers[0].env' | tee /dev/stderr)
 
-  local actual=$(echo $object |
-      yq -r '.[11].name' | tee /dev/stderr)
-  [ "${actual}" = "VAULT_DEV_ROOT_TOKEN_ID" ]
-
-  local actual=$(echo $object |
-      yq -r '.[11].value' | tee /dev/stderr)
-  [ "${actual}" = "customtoken" ]
+  local name=$(echo $object |
+      yq -r 'map(select(.name=="VAULT_DEV_ROOT_TOKEN_ID")) | .[] .value' | tee /dev/stderr)
+  [ "${name}" = "customtoken" ]
 }
 
 #--------------------------------------------------------------------
@@ -340,27 +332,21 @@ load _helpers
       . | tee /dev/stderr |
       yq -r '.spec.template.spec.containers[0].env' | tee /dev/stderr)
 
-  local actual=$(echo $object |
-      yq -r '.[11].name' | tee /dev/stderr)
-  [ "${actual}" = "ENV_FOO_0" ]
-  local actual=$(echo $object |
-      yq -r '.[11].valueFrom.secretKeyRef.name' | tee /dev/stderr)
-  [ "${actual}" = "secret_name_0" ]
-  local actual=$(echo $object |
-      yq -r '.[11].valueFrom.secretKeyRef.key' | tee /dev/stderr)
-  [ "${actual}" = "secret_key_0" ]
+  local value=$(echo $object |
+      yq -r 'map(select(.name=="ENV_FOO_0")) | .[] .valueFrom.secretKeyRef.name' | tee /dev/stderr)
+  [ "${value}" = "secret_name_0" ]
 
-  local actual=$(echo $object |
-      yq -r '.[12].name' | tee /dev/stderr)
-  [ "${actual}" = "ENV_FOO_1" ]
+  local value=$(echo $object |
+      yq -r 'map(select(.name=="ENV_FOO_0")) | .[] .valueFrom.secretKeyRef.key' | tee /dev/stderr)
+  [ "${value}" = "secret_key_0" ]
 
-  local actual=$(echo $object |
-      yq -r '.[12].valueFrom.secretKeyRef.name' | tee /dev/stderr)
-  [ "${actual}" = "secret_name_1" ]
+  local value=$(echo $object |
+      yq -r 'map(select(.name=="ENV_FOO_1")) | .[] .valueFrom.secretKeyRef.name' | tee /dev/stderr)
+  [ "${value}" = "secret_name_1" ]
 
-  local actual=$(echo $object |
-      yq -r '.[12].valueFrom.secretKeyRef.key' | tee /dev/stderr)
-  [ "${actual}" = "secret_key_1" ]
+  local value=$(echo $object |
+      yq -r 'map(select(.name=="ENV_FOO_1")) | .[] .valueFrom.secretKeyRef.key' | tee /dev/stderr)
+  [ "${value}" = "secret_key_1" ]
 }
 
 #--------------------------------------------------------------------

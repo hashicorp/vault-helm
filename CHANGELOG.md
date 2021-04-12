@@ -1,5 +1,17 @@
 ## Unreleased
 
+Features:
+* Added `server.enabled` to explicitly skip installing a Vault server [GH-486](https://github.com/hashicorp/vault-helm/pull/486)
+* Injector now supports enabling host network [GH-471](https://github.com/hashicorp/vault-helm/pull/471)
+* Injector port is now configurable [GH-489](https://github.com/hashicorp/vault-helm/pull/489)
+* Injector Vault Agent resource defaults are now configurable [GH-493](https://github.com/hashicorp/vault-helm/pull/493)
+* Extra paths can now be added to the Vault ingress service [GH-460](https://github.com/hashicorp/vault-helm/pull/460)
+* Log level and format can now be set directly using `server.logFormat` and `server.logLevel` [GH-488](https://github.com/hashicorp/vault-helm/pull/488)
+* 
+
+Bugs:
+* CSI: Fix ClusterRole name and DaemonSet's service account to properly match deployment name [GH-486](https://github.com/hashicorp/vault-helm/pull/486)
+
 ## 0.10.0 (March 25th, 2021)
 
 Features:

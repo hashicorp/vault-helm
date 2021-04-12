@@ -30,6 +30,17 @@ load _helpers
   [ "${actual}" = "false" ]
 }
 
+# serviceAccountName reference name
+@test "csi/daemonset: serviceAccountName reference name" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      --show-only templates/csi-daemonset.yaml \
+      --set "csi.enabled=true" \
+      . | tee /dev/stderr |
+      yq -r '.spec.template.spec.serviceAccountName' | tee /dev/stderr)
+  [ "${actual}" = "RELEASE-NAME-vault-csi-provider" ]
+}
+
 # Image
 @test "csi/daemonset: image is configurable" {
   cd `chart_dir`

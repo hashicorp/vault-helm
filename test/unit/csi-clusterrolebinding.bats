@@ -20,3 +20,25 @@ load _helpers
       yq 'length > 0' | tee /dev/stderr)
   [ "${actual}" = "true" ]
 }
+
+# ClusterRoleBinding cluster role ref name
+@test "csi/ClusterRoleBinding: cluster role ref name" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      --show-only templates/csi-clusterrolebinding.yaml \
+      --set "csi.enabled=true" \
+      . | tee /dev/stderr |
+      yq -r '.roleRef.name' | tee /dev/stderr)
+  [ "${actual}" = "RELEASE-NAME-vault-csi-provider-clusterrole" ]
+}
+
+# ClusterRoleBinding service account name
+@test "csi/ClusterRoleBinding: service account name" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      --show-only templates/csi-clusterrolebinding.yaml \
+      --set "csi.enabled=true" \
+      . | tee /dev/stderr |
+      yq -r '.subjects[0].name' | tee /dev/stderr)
+  [ "${actual}" = "RELEASE-NAME-vault-csi-provider" ]
+}
