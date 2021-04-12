@@ -156,8 +156,8 @@ load _helpers
       yq -r '.spec.template.spec.containers[0].env' | tee /dev/stderr)
 
   local value=$(echo $object |
-      yq -r 'map(select(.name=="AGENT_INJECT_TLS_AUTO")) | .[] .name' | tee /dev/stderr)
-  [ "${value}" = "AGENT_INJECT_TLS_AUTO" ]
+      yq -r 'map(select(.name=="AGENT_INJECT_TLS_AUTO")) | .[] .value' | tee /dev/stderr)
+  [ "${value}" = "RELEASE-NAME-vault-agent-injector-cfg" ]
 
   local value=$(echo $object |
       yq -r 'map(select(.name=="AGENT_INJECT_TLS_AUTO_HOSTS")) | .[] .name' | tee /dev/stderr)
