@@ -300,8 +300,8 @@ load _helpers
       yq -r '.spec.template.spec.containers[0].env' | tee /dev/stderr)
 
   local value=$(echo $object |
-      yq -r 'map(select(.name=="AGENT_INJECT_SET_SECURITY_CONTEXT")) | .[] .name' | tee /dev/stderr)
-  [ "${value}" = "AGENT_INJECT_SET_SECURITY_CONTEXT" ]
+      yq -r 'map(select(.name=="AGENT_INJECT_SET_SECURITY_CONTEXT")) | .[] .value' | tee /dev/stderr)
+  [ "${value}" = "false" ]
 }
 
 #--------------------------------------------------------------------
