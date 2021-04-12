@@ -3,6 +3,7 @@
 Features:
 * Added `server.enabled` to explicitly skip installing a Vault server [GH-486](https://github.com/hashicorp/vault-helm/pull/486)
 * Injector now supports enabling host network [GH-471](https://github.com/hashicorp/vault-helm/pull/471)
+* Injector port is now configurable [GH-489](https://github.com/hashicorp/vault-helm/pull/489)
 * Extra paths can now be added to the Vault ingress service [GH-460](https://github.com/hashicorp/vault-helm/pull/460)
 * Log level and format can now be set directly using `server.logFormat` and `server.logLevel` [GH-488](https://github.com/hashicorp/vault-helm/pull/488)
 
