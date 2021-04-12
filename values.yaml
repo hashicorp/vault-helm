@@ -29,6 +29,9 @@ injector:
 
   replicas: 1
 
+  # Configures the port the injector should listen on
+  port: 8080
+
   # If multiple replicas are specified, by default a leader-elector side-car
   # will be created so that only one injector attempts to create TLS certificates.
   leaderElector:

@@ -18,6 +18,25 @@ load _helpers
   [ "${actual}" = "true" ]
 }
 
+@test "injector/Service: service with default port" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      --show-only templates/injector-service.yaml \
+      . | tee /dev/stderr |
+       yq -r '.spec.ports[0].targetPort' | tee /dev/stderr)
+  [ "${actual}" = "8080" ]
+}
+
+@test "injector/Service: service with custom port" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      --show-only templates/injector-service.yaml \
+      --set 'injector.port=8443' \
+      . | tee /dev/stderr |
+       yq -r '.spec.ports[0].targetPort' | tee /dev/stderr)
+  [ "${actual}" = "8443" ]
+}
+
 @test "injector/Service: disable with global.enabled false" {
   cd `chart_dir`
   local actual=$( (helm template \
