@@ -11,7 +11,7 @@ metadata:
   {{ template "injector.service.annotations" . }}
 spec:
   ports:
-  - name: {{ include "vault.scheme" . }}
+  - name: https
     port: 443
     targetPort: {{ .Values.injector.port }}
   selector:
