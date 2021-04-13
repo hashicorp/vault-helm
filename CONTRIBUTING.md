@@ -91,7 +91,7 @@ docker build -f ${PWD}/test/docker/Test.dockerfile ${PWD}/test/docker/ -t vault-
   brew install kubernetes-helm
   ```
 
-#### Running The Tests
+#### Test
 
 To run the unit tests:
 
