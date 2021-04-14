@@ -159,9 +159,13 @@ load _helpers
       yq -r 'map(select(.name=="AGENT_INJECT_TLS_AUTO")) | .[] .value' | tee /dev/stderr)
   [ "${value}" = "RELEASE-NAME-vault-agent-injector-cfg" ]
 
+  # helm template does uses current context namespace and ignores namespace flags, so
+  # discover the targeted namespace so we can check the rendered value correctly.
+  local namespace=$(kubectl config view --minify --output 'jsonpath={..namespace}')
+
   local value=$(echo $object |
       yq -r 'map(select(.name=="AGENT_INJECT_TLS_AUTO_HOSTS")) | .[] .value' | tee /dev/stderr)
-  [ "${value}" = "RELEASE-NAME-vault-agent-injector-svc,RELEASE-NAME-vault-agent-injector-svc.default,RELEASE-NAME-vault-agent-injector-svc.default.svc" ]
+  [ "${value}" = "RELEASE-NAME-vault-agent-injector-svc,RELEASE-NAME-vault-agent-injector-svc.${namespace:-default},RELEASE-NAME-vault-agent-injector-svc.${namespace:-default}.svc" ]
 }
 
 @test "injector/deployment: with externalVaultAddr" {
