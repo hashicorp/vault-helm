@@ -205,7 +205,7 @@ server:
       # Insecure edge termination policy of the Route. Can be `None`, `Redirect`, or `Allow`
       insecureEdgeTerminationPolicy: Redirect
       # TLS termination of the route. Can be `edge`, `passthrough`, or `reencrypt`
-      termination: edge
+      termination: passthrough
 
   # authDelegator enables a cluster role binding to be attached to the service
   # account.  This cluster role binding can be used to setup Kubernetes auth
