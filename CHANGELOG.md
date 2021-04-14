@@ -1,5 +1,7 @@
 ## Unreleased
 
+## 0.11.0 (April 14th, 2021)
+
 Features:
 * Added `server.enabled` to explicitly skip installing a Vault server [GH-486](https://github.com/hashicorp/vault-helm/pull/486)
 * Injector now supports enabling host network [GH-471](https://github.com/hashicorp/vault-helm/pull/471)
