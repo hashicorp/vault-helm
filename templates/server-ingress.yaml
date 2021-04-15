@@ -4,15 +4,17 @@
 {{- if .Values.server.ingress.enabled -}}
 {{- $extraPaths := .Values.server.ingress.extraPaths -}}
 {{- $serviceName := include "vault.fullname" . -}}
-{{- if and (eq .mode "ha" ) (eq (.Values.server.service.enabled | toString) "true" ) (eq (.Values.global.enabled | toString) "true") }}
+{{- if and (eq .mode "ha" ) (eq (.Values.server.service.enabled | toString) "true" ) (eq (.Values.global.enabled | toString) "true") -}}
 {{- $serviceName = printf "%s-%s" $serviceName "active" -}}
-{{- end }}
+{{- end -}}
 {{- $servicePort := .Values.server.service.port -}}
-{{ if .Capabilities.APIVersions.Has "networking.k8s.io/v1beta1" }}
+{{- if .Capabilities.APIVersions.Has "networking.k8s.io/v1" -}}
+apiVersion: networking.k8s.io/v1
+{{- else if .Capabilities.APIVersions.Has "networking.k8s.io/v1beta1" -}}
 apiVersion: networking.k8s.io/v1beta1
-{{ else }}
+{{- else -}}
 apiVersion: extensions/v1beta1
-{{ end }}
+{{- end }}
 kind: Ingress
 metadata:
   name: {{ template "vault.fullname" . }}
@@ -47,9 +49,18 @@ spec:
 {{- end }}
         {{- range (.paths | default (list "/")) }}
           - path: {{ . }}
+            {{- if .Capabilities.APIVersions.Has "networking.k8s.io/v1" }}
+            pathType: Prefix
+            backend:
+              service:
+                name: {{ $serviceName }}
+                port:
+                  number: {{ $servicePort }}
+            {{- else }}
             backend:
               serviceName: {{ $serviceName }}
               servicePort: {{ $servicePort }}
+            {{- end }}
         {{- end }}
   {{- end }}
 {{- end }}
