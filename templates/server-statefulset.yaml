@@ -107,8 +107,13 @@ spec:
               valueFrom:
                 fieldRef:
                   fieldPath: metadata.name
+            {{- if .Values.server.ha.clusterAddr }}
+            - name: VAULT_CLUSTER_ADDR
+              value: {{ .Values.server.ha.clusterAddr }}
+            {{- else }}
             - name: VAULT_CLUSTER_ADDR
               value: "https://$(HOSTNAME).{{ template "vault.fullname" . }}-internal:8201"
+            {{- end }}
             {{- if and (eq (.Values.server.ha.raft.enabled | toString) "true") (eq (.Values.server.ha.raft.setNodeId | toString) "true") }}
             - name: VAULT_RAFT_NODE_ID
               valueFrom:
