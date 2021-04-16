@@ -202,6 +202,10 @@ spec:
       imagePullSecrets:
         {{- toYaml .Values.global.imagePullSecrets | nindent 8 }}
       {{- end }}
+      {{- if .Values.server.dnsConfig }}
+      dnsConfig:
+        {{- toYaml .Values.server.dnsConfig | nindent 8 }}
+      {{- end }}
   {{ template "vault.volumeclaims" . }}
 {{ end }}
 {{ end }}
