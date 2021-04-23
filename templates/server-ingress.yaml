@@ -39,7 +39,9 @@ spec:
 {{- end }}
   rules:
   {{- range .Values.server.ingress.hosts }}
-    - host: {{ .host | quote }}
+    - {{- if .host }}
+      host: {{ .host | quote }}
+      {{- end }}
       http:
         paths:
 {{ if $extraPaths }}
