@@ -7,7 +7,11 @@
 {{- $serviceName = printf "%s-%s" $serviceName "active" -}}
 {{- end }}
 {{- $servicePort := .Values.server.service.port -}}
-{{ if .Capabilities.APIVersions.Has "networking.k8s.io/v1beta1" }}
+{{ if .Values.server.ingress.apiVersion }}
+apiVersion: {{ .Values.server.ingress.apiVersion }}
+{{ else if .Capabilities.APIVersions.Has "networking.k8s.io/v1" }}
+apiVersion: networking.k8s.io/v1
+{{ else if .Capabilities.APIVersions.Has "networking.k8s.io/v1beta1" }}
 apiVersion: networking.k8s.io/v1beta1
 {{ else }}
 apiVersion: extensions/v1beta1

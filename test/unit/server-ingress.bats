@@ -121,3 +121,26 @@ load _helpers
       yq -r '.spec.rules[0].http.paths[0].backend.serviceName' | tee /dev/stderr)
   [ "${actual}" = "RELEASE-NAME-vault" ]
 }
+
+@test "server/ingress: api version capabilities default" {
+  cd `chart_dir`
+
+  local actual=$(helm template \
+      --show-only templates/server-ingress.yaml \
+      --set 'server.ingress.enabled=true' \
+      . | tee /dev/stderr |
+      yq -r '.apiVersion' | tee /dev/stderr)
+  [ "${actual}" = "networking.k8s.io/v1" ]
+}
+
+@test "server/ingress: api version custom" {
+  cd `chart_dir`
+
+  local actual=$(helm template \
+      --show-only templates/server-ingress.yaml \
+      --set 'server.ingress.enabled=true' \
+      --set 'server.ingress.apiVersion=networking.k8s.io/v2' \
+      . | tee /dev/stderr |
+      yq -r '.apiVersion' | tee /dev/stderr)
+  [ "${actual}" = "networking.k8s.io/v2" ]
+}
