@@ -1,0 +1,23 @@
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: vault
+  namespace: vault
+spec:
+  selector:
+    matchLabels:
+      prometheus_scrape: "true"
+  namespaceSelector:
+    matchNames:
+      - vault
+  endpoints:
+    - interval: 30s
+      path: /v1/sys/metrics
+      params:
+        format: ['prometheus']
+      port: http
+      scheme: http
+      scrapeTimeout: 30s
+      bearerTokenSecret: 
+        name: prometheus-vault-bearer-token
+        key: bearer_token

@@ -551,23 +551,11 @@ server:
     # https://www.vaultproject.io/docs/platform/k8s/helm/run#protecting-sensitive-vault-configurations
     config: |
       listener "tcp" {
-        tls_disable = 1
         address = "[::]:8200"
         cluster_address = "[::]:8201"
       }
       storage "file" {
         path = "/vault/data"
-      }
-
-      }
-      seal "transit" {
-      address = "http://10.0.1.37:8200"
-      disable_renewal = "false"
-      key_name = "autounseal"
-      mount_path = "transit/"
-      tls_skip_verify = "true"
-      token = "s.ljOifLcwFP5tmOMz5qOnrHLB"
-      }
 
       ui = true
       listener "tcp" {

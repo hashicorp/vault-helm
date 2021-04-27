@@ -1,10 +1,10 @@
 # standard settings for trigo openshift vault.
-# our standard setup includes: tls being enabled (default would be disabled) and openshift set to true (default would be vanilla kubernetes and therefore false)
+# our standard setup includes: tls being disabled (vault is only used within cluster, for outside access a tls safe route will be defined) and openshift set to true (default would be vanilla kubernetes and therefore false)
 # data storage set to 10GB and Audit log storage to 5GB per replica for 3 replicas using "raft" as replicated storage backend in a high availability setup.
 # the config settings are directly applied to the vault server settings and allow for the secondary vault on our VM to perform a auto unseal action when the vault pods get restarted
 # the agent injector will be disabled as secrets should get to the pods in the form of external secrets 
 global:
-  tlsDisable: false
+  tlsDisable: true
   openshift: true
 
 server:
@@ -29,32 +29,46 @@ server:
     apiAddr: null
     raft:
       enabled: true
-    config: |
-      listener "tcp" {
-        tls_disable = 1
-        address = "[::]:8200"
-        cluster_address = "[::]:8201"
-      }
-      storage "file" {
-        path = "/vault/data"
-      }
+      config: |
+        storage "raft" {
+          path = "/vault/data"
+        }
 
-      }
-      seal "transit" {
-      address = "http://10.0.1.37:8200"
-      disable_renewal = "false"
-      key_name = "autounseal"
-      mount_path = "transit/"
-      tls_skip_verify = "true"
-      token = "s.ljOifLcwFP5tmOMz5qOnrHLB"
-      }
-
-      ui = true
-      listener "tcp" {
-        address = "[::]:8200"
-        cluster_address = "[::]:8201"
-        tls_cert_file = "/var/run/secrets/kubernetes.io/certs/tls.crt"
-        tls_key_file = "/var/run/secrets/kubernetes.io/certs/tls.key"
-      }
+        seal "transit" {
+          address = "https://vault-backup.ocp.trigo.cloud:8200"
+          disable_renewal = "false"
+          key_name = "autounseal"
+          mount_path = "transit/"
+          tls_skip_verify = "false"
+          token = "s.ljOifLcwFP5tmOMz5qOnrHLB"
+        }
+        telemetry {
+          prometheus_retention_time = "24h"
+          disable_hostname = true
+        }
+        ui = true
+        listener "tcp" {
+          address = "[::]:8200"
+          tls_disable = 1
+          cluster_address = "[::]:8201"
+            telemetry {
+                unauthenticated_metrics_access = true
+            }
+          # tls_cert_file = "/var/run/secrets/kubernetes.io/certs/tls.crt"
+          # tls_key_file = "/var/run/secrets/kubernetes.io/certs/tls.key"
+        }
 injector:
   enabled: false
+ui:
+  # True if you want to create a Service entry for the Vault UI.
+  #
+  # serviceType can be used to control the type of service created. For
+  # example, setting this to "LoadBalancer" will create an external load
+  # balancer (for supported K8S installations) to access the UI.
+  enabled: true
+  publishNotReadyAddresses: true
+  # The service should only contain selectors for active Vault pod
+  activeVaultPodOnly: false
+  serviceType: "ClusterIP"
+  serviceNodePort: null
+  externalPort: 8200
