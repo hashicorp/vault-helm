@@ -46,7 +46,7 @@ spec:
       {{ if  .Values.server.shareProcessNamespace }}
       shareProcessNamespace: true
       {{ end }}
-      {{- if not .Values.global.openshift }}
+      {{- if .Values.global.openshift }}
       securityContext:
         runAsNonRoot: true
         runAsGroup: {{ .Values.server.gid | default 1000 }}
