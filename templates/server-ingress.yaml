@@ -8,7 +8,8 @@
 {{- $serviceName = printf "%s-%s" $serviceName "active" -}}
 {{- end -}}
 {{- $servicePort := .Values.server.service.port -}}
-{{- if .Capabilities.APIVersions.Has "networking.k8s.io/v1" -}}
+{{- $apiIsStable := .Capabilities.APIVersions.Has "networking.k8s.io/v1" -}}
+{{- if and $apiIsStable (semverCompare ">= 1.19.x" .Capabilities.KubeVersion.Version) -}}
 apiVersion: networking.k8s.io/v1
 {{- else if .Capabilities.APIVersions.Has "networking.k8s.io/v1beta1" -}}
 apiVersion: networking.k8s.io/v1beta1
@@ -49,7 +50,7 @@ spec:
 {{- end }}
         {{- range (.paths | default (list "/")) }}
           - path: {{ . }}
-            {{- if .Capabilities.APIVersions.Has "networking.k8s.io/v1" }}
+            {{- if $apiIsStable }}
             pathType: Prefix
             backend:
               service:
