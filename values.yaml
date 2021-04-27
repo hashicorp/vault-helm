@@ -258,6 +258,27 @@ server:
     #    hosts:
     #      - chart-example.local
 
+    # Extra kubernetes resources needed by the Ingress. This is a YAML-formatted
+    # multi-line templated string.
+    # Example: ManagedCertificate on GKE (with external-dns)
+    # hostname: chart-example.local
+    # annotations: |-
+    #   external-dns.alpha.kubernetes.io/hostname: {{ .Values.server.ingress.hostname }}
+    #   networking.gke.io/managed-certificates: {{ template "vault.fullname" . }}-certificate
+    # extraResources: |-
+    #   apiVersion: networking.gke.io/v1beta1
+    #   kind: ManagedCertificate
+    #   metadata:
+    #     name: {{ template "vault.fullname" . }}-certificate
+    #     labels:
+    #       helm.sh/chart: {{ include "vault.chart" . }}
+    #       app.kubernetes.io/name: {{ include "vault.name" . }}
+    #       app.kubernetes.io/instance: {{ .Release.Name }}
+    #       app.kubernetes.io/managed-by: {{ .Release.Service }}
+    #   spec:
+    #     domains:
+    #       - {{ .Values.server.ingress.hostname }}
+
   # OpenShift only - create a route to expose the service
   # The created route will be of type passthrough
   route:
@@ -458,6 +479,29 @@ server:
     # YAML-formatted multi-line templated string map of the annotations to apply
     # to the service.
     annotations: {}
+
+    # Extra kubernetes resources needed by the Service. This is a YAML-formatted
+    # multi-line templated string.
+    # Example: BackendConfig on GKE
+    # annotations: |-
+    #   cloud.google.com/backend-config: '{"ports": {"8200":"{{ template "vault.fullname" . }}-bec"}}'
+    # extraResources: |-
+    #   apiVersion: cloud.google.com/v1
+    #   kind: BackendConfig
+    #   metadata:
+    #     name: {{ template "vault.fullname" . }}-bec
+    #     labels:
+    #       helm.sh/chart: {{ include "vault.chart" . }}
+    #       app.kubernetes.io/name: {{ include "vault.name" . }}
+    #       app.kubernetes.io/instance: {{ .Release.Name }}
+    #       app.kubernetes.io/managed-by: {{ .Release.Service }}
+    #   spec:
+    #     healthCheck:
+    #       checkIntervalSec: 5
+    #       timeoutSec: 3
+    #       port: 8200
+    #       type: HTTP
+    #       requestPath: /v1/sys/health?standbyok=true
 
   # This configures the Vault Statefulset to create a PVC for data
   # storage when using the file or raft backend storage engines.

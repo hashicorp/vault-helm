@@ -38,5 +38,9 @@ spec:
     app.kubernetes.io/name: {{ include "vault.name" . }}
     app.kubernetes.io/instance: {{ .Release.Name }}
     component: server
+{{ if .Values.server.service.extraResources }}
+---
+{{- tpl .Values.server.service.extraResources . }}
+{{- end }}
 {{- end }}
 {{- end }}
