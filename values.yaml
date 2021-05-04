@@ -540,15 +540,13 @@ server:
         path = "/vault/data"
       }
 
-      # Example configuration for using auto-unseal, using Google Cloud KMS. The
-      # GKMS keys must already exist, and the cluster must have a service account
-      # that is authorized to access GCP KMS.
-      #seal "gcpckms" {
-      #   project     = "vault-helm-dev"
-      #   region      = "global"
-      #   key_ring    = "vault-helm-unseal-kr"
-      #   crypto_key  = "vault-helm-unseal-key"
-      #}
+      seal "transit" {
+        address = "https://pi4u2"
+        disable_renewal = "false"
+        key_name = "autounseal-nuc6"
+        mount_path = "transit/"
+        tls_skip_verify = "false"
+      }
 
   # Run Vault in "HA" mode. There are no storage requirements unless audit log
   # persistence is required.  In HA mode Vault will configure itself to use Consul
