@@ -541,7 +541,7 @@ server:
       }
 
       seal "transit" {
-        address = "https://pi4u2"
+        address = "https://vault-pi4u2"
         disable_renewal = "false"
         key_name = "autounseal-nuc6"
         mount_path = "transit/"
