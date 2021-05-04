@@ -245,7 +245,7 @@ server:
       traefik.ingress.kubernetes.io/router.entrypoints: web, websecure
       traefik.ingress.kubernetes.io/router.tls: "true"
     hosts:
-      - host: vault-pi4u2
+      - host: vault
         paths: []
     ## Extra paths to prepend to the host configuration. This is useful when working with annotation based services.
     extraPaths: []
@@ -256,7 +256,7 @@ server:
     tls:
      - secretName: vault-ingress-cert
        hosts:
-         - vault-pi4u2
+         - vault
 
   # OpenShift only - create a route to expose the service
   # The created route will be of type passthrough
