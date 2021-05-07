@@ -46,19 +46,19 @@ teardown_file() {
 }
 
 @test "helm-lint" {
-    check_result not-contains-crds
+    check_result helm-lint
 }
 
 @test "not-contain-csi-objects" {
-    check_result not-contains-crds
+    check_result not-contain-csi-objects
 }
 
 @test "has-readme" {
-    check_result not-contains-crds
+    check_result has-readme
 }
 
 @test "contains-values" {
-    check_result not-contains-crds
+    check_result contains-values
 }
 
 @test "images-are-certified" {
