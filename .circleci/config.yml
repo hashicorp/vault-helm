@@ -10,6 +10,29 @@ jobs:
     steps:
       - checkout
       - run: bats ./test/unit -t
+
+  chart-verifier:
+    docker:
+      - image: docker.mirror.hashicorp.services/cimg/go:1.16
+    environment:
+      BATS_VERSION: "1.3.0"
+      # Note: the commit SHA is used here since the repo doesn't use release tags
+      CHART_VERIFIER_VERSION: "190d532246a5936dc6a7125e2da917d04e38a672"
+    steps:
+      - checkout
+      - run:
+          name: install chart-verifier
+          command: go get github.com/redhat-certification/chart-verifier@${CHART_VERIFIER_VERSION}
+      - run:
+          name: install bats
+          command: |
+            curl -sSL https://github.com/bats-core/bats-core/archive/v${BATS_VERSION}.tar.gz -o /tmp/bats.tgz
+            tar -zxf /tmp/bats.tgz -C /tmp
+            sudo /bin/bash /tmp/bats-core-${BATS_VERSION}/install.sh /usr/local
+      - run:
+          name: run chart-verifier tests
+          command: bats ./test/chart -t
+
   acceptance:
     docker:
       # This image is build from test/docker/Test.dockerfile
@@ -66,6 +89,7 @@ workflows:
   build_and_test:
     jobs:
       - bats-unit-test
+      - chart-verifier
       - acceptance:
           requires:
             - bats-unit-test
