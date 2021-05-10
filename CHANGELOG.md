@@ -1,5 +1,8 @@
 ## Unreleased
 
+Improvements:
+* Set chart kubeVersion and added chart-verifier tests [GH-510](https://github.com/hashicorp/vault-helm/pull/510)
+
 ## 0.11.0 (April 14th, 2021)
 
 Features:
