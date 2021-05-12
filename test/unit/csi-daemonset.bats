@@ -62,6 +62,33 @@ load _helpers
   [ "${actual}" = "SomePullPolicy" ]
 }
 
+@test "csi/daemonset: Custom imagePullSecrets" {
+  cd `chart_dir`
+  local object=$(helm template \
+      --show-only templates/csi-daemonset.yaml  \
+      --set 'global.imagePullSecrets[0].name=foo' \
+      --set 'global.imagePullSecrets[1].name=bar' \
+      . | tee /dev/stderr |
+      yq -r '.spec.template.spec.imagePullSecrets' | tee /dev/stderr)
+
+  local actual=$(echo $object |
+     yq -r '.[0].name' | tee /dev/stderr)
+  [ "${actual}" = "foo" ]
+
+  local actual=$(echo $object |
+      yq -r '.[1].name' | tee /dev/stderr)
+  [ "${actual}" = "bar" ]
+}
+
+@test "csi/daemonset: default imagePullSecrets" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      --show-only templates/csi-daemonset.yaml  \
+      . | tee /dev/stderr |
+      yq -r '.spec.template.spec.imagePullSecrets' | tee /dev/stderr)
+  [ "${actual}" = "null" ]
+}
+
 # Debug arg
 @test "csi/daemonset: debug arg is configurable" {
   cd `chart_dir`
