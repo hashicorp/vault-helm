@@ -66,6 +66,7 @@ load _helpers
   cd `chart_dir`
   local object=$(helm template \
       --show-only templates/csi-daemonset.yaml  \
+      --set "csi.enabled=true" \
       --set 'global.imagePullSecrets[0].name=foo' \
       --set 'global.imagePullSecrets[1].name=bar' \
       . | tee /dev/stderr |
@@ -84,6 +85,7 @@ load _helpers
   cd `chart_dir`
   local actual=$(helm template \
       --show-only templates/csi-daemonset.yaml  \
+      --set "csi.enabled=true" \
       . | tee /dev/stderr |
       yq -r '.spec.template.spec.imagePullSecrets' | tee /dev/stderr)
   [ "${actual}" = "null" ]
