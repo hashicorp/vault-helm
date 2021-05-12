@@ -192,7 +192,7 @@ load _helpers
   local actual=$(helm template \
       --show-only templates/csi-daemonset.yaml  \
       --set 'csi.enabled=true' \
-      --set 'csi.daemonset.tolerations=foobar' \
+      --set 'csi.daemonSet.tolerations=foobar' \
       . | tee /dev/stderr |
       yq '.spec.template.spec.tolerations == "foobar"' | tee /dev/stderr)
   [ "${actual}" = "true" ]
