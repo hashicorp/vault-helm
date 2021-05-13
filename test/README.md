@@ -1,4 +1,4 @@
-# vault-helm Tests
+# Vault Helm Tests
 
 ## Running Vault Helm Acceptance tests
 
