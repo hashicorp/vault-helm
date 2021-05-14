@@ -2,6 +2,7 @@
 
 Improvements:
 * Set chart kubeVersion and added chart-verifier tests [GH-510](https://github.com/hashicorp/vault-helm/pull/510)
+* Added values json schema [GH-513](https://github.com/hashicorp/vault-helm/pull/513)
 
 Bugs:
 * CSI: `global.imagePullSecrets` are now also used for CSI daemonset [GH-519](https://github.com/hashicorp/vault-helm/pull/519)
