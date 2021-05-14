@@ -14,6 +14,10 @@ test-bats: test-unit test-acceptance
 
 test: test-image test-bats
 
+# Generate json schema for chart values. See test/README.md for more details.
+gen-values-schema:
+	helm schema-gen values.yaml > values.schema.json
+
 # run acceptance tests on GKE
 # set google project/credential vars above
 test-acceptance:
