@@ -26,7 +26,7 @@ USE_DOCKER:
 
 There is a make target for generating values.schema.json:
 
-    make gen-values-schema
+    make values-schema
 
 It relies on the helm [schema-gen plugin][schema-gen]. Note that some manual
 editing will be required, since several properties accept multiple data types.

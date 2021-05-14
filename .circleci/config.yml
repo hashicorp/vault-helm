@@ -99,7 +99,7 @@ workflows:
   update-helm-charts-index:
     jobs:
       - update-helm-charts-index:
-          context: helm-charts-trigger
+          context: helm-charts-trigger-vault
           filters:
             tags:
               only: /^v.*/
