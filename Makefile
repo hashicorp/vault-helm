@@ -4,6 +4,10 @@ CLOUDSDK_CORE_PROJECT?=vault-helm-dev-246514
 # set to run a single test - e.g acceptance/server-ha-enterprise-dr.bats
 ACCEPTANCE_TESTS?=acceptance
 
+# Generate json schema for chart values. See test/README.md for more details.
+values-schema:
+	helm schema-gen values.yaml > values.schema.json
+
 test-image:
 	@docker build --rm -t $(TEST_IMAGE) -f $(CURDIR)/test/docker/Test.dockerfile $(CURDIR)
 
@@ -62,4 +66,4 @@ provision-cluster:
 destroy-cluster:
 	terraform destroy -auto-approve
 
-.PHONY: test-image test-unit test-bats test test-acceptance test-destroy test-provision acceptance provision-cluster destroy-cluster
+.PHONY: values-schema test-image test-unit test-bats test test-acceptance test-destroy test-provision acceptance provision-cluster destroy-cluster

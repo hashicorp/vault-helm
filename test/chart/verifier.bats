@@ -61,6 +61,10 @@ teardown_file() {
     check_result contains-values
 }
 
+@test "contains-values-schema" {
+    check_result contains-values-schema
+}
+
 @test "images-are-certified" {
     skip "Skipping until this has been addressed"
     check_result images-are-certified
@@ -69,9 +73,4 @@ teardown_file() {
 @test "contains-test" {
     skip "Skipping until this has been addressed"
     check_result contains-test
-}
-
-@test "contains-values-schema" {
-    skip "Skipping until this has been addressed"
-    check_result contains-values-schema
 }
