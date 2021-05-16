@@ -505,10 +505,10 @@ Sets extra CSI daemonset annotations
 {{/*
 Sets the injector toleration for pod placement
 */}}
-{{- define "csi.daemonSet.tolerations" -}}
-  {{- if .Values.csi.daemonSet.tolerations }}
+{{- define "csi.pod.tolerations" -}}
+  {{- if .Values.csi.pod.tolerations }}
       tolerations:
-        {{ tpl .Values.csi.daemonSet.tolerations . | nindent 8 | trim }}
+        {{ tpl .Values.csi.pod.tolerations . | nindent 8 | trim }}
   {{- end }}
 {{- end -}}
 
