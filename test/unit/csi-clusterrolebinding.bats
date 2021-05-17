@@ -15,10 +15,33 @@ load _helpers
   cd `chart_dir`
   local actual=$(helm template \
       --show-only templates/csi-clusterrolebinding.yaml  \
-      --set 'csi.enabled=true' \
+      --set "csi.enabled=true" \
       . | tee /dev/stderr |
       yq 'length > 0' | tee /dev/stderr)
   [ "${actual}" = "true" ]
+}
+
+# ClusterRoleBinding name
+@test "csi/ClusterRoleBinding: name" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      --show-only templates/csi-clusterrolebinding.yaml \
+      --set "csi.enabled=true" \
+      . | tee /dev/stderr |
+      yq -r '.metadata.name' | tee /dev/stderr)
+  [ "${actual}" = "RELEASE-NAME-vault-default-csi-provider-clusterrolebinding" ]
+}
+
+# ClusterRoleBinding name in custom namespace
+@test "csi/ClusterRoleBinding: name in custom namespace" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      --namespace my-custom-namespace \
+      --show-only templates/csi-clusterrolebinding.yaml \
+      --set "csi.enabled=true" \
+      . | tee /dev/stderr |
+      yq -r '.metadata.name' | tee /dev/stderr)
+  [ "${actual}" = "RELEASE-NAME-vault-my-custom-namespace-csi-provider-clusterrolebinding" ]
 }
 
 # ClusterRoleBinding cluster role ref name
@@ -29,7 +52,19 @@ load _helpers
       --set "csi.enabled=true" \
       . | tee /dev/stderr |
       yq -r '.roleRef.name' | tee /dev/stderr)
-  [ "${actual}" = "RELEASE-NAME-vault-csi-provider-clusterrole" ]
+  [ "${actual}" = "RELEASE-NAME-vault-default-csi-provider-clusterrole" ]
+}
+
+# ClusterRoleBinding cluster role ref name in custom namespace
+@test "csi/ClusterRoleBinding: cluster role ref name in custom namespace" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      --namespace my-custom-namespace \
+      --show-only templates/csi-clusterrolebinding.yaml \
+      --set "csi.enabled=true" \
+      . | tee /dev/stderr |
+      yq -r '.roleRef.name' | tee /dev/stderr)
+  [ "${actual}" = "RELEASE-NAME-vault-my-custom-namespace-csi-provider-clusterrole" ]
 }
 
 # ClusterRoleBinding service account name

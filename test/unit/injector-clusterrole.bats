@@ -20,3 +20,24 @@ load _helpers
       yq 'length > 0' | tee /dev/stderr)
   [ "${actual}" = "false" ]
 }
+
+# ClusterRole name
+@test "injector/ClusterRole: name" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      --show-only templates/injector-clusterrole.yaml \
+      . | tee /dev/stderr |
+      yq -r '.metadata.name' | tee /dev/stderr)
+  [ "${actual}" = "RELEASE-NAME-vault-default-agent-injector-clusterrole" ]
+}
+
+# ClusterRole name in custom namespace
+@test "injector/ClusterRole: name in custom namespace" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      --namespace my-custom-namespace \
+      --show-only templates/injector-clusterrole.yaml \
+      . | tee /dev/stderr |
+      yq -r '.metadata.name' | tee /dev/stderr)
+  [ "${actual}" = "RELEASE-NAME-vault-my-custom-namespace-agent-injector-clusterrole" ]
+}

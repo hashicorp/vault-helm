@@ -35,6 +35,27 @@ load _helpers
   [ "${actual}" = "false" ]
 }
 
+# ClusterRole name
+@test "server/ClusterRoleBinding: name" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      --show-only templates/server-clusterrolebinding.yaml \
+      . | tee /dev/stderr |
+      yq -r '.metadata.name' | tee /dev/stderr)
+  [ "${actual}" = "RELEASE-NAME-vault-default-server-binding" ]
+}
+
+# ClusterRole name in custom namespace
+@test "server/ClusterRoleBinding: name in custom namespace" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      --namespace my-custom-namespace \
+      --show-only templates/server-clusterrolebinding.yaml \
+      . | tee /dev/stderr |
+      yq -r '.metadata.name' | tee /dev/stderr)
+  [ "${actual}" = "RELEASE-NAME-vault-my-custom-namespace-server-binding" ]
+}
+
 @test "server/ClusterRoleBinding: can disable with server.authDelegator" {
   cd `chart_dir`
   local actual=$( (helm template \
