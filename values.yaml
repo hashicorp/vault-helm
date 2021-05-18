@@ -195,10 +195,6 @@ server:
   # to Vault in the path `/vault/userconfig/<name>/`. The value below is
   # an array of objects, examples are shown below.
   extraVolumes: []
-    # - type: secret (or "configMap")
-    #   name: my-secret
-    #   path: null # default is `/vault/userconfig`
-
   # Affinity Settings
   # Commenting out or setting as empty the affinity variable, will allow
   # deployment to single node services such as Minikube
@@ -407,6 +403,8 @@ server:
     # multi-line string formatted as a map of the annotations to apply to the
     # serviceAccount.
     annotations: {}
+  # A boolean flag to setup logrotate as a side car continer
+  logrotate: null
 
 # Vault UI
 ui:
