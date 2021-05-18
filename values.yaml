@@ -728,11 +728,17 @@ csi:
     # YAML-formatted multi-line templated string map of the annotations to apply
     # to the daemonSet.
     annotations: {}
+
   pod:
     # Extra annotations for the provider pods. This can either be YAML or a
     # YAML-formatted multi-line templated string map of the annotations to apply
     # to the pod.
     annotations: {}
+
+    # Toleration Settings for provider pods
+    # This should be a multi-line string matching the Toleration array
+    # in a PodSpec.
+    tolerations: null
 
   serviceAccount:
     # Extra annotations for the serviceAccount definition. This can either be
