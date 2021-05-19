@@ -62,7 +62,37 @@ The unit tests don't require any active Kubernetes cluster and complete
 very quickly. These should be used for fast feedback during development.
 The acceptance tests require a Kubernetes cluster with a configured `kubectl`.
 
-### Prequisites
+### Test Using Docker Container
+
+The following are the instructions for running bats tests using a Docker container.
+
+#### Prerequisites
+
+* Docker installed
+* `vault-helm` checked out locally
+
+#### Test
+
+**Note:** the following commands should be run from the `vault-helm` directory.
+
+First, build the Docker image for running the tests:
+
+```shell
+docker build -f ${PWD}/test/docker/Test.dockerfile ${PWD}/test/docker/ -t vault-helm-test
+```
+Next, execute the tests with the following commands:
+```shell
+docker run -it --rm -v "${PWD}:/test" vault-helm-test bats /test/test/unit
+```
+It's possible to only run specific bats tests using regular expressions. 
+For example, the following will run only tests with "injector" in the name:
+```shell
+docker run -it --rm -v "${PWD}:/test" vault-helm-test bats /test/test/unit -f "injector"
+```
+
+### Test Manually
+The following are the instructions for running bats tests on your workstation.
+#### Prerequisites
 * [Bats](https://github.com/bats-core/bats-core)
   ```bash
   brew install bats-core
@@ -76,7 +106,7 @@ The acceptance tests require a Kubernetes cluster with a configured `kubectl`.
   brew install kubernetes-helm
   ```
 
-### Running The Tests
+#### Test
 
 To run the unit tests:
 

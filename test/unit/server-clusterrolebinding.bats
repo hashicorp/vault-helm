@@ -61,12 +61,12 @@ load _helpers
   [ "${actual}" = "false" ]
 }
 
-@test "server/ClusterRoleBinding: disable with injector.externalVaultAddr" {
+@test "server/ClusterRoleBinding: also deploy with injector.externalVaultAddr" {
   cd `chart_dir`
   local actual=$( (helm template \
       --show-only templates/server-clusterrolebinding.yaml  \
       --set 'injector.externalVaultAddr=http://vault-outside' \
       . || echo "---") | tee /dev/stderr |
       yq 'length > 0' | tee /dev/stderr)
-  [ "${actual}" = "false" ]
+  [ "${actual}" = "true" ]
 }

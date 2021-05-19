@@ -106,6 +106,23 @@ load _helpers
   [ "${actual}" = "250m" ]
 }
 
+@test "injector/deployment: enable metrics" {
+  cd `chart_dir`
+  local object=$(helm template \
+      --show-only templates/injector-deployment.yaml  \
+      --set 'injector.metrics.enabled=true' \
+      . | tee /dev/stderr |
+      yq -r '.spec.template.spec.containers[0].env' | tee /dev/stderr)
+
+  local actual=$(echo $object |
+     yq -r '.[9].name' | tee /dev/stderr)
+  [ "${actual}" = "AGENT_INJECT_TELEMETRY_PATH" ]
+
+  local actual=$(echo $object |
+      yq -r '.[9].value' | tee /dev/stderr)
+  [ "${actual}" = "/metrics" ]
+}
+
 @test "injector/deployment: manual TLS environment vars" {
   cd `chart_dir`
   local object=$(helm template \
@@ -116,21 +133,13 @@ load _helpers
       . | tee /dev/stderr |
       yq -r '.spec.template.spec.containers[0].env' | tee /dev/stderr)
 
-  local actual=$(echo $object |
-     yq -r '.[5].name' | tee /dev/stderr)
-  [ "${actual}" = "AGENT_INJECT_TLS_CERT_FILE" ]
+  local value=$(echo $object |
+      yq -r 'map(select(.name=="AGENT_INJECT_TLS_CERT_FILE")) | .[] .value' | tee /dev/stderr)
+  [ "${value}" = "/etc/webhook/certs/test.crt" ]
 
-  local actual=$(echo $object |
-      yq -r '.[5].value' | tee /dev/stderr)
-  [ "${actual}" = "/etc/webhook/certs/test.crt" ]
-
-  local actual=$(echo $object |
-      yq -r '.[6].name' | tee /dev/stderr)
-  [ "${actual}" = "AGENT_INJECT_TLS_KEY_FILE" ]
-
-  local actual=$(echo $object |
-      yq -r '.[6].value' | tee /dev/stderr)
-  [ "${actual}" = "/etc/webhook/certs/test.key" ]
+  local value=$(echo $object |
+      yq -r 'map(select(.name=="AGENT_INJECT_TLS_KEY_FILE")) | .[] .value' | tee /dev/stderr)
+  [ "${value}" = "/etc/webhook/certs/test.key" ]
 }
 
 @test "injector/deployment: auto TLS by default" {
@@ -146,13 +155,17 @@ load _helpers
       . | tee /dev/stderr |
       yq -r '.spec.template.spec.containers[0].env' | tee /dev/stderr)
 
-  local actual=$(echo $object |
-     yq -r '.[5].name' | tee /dev/stderr)
-  [ "${actual}" = "AGENT_INJECT_TLS_AUTO" ]
+  local value=$(echo $object |
+      yq -r 'map(select(.name=="AGENT_INJECT_TLS_AUTO")) | .[] .value' | tee /dev/stderr)
+  [ "${value}" = "RELEASE-NAME-vault-agent-injector-cfg" ]
 
-  local actual=$(echo $object |
-      yq -r '.[6].name' | tee /dev/stderr)
-  [ "${actual}" = "AGENT_INJECT_TLS_AUTO_HOSTS" ]
+  # helm template does uses current context namespace and ignores namespace flags, so
+  # discover the targeted namespace so we can check the rendered value correctly.
+  local namespace=$(kubectl config view --minify --output 'jsonpath={..namespace}')
+
+  local value=$(echo $object |
+      yq -r 'map(select(.name=="AGENT_INJECT_TLS_AUTO_HOSTS")) | .[] .value' | tee /dev/stderr)
+  [ "${value}" = "RELEASE-NAME-vault-agent-injector-svc,RELEASE-NAME-vault-agent-injector-svc.${namespace:-default},RELEASE-NAME-vault-agent-injector-svc.${namespace:-default}.svc" ]
 }
 
 @test "injector/deployment: with externalVaultAddr" {
@@ -163,13 +176,9 @@ load _helpers
       . | tee /dev/stderr |
       yq -r '.spec.template.spec.containers[0].env' | tee /dev/stderr)
 
-  local actual=$(echo $object |
-     yq -r '.[2].name' | tee /dev/stderr)
-  [ "${actual}" = "AGENT_INJECT_VAULT_ADDR" ]
-
-  local actual=$(echo $object |
-      yq -r '.[2].value' | tee /dev/stderr)
-  [ "${actual}" = "http://vault-outside" ]
+  local value=$(echo $object |
+      yq -r 'map(select(.name=="AGENT_INJECT_VAULT_ADDR")) | .[] .value' | tee /dev/stderr)
+  [ "${value}" = "http://vault-outside" ]
 }
 
 @test "injector/deployment: without externalVaultAddr" {
@@ -181,13 +190,9 @@ load _helpers
       . | tee /dev/stderr |
       yq -r '.spec.template.spec.containers[0].env' | tee /dev/stderr)
 
-  local actual=$(echo $object |
-     yq -r '.[2].name' | tee /dev/stderr)
-  [ "${actual}" = "AGENT_INJECT_VAULT_ADDR" ]
-
-  local actual=$(echo $object |
-      yq -r '.[2].value' | tee /dev/stderr)
-  [ "${actual}" = "http://not-external-test-vault.default.svc:8200" ]
+  local value=$(echo $object |
+      yq -r 'map(select(.name=="AGENT_INJECT_VAULT_ADDR")) | .[] .value' | tee /dev/stderr)
+  [ "${value}" = "http://not-external-test-vault.default.svc:8200" ]
 }
 
 @test "injector/deployment: default authPath" {
@@ -197,13 +202,9 @@ load _helpers
       . | tee /dev/stderr |
       yq -r '.spec.template.spec.containers[0].env' | tee /dev/stderr)
 
-  local actual=$(echo $object |
-     yq -r '.[3].name' | tee /dev/stderr)
-  [ "${actual}" = "AGENT_INJECT_VAULT_AUTH_PATH" ]
-
-  local actual=$(echo $object |
-      yq -r '.[3].value' | tee /dev/stderr)
-  [ "${actual}" = "auth/kubernetes" ]
+  local value=$(echo $object |
+      yq -r 'map(select(.name=="AGENT_INJECT_VAULT_AUTH_PATH")) | .[] .value' | tee /dev/stderr)
+  [ "${value}" = "auth/kubernetes" ]
 }
 
 @test "injector/deployment: custom authPath" {
@@ -214,13 +215,9 @@ load _helpers
       . | tee /dev/stderr |
       yq -r '.spec.template.spec.containers[0].env' | tee /dev/stderr)
 
-  local actual=$(echo $object |
-     yq -r '.[3].name' | tee /dev/stderr)
-  [ "${actual}" = "AGENT_INJECT_VAULT_AUTH_PATH" ]
-
-  local actual=$(echo $object |
-      yq -r '.[3].value' | tee /dev/stderr)
-  [ "${actual}" = "auth/k8s" ]
+  local value=$(echo $object |
+      yq -r 'map(select(.name=="AGENT_INJECT_VAULT_AUTH_PATH")) | .[] .value' | tee /dev/stderr)
+  [ "${value}" = "auth/k8s" ]
 }
 
 @test "injector/deployment: default logLevel" {
@@ -230,13 +227,9 @@ load _helpers
       . | tee /dev/stderr |
       yq -r '.spec.template.spec.containers[0].env' | tee /dev/stderr)
 
-  local actual=$(echo $object |
-     yq -r '.[1].name' | tee /dev/stderr)
-  [ "${actual}" = "AGENT_INJECT_LOG_LEVEL" ]
-
-  local actual=$(echo $object |
-      yq -r '.[1].value' | tee /dev/stderr)
-  [ "${actual}" = "info" ]
+  local value=$(echo $object |
+      yq -r 'map(select(.name=="AGENT_INJECT_LOG_LEVEL")) | .[] .value' | tee /dev/stderr)
+  [ "${value}" = "info" ]
 }
 
 @test "injector/deployment: custom logLevel" {
@@ -247,13 +240,9 @@ load _helpers
       . | tee /dev/stderr |
       yq -r '.spec.template.spec.containers[0].env' | tee /dev/stderr)
 
-  local actual=$(echo $object |
-     yq -r '.[1].name' | tee /dev/stderr)
-  [ "${actual}" = "AGENT_INJECT_LOG_LEVEL" ]
-
-  local actual=$(echo $object |
-      yq -r '.[1].value' | tee /dev/stderr)
-  [ "${actual}" = "foo" ]
+  local value=$(echo $object |
+      yq -r 'map(select(.name=="AGENT_INJECT_LOG_LEVEL")) | .[] .value' | tee /dev/stderr)
+  [ "${value}" = "foo" ]
 }
 
 @test "injector/deployment: default logFormat" {
@@ -263,13 +252,9 @@ load _helpers
       . | tee /dev/stderr |
       yq -r '.spec.template.spec.containers[0].env' | tee /dev/stderr)
 
-  local actual=$(echo $object |
-     yq -r '.[7].name' | tee /dev/stderr)
-  [ "${actual}" = "AGENT_INJECT_LOG_FORMAT" ]
-
-  local actual=$(echo $object |
-      yq -r '.[7].value' | tee /dev/stderr)
-  [ "${actual}" = "standard" ]
+  local value=$(echo $object |
+      yq -r 'map(select(.name=="AGENT_INJECT_LOG_FORMAT")) | .[] .value' | tee /dev/stderr)
+  [ "${value}" = "standard" ]
 }
 
 @test "injector/deployment: custom logFormat" {
@@ -280,13 +265,9 @@ load _helpers
       . | tee /dev/stderr |
       yq -r '.spec.template.spec.containers[0].env' | tee /dev/stderr)
 
-  local actual=$(echo $object |
-     yq -r '.[7].name' | tee /dev/stderr)
-  [ "${actual}" = "AGENT_INJECT_LOG_FORMAT" ]
-
-  local actual=$(echo $object |
-      yq -r '.[7].value' | tee /dev/stderr)
-  [ "${actual}" = "json" ]
+  local value=$(echo $object |
+      yq -r 'map(select(.name=="AGENT_INJECT_LOG_FORMAT")) | .[] .value' | tee /dev/stderr)
+  [ "${value}" = "json" ]
 }
 
 @test "injector/deployment: default revoke on shutdown" {
@@ -296,13 +277,9 @@ load _helpers
       . | tee /dev/stderr |
       yq -r '.spec.template.spec.containers[0].env' | tee /dev/stderr)
 
-  local actual=$(echo $object |
-     yq -r '.[8].name' | tee /dev/stderr)
-  [ "${actual}" = "AGENT_INJECT_REVOKE_ON_SHUTDOWN" ]
-
-  local actual=$(echo $object |
-      yq -r '.[8].value' | tee /dev/stderr)
-  [ "${actual}" = "false" ]
+  local value=$(echo $object |
+      yq -r 'map(select(.name=="AGENT_INJECT_REVOKE_ON_SHUTDOWN")) | .[] .value' | tee /dev/stderr)
+  [ "${value}" = "false" ]
 }
 
 @test "injector/deployment: custom revoke on shutdown" {
@@ -313,13 +290,22 @@ load _helpers
       . | tee /dev/stderr |
       yq -r '.spec.template.spec.containers[0].env' | tee /dev/stderr)
 
-  local actual=$(echo $object |
-     yq -r '.[8].name' | tee /dev/stderr)
-  [ "${actual}" = "AGENT_INJECT_REVOKE_ON_SHUTDOWN" ]
+  local value=$(echo $object |
+      yq -r 'map(select(.name=="AGENT_INJECT_REVOKE_ON_SHUTDOWN")) | .[] .value' | tee /dev/stderr)
+  [ "${value}" = "true" ]
+}
 
-  local actual=$(echo $object |
-      yq -r '.[8].value' | tee /dev/stderr)
-  [ "${actual}" = "true" ]
+@test "injector/deployment: disable security context when openshift enabled" {
+  cd `chart_dir`
+  local object=$(helm template \
+      --show-only templates/injector-deployment.yaml  \
+      --set 'global.openshift=true' \
+      . | tee /dev/stderr |
+      yq -r '.spec.template.spec.containers[0].env' | tee /dev/stderr)
+
+  local value=$(echo $object |
+      yq -r 'map(select(.name=="AGENT_INJECT_SET_SECURITY_CONTEXT")) | .[] .value' | tee /dev/stderr)
+  [ "${value}" = "false" ]
 }
 
 #--------------------------------------------------------------------
@@ -335,41 +321,97 @@ load _helpers
       . | tee /dev/stderr |
       yq -r '.spec.template.spec.containers[0].env' | tee /dev/stderr)
 
-  local actual=$(echo $object |
-     yq -r '.[9].name' | tee /dev/stderr)
-  [ "${actual}" = "FOO" ]
+  local value=$(echo $object |
+      yq -r 'map(select(.name=="FOO")) | .[] .value' | tee /dev/stderr)
+  [ "${value}" = "bar" ]
 
-  local actual=$(echo $object |
-      yq -r '.[9].value' | tee /dev/stderr)
+  local value=$(echo $object |
+      yq -r 'map(select(.name=="FOOBAR")) | .[] .value' | tee /dev/stderr)
+  [ "${value}" = "foobar" ]
+
+  local value=$(echo $object |
+      yq -r 'map(select(.name=="LOWER_CASE")) | .[] .value' | tee /dev/stderr)
+  [ "${value}" = "sanitized" ]
+}
+
+#--------------------------------------------------------------------
+# extra annotations
+
+@test "injector/deployment: default annotations" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      --show-only templates/injector-deployment.yaml \
+      . | tee /dev/stderr |
+      yq -r '.spec.template.metadata.annotations' | tee /dev/stderr)
+  [ "${actual}" = "null" ]
+}
+
+@test "injector/deployment: specify annotations yaml" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      --show-only templates/injector-deployment.yaml \
+      --set 'injector.annotations.foo=bar' \
+      . | tee /dev/stderr |
+      yq -r '.spec.template.metadata.annotations.foo' | tee /dev/stderr)
   [ "${actual}" = "bar" ]
+}
+
+@test "injector/deployment: specify annotations yaml string" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      --show-only templates/injector-deployment.yaml \
+      --set 'injector.annotations=foo: bar' \
+      . | tee /dev/stderr |
+      yq -r '.spec.template.metadata.annotations.foo' | tee /dev/stderr)
+  [ "${actual}" = "bar" ]
+}
+
+#--------------------------------------------------------------------
+# agent port
+
+@test "injector/deployment: default agentPort" {
+  cd `chart_dir`
+  local object=$(helm template \
+      --show-only templates/injector-deployment.yaml  \
+      . | tee /dev/stderr |
+      yq -r '.spec.template.spec.containers[0].env' | tee /dev/stderr)
 
   local actual=$(echo $object |
-      yq -r '.[10].name' | tee /dev/stderr)
-  [ "${actual}" = "FOOBAR" ]
+     yq -r '.[0].name' | tee /dev/stderr)
+  [ "${actual}" = "AGENT_INJECT_LISTEN" ]
 
   local actual=$(echo $object |
-      yq -r '.[10].value' | tee /dev/stderr)
-  [ "${actual}" = "foobar" ]
+      yq -r '.[0].value' | tee /dev/stderr)
+  [ "${actual}" = ":8080" ]
+}
+
+@test "injector/deployment: custom agentPort" {
+  cd `chart_dir`
+  local object=$(helm template \
+      --show-only templates/injector-deployment.yaml  \
+      --set 'injector.port=8443' \
+      . | tee /dev/stderr |
+      yq -r '.spec.template.spec.containers[0].env' | tee /dev/stderr)
 
   local actual=$(echo $object |
-      yq -r '.[11].name' | tee /dev/stderr)
-  [ "${actual}" = "LOWER_CASE" ]
+     yq -r '.[0].name' | tee /dev/stderr)
+  [ "${actual}" = "AGENT_INJECT_LISTEN" ]
 
   local actual=$(echo $object |
-      yq -r '.[11].value' | tee /dev/stderr)
-  [ "${actual}" = "sanitized" ]
+      yq -r '.[0].value' | tee /dev/stderr)
+  [ "${actual}" = ":8443" ]
 }
 
 #--------------------------------------------------------------------
 # affinity
 
-@test "injector/deployment: affinity not set by default" {
+@test "injector/deployment: affinity set by default" {
   cd `chart_dir`
   local actual=$(helm template \
       --show-only templates/injector-deployment.yaml  \
       . | tee /dev/stderr |
       yq '.spec.template.spec | .affinity? == null' | tee /dev/stderr)
-  [ "${actual}" = "true" ]
+  [ "${actual}" = "false" ]
 }
 
 @test "injector/deployment: affinity can be set" {
@@ -424,4 +466,159 @@ load _helpers
       . | tee /dev/stderr |
       yq -r '.spec.template.spec.nodeSelector' | tee /dev/stderr)
   [ "${actual}" = "testing" ]
+}
+
+#--------------------------------------------------------------------
+# priorityClassName
+
+@test "injector/deployment: priorityClassName not set by default" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      --show-only templates/injector-deployment.yaml  \
+      . | tee /dev/stderr |
+      yq '.spec.template.spec | .priorityClassName? == null' | tee /dev/stderr)
+  [ "${actual}" = "true" ]
+}
+
+@test "injector/deployment: priorityClassName can be set" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      --show-only templates/injector-deployment.yaml  \
+      --set 'injector.priorityClassName=armaggeddon' \
+      . | tee /dev/stderr |
+      yq '.spec.template.spec | .priorityClassName == "armaggeddon"' | tee /dev/stderr)
+  [ "${actual}" = "true" ]
+}
+#--------------------------------------------------------------------
+# OpenShift
+
+@test "injector/deployment: OpenShift - runAsUser disabled" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      --show-only templates/injector-deployment.yaml  \
+      --set 'global.openshift=true' \
+      . | tee /dev/stderr |
+      yq '.spec.template.spec.securityContext.runAsUser | length > 0' | tee /dev/stderr)
+  [ "${actual}" = "false" ]
+}
+
+@test "injector/deployment: OpenShift - runAsGroup disabled" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      --show-only templates/injector-deployment.yaml  \
+      --set 'global.openshift=true' \
+      . | tee /dev/stderr |
+      yq '.spec.template.spec.securityContext.runAsGroup | length > 0' | tee /dev/stderr)
+  [ "${actual}" = "false" ]
+}
+#--------------------------------------------------------------------
+# extra labels
+
+@test "injector/deployment: specify extraLabels" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      --show-only templates/injector-deployment.yaml \
+      --set 'injector.extraLabels.foo=bar' \
+      . | tee /dev/stderr |
+      yq -r '.spec.template.metadata.labels.foo' | tee /dev/stderr)
+  [ "${actual}" = "bar" ]
+}
+
+#--------------------------------------------------------------------
+# hostNetwork
+
+@test "injector/deployment: injector.hostNetwork not set" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      --show-only templates/injector-deployment.yaml \
+      . | tee /dev/stderr |
+      yq -r '.spec.template.spec.hostNetwork' | tee /dev/stderr)
+  [ "${actual}" = "false" ]
+}
+
+@test "injector/deployment: injector.hostNetwork is set" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      --show-only templates/injector-deployment.yaml \
+      --set 'injector.hostNetwork=true' \
+      . | tee /dev/stderr |
+      yq -r '.spec.template.spec.hostNetwork' | tee /dev/stderr)
+  [ "${actual}" = "true" ]
+}
+
+@test "injector/deployment: agent default resources" {
+  cd `chart_dir`
+  local object=$(helm template \
+      --show-only templates/injector-deployment.yaml  \
+      . | tee /dev/stderr |
+      yq -r '.spec.template.spec.containers[0].env' | tee /dev/stderr)
+
+  local value=$(echo $object |
+      yq -r 'map(select(.name=="AGENT_INJECT_CPU_LIMIT")) | .[] .value' | tee /dev/stderr)
+  [ "${value}" = "500m" ]
+
+  local value=$(echo $object |
+      yq -r 'map(select(.name=="AGENT_INJECT_CPU_REQUEST")) | .[] .value' | tee /dev/stderr)
+  [ "${value}" = "250m" ]
+
+  local value=$(echo $object |
+      yq -r 'map(select(.name=="AGENT_INJECT_MEM_LIMIT")) | .[] .value' | tee /dev/stderr)
+  [ "${value}" = "128Mi" ]
+
+  local value=$(echo $object |
+      yq -r 'map(select(.name=="AGENT_INJECT_MEM_REQUEST")) | .[] .value' | tee /dev/stderr)
+  [ "${value}" = "64Mi" ]
+}
+
+@test "injector/deployment: can set agent default resources" {
+  cd `chart_dir`
+  local object=$(helm template \
+      --show-only templates/injector-deployment.yaml  \
+      --set 'injector.agentDefaults.cpuLimit=cpuLimit' \
+      --set 'injector.agentDefaults.cpuRequest=cpuRequest' \
+      --set 'injector.agentDefaults.memLimit=memLimit' \
+      --set 'injector.agentDefaults.memRequest=memRequest' \
+      . | tee /dev/stderr |
+      yq -r '.spec.template.spec.containers[0].env' | tee /dev/stderr)
+
+  local value=$(echo $object |
+      yq -r 'map(select(.name=="AGENT_INJECT_CPU_LIMIT")) | .[] .value' | tee /dev/stderr)
+  [ "${value}" = "cpuLimit" ]
+
+  local value=$(echo $object |
+      yq -r 'map(select(.name=="AGENT_INJECT_CPU_REQUEST")) | .[] .value' | tee /dev/stderr)
+  [ "${value}" = "cpuRequest" ]
+
+  local value=$(echo $object |
+      yq -r 'map(select(.name=="AGENT_INJECT_MEM_LIMIT")) | .[] .value' | tee /dev/stderr)
+  [ "${value}" = "memLimit" ]
+
+  local value=$(echo $object |
+      yq -r 'map(select(.name=="AGENT_INJECT_MEM_REQUEST")) | .[] .value' | tee /dev/stderr)
+  [ "${value}" = "memRequest" ]
+}
+
+@test "injector/deployment: agent default template" {
+  cd `chart_dir`
+  local object=$(helm template \
+      --show-only templates/injector-deployment.yaml  \
+      . | tee /dev/stderr |
+      yq -r '.spec.template.spec.containers[0].env' | tee /dev/stderr)
+
+  local value=$(echo $object |
+      yq -r 'map(select(.name=="AGENT_INJECT_DEFAULT_TEMPLATE")) | .[] .value' | tee /dev/stderr)
+  [ "${value}" = "map" ]
+}
+
+@test "injector/deployment: can set agent default template" {
+  cd `chart_dir`
+  local object=$(helm template \
+      --show-only templates/injector-deployment.yaml  \
+      --set='injector.agentDefaults.template=json' \
+      . | tee /dev/stderr |
+      yq -r '.spec.template.spec.containers[0].env' | tee /dev/stderr)
+
+  local value=$(echo $object |
+      yq -r 'map(select(.name=="AGENT_INJECT_DEFAULT_TEMPLATE")) | .[] .value' | tee /dev/stderr)
+  [ "${value}" = "json" ]
 }

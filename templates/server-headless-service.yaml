@@ -13,10 +13,7 @@ metadata:
     app.kubernetes.io/instance: {{ .Release.Name }}
     app.kubernetes.io/managed-by: {{ .Release.Service }}
   annotations:
-    service.alpha.kubernetes.io/tolerate-unready-endpoints: "true"
-{{- if .Values.server.service.annotations }}
-{{ tpl .Values.server.service.annotations . | indent 4 }}
-{{- end }}
+{{ template "vault.service.annotations" .}}
 spec:
   clusterIP: None
   publishNotReadyAddresses: true
@@ -24,7 +21,7 @@ spec:
     - name: "{{ include "vault.scheme" . }}"
       port: {{ .Values.server.service.port }}
       targetPort: {{ .Values.server.service.targetPort }}
-    - name: internal
+    - name: https-internal
       port: 8201
       targetPort: 8201
   selector:

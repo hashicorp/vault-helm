@@ -13,13 +13,7 @@ metadata:
     app.kubernetes.io/instance: {{ .Release.Name }}
     app.kubernetes.io/managed-by: {{ .Release.Service }}
   annotations:
-    # This must be set in addition to publishNotReadyAddresses due
-    # to an open issue where it may not work:
-    # https://github.com/kubernetes/kubernetes/issues/58662
-    service.alpha.kubernetes.io/tolerate-unready-endpoints: "true"
-{{- if .Values.server.service.annotations }}
-{{ tpl .Values.server.service.annotations . | indent 4 }}
-{{- end }}
+{{ template "vault.service.annotations" .}}
 spec:
   {{- if .Values.server.service.type}}
   type: {{ .Values.server.service.type }}
@@ -34,13 +28,13 @@ spec:
   # since this DNS is also used for join operations.
   publishNotReadyAddresses: true
   ports:
-    - name: http
+    - name: {{ include "vault.scheme" . }}
       port: {{ .Values.server.service.port }}
       targetPort: {{ .Values.server.service.targetPort }}
       {{- if and (.Values.server.service.nodePort) (eq (.Values.server.service.type | toString) "NodePort") }}
       nodePort: {{ .Values.server.service.nodePort }}
       {{- end }}
-    - name: internal
+    - name: https-internal
       port: 8201
       targetPort: 8201
   selector:

@@ -19,11 +19,6 @@ load _helpers
     jq -r '.initialized')
   [ "${init_status}" == "false" ]
 
-  # Security
-  local ipc=$(kubectl get statefulset "$(name_prefix)" --output json |
-    jq -r '.spec.template.spec.containers[0].securityContext.capabilities.add[0]')
-  [ "${ipc}" == "IPC_LOCK" ]
-
   # Replicas
   local replicas=$(kubectl get statefulset "$(name_prefix)" --output json |
     jq -r '.spec.replicas')
@@ -32,12 +27,12 @@ load _helpers
   # Volume Mounts
   local volumeCount=$(kubectl get statefulset "$(name_prefix)" --output json |
     jq -r '.spec.template.spec.containers[0].volumeMounts | length')
-  [ "${volumeCount}" == "2" ]
+  [ "${volumeCount}" == "3" ]
 
   # Volumes
   local volumeCount=$(kubectl get statefulset "$(name_prefix)" --output json |
     jq -r '.spec.template.spec.volumes | length')
-  [ "${volumeCount}" == "1" ]
+  [ "${volumeCount}" == "2" ]
 
   local volume=$(kubectl get statefulset "$(name_prefix)" --output json |
     jq -r '.spec.template.spec.volumes[0].configMap.name')
@@ -102,7 +97,7 @@ load _helpers
 
   kubectl exec "$(name_prefix)-0" -- vault login ${root}
 
-  local raft_status=$(kubectl exec "$(name_prefix)-0" -- vault operator raft configuration -format=json | 
+  local raft_status=$(kubectl exec "$(name_prefix)-0" -- vault operator raft list-peers -format=json | 
     jq -r '.data.config.servers | length')
   [ "${raft_status}" == "3" ]
 }
@@ -115,7 +110,10 @@ setup() {
 
 #cleanup
 teardown() {
-  helm delete vault
-  kubectl delete --all pvc
-  kubectl delete namespace acceptance --ignore-not-found=true
+  if [[ ${CLEANUP:-true} == "true" ]]
+  then
+      helm delete vault
+      kubectl delete --all pvc
+      kubectl delete namespace acceptance --ignore-not-found=true
+  fi
 }

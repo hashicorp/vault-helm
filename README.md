@@ -5,38 +5,43 @@ This repository is used as a submodule in other repositories that install and se
 
 # Vault Helm Chart
 
+> :warning: **Please note**: We take Vault's security and our users' trust very seriously. If 
+you believe you have found a security issue in Vault Helm, _please responsibly disclose_ 
+by contacting us at [security@hashicorp.com](mailto:security@hashicorp.com).
+
 This repository contains the official HashiCorp Helm chart for installing
 and configuring Vault on Kubernetes. This chart supports multiple use
 cases of Vault on Kubernetes depending on the values provided.
 
 For full documentation on this Helm chart along with all the ways you can
 use Vault with Kubernetes, please see the
-[Vault and Kubernetes documentation](https://www.vaultproject.io/docs/platform/k8s/index.html).
+[Vault and Kubernetes documentation](https://www.vaultproject.io/docs/platform/k8s/).
 
 ## Prerequisites
 
-To use the charts here, [Helm](https://helm.sh/) must be installed in your
-Kubernetes cluster. Setting up Kubernetes and Helm and is outside the scope
-of this README. Please refer to the Kubernetes and Helm documentation.
+To use the charts here, [Helm](https://helm.sh/) must be configured for your
+Kubernetes cluster. Setting up Kubernetes and Helm is outside the scope of
+this README. Please refer to the Kubernetes and Helm documentation.
 
 The versions required are:
 
   * **Helm 3.0+** - This is the earliest version of Helm tested. It is possible
     it works with earlier versions but this chart is untested for those versions.
-  * **Kubernetes 1.9+** - This is the earliest version of Kubernetes tested.
+  * **Kubernetes 1.14+** - This is the earliest version of Kubernetes tested.
     It is possible that this chart works with earlier versions but it is
-    untested. Other versions verified are Kubernetes 1.10, 1.11.
+    untested.
 
 ## Usage
 
-For now, we do not host a chart repository. To use the charts, you must
-download this repository and unpack it into a directory. Either
-[download a tagged release](https://github.com/hashicorp/vault-helm/releases) or
-use `git checkout` to a tagged release.
-Assuming this repository was unpacked into the directory `vault-helm`, the chart can
-then be installed directly:
+To install the latest version of this chart, add the Hashicorp helm repository
+and run `helm install`:
 
-    helm install ./vault-helm
+```console
+$ helm repo add hashicorp https://helm.releases.hashicorp.com
+"hashicorp" has been added to your repositories
+
+$ helm install vault hashicorp/vault
+```
 
 Please see the many options supported in the `values.yaml`
 file. These are also fully documented directly on the
@@ -51,3 +56,7 @@ This Helm chart has been customized in the following ways:
 The Service spec in the **server-service.yaml** file now allows setting a
 specific IP address when the Service type is set to `LoadBalancer` and a
 **maas.lbAddress** value has been provided.
+Please see the many options supported in the `values.yaml` file. These are also
+fully documented directly on the [Vault
+website](https://www.vaultproject.io/docs/platform/k8s/helm) along with more
+detailed installation instructions.

@@ -11,6 +11,7 @@ metadata:
     app.kubernetes.io/name: {{ include "vault.name" . }}
     app.kubernetes.io/instance: {{ .Release.Name }}
     app.kubernetes.io/managed-by: {{ .Release.Service }}
+  {{- template "vault.statefulSet.annotations" . }}
 spec:
   serviceName: {{ template "vault.fullname" . }}-internal
   podManagementPolicy: Parallel
@@ -37,28 +38,42 @@ spec:
       {{ template "vault.affinity" . }}
       {{ template "vault.tolerations" . }}
       {{ template "vault.nodeselector" . }}
+      {{- if .Values.server.priorityClassName }}
+      priorityClassName: {{ .Values.server.priorityClassName }}
+      {{- end }}
       terminationGracePeriodSeconds: 10
-      serviceAccountName: {{ template "vault.fullname" . }}
+      serviceAccountName: {{ template "vault.serviceAccount.name" . }}
       {{ if  .Values.server.shareProcessNamespace }}
       shareProcessNamespace: true
       {{ end }}
+      {{- if not .Values.global.openshift }}
       securityContext:
         runAsNonRoot: true
         runAsGroup: {{ .Values.server.gid | default 1000 }}
         runAsUser: {{ .Values.server.uid | default 100 }}
         fsGroup: {{ .Values.server.gid | default 1000 }}
+      {{- end }}
       volumes:
         {{ template "vault.volumes" . }}
+        - name: home
+          emptyDir: {}
+      {{- if .Values.server.extraInitContainers }}
+      initContainers:
+        {{ toYaml .Values.server.extraInitContainers | nindent 8}}
+      {{- end }}
       containers:
         - name: vault
           {{ template "vault.resources" . }}
-          securityContext:
-            capabilities:
-              add: ["IPC_LOCK"]
           image: {{ .Values.server.image.repository }}:{{ .Values.server.image.tag | default "latest" }}
           imagePullPolicy: {{ .Values.server.image.pullPolicy }}
-          command: {{ template "vault.command" . }}
+          command:
+          - "/bin/sh"
+          - "-ec"
           args: {{ template "vault.args" . }}
+          {{- if not .Values.global.openshift }}
+          securityContext:
+            allowPrivilegeEscalation: false
+          {{- end }}
           env:
             - name: HOST_IP
               valueFrom:
@@ -68,10 +83,22 @@ spec:
               valueFrom:
                 fieldRef:
                   fieldPath: status.podIP
+            - name: VAULT_K8S_POD_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.name
+            - name: VAULT_K8S_NAMESPACE
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.namespace
             - name: VAULT_ADDR
               value: "{{ include "vault.scheme" . }}://127.0.0.1:8200"
             - name: VAULT_API_ADDR
+              {{- if .Values.server.ha.apiAddr }}
+              value: {{ .Values.server.ha.apiAddr }}
+              {{- else }}
               value: "{{ include "vault.scheme" . }}://$(POD_IP):8200"
+              {{- end }}
             - name: SKIP_CHOWN
               value: "true"
             - name: SKIP_SETCAP
@@ -80,18 +107,38 @@ spec:
               valueFrom:
                 fieldRef:
                   fieldPath: metadata.name
+            - name: VAULT_CLUSTER_ADDR
+              value: "https://$(HOSTNAME).{{ template "vault.fullname" . }}-internal:8201"
+            {{- if and (eq (.Values.server.ha.raft.enabled | toString) "true") (eq (.Values.server.ha.raft.setNodeId | toString) "true") }}
+            - name: VAULT_RAFT_NODE_ID
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.name
+            {{- end }}
+            - name: HOME
+              value: "/home/vault"
+            {{- if .Values.server.logLevel }}
+            - name: VAULT_LOG_LEVEL
+              value: "{{ .Values.server.logLevel }}"
+            {{- end }}
+            {{- if .Values.server.logFormat }}
+            - name: VAULT_LOG_FORMAT
+              value: "{{ .Values.server.logFormat }}"
+            {{- end }}
             {{ template "vault.envs" . }}
             {{- include "vault.extraEnvironmentVars" .Values.server | nindent 12 }}
             {{- include "vault.extraSecretEnvironmentVars" .Values.server | nindent 12 }}
           volumeMounts:
           {{ template "vault.mounts" . }}
+            - name: home
+              mountPath: /home/vault
           ports:
             - containerPort: 8200
-              name: http
+              name: {{ include "vault.scheme" . }}
             - containerPort: 8201
-              name: internal
+              name: https-internal
             - containerPort: 8202
-              name: replication
+              name: {{ include "vault.scheme" . }}-rep
           {{- if .Values.server.readinessProbe.enabled }}
           readinessProbe:
             {{- if .Values.server.readinessProbe.path }}
@@ -108,11 +155,11 @@ spec:
             exec:
               command: ["/bin/sh", "-ec", "vault status -tls-skip-verify"]
             {{- end }}
-            failureThreshold: 2
-            initialDelaySeconds: 5
-            periodSeconds: 3
-            successThreshold: 1
-            timeoutSeconds: 5
+            failureThreshold: {{ .Values.server.readinessProbe.failureThreshold }}
+            initialDelaySeconds: {{ .Values.server.readinessProbe.initialDelaySeconds }}
+            periodSeconds: {{ .Values.server.readinessProbe.periodSeconds }}
+            successThreshold: {{ .Values.server.readinessProbe.successThreshold }}
+            timeoutSeconds: {{ .Values.server.readinessProbe.timeoutSeconds }}
           {{- end }}
           {{- if .Values.server.livenessProbe.enabled }}
           livenessProbe:
@@ -120,10 +167,11 @@ spec:
               path: {{ .Values.server.livenessProbe.path | quote }}
               port: 8200
               scheme: {{ include "vault.scheme" . | upper }}
+            failureThreshold: {{ .Values.server.livenessProbe.failureThreshold }}
             initialDelaySeconds: {{ .Values.server.livenessProbe.initialDelaySeconds }}
-            periodSeconds: 3
-            successThreshold: 1
-            timeoutSeconds: 5
+            periodSeconds: {{ .Values.server.livenessProbe.periodSeconds }}
+            successThreshold: {{ .Values.server.livenessProbe.successThreshold }}
+            timeoutSeconds: {{ .Values.server.livenessProbe.timeoutSeconds }}
           {{- end }}
           lifecycle:
             # Vault container doesn't receive SIGTERM from Kubernetes
@@ -139,6 +187,14 @@ spec:
                   # to this pod while it's terminating
                   "sleep {{ .Values.server.preStopSleepSeconds }} && kill -SIGTERM $(pidof vault)",
                 ]
+            {{- if .Values.server.postStart }}
+            postStart:
+              exec:
+                command:
+                {{- range (.Values.server.postStart) }}
+                - {{ . | quote }}
+                {{- end }}
+            {{- end }}
         {{- if .Values.server.extraContainers }}
           {{ toYaml .Values.server.extraContainers | nindent 8}}
         {{- end }}

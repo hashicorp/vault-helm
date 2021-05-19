@@ -1,5 +1,9 @@
 {{- if and (eq (.Values.injector.enabled | toString) "true" ) (eq (.Values.global.enabled | toString) "true") }}
+{{- if .Capabilities.APIVersions.Has "admissionregistration.k8s.io/v1" }}
+apiVersion: admissionregistration.k8s.io/v1
+{{- else }}
 apiVersion: admissionregistration.k8s.io/v1beta1
+{{- end }}
 kind: MutatingWebhookConfiguration
 metadata:
   name: {{ template "vault.fullname" . }}-agent-injector-cfg
@@ -9,12 +13,16 @@ metadata:
     app.kubernetes.io/managed-by: {{ .Release.Service }}
 webhooks:
   - name: vault.hashicorp.com
+    sideEffects: None
+    admissionReviewVersions:
+    - "v1beta1"
+    - "v1"
     clientConfig:
       service:
         name: {{ template "vault.fullname" . }}-agent-injector-svc
         namespace: {{ .Release.Namespace }}
         path: "/mutate"
-      caBundle: {{ .Values.injector.certs.caBundle }}
+      caBundle: {{ .Values.injector.certs.caBundle | quote }}
     rules:
       - operations: ["CREATE", "UPDATE"]
         apiGroups: [""]
@@ -23,5 +31,12 @@ webhooks:
 {{- if .Values.injector.namespaceSelector }}
     namespaceSelector:
 {{ toYaml .Values.injector.namespaceSelector | indent 6}}
+{{ end }}
+{{- if .Values.injector.objectSelector }}
+    objectSelector:
+{{ toYaml .Values.injector.objectSelector | indent 6}}
+{{ end }}
+{{- with .Values.injector.failurePolicy }}
+    failurePolicy: {{.}}
 {{ end }}
 {{ end }}

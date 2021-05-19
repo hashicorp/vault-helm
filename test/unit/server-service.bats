@@ -143,32 +143,6 @@ load _helpers
   [ "${actual}" = "false" ]
 }
 
-# This can be seen as testing just what we put into the YAML raw, but
-# this is such an important part of making everything work we verify it here.
-@test "server/Service: tolerates unready endpoints" {
-  cd `chart_dir`
-  local actual=$(helm template \
-      --show-only templates/server-service.yaml \
-      --set 'server.dev.enabled=true' \
-      . | tee /dev/stderr |
-      yq -r '.metadata.annotations["service.alpha.kubernetes.io/tolerate-unready-endpoints"]' | tee /dev/stderr)
-  [ "${actual}" = "true" ]
-
-  local actual=$(helm template \
-      --show-only templates/server-service.yaml \
-      --set 'server.ha.enabled=true' \
-      . | tee /dev/stderr |
-      yq -r '.metadata.annotations["service.alpha.kubernetes.io/tolerate-unready-endpoints"]' | tee /dev/stderr)
-  [ "${actual}" = "true" ]
-
-  local actual=$(helm template \
-      --show-only templates/server-service.yaml \
-      --set 'server.standalone.enabled=true' \
-      . | tee /dev/stderr |
-      yq -r '.metadata.annotations["service.alpha.kubernetes.io/tolerate-unready-endpoints"]' | tee /dev/stderr)
-  [ "${actual}" = "true" ]
-}
-
 @test "server/Service: generic annotations" {
   cd `chart_dir`
   local actual=$(helm template \
@@ -387,4 +361,26 @@ load _helpers
       . | tee /dev/stderr |
       yq -r '.spec.ports[0].nodePort' | tee /dev/stderr)
   [ "${actual}" = "null" ]
+}
+
+@test "server/Service: vault port name is http, when tlsDisable is true" {
+  cd `chart_dir`
+
+  local actual=$(helm template \
+      --show-only templates/server-service.yaml \
+      --set 'global.tlsDisable=true' \
+      . | tee /dev/stderr |
+      yq -r '.spec.ports | map(select(.port==8200)) | .[] .name' | tee /dev/stderr)
+  [ "${actual}" = "http" ]
+}
+
+@test "server/Service: vault port name is https, when tlsDisable is false" {
+  cd `chart_dir`
+
+  local actual=$(helm template \
+      --show-only templates/server-service.yaml \
+      --set 'global.tlsDisable=false' \
+      . | tee /dev/stderr |
+      yq -r '.spec.ports | map(select(.port==8200)) | .[] .name' | tee /dev/stderr)
+  [ "${actual}" = "https" ]
 }

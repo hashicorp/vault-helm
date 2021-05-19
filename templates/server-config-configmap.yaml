@@ -1,7 +1,7 @@
 {{ template "vault.mode" . }}
 {{- if ne .mode "external" }}
 {{- if and (eq (.Values.global.enabled | toString) "true") (ne .mode "dev") -}}
-{{ if or (ne .Values.server.standalone.config "")  (ne .Values.server.ha.config "") -}}
+{{ if or (.Values.server.standalone.config) (.Values.server.ha.config) -}}
 apiVersion: v1
 kind: ConfigMap
 metadata:
@@ -14,6 +14,9 @@ metadata:
     app.kubernetes.io/managed-by: {{ .Release.Service }}
 data:
   extraconfig-from-values.hcl: |-
+  {{- if or (eq .mode "ha") (eq .mode "standalone") }}
+  {{- $type := typeOf (index .Values.server .mode).config }}
+  {{- if eq $type "string" }}
     disable_mlock = true
   {{- if eq .mode "standalone" }}
     {{ tpl .Values.server.standalone.config . | nindent 4 | trim }}
@@ -22,6 +25,14 @@ data:
   {{- else if and (eq .mode "ha") (eq (.Values.server.ha.raft.enabled | toString) "true") }}
     {{ tpl .Values.server.ha.raft.config . | nindent 4 | trim }}
   {{ end }}
+  {{- else }}
+  {{- if and (eq .mode "ha") (eq (.Values.server.ha.raft.enabled | toString) "true") }}
+{{ merge (dict "disable_mlock" true) (index .Values.server .mode).raft.config | toPrettyJson | indent 4 }}
+  {{- else }}
+{{ merge (dict "disable_mlock" true) (index .Values.server .mode).config | toPrettyJson | indent 4 }}
+  {{- end }}
+  {{- end }}
+  {{- end }}
 {{- end }}
 {{- end }}
 {{- end }}

@@ -42,7 +42,7 @@ load _helpers
   [ "${actual}" = "\"foo\"" ]
 }
 
-@test "injector/MutatingWebhookConfiguration: caBundle is empty" {
+@test "injector/MutatingWebhookConfiguration: caBundle is empty string" {
   cd `chart_dir`
   local actual=$(helm template \
       --show-only templates/injector-mutating-webhook.yaml  \
@@ -50,7 +50,7 @@ load _helpers
       --namespace foo \
       . | tee /dev/stderr |
       yq '.webhooks[0].clientConfig.caBundle' | tee /dev/stderr)
-  [ "${actual}" = "null" ]
+  [ "${actual}" = "\"\"" ]
 }
 
 @test "injector/MutatingWebhookConfiguration: namespaceSelector empty by default" {
@@ -74,4 +74,50 @@ load _helpers
       yq '.webhooks[0].namespaceSelector.matchLabels.injector' | tee /dev/stderr)
 
   [ "${actual}" = "true" ]
+}
+
+@test "injector/MutatingWebhookConfiguration: objectSelector empty by default" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      --show-only templates/injector-mutating-webhook.yaml  \
+      --set 'injector.enabled=true' \
+      --namespace foo \
+      . | tee /dev/stderr |
+      yq '.webhooks[0].objectSelector' | tee /dev/stderr)
+  [ "${actual}" = "null" ]
+}
+
+@test "injector/MutatingWebhookConfiguration: can set objectSelector" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      --show-only templates/injector-mutating-webhook.yaml  \
+      --set 'injector.enabled=true' \
+      --set 'injector.objectSelector.matchLabels.injector=true' \
+      . | tee /dev/stderr |
+      yq '.webhooks[0].objectSelector.matchLabels.injector' | tee /dev/stderr)
+
+  [ "${actual}" = "true" ]
+}
+
+@test "injector/MutatingWebhookConfiguration: failurePolicy 'Ignore' by default" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      --show-only templates/injector-mutating-webhook.yaml  \
+      --set 'injector.enabled=true' \
+      --namespace foo \
+      . | tee /dev/stderr |
+      yq '.webhooks[0].failurePolicy' | tee /dev/stderr)
+  [ "${actual}" = "\"Ignore\"" ]
+}
+
+@test "injector/MutatingWebhookConfiguration: can set failurePolicy" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      --show-only templates/injector-mutating-webhook.yaml  \
+      --set 'injector.enabled=true' \
+      --set 'injector.failurePolicy=Fail' \
+      . | tee /dev/stderr |
+      yq '.webhooks[0].failurePolicy' | tee /dev/stderr)
+
+  [ "${actual}" = "\"Fail\"" ]
 }

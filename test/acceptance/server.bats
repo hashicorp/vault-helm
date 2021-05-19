@@ -21,11 +21,6 @@ load _helpers
     jq -r '.initialized')
   [ "${init_status}" == "false" ]
 
-  # Security
-  local ipc=$(kubectl get statefulset "$(name_prefix)" --output json |
-    jq -r '.spec.template.spec.containers[0].securityContext.capabilities.add[0]')
-  [ "${ipc}" == "IPC_LOCK" ]
-
   # Replicas
   local replicas=$(kubectl get statefulset "$(name_prefix)" --output json |
     jq -r '.spec.replicas')
@@ -39,7 +34,7 @@ load _helpers
   # Volume Mounts
   local volumeCount=$(kubectl get statefulset "$(name_prefix)" --output json |
     jq -r '.spec.template.spec.containers[0].volumeMounts | length')
-  [ "${volumeCount}" == "2" ]
+  [ "${volumeCount}" == "3" ]
 
   local mountName=$(kubectl get statefulset "$(name_prefix)" --output json |
     jq -r '.spec.template.spec.containers[0].volumeMounts[0].name')
@@ -52,16 +47,11 @@ load _helpers
   # Volumes
   local volumeCount=$(kubectl get statefulset "$(name_prefix)" --output json |
     jq -r '.spec.template.spec.volumes | length')
-  [ "${volumeCount}" == "1" ]
+  [ "${volumeCount}" == "2" ]
 
   local volume=$(kubectl get statefulset "$(name_prefix)" --output json |
     jq -r '.spec.template.spec.volumes[0].configMap.name')
   [ "${volume}" == "$(name_prefix)-config" ]
-
-  # Security Context
-  local fsGroup=$(kubectl get statefulset "$(name_prefix)" --output json |
-    jq -r '.spec.template.spec.securityContext.fsGroup')
-  [ "${fsGroup}" == "1000" ]
 
   # Service
   local service=$(kubectl get service "$(name_prefix)" --output json |
@@ -111,8 +101,11 @@ load _helpers
 
 # Clean up
 teardown() {
-  echo "helm/pvc teardown"
-  helm delete vault
-  kubectl delete --all pvc
-  kubectl delete namespace acceptance --ignore-not-found=true
+  if [[ ${CLEANUP:-true} == "true" ]]
+  then
+      echo "helm/pvc teardown"
+      helm delete vault
+      kubectl delete --all pvc
+      kubectl delete namespace acceptance --ignore-not-found=true
+  fi
 }

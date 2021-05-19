@@ -11,7 +11,7 @@ metadata:
     app.kubernetes.io/managed-by: {{ .Release.Service }}
     component: webhook
 spec:
-  replicas: 1
+  replicas: {{ .Values.injector.replicas }}
   selector:
     matchLabels:
       app.kubernetes.io/name: {{ template "vault.name" . }}-agent-injector
@@ -23,23 +23,37 @@ spec:
         app.kubernetes.io/name: {{ template "vault.name" . }}-agent-injector
         app.kubernetes.io/instance: {{ .Release.Name }}
         component: webhook
+        {{- if  .Values.injector.extraLabels -}}
+          {{- toYaml .Values.injector.extraLabels | nindent 8 -}}
+        {{- end -}}
+      {{ template "injector.annotations" . }}
     spec:
       {{ template "injector.affinity" . }}
       {{ template "injector.tolerations" . }}
       {{ template "injector.nodeselector" . }}
+      {{- if .Values.injector.priorityClassName }}
+      priorityClassName: {{ .Values.injector.priorityClassName }}
+      {{- end }}
       serviceAccountName: "{{ template "vault.fullname" . }}-agent-injector"
+      {{- if not .Values.global.openshift }}
+      hostNetwork: {{ .Values.injector.hostNetwork }}
       securityContext:
         runAsNonRoot: true
         runAsGroup: {{ .Values.injector.gid | default 1000 }}
         runAsUser: {{ .Values.injector.uid | default 100 }}
+      {{- end }}
       containers:
         - name: sidecar-injector
           {{ template "injector.resources" . }}
           image: "{{ .Values.injector.image.repository }}:{{ .Values.injector.image.tag }}"
           imagePullPolicy: "{{ .Values.injector.image.pullPolicy }}"
+          {{- if not .Values.global.openshift }}
+          securityContext:
+            allowPrivilegeEscalation: false
+          {{- end }}
           env:
             - name: AGENT_INJECT_LISTEN
-              value: ":8080"
+              value: {{ printf ":%v" .Values.injector.port  }}
             - name: AGENT_INJECT_LOG_LEVEL
               value: {{ .Values.injector.logLevel | default "info" }}
             - name: AGENT_INJECT_VAULT_ADDR
@@ -67,6 +81,32 @@ spec:
               value: {{ .Values.injector.logFormat | default "standard" }}
             - name: AGENT_INJECT_REVOKE_ON_SHUTDOWN
               value: "{{ .Values.injector.revokeOnShutdown | default false }}"
+            {{- if .Values.global.openshift }}
+            - name: AGENT_INJECT_SET_SECURITY_CONTEXT
+              value: "false"
+            {{- end }}
+            {{- if .Values.injector.metrics.enabled }}
+            - name: AGENT_INJECT_TELEMETRY_PATH
+              value: "/metrics"
+            {{- end }}
+            {{- if and (eq (.Values.injector.leaderElector.enabled | toString) "true") (gt (.Values.injector.replicas | int) 1) }}
+            - name: AGENT_INJECT_USE_LEADER_ELECTOR
+              value: "true"
+            - name: NAMESPACE
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.namespace
+            {{- end }}
+            - name: AGENT_INJECT_CPU_REQUEST
+              value: "{{ .Values.injector.agentDefaults.cpuRequest }}"
+            - name: AGENT_INJECT_CPU_LIMIT
+              value: "{{ .Values.injector.agentDefaults.cpuLimit }}"
+            - name: AGENT_INJECT_MEM_REQUEST
+              value: "{{ .Values.injector.agentDefaults.memRequest }}"
+            - name: AGENT_INJECT_MEM_LIMIT
+              value: "{{ .Values.injector.agentDefaults.memLimit }}"
+            - name: AGENT_INJECT_DEFAULT_TEMPLATE
+              value: "{{ .Values.injector.agentDefaults.template }}"
             {{- include "vault.extraEnvironmentVars" .Values.injector | nindent 12 }}
           args:
             - agent-inject
@@ -74,23 +114,52 @@ spec:
           livenessProbe:
             httpGet:
               path: /health/ready
-              port: 8080
+              port: {{ .Values.injector.port }}
               scheme: HTTPS
             failureThreshold: 2
-            initialDelaySeconds: 1
+            initialDelaySeconds: 5
             periodSeconds: 2
             successThreshold: 1
             timeoutSeconds: 5
           readinessProbe:
             httpGet:
               path: /health/ready
-              port: 8080
+              port: {{ .Values.injector.port }}
               scheme: HTTPS
             failureThreshold: 2
-            initialDelaySeconds: 2
+            initialDelaySeconds: 5
             periodSeconds: 2
             successThreshold: 1
             timeoutSeconds: 5
+        {{- if and (eq (.Values.injector.leaderElector.enabled | toString) "true") (gt (.Values.injector.replicas | int) 1) }}
+        - name: leader-elector
+          image: {{ .Values.injector.leaderElector.image.repository }}:{{ .Values.injector.leaderElector.image.tag }}
+          args:
+            - --election={{ template "vault.fullname" . }}-agent-injector-leader
+            - --election-namespace={{ .Release.Namespace }}
+            - --http=0.0.0.0:4040
+            - --ttl={{ .Values.injector.leaderElector.ttl }}
+          livenessProbe:
+            httpGet:
+              path: /
+              port: 4040
+              scheme: HTTP
+            failureThreshold: 2
+            initialDelaySeconds: 5
+            periodSeconds: 2
+            successThreshold: 1
+            timeoutSeconds: 5
+          readinessProbe:
+            httpGet:
+              path: /
+              port: 4040
+              scheme: HTTP
+            failureThreshold: 2
+            initialDelaySeconds: 5
+            periodSeconds: 2
+            successThreshold: 1
+            timeoutSeconds: 5
+        {{- end }}
 {{- if .Values.injector.certs.secretName }}
           volumeMounts:
             - name: webhook-certs
@@ -101,4 +170,8 @@ spec:
           secret:
             secretName: "{{ .Values.injector.certs.secretName }}"
 {{- end }}
+      {{- if .Values.global.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml .Values.global.imagePullSecrets | nindent 8 }}
+      {{- end }}
 {{ end }}

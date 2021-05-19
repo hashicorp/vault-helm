@@ -236,6 +236,65 @@ load _helpers
 }
 
 #--------------------------------------------------------------------
+# devRootToken
+
+@test "server/dev-StatefulSet: set default devRootToken" {
+  cd `chart_dir`
+  local object=$(helm template \
+      --show-only templates/server-statefulset.yaml  \
+      --set 'server.dev.enabled=true' \
+      . | tee /dev/stderr |
+      yq -r '.spec.template.spec.containers[0].env' | tee /dev/stderr)
+
+  local name=$(echo $object |
+      yq -r 'map(select(.name=="VAULT_DEV_ROOT_TOKEN_ID")) | .[] .value' | tee /dev/stderr)
+  [ "${name}" = "root" ]
+}
+
+@test "server/dev-StatefulSet: set custom devRootToken" {
+  cd `chart_dir`
+  local object=$(helm template \
+      --show-only templates/server-statefulset.yaml  \
+      --set 'server.dev.enabled=true' \
+      --set 'server.dev.devRootToken=customtoken' \
+      . | tee /dev/stderr |
+      yq -r '.spec.template.spec.containers[0].env' | tee /dev/stderr)
+
+  local name=$(echo $object |
+      yq -r 'map(select(.name=="VAULT_DEV_ROOT_TOKEN_ID")) | .[] .value' | tee /dev/stderr)
+  [ "${name}" = "customtoken" ]
+}
+
+#--------------------------------------------------------------------
+# dev listen address
+
+@test "server/dev-StatefulSet: set dev listen address in dev mode" {
+  cd `chart_dir`
+  local objects=$(helm template \
+      --show-only templates/server-statefulset.yaml  \
+      --set 'server.dev.enabled=true' \
+      . | tee /dev/stderr |
+      yq -r '.spec.template.spec.containers[0].env' | tee /dev/stderr)
+
+  local value=$(echo $objects |
+      yq -r 'map(select(.name=="VAULT_DEV_LISTEN_ADDRESS")) | .[] .value' | tee /dev/stderr)
+  [ "${value}" = "[::]:8200" ]
+}
+
+@test "server/dev-StatefulSet: dev listen address isn't set in non-dev mode" {
+  cd `chart_dir`
+  local objects=$(helm template \
+      --show-only templates/server-statefulset.yaml  \
+      --set 'server.dev.enabled=false' \
+      . | tee /dev/stderr |
+      yq -r '.spec.template.spec.containers[0].env' | tee /dev/stderr)
+
+  local name=$(echo $objects |
+      yq -r 'map(select(.name=="VAULT_DEV_LISTEN_ADDRESS")) | .[] .name' | tee /dev/stderr)
+  [ "${name}" = "" ]
+}
+
+#--------------------------------------------------------------------
 # extraEnvironmentVars
 
 @test "server/dev-StatefulSet: set extraEnvironmentVars" {
@@ -248,21 +307,13 @@ load _helpers
       . | tee /dev/stderr |
       yq -r '.spec.template.spec.containers[0].env' | tee /dev/stderr)
 
-  local actual=$(echo $object |
-     yq -r '.[8].name' | tee /dev/stderr)
-  [ "${actual}" = "FOO" ]
+  local value=$(echo $object |
+      yq -r 'map(select(.name=="FOO")) | .[] .value' | tee /dev/stderr)
+  [ "${value}" = "bar" ]
 
-  local actual=$(echo $object |
-      yq -r '.[8].value' | tee /dev/stderr)
-  [ "${actual}" = "bar" ]
-
-  local actual=$(echo $object |
-      yq -r '.[9].name' | tee /dev/stderr)
-  [ "${actual}" = "FOOBAR" ]
-
-  local actual=$(echo $object |
-      yq -r '.[9].value' | tee /dev/stderr)
-  [ "${actual}" = "foobar" ]
+  local value=$(echo $object |
+      yq -r 'map(select(.name=="FOOBAR")) | .[] .value' | tee /dev/stderr)
+  [ "${value}" = "foobar" ]
 }
 
 #--------------------------------------------------------------------
@@ -281,25 +332,21 @@ load _helpers
       . | tee /dev/stderr |
       yq -r '.spec.template.spec.containers[0].env' | tee /dev/stderr)
 
-  local actual=$(echo $object |
-      yq -r '.[7].name' | tee /dev/stderr)
-  [ "${actual}" = "ENV_FOO_0" ]
-  local actual=$(echo $object |
-      yq -r '.[7].valueFrom.secretKeyRef.name' | tee /dev/stderr)
-  [ "${actual}" = "secret_name_0" ]
-  local actual=$(echo $object |
-      yq -r '.[7].valueFrom.secretKeyRef.key' | tee /dev/stderr)
-  [ "${actual}" = "secret_key_0" ]
+  local value=$(echo $object |
+      yq -r 'map(select(.name=="ENV_FOO_0")) | .[] .valueFrom.secretKeyRef.name' | tee /dev/stderr)
+  [ "${value}" = "secret_name_0" ]
 
-  local actual=$(echo $object |
-      yq -r '.[8].name' | tee /dev/stderr)
-  [ "${actual}" = "ENV_FOO_1" ]
-  local actual=$(echo $object |
-      yq -r '.[8].valueFrom.secretKeyRef.name' | tee /dev/stderr)
-  [ "${actual}" = "secret_name_1" ]
-  local actual=$(echo $object |
-      yq -r '.[8].valueFrom.secretKeyRef.key' | tee /dev/stderr)
-  [ "${actual}" = "secret_key_1" ]
+  local value=$(echo $object |
+      yq -r 'map(select(.name=="ENV_FOO_0")) | .[] .valueFrom.secretKeyRef.key' | tee /dev/stderr)
+  [ "${value}" = "secret_key_0" ]
+
+  local value=$(echo $object |
+      yq -r 'map(select(.name=="ENV_FOO_1")) | .[] .valueFrom.secretKeyRef.name' | tee /dev/stderr)
+  [ "${value}" = "secret_name_1" ]
+
+  local value=$(echo $object |
+      yq -r 'map(select(.name=="ENV_FOO_1")) | .[] .valueFrom.secretKeyRef.key' | tee /dev/stderr)
+  [ "${value}" = "secret_key_1" ]
 }
 
 #--------------------------------------------------------------------
@@ -400,4 +447,15 @@ load _helpers
       . | tee /dev/stderr |
       yq -r '.spec.template.spec.securityContext.fsGroup' | tee /dev/stderr)
   [ "${actual}" = "2000" ]
+}
+
+@test "server/dev-StatefulSet: add extraArgs" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      --show-only templates/server-statefulset.yaml \
+      --set 'server.dev.enabled=true' \
+      --set 'server.extraArgs=foobar' \
+      . | tee /dev/stderr |
+       yq -r '.spec.template.spec.containers[0].args[0]' | tee /dev/stderr)
+  [[ "${actual}" = *"foobar"* ]]
 }
