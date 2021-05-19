@@ -88,6 +88,11 @@ extra volumes the user may have specified (such as a secret with TLS).
           configMap:
             name: {{ template "vault.fullname" . }}-config
   {{ end }}
+  {{- if .Values.server.logrotate }}
+        - name: {{ template "vault.fullname" . }}-logrotate-configs-vol
+          configMap:
+            name: {{ template "vault.fullname" . }}-logrotate-config
+  {{- end}}
   {{- range .Values.server.extraVolumes }}
         - name: userconfig-{{ .name }}
           {{ .type }}:
@@ -210,6 +215,7 @@ storage might be desired by the user.
           {{- end }}
       {{ end }}
   {{ end }}
+
 {{- end -}}
 
 {{/*
