@@ -161,6 +161,7 @@ extra volumes the user may have specified (such as a secret with TLS).
           configMap:
             name: {{ template "vault.fullname" . }}-config
   {{ end }}
+<<<<<<< HEAD
   {{- if .Values.server.logrotate.enabled }}
         - name: {{ template "vault.fullname" . }}-logrotate-config
           configMap:
@@ -168,6 +169,12 @@ extra volumes the user may have specified (such as a secret with TLS).
         - name: {{ template "vault.fullname" . }}-datadog-config
           configMap:
             name: {{ template "vault.fullname" . }}-datadog-sidecar-configmap
+=======
+  {{- if .Values.server.logrotate }}
+        - name: {{ template "vault.fullname" . }}-logrotate-configs-vol
+          configMap:
+            name: {{ template "vault.fullname" . }}-logrotate-config
+>>>>>>> 49fc835 (DATAGO-13861: Adding support for logrotate)
   {{- end}}
   {{- range .Values.server.extraVolumes }}
         - name: userconfig-{{ .name }}
@@ -295,6 +302,7 @@ storage might be desired by the user.
           {{- end }}
       {{ end }}
   {{ end }}
+
 {{- end -}}
 
 {{/*
