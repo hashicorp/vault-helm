@@ -880,8 +880,6 @@ server:
     # YAML-formatted multi-line templated string map of the annotations to apply
     # to the statefulSet.
     annotations: {}
-  # A boolean flag to setup logrotate as a side car continer
-  logrotate: null
 
     # Set the pod and container security contexts.
     # If not set, these will default to, and for *not* OpenShift:
