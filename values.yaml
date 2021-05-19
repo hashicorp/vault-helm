@@ -856,24 +856,6 @@ server:
   # A boolean flag to setup logrotate as a side car continer
   logrotate: null
 
-    # Set the pod and container security contexts.
-    # If not set, these will default to, and for *not* OpenShift:
-    # pod:
-    #   runAsNonRoot: true
-    #   runAsGroup: {{ .Values.server.gid | default 1000 }}
-    #   runAsUser: {{ .Values.server.uid | default 100 }}
-    #   fsGroup: {{ .Values.server.gid | default 1000 }}
-    # container:
-    #   allowPrivilegeEscalation: false
-    #
-    # If not set, these will default to, and for OpenShift:
-    # pod: {}
-    # container: {}
-    securityContext:
-      pod: {}
-      container: {}
-
-
 # Vault UI
 ui:
   # True if you want to create a Service entry for the Vault UI.
