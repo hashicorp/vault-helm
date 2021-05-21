@@ -577,3 +577,18 @@ Inject extra environment populated by secrets, if populated
 {{ "https" }}
 {{- end -}}
 {{- end -}}
+
+{{/*
+Sets mutating web hook annotations
+*/}}
+{{- define "webhook.annotations" -}}
+  {{- if .Values.injector.webhook.annotations }}
+  annotations:
+      {{- $tp := typeOf .Values.injector.webhook.annotations }}
+      {{- if eq $tp "string" }}
+        {{- tpl .Values.injector.webhook.annotations . | nindent 4 }}
+      {{- else }}
+        {{- toYaml .Values.injector.webhook.annotations | nindent 4 }}
+      {{- end }}
+  {{- end }}
+{{- end -}}
