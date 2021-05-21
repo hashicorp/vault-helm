@@ -773,3 +773,6 @@ csi:
 
   # Enables debug logging.
   debug: false
+
+  # Pass arbitrary additional arguments to vault-csi-provider.
+  extraArgs: []

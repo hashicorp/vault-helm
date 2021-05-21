@@ -30,6 +30,9 @@
                 "enabled": {
                     "type": "boolean"
                 },
+                "extraArgs": {
+                    "type": "array"
+                },
                 "image": {
                     "type": "object",
                     "properties": {
