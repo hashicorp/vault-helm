@@ -90,6 +90,7 @@ injector:
 
   # namespaceSelector is the selector for restricting the webhook to only
   # specific namespaces.
+  # Values can use templated strings.
   # See https://kubernetes.io/docs/reference/access-authn-authz/extensible-admission-controllers/#matching-requests-namespaceselector
   # for more details.
   # Example:
@@ -99,6 +100,7 @@ injector:
   namespaceSelector: {}
   # objectSelector is the selector for restricting the webhook to only
   # specific labels.
+  # Values can use templated strings.
   # See https://kubernetes.io/docs/reference/access-authn-authz/extensible-admission-controllers/#matching-requests-objectselector
   # for more details.
   # Example:

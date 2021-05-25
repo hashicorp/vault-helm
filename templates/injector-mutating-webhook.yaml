@@ -28,15 +28,15 @@ webhooks:
         apiGroups: [""]
         apiVersions: ["v1"]
         resources: ["pods"]
-{{- if .Values.injector.namespaceSelector }}
+    {{- if .Values.injector.namespaceSelector }}
     namespaceSelector:
-{{ toYaml .Values.injector.namespaceSelector | indent 6}}
-{{ end }}
-{{- if .Values.injector.objectSelector }}
+    {{- tpl (toYaml .Values.injector.namespaceSelector | toString) . | nindent 6}}
+    {{- end }}
+    {{- if .Values.injector.objectSelector }}
     objectSelector:
-{{ toYaml .Values.injector.objectSelector | indent 6}}
-{{ end }}
-{{- with .Values.injector.failurePolicy }}
+    {{- tpl (toYaml .Values.injector.objectSelector | toString) . | nindent 6}}
+    {{- end }}
+    {{- with .Values.injector.failurePolicy }}
     failurePolicy: {{.}}
-{{ end }}
+    {{ end }}
 {{ end }}
