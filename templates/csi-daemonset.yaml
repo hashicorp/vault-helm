@@ -37,6 +37,9 @@ spec:
           args:
             - --endpoint=/provider/vault.sock
             - --debug={{ .Values.csi.debug }}
+            {{- if .Values.csi.extraArgs }}
+              {{- toYaml .Values.csi.extraArgs | nindent 12 }}
+            {{- end }}
           volumeMounts:
             - name: providervol
               mountPath: "/provider"

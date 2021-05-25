@@ -1,9 +1,15 @@
 ## Unreleased
 
+## 0.12.0 (May 25th, 2021)
+
+Features:
+* Pass additional arguments to `vault-csi-provider` using `csi.extraArgs` [GH-526](https://github.com/hashicorp/vault-helm/pull/526)
+
 Improvements:
 * Set chart kubeVersion and added chart-verifier tests [GH-510](https://github.com/hashicorp/vault-helm/pull/510)
 * Added values json schema [GH-513](https://github.com/hashicorp/vault-helm/pull/513)
 * Ability to set tolerations for CSI daemonset pods [GH-521](https://github.com/hashicorp/vault-helm/pull/521)
+* UI target port is now configurable [GH-437](https://github.com/hashicorp/vault-helm/pull/437)
 
 Bugs:
 * CSI: `global.imagePullSecrets` are now also used for CSI daemonset [GH-519](https://github.com/hashicorp/vault-helm/pull/519)

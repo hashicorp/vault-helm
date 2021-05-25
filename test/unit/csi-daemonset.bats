@@ -110,6 +110,36 @@ load _helpers
   [ "${actual}" = "--debug=true" ]
 }
 
+# Extra args
+@test "csi/daemonset: extra args can be passed" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      --show-only templates/csi-daemonset.yaml \
+      --set "csi.enabled=true" \
+      . | tee /dev/stderr |
+      yq -r '.spec.template.spec.containers[0].args | length' | tee /dev/stderr)
+  [ "${actual}" = "2" ]
+
+  local object=$(helm template \
+      --show-only templates/csi-daemonset.yaml \
+      --set "csi.enabled=true" \
+      --set "csi.extraArgs={--foo=bar,--bar baz,first}" \
+      . | tee /dev/stderr |
+      yq -r '.spec.template.spec.containers[0]')
+  local actual=$(echo $object |
+      yq -r '.args | length' | tee /dev/stderr)
+  [ "${actual}" = "5" ]
+  local actual=$(echo $object |
+      yq -r '.args[2]' | tee /dev/stderr)
+  [ "${actual}" = "--foo=bar" ]
+  local actual=$(echo $object |
+      yq -r '.args[3]' | tee /dev/stderr)
+  [ "${actual}" = "--bar baz" ]
+  local actual=$(echo $object |
+      yq -r '.args[4]' | tee /dev/stderr)
+  [ "${actual}" = "first" ]
+}
+
 # updateStrategy
 @test "csi/daemonset: updateStrategy is configurable" {
   cd `chart_dir`
