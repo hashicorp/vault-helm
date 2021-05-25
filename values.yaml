@@ -51,7 +51,7 @@ injector:
 
   # image sets the repo and tag of the vault-k8s image to use for the injector.
   image:
-    repository: "hashicorp/vault-k8s"
+    repository: "gcr.io/vault-helm-dev/hashicorp/vault-k8s"
     tag: "0.10.1"
     pullPolicy: IfNotPresent
 

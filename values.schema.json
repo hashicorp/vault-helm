@@ -9,7 +9,10 @@
                     "type": "object",
                     "properties": {
                         "annotations": {
-                            "type": "object"
+                            "type": [
+                                "object",
+                                "string"
+                            ]
                         },
                         "updateStrategy": {
                             "type": "object",
@@ -71,10 +74,13 @@
                     "type": "object",
                     "properties": {
                         "annotations": {
-                            "type": "object"
+                            "type": [
+                                "object",
+                                "string"
+                            ]
                         },
                         "tolerations": {
-                            "type": "null"
+                            "type": ["null", "string"]
                         }
                     }
                 },
@@ -105,15 +111,24 @@
                     "type": "object",
                     "properties": {
                         "annotations": {
-                            "type": "object"
+                            "type": [
+                                "object",
+                                "string"
+                            ]
                         }
                     }
                 },
                 "volumeMounts": {
-                    "type": "null"
+                    "type": [
+                        "null",
+                        "array"
+                    ]
                 },
                 "volumes": {
-                    "type": "null"
+                    "type": [
+                        "null",
+                        "array"
+                    ]
                 }
             }
         },
@@ -133,7 +148,10 @@
                     "type": "object",
                     "properties": {
                         "annotations": {
-                            "type": "string"
+                            "type": [
+                                "object",
+                                "string"
+                            ]
                         },
                         "enable": {
                             "type": "boolean"
@@ -183,7 +201,10 @@
                     }
                 },
                 "annotations": {
-                    "type": "object"
+                    "type": [
+                        "object",
+                        "string"
+                    ]
                 },
                 "authPath": {
                     "type": "string"
@@ -201,7 +222,10 @@
                             "type": "string"
                         },
                         "secretName": {
-                            "type": "null"
+                            "type": [
+                                "null",
+                                "string"
+                            ]
                         }
                     }
                 },
@@ -277,7 +301,7 @@
                     "type": "object"
                 },
                 "nodeSelector": {
-                    "type": "null"
+                    "type": ["null", "string"]
                 },
                 "objectSelector": {
                     "type": "object"
@@ -301,12 +325,18 @@
                     "type": "object",
                     "properties": {
                         "annotations": {
-                            "type": "object"
+                            "type": [
+                                "object",
+                                "string"
+                            ]
                         }
                     }
                 },
                 "tolerations": {
-                    "type": "null"
+                    "type": [
+                        "null",
+                        "string"
+                    ]
                 }
             }
         },
@@ -317,7 +347,10 @@
                     "type": "string"
                 },
                 "annotations": {
-                    "type": "object"
+                    "type": [
+                        "object",
+                        "string"
+                    ]
                 },
                 "auditStorage": {
                     "type": "object",
@@ -326,10 +359,16 @@
                             "type": "string"
                         },
                         "annotations": {
-                            "type": "object"
+                            "type": [
+                                "object",
+                                "string"
+                            ]
                         },
                         "enabled": {
-                            "type": "boolean"
+                            "type": [
+                                "boolean",
+                                "string"
+                            ]
                         },
                         "mountPath": {
                             "type": "string"
@@ -338,7 +377,10 @@
                             "type": "string"
                         },
                         "storageClass": {
-                            "type": "null"
+                            "type": [
+                                "null",
+                                "string"
+                            ]
                         }
                     }
                 },
@@ -357,10 +399,16 @@
                             "type": "string"
                         },
                         "annotations": {
-                            "type": "object"
+                            "type": [
+                                "object",
+                                "string"
+                            ]
                         },
                         "enabled": {
-                            "type": "boolean"
+                            "type": [
+                                "boolean",
+                                "string"
+                            ]
                         },
                         "mountPath": {
                             "type": "string"
@@ -369,7 +417,10 @@
                             "type": "string"
                         },
                         "storageClass": {
-                            "type": "null"
+                            "type": [
+                                "null",
+                                "string"
+                            ]
                         }
                     }
                 },
@@ -391,13 +442,19 @@
                     "type": "string"
                 },
                 "extraContainers": {
-                    "type": "null"
+                    "type": [
+                        "null",
+                        "array"
+                    ]
                 },
                 "extraEnvironmentVars": {
                     "type": "object"
                 },
                 "extraInitContainers": {
-                    "type": "null"
+                    "type": [
+                        "null",
+                        "array"
+                    ]
                 },
                 "extraLabels": {
                     "type": "object"
@@ -412,7 +469,10 @@
                     "type": "object",
                     "properties": {
                         "apiAddr": {
-                            "type": "null"
+                            "type": [
+                                "null",
+                                "string"
+                            ]
                         },
                         "config": {
                             "type": "string"
@@ -468,7 +528,10 @@
                     "type": "object",
                     "properties": {
                         "annotations": {
-                            "type": "object"
+                            "type": [
+                                "object",
+                                "string"
+                            ]
                         },
                         "enabled": {
                             "type": "boolean"
@@ -542,7 +605,10 @@
                     }
                 },
                 "nodeSelector": {
-                    "type": "null"
+                    "type": [
+                        "null",
+                        "string"
+                    ]
                 },
                 "postStart": {
                     "type": "array"
@@ -583,7 +649,10 @@
                     "type": "object",
                     "properties": {
                         "annotations": {
-                            "type": "object"
+                            "type": [
+                                "object",
+                                "string"
+                            ]
                         },
                         "enabled": {
                             "type": "boolean"
@@ -600,7 +669,10 @@
                     "type": "object",
                     "properties": {
                         "annotations": {
-                            "type": "object"
+                            "type": [
+                                "object",
+                                "string"
+                            ]
                         },
                         "enabled": {
                             "type": "boolean"
@@ -617,7 +689,10 @@
                     "type": "object",
                     "properties": {
                         "annotations": {
-                            "type": "object"
+                            "type": [
+                                "object",
+                                "string"
+                            ]
                         },
                         "create": {
                             "type": "boolean"
@@ -637,7 +712,10 @@
                             "type": "string"
                         },
                         "enabled": {
-                            "type": "string"
+                            "type": [
+                                "string",
+                                "boolean"
+                            ]
                         }
                     }
                 },
@@ -645,21 +723,33 @@
                     "type": "object",
                     "properties": {
                         "annotations": {
-                            "type": "object"
+                            "type": [
+                                "object",
+                                "string"
+                            ]
                         }
                     }
                 },
                 "tolerations": {
-                    "type": "null"
+                    "type": [
+                        "null",
+                        "string"
+                    ]
                 },
                 "updateStrategyType": {
                     "type": "string"
                 },
                 "volumeMounts": {
-                    "type": "null"
+                    "type": [
+                        "null",
+                        "array"
+                    ]
                 },
                 "volumes": {
-                    "type": "null"
+                    "type": [
+                        "null",
+                        "array"
+                    ]
                 }
             }
         },
@@ -670,7 +760,10 @@
                     "type": "boolean"
                 },
                 "annotations": {
-                    "type": "object"
+                    "type": [
+                        "object",
+                        "string"
+                    ]
                 },
                 "enabled": {
                     "type": "boolean"
