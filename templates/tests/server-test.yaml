@@ -9,8 +9,8 @@ metadata:
 spec:
   containers:
     - name: {{ .Release.Name }}-server-test
-      image: {{ .Values.server.image.repository }}:{{ .Values.server.image.tag | default "latest" }}
-      imagePullPolicy: {{ .Values.server.image.pullPolicy | quote }}
+      image: {{ .Values.server.image.repository }}:{{ .Values.server.image.tag }}
+      imagePullPolicy: {{ .Values.server.image.pullPolicy }}
       env:
         - name: VAULT_ADDR
           value: {{ include "vault.scheme" . }}://{{ template "vault.fullname" . }}.{{ .Release.Namespace }}.svc:{{ .Values.server.service.port }}
