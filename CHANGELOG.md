@@ -1,5 +1,7 @@
 ## Unreleased
 
+## 0.12.0 (May 25th, 2021)
+
 Features:
 * Pass additional arguments to `vault-csi-provider` using `csi.extraArgs` [GH-526](https://github.com/hashicorp/vault-helm/pull/526)
 
