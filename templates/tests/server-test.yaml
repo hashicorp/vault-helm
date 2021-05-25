@@ -9,7 +9,7 @@ metadata:
 spec:
   containers:
     - name: {{ .Release.Name }}-server-test
-      image: {{ .Values.server.image.repository }}:{{ .Values.server.image.tag }}
+      image: {{ .Values.server.image.repository }}:{{ .Values.server.image.tag | default "latest" }}
       imagePullPolicy: {{ .Values.server.image.pullPolicy }}
       env:
         - name: VAULT_ADDR
