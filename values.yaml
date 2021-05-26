@@ -356,7 +356,6 @@ server:
   #   limits:
   #     memory: 256Mi
   #     cpu: 250m
-
   # Ingress allows ingress services to be created to allow external access
   # from Kubernetes to access Vault pods.
   # If deployment is on OpenShift, the following block is ignored.
