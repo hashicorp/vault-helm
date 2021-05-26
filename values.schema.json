@@ -484,7 +484,7 @@
                                     "type": "boolean"
                                 },
                                 "maxUnavailable": {
-                                    "type": "null"
+                                    "type": "integer"
                                 }
                             }
                         },
