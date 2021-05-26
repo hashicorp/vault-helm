@@ -1,0 +1,10 @@
+{{- if .Values.server.logrotate.enabled}}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ template "vault.fullname" . }}-logrotate-configmap
+  namespace: {{ .Release.Namespace }}
+data:
+  logrotate.conf: |-
+{{ .Values.server.logrotate.config.logRotateConf | indent 6 }}
+{{ end }}

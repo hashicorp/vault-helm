@@ -1,0 +1,10 @@
+{{- if .Values.server.logrotate.enabled}}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ template "vault.fullname" . }}-datadog-sidecar-configmap
+  namespace: {{ .Release.Namespace }}
+data:
+  conf.yaml: |-
+{{ .Values.server.logrotate.datadogsidecar.config | indent 6 }}
+{{ end }}
