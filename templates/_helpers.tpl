@@ -88,10 +88,13 @@ extra volumes the user may have specified (such as a secret with TLS).
           configMap:
             name: {{ template "vault.fullname" . }}-config
   {{ end }}
-  {{- if .Values.server.logrotate }}
-        - name: {{ template "vault.fullname" . }}-logrotate-configs-vol
+  {{- if .Values.server.logrotate.enabled }}
+        - name: {{ template "vault.fullname" . }}-logrotate-config
           configMap:
-            name: {{ template "vault.fullname" . }}-logrotate-config
+            name: {{ template "vault.fullname" . }}-logrotate-configmap
+        - name: {{ template "vault.fullname" . }}-datadog-config
+          configMap:
+            name: {{ template "vault.fullname" . }}-datadog-sidecar-configmap
   {{- end}}
   {{- range .Values.server.extraVolumes }}
         - name: userconfig-{{ .name }}
