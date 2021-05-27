@@ -695,6 +695,7 @@ ui:
   serviceType: "ClusterIP"
   serviceNodePort: null
   externalPort: 8200
+  targetPort: 8200
 
   # loadBalancerSourceRanges:
   #   - 10.0.0.0/16
@@ -803,3 +804,6 @@ csi:
 
   # Enables debug logging.
   debug: false
+
+  # Pass arbitrary additional arguments to vault-csi-provider.
+  extraArgs: []
