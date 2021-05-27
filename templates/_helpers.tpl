@@ -577,3 +577,40 @@ Inject extra environment populated by secrets, if populated
 {{ "https" }}
 {{- end -}}
 {{- end -}}
+
+{{/*
+Check for OpenShift API to set OpenShift defaults automatically
+*/}}
+{{- define "vault.openshift" -}}
+  {{- if or ($.Capabilities.APIVersions.Has "apps.openshift.io/v1") ($.Values.global.openshift) -}}
+    {{- $_ := set . "openshift" true -}}
+  {{- else -}}
+    {{- $_ := set . "openshift" false -}}
+  {{- end -}}
+{{- end -}}
+
+{{/*
+Set defaults for images based on platform
+
+To be called like this:
+  {{- $image_data := dict "openshift" .openshift "image" .Values.injector.image }}
+  {{ include "platform.image" $image_data }}
+*/}}
+{{- define "platform.image" -}}
+  {{- $default_repository := .image.kubernetes.repository -}}
+  {{- if .openshift -}}
+    {{- $default_repository = .image.openshift.repository -}}
+  {{- end -}}
+
+  {{ $default_tag := .image.kubernetes.tag }}
+  {{- if .openshift -}}
+    {{- $default_tag = .image.openshift.tag -}}
+  {{- end -}}
+
+  {{/* If the user has specified an image, use that, otherwise use the default as
+       determined above */}}
+  {{- $repository := default $default_repository .image.repository -}}
+  {{- $tag := default $default_tag .image.tag -}}
+
+  {{- printf "%s:%s" $repository $tag -}}
+{{- end -}}

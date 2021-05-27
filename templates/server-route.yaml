@@ -1,4 +1,5 @@
-{{- if .Values.global.openshift }}
+{{ template "vault.openshift" . }}
+{{- if .openshift }}
 {{- if ne .mode "external" }}
 {{- if .Values.server.route.enabled -}}
 {{- $serviceName := include "vault.fullname" . -}}

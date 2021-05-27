@@ -51,16 +51,36 @@ injector:
 
   # image sets the repo and tag of the vault-k8s image to use for the injector.
   image:
-    repository: "hashicorp/vault-k8s"
-    tag: "0.10.0"
+    repository: ""
+    tag: ""
     pullPolicy: IfNotPresent
+    # Kubernetes defaults (these will be used if global.openshift=false and
+    # OpenShift is not detected)
+    kubernetes:
+      repository: "hashicorp/vault-k8s"
+      tag: "0.10.1"
+    # OpenShift defaults (these will be used if global.openshift=true or
+    # OpenShift is detected)
+    openshift:
+      repository: "registry.connect.redhat.com/hashicorp/vault-k8s"
+      tag: "0.10.1-ubi"
 
   # agentImage sets the repo and tag of the Vault image to use for the Vault Agent
   # containers.  This should be set to the official Vault image.  Vault 1.3.1+ is
   # required.
   agentImage:
-    repository: "vault"
-    tag: "1.7.0"
+    repository: ""
+    tag: ""
+    # Kubernetes defaults (these will be used if global.openshift=false and
+    # OpenShift is not detected)
+    kubernetes:
+      repository: "vault"
+      tag: "1.7.2"
+    # OpenShift defaults (these will be used if global.openshift=true or
+    # OpenShift is detected)
+    openshift:
+      repository: "registry.connect.redhat.com/hashicorp/vault"
+      tag: "1.7.2-ubi"
 
   # The default values for the injected Vault Agent containers.
   agentDefaults:
@@ -203,10 +223,20 @@ server:
   # By default no direct resource request is made.
 
   image:
-    repository: "vault"
-    tag: "1.7.0"
+    repository: ""
+    tag: ""
     # Overrides the default Image Pull Policy
     pullPolicy: IfNotPresent
+    # Kubernetes defaults (these will be used if global.openshift=false and
+    # OpenShift is not detected)
+    kubernetes:
+      repository: "vault"
+      tag: "1.7.2"
+    # OpenShift defaults (these will be used if global.openshift=true or
+    # OpenShift is detected)
+    openshift:
+      repository: "registry.connect.redhat.com/hashicorp/vault"
+      tag: "1.7.2-ubi"
 
   # Configure the Update Strategy Type for the StatefulSet
   # See https://kubernetes.io/docs/concepts/workloads/controllers/statefulset/#update-strategies

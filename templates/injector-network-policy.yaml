@@ -1,4 +1,5 @@
-{{- if and (eq (.Values.injector.enabled | toString) "true" ) (eq (.Values.global.enabled | toString) "true") (eq (.Values.global.openshift | toString) "true") }}
+{{ template "vault.openshift" . }}
+{{- if and (eq (.Values.injector.enabled | toString) "true" ) (eq (.Values.global.enabled | toString) "true") .openshift }}
 apiVersion: networking.k8s.io/v1
 kind: NetworkPolicy
 metadata:

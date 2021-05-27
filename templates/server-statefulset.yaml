@@ -46,7 +46,7 @@ spec:
       {{ if  .Values.server.shareProcessNamespace }}
       shareProcessNamespace: true
       {{ end }}
-      {{- if not .Values.global.openshift }}
+      {{- if not .openshift }}
       securityContext:
         runAsNonRoot: true
         runAsGroup: {{ .Values.server.gid | default 1000 }}
@@ -64,13 +64,14 @@ spec:
       containers:
         - name: vault
           {{ template "vault.resources" . }}
-          image: {{ .Values.server.image.repository }}:{{ .Values.server.image.tag | default "latest" }}
+          {{- $image_data := dict "openshift" .openshift "image" .Values.server.image }}
+          image: {{ include "platform.image" $image_data }}
           imagePullPolicy: {{ .Values.server.image.pullPolicy }}
           command:
           - "/bin/sh"
           - "-ec"
           args: {{ template "vault.args" . }}
-          {{- if not .Values.global.openshift }}
+          {{- if not .openshift }}
           securityContext:
             allowPrivilegeEscalation: false
           {{- end }}

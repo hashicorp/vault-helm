@@ -1,3 +1,4 @@
+{{ template "vault.openshift" . }}
 {{- if and (eq (.Values.injector.enabled | toString) "true" ) (eq (.Values.global.enabled | toString) "true") }}
 # Deployment for the injector
 apiVersion: apps/v1
@@ -35,7 +36,7 @@ spec:
       priorityClassName: {{ .Values.injector.priorityClassName }}
       {{- end }}
       serviceAccountName: "{{ template "vault.fullname" . }}-agent-injector"
-      {{- if not .Values.global.openshift }}
+      {{- if not .openshift }}
       hostNetwork: {{ .Values.injector.hostNetwork }}
       securityContext:
         runAsNonRoot: true
@@ -45,9 +46,10 @@ spec:
       containers:
         - name: sidecar-injector
           {{ template "injector.resources" . }}
-          image: "{{ .Values.injector.image.repository }}:{{ .Values.injector.image.tag }}"
+          {{- $image_data := dict "openshift" .openshift "image" .Values.injector.image }}
+          image: {{ include "platform.image" $image_data }}
           imagePullPolicy: "{{ .Values.injector.image.pullPolicy }}"
-          {{- if not .Values.global.openshift }}
+          {{- if not .openshift }}
           securityContext:
             allowPrivilegeEscalation: false
           {{- end }}
@@ -65,7 +67,8 @@ spec:
             - name: AGENT_INJECT_VAULT_AUTH_PATH
               value: {{ .Values.injector.authPath }}
             - name: AGENT_INJECT_VAULT_IMAGE
-              value: "{{ .Values.injector.agentImage.repository }}:{{ .Values.injector.agentImage.tag }}"
+            {{- $agentData := dict "openshift" .openshift "image" .Values.injector.agentImage }}
+              value: {{ include "platform.image" $agentData }}
             {{- if .Values.injector.certs.secretName }}
             - name: AGENT_INJECT_TLS_CERT_FILE
               value: "/etc/webhook/certs/{{ .Values.injector.certs.certName }}"
@@ -81,7 +84,7 @@ spec:
               value: {{ .Values.injector.logFormat | default "standard" }}
             - name: AGENT_INJECT_REVOKE_ON_SHUTDOWN
               value: "{{ .Values.injector.revokeOnShutdown | default false }}"
-            {{- if .Values.global.openshift }}
+            {{- if .openshift }}
             - name: AGENT_INJECT_SET_SECURITY_CONTEXT
               value: "false"
             {{- end }}
