@@ -59,7 +59,7 @@ spec:
           emptyDir: {}
       {{- if .Values.server.extraInitContainers }}
       initContainers:
-        {{ toYaml .Values.server.extraInitContainers | nindent 8}}
+        {{- tpl (toYaml .Values.server.extraInitContainers | toString) . | nindent 8}}
       {{- end }}
       containers:
         - name: vault
@@ -196,7 +196,7 @@ spec:
                 {{- end }}
             {{- end }}
         {{- if .Values.server.extraContainers }}
-          {{ toYaml .Values.server.extraContainers | nindent 8}}
+          {{- tpl (toYaml .Values.server.extraContainers | toString) . | nindent 8}}
         {{- end }}
       {{- if .Values.global.imagePullSecrets }}
       imagePullSecrets:
