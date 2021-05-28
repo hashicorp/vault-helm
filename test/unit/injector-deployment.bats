@@ -2,6 +2,18 @@
 
 load _helpers
 
+setup_file() {
+  cd `chart_dir`
+  export k8sRepo=$(cat values.yaml | yq -r .injector.image.kubernetes.repository)
+  export k8sTag=$(cat values.yaml | yq -r .injector.image.kubernetes.tag)
+  export k8sAgentRepo=$(cat values.yaml | yq -r .injector.agentImage.kubernetes.repository)
+  export k8sAgentTag=$(cat values.yaml | yq -r .injector.agentImage.kubernetes.tag)
+  export openshiftRepo=$(cat values.yaml | yq -r .injector.image.openshift.repository)
+  export openshiftTag=$(cat values.yaml | yq -r .injector.image.openshift.tag)
+  export openshiftAgentRepo=$(cat values.yaml | yq -r .injector.agentImage.openshift.repository)
+  export openshiftAgentTag=$(cat values.yaml | yq -r .injector.agentImage.openshift.tag)
+}
+
 @test "injector/deployment: default injector.enabled" {
   cd `chart_dir`
   local actual=$(helm template \
@@ -621,4 +633,53 @@ load _helpers
   local value=$(echo $object |
       yq -r 'map(select(.name=="AGENT_INJECT_DEFAULT_TEMPLATE")) | .[] .value' | tee /dev/stderr)
   [ "${value}" = "json" ]
+}
+
+#--------------------------------------------------------------------
+# OpenShift image defaults
+@test "injector/deployment: images default to k8s" {
+  cd `chart_dir`
+  local container=$(helm template \
+      --show-only templates/injector-deployment.yaml  \
+      . | tee /dev/stderr |
+      yq -r '.spec.template.spec.containers[0]' | tee /dev/stderr)
+  check_image "${container}" $k8sRepo $k8sTag
+  check_agentImage "${container}" $k8sAgentRepo $k8sAgentTag
+}
+
+@test "injector/deployment: global.openshift sets defaults to ubi" {
+  cd `chart_dir`
+  local container=$(helm template \
+      --show-only templates/injector-deployment.yaml \
+      --set global.openshift=true \
+      . | tee /dev/stderr |
+      yq -r '.spec.template.spec.containers[0]' | tee /dev/stderr)
+  check_image "${container}" $openshiftRepo $openshiftTag
+  check_agentImage "${container}" $openshiftAgentRepo $openshiftAgentTag
+}
+
+@test "injector/deployment: OpenShift API sets image defaults to ubi" {
+  cd `chart_dir`
+  local container=$(helm template \
+      --show-only templates/injector-deployment.yaml \
+      -a "apps.openshift.io/v1" \
+      . | tee /dev/stderr |
+      yq -r '.spec.template.spec.containers[0]' | tee /dev/stderr)
+  check_image "${container}" $openshiftRepo $openshiftTag
+  check_agentImage "${container}" $openshiftAgentRepo $openshiftAgentTag
+}
+
+@test "injector/deployment: Can override image when openshift=true" {
+  cd `chart_dir`
+  local container=$(helm template \
+      --show-only templates/injector-deployment.yaml \
+      --set global.openshift=true \
+      --set injector.image.repository=foo \
+      --set injector.image.tag=1.2.3 \
+      --set injector.agentImage.repository=bar \
+      --set injector.agentImage.tag=4.5.6 \
+      . | tee /dev/stderr |
+      yq -r '.spec.template.spec.containers[0]' | tee /dev/stderr)
+  check_image "${container}" foo 1.2.3
+  check_agentImage "${container}" bar 4.5.6
 }

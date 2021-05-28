@@ -2,6 +2,14 @@
 
 load _helpers
 
+setup_file() {
+  cd `chart_dir`
+  export k8sRepo=$(cat values.yaml | yq -r .server.image.kubernetes.repository)
+  export k8sTag=$(cat values.yaml | yq -r .server.image.kubernetes.tag)
+  export openshiftRepo=$(cat values.yaml | yq -r .server.image.openshift.repository)
+  export openshiftTag=$(cat values.yaml | yq -r .server.image.openshift.tag)
+}
+
 #--------------------------------------------------------------------
 # disable / enable server deployment
 
@@ -1545,4 +1553,50 @@ load _helpers
   [ "${actual}" = "RELEASE-NAME-vault" ]
 
 
+}
+
+#--------------------------------------------------------------------
+# OpenShift image defaults
+@test "server/standalone-StatefulSet: image defaults to k8s" {
+  cd `chart_dir`
+  local container=$(helm template \
+      --show-only templates/server-statefulset.yaml \
+      --set 'server.standalone.enabled=true' \
+      . | tee /dev/stderr |
+      yq -r '.spec.template.spec.containers[0]' | tee /dev/stderr)
+  check_image "${container}" $k8sRepo $k8sTag
+}
+
+@test "server/standalone-StatefulSet: global.openshift sets defaults to ubi" {
+  cd `chart_dir`
+  local container=$(helm template \
+      --show-only templates/server-statefulset.yaml  \
+      --set 'global.openshift=true' \
+      --set 'server.standalone.enabled=true' \
+      . | tee /dev/stderr |
+      yq -r '.spec.template.spec.containers[0]' | tee /dev/stderr)
+  check_image "${container}" $openshiftRepo $openshiftTag
+}
+
+@test "server/standalone-StatefulSet: OpenShift API sets image defaults to ubi" {
+  cd `chart_dir`
+  local container=$(helm template \
+      --show-only templates/server-statefulset.yaml  \
+      -a "apps.openshift.io/v1" \
+      --set 'server.standalone.enabled=true' \
+      . | tee /dev/stderr |
+      yq -r '.spec.template.spec.containers[0]' | tee /dev/stderr)
+  check_image "${container}" $openshiftRepo $openshiftTag
+}
+
+@test "server/standalone-StatefulSet: Can override image when openshift=true" {
+  cd `chart_dir`
+  local container=$(helm template \
+      --show-only templates/server-statefulset.yaml  \
+      --set 'server.image.repository=foo' \
+      --set 'server.image.tag=1.2.3' \
+      --set 'server.standalone.enabled=true' \
+      . | tee /dev/stderr |
+      yq -r '.spec.template.spec.containers[0]' | tee /dev/stderr)
+  check_image "${container}" foo 1.2.3
 }
