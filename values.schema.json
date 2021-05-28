@@ -775,7 +775,10 @@
                     "type": "boolean"
                 },
                 "serviceNodePort": {
-                    "type": "null"
+                    "type": [
+                        "null",
+                        "integer"
+                    ]
                 },
                 "serviceType": {
                     "type": "string"
