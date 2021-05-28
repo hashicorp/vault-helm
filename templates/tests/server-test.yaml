@@ -1,4 +1,5 @@
 {{- if .Values.server.enabled }}
+{{ template "vault.openshift" . }}
 apiVersion: v1
 kind: Pod
 metadata:
@@ -9,7 +10,8 @@ metadata:
 spec:
   containers:
     - name: {{ .Release.Name }}-server-test
-      image: {{ .Values.server.image.repository }}:{{ .Values.server.image.tag | default "latest" }}
+      {{- $image_data := dict "openshift" .openshift "image" .Values.server.image }}
+      image: {{ include "platform.image" $image_data }}
       imagePullPolicy: {{ .Values.server.image.pullPolicy }}
       env:
         - name: VAULT_ADDR

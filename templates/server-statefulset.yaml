@@ -1,3 +1,4 @@
+{{ template "vault.openshift" . }}
 {{ template "vault.mode" . }}
 {{- if ne .mode "external" }}
 {{- if and (ne .mode "") (eq (.Values.global.enabled | toString) "true") }}

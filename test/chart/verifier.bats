@@ -30,7 +30,8 @@ setup_file() {
     $run_cmd verify $chart_src \
       --output json \
       --openshift-version $OPENSHIFT_VERSION \
-      --disable $DISABLED_TESTS 2>&1 | tee $VERIFY_OUTPUT
+      --disable $DISABLED_TESTS \
+      --chart-set global.openshift=true 2>&1 | tee $VERIFY_OUTPUT
 }
 
 teardown_file() {
@@ -75,12 +76,11 @@ teardown_file() {
     check_result contains-test
 }
 
+@test "images-are-certified" {
+    check_result images-are-certified
+}
+
 @test "chart-testing" {
     skip "Skipping since this test requires a kubernetes/openshift cluster"
     check_result chart-testing
-}
-
-@test "images-are-certified" {
-    skip "Skipping until this has been addressed"
-    check_result images-are-certified
 }
