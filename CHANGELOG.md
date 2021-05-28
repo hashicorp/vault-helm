@@ -1,5 +1,8 @@
 ## Unreleased
 
+Improvements:
+* Added a helm test for vault server [GH-531](https://github.com/hashicorp/vault-helm/pull/531)
+
 ## 0.12.0 (May 25th, 2021)
 
 Features:

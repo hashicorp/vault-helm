@@ -8,6 +8,9 @@ setup_file() {
     export CHART_VOLUME=vault-helm-chart-src
     # Note: currently `latest` is the only tag available in the chart-verifier repo.
     local IMAGE="quay.io/redhat-certification/chart-verifier:latest"
+    # chart-verifier requires an openshift version if a cluster isn't available
+    local OPENSHIFT_VERSION="4.7"
+    local DISABLED_TESTS="chart-testing"
 
     local run_cmd="chart-verifier"
     local chart_src="."
@@ -23,8 +26,11 @@ setup_file() {
         # Start chart-verifier using this volume
         run_cmd="docker run --rm --volumes-from $CHART_VOLUME $IMAGE"
     fi
-    
-    $run_cmd verify --output json $chart_src 2>&1 | tee $VERIFY_OUTPUT
+
+    $run_cmd verify $chart_src \
+      --output json \
+      --openshift-version $OPENSHIFT_VERSION \
+      --disable $DISABLED_TESTS 2>&1 | tee $VERIFY_OUTPUT
 }
 
 teardown_file() {
@@ -33,8 +39,8 @@ teardown_file() {
     fi
 }
 
-@test "has-minkubeversion" {
-    check_result has-minkubeversion
+@test "has-kubeversion" {
+    check_result has-kubeversion
 }
 
 @test "is-helm-v3" {
@@ -65,12 +71,16 @@ teardown_file() {
     check_result contains-values-schema
 }
 
+@test "contains-test" {
+    check_result contains-test
+}
+
+@test "chart-testing" {
+    skip "Skipping since this test requires a kubernetes/openshift cluster"
+    check_result chart-testing
+}
+
 @test "images-are-certified" {
     skip "Skipping until this has been addressed"
     check_result images-are-certified
-}
-
-@test "contains-test" {
-    skip "Skipping until this has been addressed"
-    check_result contains-test
 }
