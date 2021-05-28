@@ -98,26 +98,6 @@ load _helpers
   [ "${actual}" = "foo:1.2.3" ]
 }
 
-@test "server/standalone-StatefulSet: image tag defaults to latest" {
-  cd `chart_dir`
-  local actual=$(helm template \
-      --show-only templates/server-statefulset.yaml  \
-      --set 'server.image.repository=foo' \
-      --set 'server.image.tag=' \
-      . | tee /dev/stderr |
-      yq -r '.spec.template.spec.containers[0].image' | tee /dev/stderr)
-  [ "${actual}" = "foo:latest" ]
-
-  local actual=$(helm template \
-      --show-only templates/server-statefulset.yaml  \
-      --set 'server.image.repository=foo' \
-      --set 'server.image.tag=' \
-      --set 'server.standalone.enabled=true' \
-      . | tee /dev/stderr |
-      yq -r '.spec.template.spec.containers[0].image' | tee /dev/stderr)
-  [ "${actual}" = "foo:latest" ]
-}
-
 @test "server/standalone-StatefulSet: default imagePullPolicy" {
   cd `chart_dir`
   local actual=$(helm template \
