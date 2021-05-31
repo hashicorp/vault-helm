@@ -17,7 +17,7 @@ jobs:
     environment:
       BATS_VERSION: "1.3.0"
       # Note: the commit SHA is used here since the repo doesn't use release tags
-      CHART_VERIFIER_VERSION: "190d532246a5936dc6a7125e2da917d04e38a672"
+      CHART_VERIFIER_VERSION: "e2c03bd1a4aea20deb0a4a03ebfde254b1672050"
     steps:
       - checkout
       - run:

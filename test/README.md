@@ -32,3 +32,10 @@ It relies on the helm [schema-gen plugin][schema-gen]. Note that some manual
 editing will be required, since several properties accept multiple data types.
 
 [schema-gen]: https://github.com/karuppiah7890/helm-schema-gen
+
+## Helm test
+
+Vault Helm also contains a simple helm test under
+[templates/tests/](../templates/tests/) that may be run against a helm release:
+
+    helm test <RELEASE_NAME>
