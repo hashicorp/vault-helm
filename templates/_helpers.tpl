@@ -99,6 +99,7 @@ extra volumes the user may have specified (such as a secret with TLS).
             secretName: {{ .name }}
           {{- end }}
             defaultMode: {{ .defaultMode | default 420 }}
+            optional: {{ .optional | default "false" }}
   {{- end }}
   {{- if .Values.server.volumes }}
     {{- toYaml .Values.server.volumes | nindent 8}}
