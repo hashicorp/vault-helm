@@ -6,7 +6,7 @@ jobs:
   bats-unit-test:
     docker:
       # This image is built from test/docker/Test.dockerfile
-      - image: docker.mirror.hashicorp.services/hashicorpdev/vault-helm-test:0.1.0
+      - image: docker.mirror.hashicorp.services/hashicorpdev/vault-helm-test:0.2.0
     steps:
       - checkout
       - run: bats ./test/unit -t
@@ -36,7 +36,7 @@ jobs:
   acceptance:
     docker:
       # This image is build from test/docker/Test.dockerfile
-      - image: docker.mirror.hashicorp.services/hashicorpdev/vault-helm-test:0.1.0
+      - image: docker.mirror.hashicorp.services/hashicorpdev/vault-helm-test:0.2.0
 
     steps:
       - checkout
