@@ -3,6 +3,9 @@
 Improvements:
 * Added a helm test for vault server [GH-531](https://github.com/hashicorp/vault-helm/pull/531)
 
+Bugs:
+* Fix ui.serviceNodePort schema [GH-537](https://github.com/hashicorp/vault-helm/pull/537)
+
 ## 0.12.0 (May 25th, 2021)
 
 Features:
