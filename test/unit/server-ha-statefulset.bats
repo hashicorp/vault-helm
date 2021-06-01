@@ -46,6 +46,20 @@ load _helpers
   [ "${actual}" = "foo:1.2.3" ]
 }
 
+@test "server/ha-StatefulSet: empty image tag defaults to kubernetes" {
+  cd `chart_dir`
+
+  local k8sTag=$(cat values.yaml | yq -r .server.image.kubernetes.tag)
+  local actual=$(helm template \
+      --show-only templates/server-statefulset.yaml  \
+      --set 'server.image.repository=foo' \
+      --set 'server.image.tag=' \
+      --set 'server.ha.enabled=true' \
+      . | tee /dev/stderr |
+      yq -r '.spec.template.spec.containers[0].image' | tee /dev/stderr)
+  [ "${actual}" = "foo:${k8sTag}" ]
+}
+
 #--------------------------------------------------------------------
 # TLS
 

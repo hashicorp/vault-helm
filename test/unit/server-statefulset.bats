@@ -106,6 +106,27 @@ setup_file() {
   [ "${actual}" = "foo:1.2.3" ]
 }
 
+@test "server/standalone-StatefulSet: empty image tag defaults to kubernetes" {
+  cd `chart_dir`
+  local k8sTag=$(cat values.yaml | yq -r .server.image.kubernetes.tag)
+  local actual=$(helm template \
+      --show-only templates/server-statefulset.yaml  \
+      --set 'server.image.repository=foo' \
+      --set 'server.image.tag=' \
+      . | tee /dev/stderr |
+      yq -r '.spec.template.spec.containers[0].image' | tee /dev/stderr)
+  [ "${actual}" = "foo:${k8sTag}" ]
+
+  local actual=$(helm template \
+      --show-only templates/server-statefulset.yaml  \
+      --set 'server.image.repository=foo' \
+      --set 'server.image.tag=' \
+      --set 'server.standalone.enabled=true' \
+      . | tee /dev/stderr |
+      yq -r '.spec.template.spec.containers[0].image' | tee /dev/stderr)
+  [ "${actual}" = "foo:${k8sTag}" ]
+}
+
 @test "server/standalone-StatefulSet: default imagePullPolicy" {
   cd `chart_dir`
   local actual=$(helm template \
