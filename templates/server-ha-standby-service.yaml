@@ -13,12 +13,16 @@ metadata:
     app.kubernetes.io/instance: {{ .Release.Name }}
     app.kubernetes.io/managed-by: {{ .Release.Service }}
   annotations:
-{{ template "vault.service.annotations" .}}
+{{ template "vault.service.standby.annotations" .}}
 spec:
-  {{- if .Values.server.service.type}}
+  {{- if .Values.server.service.standby.type}}
+  type: {{ .Values.server.service.standby.type }}
+  {{- else if .Values.server.service.type }}
   type: {{ .Values.server.service.type }}
   {{- end}}
-  {{- if .Values.server.service.clusterIP }}
+  {{- if .Values.server.service.standby.clusterIP }}
+  clusterIP: {{ .Values.server.service.standby.clusterIP }}
+  {{- else if .Values.server.service.clusterIP }}
   clusterIP: {{ .Values.server.service.clusterIP }}
   {{- end }}
   publishNotReadyAddresses: true
@@ -26,7 +30,9 @@ spec:
     - name: {{ include "vault.scheme" . }}
       port: {{ .Values.server.service.port }}
       targetPort: {{ .Values.server.service.targetPort }}
-      {{- if and (.Values.server.service.nodePort) (eq (.Values.server.service.type | toString) "NodePort") }}
+      {{- if and (.Values.server.service.standby.nodePort) (eq (.Values.server.service.standby.type | toString) "NodePort") }}
+      nodePort: {{ .Values.server.service.standby.nodePort }}
+      {{- else if and (.Values.server.service.nodePort) (eq (.Values.server.service.type | toString) "NodePort") }}
       nodePort: {{ .Values.server.service.nodePort }}
       {{- end }}
     - name: https-internal

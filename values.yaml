@@ -459,6 +459,52 @@ server:
     # to the service.
     annotations: {}
 
+    # Enables a headless service that contains the active pod only
+    active:
+      # clusterIP controls whether a Cluster IP address is attached to the
+      # Vault service within Kubernetes.  By default the Vault service will
+      # be given a Cluster IP address, set to None to disable.  When disabled
+      # Kubernetes will create a "headless" service.  Headless services can be
+      # used to communicate with pods directly through DNS instead of a round robin
+      # load balancer.
+      # clusterIP: None
+
+      # Configures the service type for the active Vault service.  Can be ClusterIP
+      # or NodePort.
+      #type: ClusterIP
+
+      # If type is set to "NodePort", a specific nodePort value can be configured,
+      # will be random if left blank.
+      #nodePort: 30000
+
+      # Extra annotations for the service definition. This can either be YAML or a
+      # YAML-formatted multi-line templated string map of the annotations to apply
+      # to the service.
+      annotations: {}
+
+    # Enables a headless service that contains standby pods only
+    standby:
+      # clusterIP controls whether a Cluster IP address is attached to the
+      # Vault service within Kubernetes.  By default the Vault service will
+      # be given a Cluster IP address, set to None to disable.  When disabled
+      # Kubernetes will create a "headless" service.  Headless services can be
+      # used to communicate with pods directly through DNS instead of a round robin
+      # load balancer.
+      # clusterIP: None
+
+      # Configures the service type for the standby Vault service.  Can be ClusterIP
+      # or NodePort.
+      #type: ClusterIP
+
+      # If type is set to "NodePort", a specific nodePort value can be configured,
+      # will be random if left blank.
+      #nodePort: 30000
+
+      # Extra annotations for the service definition. This can either be YAML or a
+      # YAML-formatted multi-line templated string map of the annotations to apply
+      # to the service.
+      annotations: {}
+
   # This configures the Vault Statefulset to create a PVC for data
   # storage when using the file or raft backend storage engines.
   # See https://www.vaultproject.io/docs/configuration/storage/index.html to know more

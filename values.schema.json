@@ -685,6 +685,28 @@
                         },
                         "targetPort": {
                             "type": "integer"
+                        },
+                        "active": {
+                            "type": "object",
+                            "properties": {
+                                "annotations": {
+                                    "type": [
+                                        "object",
+                                        "string"
+                                    ]
+                                }
+                            }
+                        },
+                        "standby": {
+                            "type": "object",
+                            "properties": {
+                                "annotations": {
+                                    "type": [
+                                        "object",
+                                        "string"
+                                    ]
+                                }
+                            }
                         }
                     }
                 },

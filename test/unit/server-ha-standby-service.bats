@@ -7,7 +7,7 @@ load _helpers
   local actual=$(helm template \
       --show-only templates/server-ha-standby-service.yaml \
       --set 'server.ha.enabled=true' \
-      --set 'server.service.annotations=vaultIsAwesome: true' \
+      --set 'server.service.standby.annotations=vaultIsAwesome: true' \
       . | tee /dev/stderr |
       yq -r '.metadata.annotations["vaultIsAwesome"]' | tee /dev/stderr)
   [ "${actual}" = "true" ]
@@ -18,7 +18,7 @@ load _helpers
   local actual=$(helm template \
       --show-only templates/server-ha-standby-service.yaml \
       --set 'server.ha.enabled=true' \
-      --set 'server.service.annotations.vaultIsAwesome=true' \
+      --set 'server.service.standby.annotations.vaultIsAwesome=true' \
       . | tee /dev/stderr |
       yq -r '.metadata.annotations["vaultIsAwesome"]' | tee /dev/stderr)
   [ "${actual}" = "true" ]
