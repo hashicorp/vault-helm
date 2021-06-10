@@ -167,10 +167,6 @@ spec:
             timeoutSeconds: 5
         {{- end }}
 {{- if .Values.injector.certs.secretName }}
-          volumeMounts:
-            - name: webhook-certs
-              mountPath: /etc/webhook/certs
-              readOnly: true
       volumes:
         - name: webhook-certs
           secret:
