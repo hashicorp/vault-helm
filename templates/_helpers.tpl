@@ -103,6 +103,12 @@ extra volumes the user may have specified (such as a secret with TLS).
   {{- if .Values.server.volumes }}
     {{- toYaml .Values.server.volumes | nindent 8}}
   {{- end }}
+  {{- if (and .Values.server.enterpriseLicense.secretName .Values.server.enterpriseLicense.secretKey) }}
+        - name: vault-license
+          secret:
+            secretName: {{ .Values.server.enterpriseLicense.secretName }}
+            defaultMode: 0440
+  {{- end }}
 {{- end -}}
 
 {{/*
@@ -165,6 +171,11 @@ based on the mode configured.
   {{- end }}
   {{- if .Values.server.volumeMounts }}
     {{- toYaml .Values.server.volumeMounts | nindent 12}}
+  {{- end }}
+  {{- if (and .Values.server.enterpriseLicense.secretName .Values.server.enterpriseLicense.secretKey) }}
+            - name: vault-license
+              mountPath: /vault/license
+              readOnly: true
   {{- end }}
 {{- end -}}
 
