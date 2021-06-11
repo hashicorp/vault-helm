@@ -2,6 +2,7 @@
 
 Improvements:
 * Added a helm test for vault server [GH-531](https://github.com/hashicorp/vault-helm/pull/531)
+* Added server.enterpriseLicense option [GH-547](https://github.com/hashicorp/vault-helm/pull/547)
 
 Bugs:
 * Fix ui.serviceNodePort schema [GH-537](https://github.com/hashicorp/vault-helm/pull/537)
