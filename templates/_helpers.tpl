@@ -107,6 +107,7 @@ extra volumes the user may have specified (such as a secret with TLS).
         - name: vault-license
           secret:
             secretName: {{ .Values.server.enterpriseLicense.secretName }}
+            defaultMode: 0440
   {{- end }}
 {{- end -}}
 

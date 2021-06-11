@@ -11,8 +11,7 @@ load _helpers
     --set='injector.enabled=false' \
     --set='server.ha.enabled=true' \
     --set='server.ha.raft.enabled=true' \
-    --set='server.enterpriseLicense.secretName=vault-license' \
-    --set='server.enterpriseLicense.secretKey=license.hclic' .
+    --set='server.enterpriseLicense.secretName=vault-license' .
   wait_for_running "$(name_prefix)-east-0"
 
   # Sealed, not initialized
@@ -81,8 +80,7 @@ load _helpers
     --set='server.image.tag=1.7.2_ent' \
     --set='server.ha.enabled=true' \
     --set='server.ha.raft.enabled=true' \
-    --set='server.enterpriseLicense.secretName=vault-license' \
-    --set='server.enterpriseLicense.secretKey=license.hclic' .
+    --set='server.enterpriseLicense.secretName=vault-license' .
   wait_for_running "$(name_prefix)-west-0"
 
   # Sealed, not initialized
@@ -157,7 +155,7 @@ setup() {
   kubectl delete namespace acceptance --ignore-not-found=true
   kubectl create namespace acceptance
   kubectl config set-context --current --namespace=acceptance
-  kubectl create secret generic vault-license --from-literal license.hclic=$VAULT_LICENSE_CI
+  kubectl create secret generic vault-license --from-literal license=$VAULT_LICENSE_CI
 }
 
 #cleanup

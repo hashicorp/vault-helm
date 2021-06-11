@@ -1577,7 +1577,7 @@ load _helpers
       --set 'server.enterpriseLicense.secretKey=bar' \
       . | tee /dev/stderr |
       yq -r -c '.spec.template.spec.volumes[] | select(.name == "vault-license")' | tee /dev/stderr)
-      [ "${actual}" = '{"name":"vault-license","secret":{"secretName":"foo"}}' ]
+      [ "${actual}" = '{"name":"vault-license","secret":{"secretName":"foo","defaultMode":288}}' ]
 }
 
 @test "server/StatefulSet: adds volume mount for license secret when enterprise license secret name and key are provided" {
@@ -1600,4 +1600,25 @@ load _helpers
       . | tee /dev/stderr |
       yq -r -c '.spec.template.spec.containers[0].env[] | select(.name == "VAULT_LICENSE_PATH")' | tee /dev/stderr)
       [ "${actual}" = '{"name":"VAULT_LICENSE_PATH","value":"/vault/license/bar"}' ]
+}
+
+@test "server/StatefulSet: blank secretName does not set env var" {
+  cd `chart_dir`
+
+  # setting secretName=null
+  local actual=$(helm template \
+      -s templates/server-statefulset.yaml  \
+      --set 'server.enterpriseLicense.secretName=null' \
+      --set 'server.enterpriseLicense.secretKey=bar' \
+      . | tee /dev/stderr |
+      yq -r -c '.spec.template.spec.containers[0].env[] | select(.name == "VAULT_LICENSE_PATH")' | tee /dev/stderr)
+      [ "${actual}" = '' ]
+
+  # omitting secretName
+  local actual=$(helm template \
+      -s templates/server-statefulset.yaml  \
+      --set 'server.enterpriseLicense.secretKey=bar' \
+      . | tee /dev/stderr |
+      yq -r -c '.spec.template.spec.containers[0].env[] | select(.name == "VAULT_LICENSE_PATH")' | tee /dev/stderr)
+      [ "${actual}" = '' ]
 }
