@@ -52,7 +52,7 @@ injector:
   # image sets the repo and tag of the vault-k8s image to use for the injector.
   image:
     repository: "hashicorp/vault-k8s"
-    tag: "0.10.1"
+    tag: "0.10.2"
     pullPolicy: IfNotPresent
 
   # agentImage sets the repo and tag of the Vault image to use for the Vault Agent
@@ -60,7 +60,7 @@ injector:
   # required.
   agentImage:
     repository: "vault"
-    tag: "1.7.2"
+    tag: "1.7.3"
 
   # The default values for the injected Vault Agent containers.
   agentDefaults:
@@ -216,7 +216,7 @@ server:
 
   image:
     repository: "vault"
-    tag: "1.7.2"
+    tag: "1.7.3"
     # Overrides the default Image Pull Policy
     pullPolicy: IfNotPresent
 
