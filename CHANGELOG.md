@@ -1,5 +1,7 @@
 ## Unreleased
 
+## 0.13.0 (June 17th, 2021)
+
 Improvements:
 * Added a helm test for vault server [GH-531](https://github.com/hashicorp/vault-helm/pull/531)
 * Added server.enterpriseLicense option [GH-547](https://github.com/hashicorp/vault-helm/pull/547)
