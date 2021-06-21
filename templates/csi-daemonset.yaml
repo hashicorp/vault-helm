@@ -28,6 +28,7 @@ spec:
       {{ template "csi.pod.annotations" . }}
     spec:
       serviceAccountName: {{ template "vault.fullname" . }}-csi-provider
+      {{- template "csi.pod.tolerations" . }}
       containers:
         - name: {{ include "vault.name" . }}-csi-provider
           {{ template "csi.resources" . }}
@@ -36,6 +37,9 @@ spec:
           args:
             - --endpoint=/provider/vault.sock
             - --debug={{ .Values.csi.debug }}
+            {{- if .Values.csi.extraArgs }}
+              {{- toYaml .Values.csi.extraArgs | nindent 12 }}
+            {{- end }}
           volumeMounts:
             - name: providervol
               mountPath: "/provider"
@@ -73,4 +77,8 @@ spec:
        {{- if .Values.csi.volumes }}
          {{- toYaml .Values.csi.volumes | nindent 8}}
        {{- end }}
+      {{- if .Values.global.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml .Values.global.imagePullSecrets | nindent 8 }}
+      {{- end }}
 {{- end }}

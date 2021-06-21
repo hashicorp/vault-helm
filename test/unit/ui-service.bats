@@ -300,3 +300,26 @@ load _helpers
       yq -r '.spec.selector["vault-active"]' | tee /dev/stderr)
   [ "${actual}" = 'true' ]
 }
+
+@test "ui/Service: default is no nodePort" {
+  cd `chart_dir`
+
+  local actual=$(helm template \
+      --show-only templates/ui-service.yaml \
+      --set 'ui.enabled=true' \
+      . | tee /dev/stderr |
+      yq -r '.spec.ports[0].nodePort' | tee /dev/stderr)
+  [ "${actual}" = "null" ]
+}
+
+@test "ui/Service: can set nodePort" {
+  cd `chart_dir`
+
+  local actual=$(helm template \
+      --show-only templates/ui-service.yaml \
+      --set 'ui.enabled=true' \
+      --set 'ui.serviceNodePort=123' \
+      . | tee /dev/stderr |
+      yq -r '.spec.ports[0].nodePort' | tee /dev/stderr)
+  [ "${actual}" = "123" ]
+}

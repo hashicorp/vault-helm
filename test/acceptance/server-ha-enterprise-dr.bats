@@ -7,10 +7,11 @@ load _helpers
 
   helm install "$(name_prefix)-east" \
     --set='server.image.repository=hashicorp/vault-enterprise' \
-    --set='server.image.tag=1.7.0_ent' \
+    --set='server.image.tag=1.7.3_ent' \
     --set='injector.enabled=false' \
     --set='server.ha.enabled=true' \
-    --set='server.ha.raft.enabled=true' .
+    --set='server.ha.raft.enabled=true' \
+    --set='server.enterpriseLicense.secretName=vault-license' .
   wait_for_running "$(name_prefix)-east-0"
 
   # Sealed, not initialized
@@ -76,9 +77,10 @@ load _helpers
   helm install "$(name_prefix)-west" \
     --set='injector.enabled=false' \
     --set='server.image.repository=hashicorp/vault-enterprise' \
-    --set='server.image.tag=1.6.2_ent' \
+    --set='server.image.tag=1.7.3_ent' \
     --set='server.ha.enabled=true' \
-    --set='server.ha.raft.enabled=true' .
+    --set='server.ha.raft.enabled=true' \
+    --set='server.enterpriseLicense.secretName=vault-license' .
   wait_for_running "$(name_prefix)-west-0"
 
   # Sealed, not initialized
@@ -153,6 +155,7 @@ setup() {
   kubectl delete namespace acceptance --ignore-not-found=true
   kubectl create namespace acceptance
   kubectl config set-context --current --namespace=acceptance
+  kubectl create secret generic vault-license --from-literal license=$VAULT_LICENSE_CI
 }
 
 #cleanup

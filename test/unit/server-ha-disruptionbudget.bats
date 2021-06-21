@@ -85,3 +85,15 @@ load _helpers
       yq '.spec.maxUnavailable' | tee /dev/stderr)
   [ "${actual}" = "2" ]
 }
+
+@test "server/DisruptionBudget: correct maxUnavailable with custom value" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      --show-only templates/server-disruptionbudget.yaml  \
+      --set 'server.ha.enabled=true' \
+      --set 'server.ha.replicas=3' \
+      --set 'server.ha.disruptionBudget.maxUnavailable=2' \
+      . | tee /dev/stderr |
+      yq '.spec.maxUnavailable' | tee /dev/stderr)
+  [ "${actual}" = "2" ]
+}
