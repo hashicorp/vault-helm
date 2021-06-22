@@ -540,14 +540,6 @@ server:
         path = "/vault/data"
       }
 
-      seal "transit" {
-        address = "https://vault-pi4u2"
-        disable_renewal = "false"
-        key_name = "autounseal-nuc6"
-        mount_path = "transit/"
-        tls_skip_verify = "false"
-      }
-
   # Run Vault in "HA" mode. There are no storage requirements unless audit log
   # persistence is required.  In HA mode Vault will configure itself to use Consul
   # for its storage backend.  The default configuration provided will work the Consul
