@@ -52,7 +52,7 @@ injector:
   # image sets the repo and tag of the vault-k8s image to use for the injector.
   image:
     repository: "hashicorp/vault-k8s"
-    tag: "0.10.0"
+    tag: "0.10.2"
     pullPolicy: IfNotPresent
 
   # agentImage sets the repo and tag of the Vault image to use for the Vault Agent
@@ -60,7 +60,7 @@ injector:
   # required.
   agentImage:
     repository: "vault"
-    tag: "1.7.1"
+    tag: "1.7.3"
 
   # The default values for the injected Vault Agent containers.
   agentDefaults:
@@ -198,13 +198,25 @@ server:
   # If not set to true, Vault server will not be installed. See vault.mode in _helpers.tpl for implementation details
   enabled: true
 
+  # [Enterprise Only] This value refers to a Kubernetes secret that you have
+  # created that contains your enterprise license. If you are not using an
+  # enterprise image or if you plan to introduce the license key via another
+  # route, then leave secretName blank ("") or set it to null.
+  # Requires Vault Enterprise 1.8 or later.
+  enterpriseLicense:
+    # The name of the Kubernetes secret that holds the enterprise license. The
+    # secret must be in the same namespace that Vault is installed into.
+    secretName: ""
+    # The key within the Kubernetes secret that holds the enterprise license.
+    secretKey: "license"
+
   # Resource requests, limits, etc. for the server cluster placement. This
   # should map directly to the value of the resources field for a PodSpec.
   # By default no direct resource request is made.
 
   image:
     repository: "vault"
-    tag: "1.7.1"
+    tag: "1.7.3"
     # Overrides the default Image Pull Policy
     pullPolicy: IfNotPresent
 
@@ -661,6 +673,7 @@ ui:
   serviceType: "ClusterIP"
   serviceNodePort: null
   externalPort: 8200
+  targetPort: 8200
 
   # loadBalancerSourceRanges:
   #   - 10.0.0.0/16
@@ -687,7 +700,7 @@ csi:
 
   image:
     repository: "hashicorp/vault-csi-provider"
-    tag: "0.2.0"
+    tag: "0.3.0"
     pullPolicy: IfNotPresent
 
   # volumes is a list of volumes made available to all containers. These are rendered
@@ -724,11 +737,17 @@ csi:
     # YAML-formatted multi-line templated string map of the annotations to apply
     # to the daemonSet.
     annotations: {}
+
   pod:
     # Extra annotations for the provider pods. This can either be YAML or a
     # YAML-formatted multi-line templated string map of the annotations to apply
     # to the pod.
     annotations: {}
+
+    # Toleration Settings for provider pods
+    # This should be a multi-line string matching the Toleration array
+    # in a PodSpec.
+    tolerations: null
 
   serviceAccount:
     # Extra annotations for the serviceAccount definition. This can either be
@@ -763,3 +782,6 @@ csi:
 
   # Enables debug logging.
   debug: false
+
+  # Pass arbitrary additional arguments to vault-csi-provider.
+  extraArgs: []

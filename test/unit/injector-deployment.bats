@@ -168,6 +168,24 @@ load _helpers
   [ "${value}" = "RELEASE-NAME-vault-agent-injector-svc,RELEASE-NAME-vault-agent-injector-svc.${namespace:-default},RELEASE-NAME-vault-agent-injector-svc.${namespace:-default}.svc" ]
 }
 
+@test "injector/deployment: manual TLS adds volume mount" { 
+   cd `chart_dir`
+   local object=$(helm template \
+       --show-only templates/injector-deployment.yaml  \
+       --set 'injector.enabled=true' \
+       --set 'injector.certs.secretName=vault-tls' \
+       . | tee /dev/stderr |
+       yq -r '.spec.template.spec.containers[0].volumeMounts[] | select(.name == "webhook-certs")' | tee /dev/stderr)
+
+   local actual=$(echo $object |
+       yq -r '.mountPath' | tee /dev/stderr)
+   [ "${actual}" = "/etc/webhook/certs" ]
+
+   local actual=$(echo $object |
+       yq -r '.readOnly' | tee /dev/stderr)
+   [ "${actual}" = "true" ]
+}
+
 @test "injector/deployment: with externalVaultAddr" {
   cd `chart_dir`
   local object=$(helm template \

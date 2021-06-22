@@ -1,5 +1,31 @@
 ## Unreleased
 
+## 0.13.0 (June 17th, 2021)
+
+Improvements:
+* Added a helm test for vault server [GH-531](https://github.com/hashicorp/vault-helm/pull/531)
+* Added server.enterpriseLicense option [GH-547](https://github.com/hashicorp/vault-helm/pull/547)
+* Added OpenShift overrides [GH-549](https://github.com/hashicorp/vault-helm/pull/549)
+
+Bugs:
+* Fix ui.serviceNodePort schema [GH-537](https://github.com/hashicorp/vault-helm/pull/537)
+* Fix server.ha.disruptionBudget.maxUnavailable schema [GH-535](https://github.com/hashicorp/vault-helm/pull/535)
+* Added webhook-certs volume mount to sidecar injector [GH-545](https://github.com/hashicorp/vault-helm/pull/545)
+
+## 0.12.0 (May 25th, 2021)
+
+Features:
+* Pass additional arguments to `vault-csi-provider` using `csi.extraArgs` [GH-526](https://github.com/hashicorp/vault-helm/pull/526)
+
+Improvements:
+* Set chart kubeVersion and added chart-verifier tests [GH-510](https://github.com/hashicorp/vault-helm/pull/510)
+* Added values json schema [GH-513](https://github.com/hashicorp/vault-helm/pull/513)
+* Ability to set tolerations for CSI daemonset pods [GH-521](https://github.com/hashicorp/vault-helm/pull/521)
+* UI target port is now configurable [GH-437](https://github.com/hashicorp/vault-helm/pull/437)
+
+Bugs:
+* CSI: `global.imagePullSecrets` are now also used for CSI daemonset [GH-519](https://github.com/hashicorp/vault-helm/pull/519)
+
 ## 0.11.0 (April 14th, 2021)
 
 Features:

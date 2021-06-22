@@ -79,6 +79,21 @@ First, build the Docker image for running the tests:
 
 ```shell
 docker build -f ${PWD}/test/docker/Test.dockerfile ${PWD}/test/docker/ -t vault-helm-test
+```
+Next, execute the tests with the following commands:
+```shell
+docker run -it --rm -v "${PWD}:/test" vault-helm-test bats /test/test/unit
+```
+It's possible to only run specific bats tests using regular expressions. 
+For example, the following will run only tests with "injector" in the name:
+```shell
+docker run -it --rm -v "${PWD}:/test" vault-helm-test bats /test/test/unit -f "injector"
+```
+
+### Test Manually
+The following are the instructions for running bats tests on your workstation.
+#### Prerequisites
+* [Bats](https://github.com/bats-core/bats-core)
   ```bash
   brew install bats-core
   ```
