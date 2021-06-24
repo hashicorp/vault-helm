@@ -8,6 +8,11 @@ global:
   imagePullSecrets: []
   # imagePullSecrets:
   #   - name: image-pull-secret
+  # setting the below flag to true will accept imagePullSecrets as list containing only values.
+  # eg:
+  # imagePullSecrets:
+  #   - image-pull-secret
+  imagePullSecretsAsListWithOnlyValues: false
   # TLS for end-to-end encrypted transport
   tlsDisable: true
   # If deploying to OpenShift

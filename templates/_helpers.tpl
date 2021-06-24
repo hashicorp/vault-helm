@@ -588,3 +588,21 @@ Inject extra environment populated by secrets, if populated
 {{ "https" }}
 {{- end -}}
 {{- end -}}
+
+{{/*
+Resolve imagePullSecrets value
+*/}}
+{{- define "vault.imagePullSecrets" -}}
+{{- if .Values.global.imagePullSecrets }}
+imagePullSecrets:
+{{- if .Values.global.imagePullSecretsAsListWithOnlyValues }}
+{{- range .Values.global.imagePullSecrets }}
+  - name: {{ . }}
+{{- end }}
+{{- else -}}
+{{- range .Values.global.imagePullSecrets }}
+  - {{ . | toYaml }}
+{{- end }}
+{{- end -}}
+{{- end -}}
+{{- end -}}

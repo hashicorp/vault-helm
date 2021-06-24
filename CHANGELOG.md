@@ -1,5 +1,10 @@
 ## Unreleased
 
+## 0.14.0 (Jun 28th, 2021)
+
+Improvements:
+* Use imagePullSecrets as list containing only names [GH-557](https://github.com/hashicorp/vault-helm/pull/557)
+
 ## 0.13.0 (June 17th, 2021)
 
 Improvements:
