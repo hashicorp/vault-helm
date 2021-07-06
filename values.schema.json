@@ -186,6 +186,14 @@
                         },
                         "template": {
                             "type": "string"
+                        },
+                        "templateConfig": {
+                            "type": "object",
+                            "properties": {
+                                "exitOnRetryFailure": {
+                                    "type": "boolean"
+                                }
+                            }
                         }
                     }
                 },

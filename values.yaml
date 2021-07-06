@@ -75,6 +75,10 @@ injector:
     # Possible values include: "json" and "map".
     template: "map"
 
+    # Default values within Agent's template_config stanza.
+    templateConfig:
+      exitOnRetryFailure: true
+
   # Mount Path of the Vault Kubernetes Auth Method.
   authPath: "auth/kubernetes"
 
