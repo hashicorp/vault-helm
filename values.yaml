@@ -27,6 +27,9 @@ injector:
   # True if you want to enable vault agent injection.
   enabled: true
 
+  networkPolicy:
+    enabled: false
+
   replicas: 1
 
   # Configures the port the injector should listen on
