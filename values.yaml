@@ -151,8 +151,7 @@ injector:
     # KUBERNETES_SERVICE_HOST: kubernetes.default.svc
 
   # Affinity Settings for injector pods
-  # This should be a multi-line string matching the affinity section of a
-  # PodSpec.
+  # This can either be multi-line string or YAML matching the PodSpec's affinity field.
   # Commenting out or setting as empty the affinity variable, will allow
   # deployment of multiple replicas to single node services such as Minikube.
   affinity: |
@@ -166,16 +165,16 @@ injector:
           topologyKey: kubernetes.io/hostname
 
   # Toleration Settings for injector pods
-  # This should be a multi-line string matching the Toleration array
+  # This should be either a multi-line string or YAML matching the Toleration array
   # in a PodSpec.
-  tolerations: null
+  tolerations: []
 
-  # nodeSelector labels for injector pod assignment, formatted as a muli-line string.
+  # nodeSelector labels for server pod assignment, formatted as a multi-line string or YAML map.
   # ref: https://kubernetes.io/docs/concepts/configuration/assign-pod-node/#nodeselector
   # Example:
-  # nodeSelector: |
+  # nodeSelector:
   #   beta.kubernetes.io/arch: amd64
-  nodeSelector: null
+  nodeSelector: {}
 
   # Priority class for injector pods
   priorityClassName: ""
@@ -397,10 +396,10 @@ server:
   #     name: plugins
   #     readOnly: true
 
-
   # Affinity Settings
   # Commenting out or setting as empty the affinity variable, will allow
   # deployment to single node services such as Minikube
+  # This should be either a multi-line string or YAML matching the PodSpec's affinity field.
   affinity: |
     podAntiAffinity:
       requiredDuringSchedulingIgnoredDuringExecution:
@@ -412,16 +411,16 @@ server:
           topologyKey: kubernetes.io/hostname
 
   # Toleration Settings for server pods
-  # This should be a multi-line string matching the Toleration array
+  # This should be either a multi-line string or YAML matching the Toleration array
   # in a PodSpec.
-  tolerations: null
+  tolerations: []
 
-  # nodeSelector labels for server pod assignment, formatted as a muli-line string.
+  # nodeSelector labels for server pod assignment, formatted as a multi-line string or YAML map.
   # ref: https://kubernetes.io/docs/concepts/configuration/assign-pod-node/#nodeselector
   # Example:
-  # nodeSelector: |
+  # nodeSelector:
   #   beta.kubernetes.io/arch: amd64
-  nodeSelector: null
+  nodeSelector: {}
 
   # Enables network policy for server pods
   networkPolicy:
@@ -753,9 +752,9 @@ csi:
     annotations: {}
 
     # Toleration Settings for provider pods
-    # This should be a multi-line string matching the Toleration array
+    # This should be either a multi-line string or YAML matching the Toleration array
     # in a PodSpec.
-    tolerations: null
+    tolerations: []
 
   serviceAccount:
     # Extra annotations for the serviceAccount definition. This can either be
