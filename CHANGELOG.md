@@ -1,5 +1,11 @@
 ## Unreleased
 
+Features:
+* Added templateConfig.exitOnRetryFailure annotation for the injector [GH-560](https://github.com/hashicorp/vault-helm/pull/560)
+
+Improvements:
+* Support configuring pod tolerations, pod affinity, and node selectors as YAML [GH-565](https://github.com/hashicorp/vault-helm/pull/565)
+
 ## 0.13.0 (June 17th, 2021)
 
 Improvements:
