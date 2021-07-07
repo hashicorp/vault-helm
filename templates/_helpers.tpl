@@ -224,9 +224,9 @@ Set's the affinity for pod placement when running in standalone and HA modes.
 {{- define "vault.affinity" -}}
   {{- if and (ne .mode "dev") .Values.server.affinity }}
       affinity:
-        {{- $tp := typeOf .Values.server.affinity }}
+        {{ $tp := typeOf .Values.server.affinity }}
         {{- if eq $tp "string" }}
-          {{- tpl .Values.server.affinity . | nindent 8 }}
+          {{- tpl .Values.server.affinity . | nindent 8 | trim }}
         {{- else }}
           {{- toYaml .Values.server.affinity | nindent 8 }}
         {{- end }}
@@ -239,9 +239,9 @@ Sets the injector affinity for pod placement
 {{- define "injector.affinity" -}}
   {{- if .Values.injector.affinity }}
       affinity:
-        {{- $tp := typeOf .Values.injector.affinity }}
+        {{ $tp := typeOf .Values.injector.affinity }}
         {{- if eq $tp "string" }}
-          {{- tpl .Values.injector.affinity . | nindent 8 }}
+          {{- tpl .Values.injector.affinity . | nindent 8 | trim }}
         {{- else }}
           {{- toYaml .Values.injector.affinity | nindent 8 }}
         {{- end }}
@@ -249,14 +249,14 @@ Sets the injector affinity for pod placement
 {{- end -}}
 
 {{/*
-Set's the toleration for pod placement when running in standalone and HA modes.
+Sets the toleration for pod placement when running in standalone and HA modes.
 */}}
 {{- define "vault.tolerations" -}}
   {{- if and (ne .mode "dev") .Values.server.tolerations }}
       tolerations:
       {{- $tp := typeOf .Values.server.tolerations }}
       {{- if eq $tp "string" }}
-        {{- tpl .Values.server.tolerations . | nindent 8 }}
+        {{ tpl .Values.server.tolerations . | nindent 8 | trim }}
       {{- else }}
         {{- toYaml .Values.server.tolerations | nindent 8 }}
       {{- end }}
@@ -271,7 +271,7 @@ Sets the injector toleration for pod placement
       tolerations:
       {{- $tp := typeOf .Values.injector.tolerations }}
       {{- if eq $tp "string" }}
-        {{- tpl .Values.injector.tolerations . | nindent 8 }}
+        {{ tpl .Values.injector.tolerations . | nindent 8 | trim }}
       {{- else }}
         {{- toYaml .Values.injector.tolerations | nindent 8 }}
       {{- end }}
@@ -284,9 +284,9 @@ Set's the node selector for pod placement when running in standalone and HA mode
 {{- define "vault.nodeselector" -}}
   {{- if and (ne .mode "dev") .Values.server.nodeSelector }}
       nodeSelector:
-      {{- $tp := typeOf .Values.injector.tolerations }}
+      {{- $tp := typeOf .Values.server.nodeSelector }}
       {{- if eq $tp "string" }}
-        {{ tpl .Values.server.nodeSelector . | indent 8 }}
+        {{ tpl .Values.server.nodeSelector . | nindent 8 | trim }}
       {{- else }}
         {{- toYaml .Values.server.nodeSelector | nindent 8 }}
       {{- end }}
@@ -301,7 +301,7 @@ Sets the injector node selector for pod placement
       nodeSelector:
         {{- $tp := typeOf .Values.injector.nodeSelector }}
         {{- if eq $tp "string" }}
-          {{- tpl .Values.injector.nodeSelector . | indent 8 }}
+          {{ tpl .Values.injector.nodeSelector . | nindent 8 | trim }}
         {{- else }}
           {{- toYaml .Values.injector.nodeSelector | nindent 8 }}
         {{- end }}
@@ -551,7 +551,7 @@ Sets the injector toleration for pod placement
       tolerations:
       {{- $tp := typeOf .Values.csi.pod.tolerations }}
       {{- if eq $tp "string" }}
-        {{- tpl .Values.csi.pod.tolerations . | nindent 8 }}
+        {{ tpl .Values.csi.pod.tolerations . | nindent 8 | trim }}
       {{- else }}
         {{- toYaml .Values.csi.pod.tolerations | nindent 8 }}
       {{- end }}
