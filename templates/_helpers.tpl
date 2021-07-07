@@ -299,12 +299,12 @@ Sets the injector node selector for pod placement
 {{- define "injector.nodeselector" -}}
   {{- if .Values.injector.nodeSelector }}
       nodeSelector:
-        {{- $tp := typeOf .Values.injector.nodeSelector }}
-        {{- if eq $tp "string" }}
-          {{ tpl .Values.injector.nodeSelector . | nindent 8 | trim }}
-        {{- else }}
-          {{- toYaml .Values.injector.nodeSelector | nindent 8 }}
-        {{- end }}
+      {{- $tp := typeOf .Values.injector.nodeSelector }}
+      {{- if eq $tp "string" }}
+        {{ tpl .Values.injector.nodeSelector . | nindent 8 | trim }}
+      {{- else }}
+        {{- toYaml .Values.injector.nodeSelector | nindent 8 }}
+      {{- end }}
   {{- end }}
 {{- end -}}
 
