@@ -4,6 +4,9 @@ CLOUDSDK_CORE_PROJECT?=vault-helm-dev-246514
 # set to run a single test - e.g acceptance/server-ha-enterprise-dr.bats
 ACCEPTANCE_TESTS?=acceptance
 
+# filter bats unit tests to run.
+UNIT_TESTS_FILTER?='.*'
+
 # Generate json schema for chart values. See test/README.md for more details.
 values-schema:
 	helm schema-gen values.yaml > values.schema.json
@@ -12,7 +15,7 @@ test-image:
 	@docker build --rm -t $(TEST_IMAGE) -f $(CURDIR)/test/docker/Test.dockerfile $(CURDIR)
 
 test-unit:
-	@docker run -it -v ${PWD}:/helm-test $(TEST_IMAGE) bats /helm-test/test/unit
+	@docker run --rm -it -v ${PWD}:/helm-test $(TEST_IMAGE) bats -f $(UNIT_TESTS_FILTER) /helm-test/test/unit
 
 test-bats: test-unit test-acceptance
 
