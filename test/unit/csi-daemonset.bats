@@ -246,7 +246,7 @@ load _helpers
   [ "${actual}" = "true" ]
 }
 
-@test "csi/daemonset: tolerations can be set" {
+@test "csi/daemonset: tolerations can be set as string" {
   cd `chart_dir`
   local actual=$(helm template \
       --show-only templates/csi-daemonset.yaml  \
@@ -254,6 +254,17 @@ load _helpers
       --set 'csi.pod.tolerations=foobar' \
       . | tee /dev/stderr |
       yq '.spec.template.spec.tolerations == "foobar"' | tee /dev/stderr)
+  [ "${actual}" = "true" ]
+}
+
+@test "csi/daemonset: tolerations can be set as YAML" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      --show-only templates/csi-daemonset.yaml  \
+      --set 'csi.enabled=true' \
+      --set "csi.pod.tolerations[0].foo=bar,csi.pod.tolerations[1].baz=qux" \
+      . | tee /dev/stderr |
+      yq '.spec.template.spec.tolerations == [{"foo": "bar"}, {"baz": "qux"}]' | tee /dev/stderr)
   [ "${actual}" = "true" ]
 }
 

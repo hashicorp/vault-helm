@@ -2,8 +2,11 @@
 
 ## 0.14.0 (Jun 28th, 2021)
 
+Features:
+* Added templateConfig.exitOnRetryFailure annotation for the injector [GH-560](https://github.com/hashicorp/vault-helm/pull/560)
+
 Improvements:
-* Use imagePullSecrets as list containing only names [GH-557](https://github.com/hashicorp/vault-helm/pull/557)
+* Support configuring pod tolerations, pod affinity, and node selectors as YAML [GH-565](https://github.com/hashicorp/vault-helm/pull/565)
 
 ## 0.13.0 (June 17th, 2021)
 
