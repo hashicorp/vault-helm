@@ -175,7 +175,6 @@ spec:
             secretName: "{{ .Values.injector.certs.secretName }}"
 {{- end }}
       {{- if .Values.global.imagePullSecrets }}
-      imagePullSecrets:
-        {{- toYaml .Values.global.imagePullSecrets | nindent 8 }}
+        {{- include "vault.imagePullSecrets" . | nindent 6 }}
       {{- end }}
 {{ end }}
