@@ -2,7 +2,7 @@
 
 ## Running Vault Helm Acceptance tests
 
-The Makefile at the top level of this repo contains a few target that should help with running acceptance tests in your own GKE instance or in kind cluster.
+The Makefile at the top level of this repo contains a few target that should help with running acceptance tests in your own GKE instance or in a kind cluster.
 
 ### Running in a GKE cluster
 * Set the `GOOGLE_CREDENTIALS` and `CLOUDSDK_CORE_PROJECT` variables at the top of the file. `GOOGLE_CREDENTIALS` should contain the local path to your Google Cloud Platform account credentials in JSON format. `CLOUDSDK_CORE_PROJECT` should be set to the ID of your GCP project.
