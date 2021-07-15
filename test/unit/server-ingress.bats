@@ -174,7 +174,7 @@ load _helpers
   [ "${actual}" = "RELEASE-NAME-vault" ]
 }
 
-@test "server/ingress: uses regular service when not ha and activeService is true- yaml" {
+@test "server/ingress: uses regular service when not ha and activeService is true - yaml" {
   cd `chart_dir`
 
   local actual=$(helm template \
