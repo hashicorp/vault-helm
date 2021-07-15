@@ -43,6 +43,17 @@ load _helpers
   [ "${actual}" = '/' ]
 }
 
+@test "server/ingress: support ingress rule without host to match all hosts" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      --show-only templates/server-ingress.yaml \
+      --set 'server.ingress.enabled=true' \
+      --set 'server.ingress.hosts[0].paths[0]=/' \
+      . | tee /dev/stderr |
+      yq  -r '.spec.rules[0].http.paths[0] | has("host")' | tee /dev/stderr)
+  [ "${actual}" = "false" ]
+}
+
 @test "server/ingress: vault backend should be added when I specify a path" {
   cd `chart_dir`
 
