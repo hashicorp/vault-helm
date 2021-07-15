@@ -131,7 +131,7 @@ load _helpers
   [ "${actual}" = "nginx" ]
 }
 
-@test "server/ingress: uses active service when ha - yaml" {
+@test "server/ingress: uses active service when ha by default - yaml" {
   cd `chart_dir`
 
   local actual=$(helm template \
@@ -145,12 +145,42 @@ load _helpers
   [ "${actual}" = "RELEASE-NAME-vault-active" ]
 }
 
+@test "server/ingress: uses regular service when configured with ha - yaml" {
+  cd `chart_dir`
+
+  local actual=$(helm template \
+      --show-only templates/server-ingress.yaml \
+      --set 'server.ingress.enabled=true' \
+      --set 'server.ingress.activeService=false' \
+      --set 'server.dev.enabled=false' \
+      --set 'server.ha.enabled=true' \
+      --set 'server.service.enabled=true' \
+      . | tee /dev/stderr |
+      yq -r '.spec.rules[0].http.paths[0].backend.serviceName' | tee /dev/stderr)
+  [ "${actual}" = "RELEASE-NAME-vault" ]
+}
+
 @test "server/ingress: uses regular service when not ha - yaml" {
   cd `chart_dir`
 
   local actual=$(helm template \
       --show-only templates/server-ingress.yaml \
       --set 'server.ingress.enabled=true' \
+      --set 'server.dev.enabled=false' \
+      --set 'server.ha.enabled=false' \
+      --set 'server.service.enabled=true' \
+      . | tee /dev/stderr |
+      yq -r '.spec.rules[0].http.paths[0].backend.serviceName' | tee /dev/stderr)
+  [ "${actual}" = "RELEASE-NAME-vault" ]
+}
+
+@test "server/ingress: uses regular service when not ha and activeService is true - yaml" {
+  cd `chart_dir`
+
+  local actual=$(helm template \
+      --show-only templates/server-ingress.yaml \
+      --set 'server.ingress.enabled=true' \
+      --set 'server.ingress.activeService=true' \
       --set 'server.dev.enabled=false' \
       --set 'server.ha.enabled=false' \
       --set 'server.service.enabled=true' \

@@ -564,6 +564,9 @@
                 "ingress": {
                     "type": "object",
                     "properties": {
+                        "activeService": {
+                            "type": "boolean"
+                        },
                         "annotations": {
                             "type": [
                                 "object",
@@ -686,6 +689,9 @@
                 "route": {
                     "type": "object",
                     "properties": {
+                        "activeService": {
+                            "type": "boolean"
+                        },
                         "annotations": {
                             "type": [
                                 "object",
