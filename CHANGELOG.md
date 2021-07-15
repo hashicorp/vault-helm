@@ -7,6 +7,9 @@ Improvements:
 * Support configuring pod tolerations, pod affinity, and node selectors as YAML [GH-565](https://github.com/hashicorp/vault-helm/pull/565)
 * Set the default vault image to come from the hashicorp organization [GH-567](https://github.com/hashicorp/vault-helm/pull/567)
 * Add support for running the acceptance tests against a local `kind` cluster [GH-567](https://github.com/hashicorp/vault-helm/pull/567)
+* Add `server.ingress.activeService` to configure if the ingress should use the active service [GH-570](https://github.com/hashicorp/vault-helm/pull/570)
+* Add `server.route.activeService` to configure if the route should use the active service [GH-570](https://github.com/hashicorp/vault-helm/pull/570)
+
 
 ## 0.13.0 (June 17th, 2021)
 
