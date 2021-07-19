@@ -7,6 +7,8 @@ metadata:
   annotations:
     "helm.sh/hook": test
 spec:
+  imagePullSecrets:
+    {{- toYaml .Values.global.imagePullSecrets | nindent 8 }}
   containers:
     - name: {{ .Release.Name }}-server-test
       image: {{ .Values.server.image.repository }}:{{ .Values.server.image.tag | default "latest" }}
