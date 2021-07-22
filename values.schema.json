@@ -281,20 +281,6 @@
                     "properties": {
                         "enabled": {
                             "type": "boolean"
-                        },
-                        "image": {
-                            "type": "object",
-                            "properties": {
-                                "repository": {
-                                    "type": "string"
-                                },
-                                "tag": {
-                                    "type": "string"
-                                }
-                            }
-                        },
-                        "ttl": {
-                            "type": "string"
                         }
                     }
                 },
