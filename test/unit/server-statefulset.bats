@@ -738,7 +738,7 @@ load _helpers
   [ "${actual}" = "true" ]
 }
 
-@test "server/standalone-StatefulSet: affinity can be set" {
+@test "server/standalone-StatefulSet: affinity can be set as string" {
   cd `chart_dir`
   local actual=$(helm template \
       --show-only templates/server-statefulset.yaml  \
@@ -747,6 +747,17 @@ load _helpers
       yq '.spec.template.spec.affinity == "foobar"' | tee /dev/stderr)
   [ "${actual}" = "true" ]
 }
+
+@test "server/standalone-StatefulSet: affinity can be set as YAML" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      --show-only templates/server-statefulset.yaml  \
+      --set 'server.affinity.podAntiAffinity=foobar' \
+      . | tee /dev/stderr |
+      yq '.spec.template.spec.affinity.podAntiAffinity == "foobar"' | tee /dev/stderr)
+  [ "${actual}" = "true" ]
+}
+
 
 @test "server/standalone-StatefulSet: tolerations not set by default" {
   cd `chart_dir`
@@ -757,13 +768,23 @@ load _helpers
   [ "${actual}" = "true" ]
 }
 
-@test "server/standalone-StatefulSet: tolerations can be set" {
+@test "server/standalone-StatefulSet: tolerations can be set as string" {
   cd `chart_dir`
   local actual=$(helm template \
       --show-only templates/server-statefulset.yaml  \
       --set 'server.tolerations=foobar' \
       . | tee /dev/stderr |
       yq '.spec.template.spec.tolerations == "foobar"' | tee /dev/stderr)
+  [ "${actual}" = "true" ]
+}
+
+@test "server/standalone-StatefulSet: tolerations can be set as YAML" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      --show-only templates/server-statefulset.yaml  \
+      --set "server.tolerations[0].foo=bar,server.tolerations[1].baz=qux" \
+      . | tee /dev/stderr |
+      yq '.spec.template.spec.tolerations == [{"foo": "bar"}, {"baz": "qux"}]' | tee /dev/stderr)
   [ "${actual}" = "true" ]
 }
 
@@ -776,7 +797,7 @@ load _helpers
   [ "${actual}" = "null" ]
 }
 
-@test "server/standalone-StatefulSet: specified nodeSelector" {
+@test "server/standalone-StatefulSet: specified nodeSelector as string" {
   cd `chart_dir`
   local actual=$(helm template \
       --show-only templates/server-statefulset.yaml \
@@ -784,6 +805,16 @@ load _helpers
       . | tee /dev/stderr |
       yq -r '.spec.template.spec.nodeSelector' | tee /dev/stderr)
   [ "${actual}" = "testing" ]
+}
+
+@test "server/standalone-StatefulSet: nodeSelector can be set as YAML" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      --show-only templates/server-statefulset.yaml  \
+      --set "server.nodeSelector.beta\.kubernetes\.io/arch=amd64" \
+      . | tee /dev/stderr |
+      yq '.spec.template.spec.nodeSelector == {"beta.kubernetes.io/arch": "amd64"}' | tee /dev/stderr)
+  [ "${actual}" = "true" ]
 }
 
 #--------------------------------------------------------------------

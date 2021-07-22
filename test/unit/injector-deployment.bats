@@ -432,13 +432,23 @@ load _helpers
   [ "${actual}" = "false" ]
 }
 
-@test "injector/deployment: affinity can be set" {
+@test "injector/deployment: affinity can be set as string" {
   cd `chart_dir`
   local actual=$(helm template \
       --show-only templates/injector-deployment.yaml  \
       --set 'injector.affinity=foobar' \
       . | tee /dev/stderr |
       yq '.spec.template.spec.affinity == "foobar"' | tee /dev/stderr)
+  [ "${actual}" = "true" ]
+}
+
+@test "injector/deployment: affinity can be set as YAML" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      --show-only templates/injector-deployment.yaml  \
+      --set 'injector.affinity.podAntiAffinity=foobar' \
+      . | tee /dev/stderr |
+      yq '.spec.template.spec.affinity.podAntiAffinity == "foobar"' | tee /dev/stderr)
   [ "${actual}" = "true" ]
 }
 
@@ -454,13 +464,23 @@ load _helpers
   [ "${actual}" = "true" ]
 }
 
-@test "injector/deployment: tolerations can be set" {
+@test "injector/deployment: tolerations can be set as string" {
   cd `chart_dir`
   local actual=$(helm template \
       --show-only templates/injector-deployment.yaml  \
       --set 'injector.tolerations=foobar' \
       . | tee /dev/stderr |
       yq '.spec.template.spec.tolerations == "foobar"' | tee /dev/stderr)
+  [ "${actual}" = "true" ]
+}
+
+@test "injector/deployment: tolerations can be set as YAML" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      --show-only templates/injector-deployment.yaml  \
+      --set "injector.tolerations[0].foo=bar,injector.tolerations[1].baz=qux" \
+      . | tee /dev/stderr |
+      yq '.spec.template.spec.tolerations == [{"foo": "bar"}, {"baz": "qux"}]' | tee /dev/stderr)
   [ "${actual}" = "true" ]
 }
 
@@ -476,7 +496,7 @@ load _helpers
   [ "${actual}" = "null" ]
 }
 
-@test "injector/deployment: nodeSelector can be set" {
+@test "injector/deployment: nodeSelector can be set as string" {
   cd `chart_dir`
   local actual=$(helm template \
       --show-only templates/injector-deployment.yaml \
@@ -485,6 +505,17 @@ load _helpers
       yq -r '.spec.template.spec.nodeSelector' | tee /dev/stderr)
   [ "${actual}" = "testing" ]
 }
+
+@test "injector/deployment: nodeSelector can be set as YAML" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      --show-only templates/injector-deployment.yaml \
+      --set "injector.nodeSelector.beta\.kubernetes\.io/arch=amd64" \
+      . | tee /dev/stderr |
+      yq '.spec.template.spec.nodeSelector == {"beta.kubernetes.io/arch": "amd64"}' | tee /dev/stderr)
+  [ "${actual}" = "true" ]
+}
+
 
 #--------------------------------------------------------------------
 # priorityClassName
@@ -639,4 +670,29 @@ load _helpers
   local value=$(echo $object |
       yq -r 'map(select(.name=="AGENT_INJECT_DEFAULT_TEMPLATE")) | .[] .value' | tee /dev/stderr)
   [ "${value}" = "json" ]
+}
+
+@test "injector/deployment: agent default template_config.exit_on_retry_failure" {
+  cd `chart_dir`
+  local object=$(helm template \
+      --show-only templates/injector-deployment.yaml  \
+      . | tee /dev/stderr |
+      yq -r '.spec.template.spec.containers[0].env' | tee /dev/stderr)
+
+  local value=$(echo $object |
+      yq -r 'map(select(.name=="AGENT_INJECT_TEMPLATE_CONFIG_EXIT_ON_RETRY_FAILURE")) | .[] .value' | tee /dev/stderr)
+  [ "${value}" = "true" ]
+}
+
+@test "injector/deployment: can set agent template_config.exit_on_retry_failure" {
+  cd `chart_dir`
+  local object=$(helm template \
+      --show-only templates/injector-deployment.yaml  \
+      --set='injector.agentDefaults.templateConfig.exitOnRetryFailure=false' \
+      . | tee /dev/stderr |
+      yq -r '.spec.template.spec.containers[0].env' | tee /dev/stderr)
+
+  local value=$(echo $object |
+      yq -r 'map(select(.name=="AGENT_INJECT_TEMPLATE_CONFIG_EXIT_ON_RETRY_FAILURE")) | .[] .value' | tee /dev/stderr)
+  [ "${value}" = "false" ]
 }

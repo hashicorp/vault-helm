@@ -80,7 +80,11 @@
                             ]
                         },
                         "tolerations": {
-                            "type": ["null", "string"]
+                            "type": [
+                                "null",
+                                "array",
+                                "string"
+                            ]
                         }
                     }
                 },
@@ -167,7 +171,10 @@
             "type": "object",
             "properties": {
                 "affinity": {
-                    "type": "string"
+                    "type": [
+                        "object",
+                        "string"
+                    ]
                 },
                 "agentDefaults": {
                     "type": "object",
@@ -186,6 +193,14 @@
                         },
                         "template": {
                             "type": "string"
+                        },
+                        "templateConfig": {
+                            "type": "object",
+                            "properties": {
+                                "exitOnRetryFailure": {
+                                    "type": "boolean"
+                                }
+                            }
                         }
                     }
                 },
@@ -301,7 +316,11 @@
                     "type": "object"
                 },
                 "nodeSelector": {
-                    "type": ["null", "string"]
+                    "type": [
+                        "null",
+                        "object",
+                        "string"
+                    ]
                 },
                 "objectSelector": {
                     "type": "object"
@@ -335,6 +354,7 @@
                 "tolerations": {
                     "type": [
                         "null",
+                        "array",
                         "string"
                     ]
                 }
@@ -344,7 +364,10 @@
             "type": "object",
             "properties": {
                 "affinity": {
-                    "type": "string"
+                    "type": [
+                        "object",
+                        "string"
+                    ]
                 },
                 "annotations": {
                     "type": [
@@ -541,6 +564,9 @@
                 "ingress": {
                     "type": "object",
                     "properties": {
+                        "activeService": {
+                            "type": "boolean"
+                        },
                         "annotations": {
                             "type": [
                                 "object",
@@ -621,6 +647,7 @@
                 "nodeSelector": {
                     "type": [
                         "null",
+                        "object",
                         "string"
                     ]
                 },
@@ -662,6 +689,9 @@
                 "route": {
                     "type": "object",
                     "properties": {
+                        "activeService": {
+                            "type": "boolean"
+                        },
                         "annotations": {
                             "type": [
                                 "object",
@@ -747,6 +777,7 @@
                 "tolerations": {
                     "type": [
                         "null",
+                        "array",
                         "string"
                     ]
                 },
