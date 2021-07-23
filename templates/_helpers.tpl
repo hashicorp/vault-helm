@@ -623,3 +623,20 @@ Inject extra environment populated by secrets, if populated
 {{ "https" }}
 {{- end -}}
 {{- end -}}
+
+{{/*
+imagePullSecrets generates pull secrets from either string or map values.
+A map value must be indexable by the key 'name'.
+*/}}
+{{- define "imagePullSecrets" -}}
+{{- with .Values.global.imagePullSecrets -}}
+imagePullSecrets:
+{{- range . -}}
+{{- if typeIs "string" . }}
+  - name: {{ . }}
+{{- else if index . "name" }}
+  - name: {{ .name }}
+{{- end }}
+{{- end -}}
+{{- end -}}
+{{- end -}}

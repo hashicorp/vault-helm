@@ -147,6 +147,32 @@ load _helpers
       yq -r '.spec.template.spec.imagePullSecrets' | tee /dev/stderr)
 
   local actual=$(echo $object |
+     yq -r '. | length' | tee /dev/stderr)
+  [ "${actual}" = "2" ]
+
+  local actual=$(echo $object |
+     yq -r '.[0].name' | tee /dev/stderr)
+  [ "${actual}" = "foo" ]
+
+  local actual=$(echo $object |
+      yq -r '.[1].name' | tee /dev/stderr)
+  [ "${actual}" = "bar" ]
+}
+
+@test "server/standalone-StatefulSet: Custom imagePullSecrets - string array" {
+  cd `chart_dir`
+  local object=$(helm template \
+      --show-only templates/server-statefulset.yaml  \
+      --set 'global.imagePullSecrets[0]=foo' \
+      --set 'global.imagePullSecrets[1]=bar' \
+      . | tee /dev/stderr |
+      yq -r '.spec.template.spec.imagePullSecrets' | tee /dev/stderr)
+
+  local actual=$(echo $object |
+     yq -r '. | length' | tee /dev/stderr)
+  [ "${actual}" = "2" ]
+
+  local actual=$(echo $object |
      yq -r '.[0].name' | tee /dev/stderr)
   [ "${actual}" = "foo" ]
 
