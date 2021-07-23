@@ -5,6 +5,7 @@ global:
   # will enable or disable all the components within this chart by default.
   enabled: true
   # Image pull secret to use for registry authentication.
+  # Alternatively, the value may be specified as an array of strings.
   imagePullSecrets: []
   # imagePullSecrets:
   #   - name: image-pull-secret
