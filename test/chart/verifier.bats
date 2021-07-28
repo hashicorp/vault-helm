@@ -9,7 +9,7 @@ setup_file() {
     # Note: currently `latest` is the only tag available in the chart-verifier repo.
     local IMAGE="quay.io/redhat-certification/chart-verifier:latest"
     # chart-verifier requires an openshift version if a cluster isn't available
-    local OPENSHIFT_VERSION="4.7"
+    local OPENSHIFT_VERSION="4.8"
     local DISABLED_TESTS="chart-testing"
 
     local run_cmd="chart-verifier"
@@ -41,46 +41,46 @@ teardown_file() {
 }
 
 @test "has-kubeversion" {
-    check_result has-kubeversion
+    check_result v1.0/has-kubeversion
 }
 
 @test "is-helm-v3" {
-    check_result is-helm-v3
+    check_result v1.0/is-helm-v3
 }
 
 @test "not-contains-crds" {
-    check_result not-contains-crds
+    check_result v1.0/not-contains-crds
 }
 
 @test "helm-lint" {
-    check_result helm-lint
+    check_result v1.0/helm-lint
 }
 
 @test "not-contain-csi-objects" {
-    check_result not-contain-csi-objects
+    check_result v1.0/not-contain-csi-objects
 }
 
 @test "has-readme" {
-    check_result has-readme
+    check_result v1.0/has-readme
 }
 
 @test "contains-values" {
-    check_result contains-values
+    check_result v1.0/contains-values
 }
 
 @test "contains-values-schema" {
-    check_result contains-values-schema
+    check_result v1.0/contains-values-schema
 }
 
 @test "contains-test" {
-    check_result contains-test
+    check_result v1.0/contains-test
 }
 
 @test "images-are-certified" {
-    check_result images-are-certified
+    check_result v1.0/images-are-certified
 }
 
 @test "chart-testing" {
     skip "Skipping since this test requires a kubernetes/openshift cluster"
-    check_result chart-testing
+    check_result v1.0/chart-testing
 }
