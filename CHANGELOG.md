@@ -1,5 +1,7 @@
 ## Unreleased
 
+## 0.14.0 (July 28th, 2021)
+
 Features:
 * Added templateConfig.exitOnRetryFailure annotation for the injector [GH-560](https://github.com/hashicorp/vault-helm/pull/560)
 
