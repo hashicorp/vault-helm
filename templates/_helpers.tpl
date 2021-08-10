@@ -354,6 +354,21 @@ Sets extra injector service annotations
 {{- end -}}
 
 {{/*
+Sets extra injector webhook annotations
+*/}}
+{{- define "injector.webhookAnnotations" -}}
+  {{- if .Values.injector.webhookAnnotations }}
+  annotations:
+    {{- $tp := typeOf .Values.injector.webhookAnnotations }}
+    {{- if eq $tp "string" }}
+      {{- tpl .Values.injector.webhookAnnotations . | nindent 4 }}
+    {{- else }}
+      {{- toYaml .Values.injector.webhookAnnotations | nindent 4 }}
+    {{- end }}
+  {{- end }}
+{{- end -}}
+
+{{/*
 Sets extra ui service annotations
 */}}
 {{- define "vault.ui.annotations" -}}
