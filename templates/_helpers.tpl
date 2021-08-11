@@ -224,12 +224,7 @@ Set's the affinity for pod placement when running in standalone and HA modes.
 {{- define "vault.affinity" -}}
   {{- if and (ne .mode "dev") .Values.server.affinity }}
       affinity:
-        {{ $tp := typeOf .Values.server.affinity }}
-        {{- if eq $tp "string" }}
-          {{- tpl .Values.server.affinity . | nindent 8 | trim }}
-        {{- else }}
-          {{- toYaml .Values.server.affinity | nindent 8 }}
-        {{- end }}
+        {{ tpl .Values.server.affinity . | nindent 8 | trim }}
   {{ end }}
 {{- end -}}
 
@@ -239,27 +234,17 @@ Sets the injector affinity for pod placement
 {{- define "injector.affinity" -}}
   {{- if .Values.injector.affinity }}
       affinity:
-        {{ $tp := typeOf .Values.injector.affinity }}
-        {{- if eq $tp "string" }}
-          {{- tpl .Values.injector.affinity . | nindent 8 | trim }}
-        {{- else }}
-          {{- toYaml .Values.injector.affinity | nindent 8 }}
-        {{- end }}
+        {{ tpl .Values.injector.affinity . | nindent 8 | trim }}
   {{ end }}
 {{- end -}}
 
 {{/*
-Sets the toleration for pod placement when running in standalone and HA modes.
+Set's the toleration for pod placement when running in standalone and HA modes.
 */}}
 {{- define "vault.tolerations" -}}
   {{- if and (ne .mode "dev") .Values.server.tolerations }}
       tolerations:
-      {{- $tp := typeOf .Values.server.tolerations }}
-      {{- if eq $tp "string" }}
         {{ tpl .Values.server.tolerations . | nindent 8 | trim }}
-      {{- else }}
-        {{- toYaml .Values.server.tolerations | nindent 8 }}
-      {{- end }}
   {{- end }}
 {{- end -}}
 
@@ -269,12 +254,7 @@ Sets the injector toleration for pod placement
 {{- define "injector.tolerations" -}}
   {{- if .Values.injector.tolerations }}
       tolerations:
-      {{- $tp := typeOf .Values.injector.tolerations }}
-      {{- if eq $tp "string" }}
         {{ tpl .Values.injector.tolerations . | nindent 8 | trim }}
-      {{- else }}
-        {{- toYaml .Values.injector.tolerations | nindent 8 }}
-      {{- end }}
   {{- end }}
 {{- end -}}
 
@@ -284,12 +264,7 @@ Set's the node selector for pod placement when running in standalone and HA mode
 {{- define "vault.nodeselector" -}}
   {{- if and (ne .mode "dev") .Values.server.nodeSelector }}
       nodeSelector:
-      {{- $tp := typeOf .Values.server.nodeSelector }}
-      {{- if eq $tp "string" }}
-        {{ tpl .Values.server.nodeSelector . | nindent 8 | trim }}
-      {{- else }}
-        {{- toYaml .Values.server.nodeSelector | nindent 8 }}
-      {{- end }}
+        {{ tpl .Values.server.nodeSelector . | indent 8 | trim }}
   {{- end }}
 {{- end -}}
 
@@ -299,12 +274,7 @@ Sets the injector node selector for pod placement
 {{- define "injector.nodeselector" -}}
   {{- if .Values.injector.nodeSelector }}
       nodeSelector:
-      {{- $tp := typeOf .Values.injector.nodeSelector }}
-      {{- if eq $tp "string" }}
-        {{ tpl .Values.injector.nodeSelector . | nindent 8 | trim }}
-      {{- else }}
-        {{- toYaml .Values.injector.nodeSelector | nindent 8 }}
-      {{- end }}
+        {{ tpl .Values.injector.nodeSelector . | indent 8 | trim }}
   {{- end }}
 {{- end -}}
 
@@ -549,12 +519,7 @@ Sets the injector toleration for pod placement
 {{- define "csi.pod.tolerations" -}}
   {{- if .Values.csi.pod.tolerations }}
       tolerations:
-      {{- $tp := typeOf .Values.csi.pod.tolerations }}
-      {{- if eq $tp "string" }}
         {{ tpl .Values.csi.pod.tolerations . | nindent 8 | trim }}
-      {{- else }}
-        {{- toYaml .Values.csi.pod.tolerations | nindent 8 }}
-      {{- end }}
   {{- end }}
 {{- end -}}
 
@@ -621,22 +586,5 @@ Inject extra environment populated by secrets, if populated
 {{ "http" }}
 {{- else -}}
 {{ "https" }}
-{{- end -}}
-{{- end -}}
-
-{{/*
-imagePullSecrets generates pull secrets from either string or map values.
-A map value must be indexable by the key 'name'.
-*/}}
-{{- define "imagePullSecrets" -}}
-{{- with .Values.global.imagePullSecrets -}}
-imagePullSecrets:
-{{- range . -}}
-{{- if typeIs "string" . }}
-  - name: {{ . }}
-{{- else if index . "name" }}
-  - name: {{ .name }}
-{{- end }}
-{{- end -}}
 {{- end -}}
 {{- end -}}

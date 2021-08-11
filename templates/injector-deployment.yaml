@@ -107,8 +107,6 @@ spec:
               value: "{{ .Values.injector.agentDefaults.memLimit }}"
             - name: AGENT_INJECT_DEFAULT_TEMPLATE
               value: "{{ .Values.injector.agentDefaults.template }}"
-            - name: AGENT_INJECT_TEMPLATE_CONFIG_EXIT_ON_RETRY_FAILURE
-              value: "{{ .Values.injector.agentDefaults.templateConfig.exitOnRetryFailure }}"
             {{- include "vault.extraEnvironmentVars" .Values.injector | nindent 12 }}
           args:
             - agent-inject
@@ -174,5 +172,8 @@ spec:
           secret:
             secretName: "{{ .Values.injector.certs.secretName }}"
 {{- end }}
-      {{- include "imagePullSecrets" . | nindent 6 }}
+      {{- if .Values.global.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml .Values.global.imagePullSecrets | nindent 8 }}
+      {{- end }}
 {{ end }}
