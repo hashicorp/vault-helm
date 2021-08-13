@@ -99,6 +99,7 @@ extra volumes the user may have specified (such as a secret with TLS).
             secretName: {{ .name }}
           {{- end }}
             defaultMode: {{ .defaultMode | default 420 }}
+            optional: {{ .optional | default "false" }}
   {{- end }}
   {{- if .Values.server.volumes }}
     {{- toYaml .Values.server.volumes | nindent 8}}
@@ -625,6 +626,21 @@ Inject extra environment populated by secrets, if populated
 {{- end -}}
 
 {{/*
+Sets mutating web hook annotations
+*/}}
+{{- define "webhook.annotations" -}}
+  {{- if .Values.injector.webhook.annotations }}
+  annotations:
+      {{- $tp := typeOf .Values.injector.webhook.annotations }}
+      {{- if eq $tp "string" }}
+        {{- tpl .Values.injector.webhook.annotations . | nindent 4 }}
+      {{- else }}
+        {{- toYaml .Values.injector.webhook.annotations | nindent 4 }}
+      {{- end }}
+  {{- end }}
+{{- end -}}
+
+{{/*
 imagePullSecrets generates pull secrets from either string or map values.
 A map value must be indexable by the key 'name'.
 */}}
@@ -640,3 +656,4 @@ imagePullSecrets:
 {{- end -}}
 {{- end -}}
 {{- end -}}
+
