@@ -66,9 +66,9 @@ load _helpers
       --set 'server.ingress.hosts[0].host=test.com' \
       --set 'server.ingress.hosts[0].paths[0]=/' \
       --set 'server.ingress.extraPaths[0].path=/annotation-service' \
-      --set 'server.ingress.extraPaths[0].backend.serviceName=ssl-redirect' \
+      --set 'server.ingress.extraPaths[0].backend.service.name=ssl-redirect' \
       . | tee /dev/stderr |
-      yq  -r '.spec.rules[0].http.paths[0].backend.serviceName' | tee /dev/stderr)
+      yq  -r '.spec.rules[0].http.paths[0].backend.service.name' | tee /dev/stderr)
   [ "${actual}" = 'ssl-redirect' ]
 
   local actual=$(helm template \
@@ -77,7 +77,7 @@ load _helpers
       --set 'server.ingress.hosts[0].host=test.com' \
       --set 'server.ingress.hosts[0].paths[0]=/' \
       --set 'server.ingress.extraPaths[0].path=/annotation-service' \
-      --set 'server.ingress.extraPaths[0].backend.serviceName=ssl-redirect' \
+      --set 'server.ingress.extraPaths[0].backend.service.name=ssl-redirect' \
       . | tee /dev/stderr |
       yq  -r '.spec.rules[0].http.paths[0].path' | tee /dev/stderr)
   [ "${actual}" = '/annotation-service' ]
@@ -88,7 +88,7 @@ load _helpers
       --set 'server.ingress.hosts[0].host=test.com' \
       --set 'server.ingress.hosts[0].paths[0]=/' \
       --set 'server.ingress.extraPaths[0].path=/annotation-service' \
-      --set 'server.ingress.extraPaths[0].backend.serviceName=ssl-redirect' \
+      --set 'server.ingress.extraPaths[0].backend.service.name=ssl-redirect' \
       . | tee /dev/stderr |
       yq  -r '.spec.rules[0].http.paths[1].path' | tee /dev/stderr)
   [ "${actual}" = '/' ]
@@ -141,7 +141,7 @@ load _helpers
       --set 'server.ha.enabled=true' \
       --set 'server.service.enabled=true' \
       . | tee /dev/stderr |
-      yq -r '.spec.rules[0].http.paths[0].backend.serviceName' | tee /dev/stderr)
+      yq -r '.spec.rules[0].http.paths[0].backend.service.name' | tee /dev/stderr)
   [ "${actual}" = "RELEASE-NAME-vault-active" ]
 }
 
@@ -156,7 +156,7 @@ load _helpers
       --set 'server.ha.enabled=true' \
       --set 'server.service.enabled=true' \
       . | tee /dev/stderr |
-      yq -r '.spec.rules[0].http.paths[0].backend.serviceName' | tee /dev/stderr)
+      yq -r '.spec.rules[0].http.paths[0].backend.service.name' | tee /dev/stderr)
   [ "${actual}" = "RELEASE-NAME-vault" ]
 }
 
@@ -170,7 +170,7 @@ load _helpers
       --set 'server.ha.enabled=false' \
       --set 'server.service.enabled=true' \
       . | tee /dev/stderr |
-      yq -r '.spec.rules[0].http.paths[0].backend.serviceName' | tee /dev/stderr)
+      yq -r '.spec.rules[0].http.paths[0].backend.service.name' | tee /dev/stderr)
   [ "${actual}" = "RELEASE-NAME-vault" ]
 }
 
@@ -185,6 +185,6 @@ load _helpers
       --set 'server.ha.enabled=false' \
       --set 'server.service.enabled=true' \
       . | tee /dev/stderr |
-      yq -r '.spec.rules[0].http.paths[0].backend.serviceName' | tee /dev/stderr)
+      yq -r '.spec.rules[0].http.paths[0].backend.service.name' | tee /dev/stderr)
   [ "${actual}" = "RELEASE-NAME-vault" ]
 }
