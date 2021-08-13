@@ -52,7 +52,7 @@ load _helpers
       --set 'server.ingress.hosts[0].host=test.com' \
       --set 'server.ingress.hosts[0].paths[0]=/' \
       . | tee /dev/stderr |
-      yq  -r '.spec.rules[0].http.paths[0].backend.serviceName  | length > 0' | tee /dev/stderr)
+      yq  -r '.spec.rules[0].http.paths[0].backend.service.name  | length > 0' | tee /dev/stderr)
   [ "${actual}" = "true" ]
 
 }
