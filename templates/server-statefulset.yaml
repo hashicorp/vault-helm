@@ -125,6 +125,10 @@ spec:
             - name: VAULT_LOG_FORMAT
               value: "{{ .Values.server.logFormat }}"
             {{- end }}
+            {{- if (and .Values.server.enterpriseLicense.secretName .Values.server.enterpriseLicense.secretKey) }}
+            - name: VAULT_LICENSE_PATH
+              value: /vault/license/{{ .Values.server.enterpriseLicense.secretKey }}
+            {{- end }}
             {{ template "vault.envs" . }}
             {{- include "vault.extraEnvironmentVars" .Values.server | nindent 12 }}
             {{- include "vault.extraSecretEnvironmentVars" .Values.server | nindent 12 }}
@@ -198,10 +202,7 @@ spec:
         {{- if .Values.server.extraContainers }}
           {{ toYaml .Values.server.extraContainers | nindent 8}}
         {{- end }}
-      {{- if .Values.global.imagePullSecrets }}
-      imagePullSecrets:
-        {{- toYaml .Values.global.imagePullSecrets | nindent 8 }}
-      {{- end }}
+      {{- include "imagePullSecrets" . | nindent 6 }}
   {{ template "vault.volumeclaims" . }}
 {{ end }}
 {{ end }}

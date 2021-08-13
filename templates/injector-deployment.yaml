@@ -107,6 +107,8 @@ spec:
               value: "{{ .Values.injector.agentDefaults.memLimit }}"
             - name: AGENT_INJECT_DEFAULT_TEMPLATE
               value: "{{ .Values.injector.agentDefaults.template }}"
+            - name: AGENT_INJECT_TEMPLATE_CONFIG_EXIT_ON_RETRY_FAILURE
+              value: "{{ .Values.injector.agentDefaults.templateConfig.exitOnRetryFailure }}"
             {{- include "vault.extraEnvironmentVars" .Values.injector | nindent 12 }}
           args:
             - agent-inject
@@ -131,6 +133,12 @@ spec:
             periodSeconds: 2
             successThreshold: 1
             timeoutSeconds: 5
+{{- if .Values.injector.certs.secretName }}
+          volumeMounts:
+            - name: webhook-certs
+              mountPath: /etc/webhook/certs
+              readOnly: true
+{{- end }}
         {{- if and (eq (.Values.injector.leaderElector.enabled | toString) "true") (gt (.Values.injector.replicas | int) 1) }}
         - name: leader-elector
           image: {{ .Values.injector.leaderElector.image.repository }}:{{ .Values.injector.leaderElector.image.tag }}
@@ -161,17 +169,10 @@ spec:
             timeoutSeconds: 5
         {{- end }}
 {{- if .Values.injector.certs.secretName }}
-          volumeMounts:
-            - name: webhook-certs
-              mountPath: /etc/webhook/certs
-              readOnly: true
       volumes:
         - name: webhook-certs
           secret:
             secretName: "{{ .Values.injector.certs.secretName }}"
 {{- end }}
-      {{- if .Values.global.imagePullSecrets }}
-      imagePullSecrets:
-        {{- toYaml .Values.global.imagePullSecrets | nindent 8 }}
-      {{- end }}
+      {{- include "imagePullSecrets" . | nindent 6 }}
 {{ end }}

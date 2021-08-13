@@ -1,7 +1,33 @@
 ## Unreleased
 
 Improvements:
+* Add imagePullSecrets on server test [GH-572](https://github.com/hashicorp/vault-helm/pull/572)
+
+## 0.14.0 (July 28th, 2021)
+
+Features:
+* Added templateConfig.exitOnRetryFailure annotation for the injector [GH-560](https://github.com/hashicorp/vault-helm/pull/560)
+
+Improvements:
+* Support configuring pod tolerations, pod affinity, and node selectors as YAML [GH-565](https://github.com/hashicorp/vault-helm/pull/565)
+* Set the default vault image to come from the hashicorp organization [GH-567](https://github.com/hashicorp/vault-helm/pull/567)
+* Add support for running the acceptance tests against a local `kind` cluster [GH-567](https://github.com/hashicorp/vault-helm/pull/567)
+* Add `server.ingress.activeService` to configure if the ingress should use the active service [GH-570](https://github.com/hashicorp/vault-helm/pull/570)
+* Add `server.route.activeService` to configure if the route should use the active service [GH-570](https://github.com/hashicorp/vault-helm/pull/570)
+* Support configuring `global.imagePullSecrets` from a string array [GH-576](https://github.com/hashicorp/vault-helm/pull/576)
+
+
+## 0.13.0 (June 17th, 2021)
+
+Improvements:
 * Added a helm test for vault server [GH-531](https://github.com/hashicorp/vault-helm/pull/531)
+* Added server.enterpriseLicense option [GH-547](https://github.com/hashicorp/vault-helm/pull/547)
+* Added OpenShift overrides [GH-549](https://github.com/hashicorp/vault-helm/pull/549)
+
+Bugs:
+* Fix ui.serviceNodePort schema [GH-537](https://github.com/hashicorp/vault-helm/pull/537)
+* Fix server.ha.disruptionBudget.maxUnavailable schema [GH-535](https://github.com/hashicorp/vault-helm/pull/535)
+* Added webhook-certs volume mount to sidecar injector [GH-545](https://github.com/hashicorp/vault-helm/pull/545)
 
 ## 0.12.0 (May 25th, 2021)
 

@@ -571,7 +571,7 @@ load _helpers
   [ "${actual}" = "null" ]
 }
 
-@test "server/ha-StatefulSet: specified nodeSelector" {
+@test "server/ha-StatefulSet: specified nodeSelector as string" {
   cd `chart_dir`
   local actual=$(helm template \
       --show-only templates/server-statefulset.yaml \
@@ -580,6 +580,17 @@ load _helpers
       . | tee /dev/stderr |
       yq -r '.spec.template.spec.nodeSelector' | tee /dev/stderr)
   [ "${actual}" = "testing" ]
+}
+
+@test "server/ha-StatefulSet: nodeSelector can be set as YAML" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      --show-only templates/server-statefulset.yaml  \
+      --set 'server.ha.enabled=true' \
+      --set "server.nodeSelector.beta\.kubernetes\.io/arch=amd64" \
+      . | tee /dev/stderr |
+      yq '.spec.template.spec.nodeSelector == {"beta.kubernetes.io/arch": "amd64"}' | tee /dev/stderr)
+  [ "${actual}" = "true" ]
 }
 
 #--------------------------------------------------------------------

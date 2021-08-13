@@ -6,7 +6,7 @@ jobs:
   bats-unit-test:
     docker:
       # This image is built from test/docker/Test.dockerfile
-      - image: docker.mirror.hashicorp.services/hashicorpdev/vault-helm-test:0.1.0
+      - image: docker.mirror.hashicorp.services/hashicorpdev/vault-helm-test:0.2.0
     steps:
       - checkout
       - run: bats ./test/unit -t
@@ -16,8 +16,7 @@ jobs:
       - image: docker.mirror.hashicorp.services/cimg/go:1.16
     environment:
       BATS_VERSION: "1.3.0"
-      # Note: the commit SHA is used here since the repo doesn't use release tags
-      CHART_VERIFIER_VERSION: "e2c03bd1a4aea20deb0a4a03ebfde254b1672050"
+      CHART_VERIFIER_VERSION: "1.2.1"
     steps:
       - checkout
       - run:
@@ -36,7 +35,7 @@ jobs:
   acceptance:
     docker:
       # This image is build from test/docker/Test.dockerfile
-      - image: docker.mirror.hashicorp.services/hashicorpdev/vault-helm-test:0.1.0
+      - image: docker.mirror.hashicorp.services/hashicorpdev/vault-helm-test:0.2.0
 
     steps:
       - checkout
