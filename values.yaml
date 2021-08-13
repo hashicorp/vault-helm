@@ -271,8 +271,10 @@ server:
     extraPaths: []
     # - path: /*
     #   backend:
-    #     serviceName: ssl-redirect
-    #     servicePort: use-annotation
+    #     service:
+    #       name: ssl-redirect
+    #       port:
+    #         number: use-annotation
     tls: []
     #  - secretName: chart-example-tls
     #    hosts:
