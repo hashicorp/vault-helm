@@ -2,6 +2,7 @@
 
 Improvements:
 * Add imagePullSecrets on server test [GH-572](https://github.com/hashicorp/vault-helm/pull/572)
+* Add injector.webhookAnnotations chart option [GH-584](https://github.com/hashicorp/vault-helm/pull/584)
 
 ## 0.14.0 (July 28th, 2021)
 
