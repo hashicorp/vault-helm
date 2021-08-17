@@ -696,3 +696,32 @@ load _helpers
       yq -r 'map(select(.name=="AGENT_INJECT_TEMPLATE_CONFIG_EXIT_ON_RETRY_FAILURE")) | .[] .value' | tee /dev/stderr)
   [ "${value}" = "false" ]
 }
+
+@test "injector/deployment: strategy default" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      --show-only templates/injector-deployment.yaml  \
+      . | tee /dev/stderr |
+      yq -r '.spec.strategy.rollingUpdate.maxUnavailable' | tee /dev/stderr)
+  [ "${actual}" = "25%" ]
+}
+
+@test "injector/deployment: strategy set as string" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      --show-only templates/injector-deployment.yaml  \
+      --set="injector.strategy=testing"  \
+      . | tee /dev/stderr |
+      yq -r '.spec.strategy' | tee /dev/stderr)
+  [ "${actual}" = "testing" ]
+}
+
+@test "injector/deployment: strategy can be set as YAML" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      --show-only templates/injector-deployment.yaml \
+      --set 'injector.strategy.rollingUpdate.maxUnavailable=1' \
+      . | tee /dev/stderr |
+      yq -r '.spec.strategy.rollingUpdate.maxUnavailable' | tee /dev/stderr)
+  [ "${actual}" = "1" ]
+}

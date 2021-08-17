@@ -309,6 +309,21 @@ Sets the injector node selector for pod placement
 {{- end -}}
 
 {{/*
+Sets the injector deployment update strategy
+*/}}
+{{- define "injector.strategy" -}}
+  {{- if .Values.injector.strategy }}
+  strategy:
+  {{- $tp := typeOf .Values.injector.strategy }}
+  {{- if eq $tp "string" }}
+    {{ tpl .Values.injector.strategy . | nindent 4 | trim }}
+  {{- else }}
+    {{- toYaml .Values.injector.strategy | nindent 4 }}
+  {{- end }}
+  {{- end }}
+{{- end -}}
+
+{{/*
 Sets extra pod annotations
 */}}
 {{- define "vault.annotations" -}}

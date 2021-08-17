@@ -17,6 +17,7 @@ spec:
       app.kubernetes.io/name: {{ template "vault.name" . }}-agent-injector
       app.kubernetes.io/instance: {{ .Release.Name }}
       component: webhook
+  {{ template "injector.strategy" . }}
   template:
     metadata:
       labels:
