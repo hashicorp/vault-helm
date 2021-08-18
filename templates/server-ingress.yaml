@@ -8,7 +8,12 @@
 {{- $serviceName = printf "%s-%s" $serviceName "active" -}}
 {{- end }}
 {{- $servicePort := .Values.server.service.port -}}
+{{- $kubeVersion := .Capabilities.KubeVersion.Version }}
+{{ if semverCompare ">= 1.19" $kubeVersion }}
 apiVersion: networking.k8s.io/v1
+{{ else }}
+apiVersion: extensions/v1beta1
+{{ end }}
 kind: Ingress
 metadata:
   name: {{ template "vault.fullname" . }}
@@ -44,10 +49,16 @@ spec:
         {{- range (.paths | default (list "/")) }}
           - path: {{ . }}
             backend:
+              {{ if semverCompare ">= 1.19" $kubeVersion }}
               service:
                 name: {{ $serviceName }}
                 port:
                   number: {{ $servicePort }}
+              {{ else }}
+              serviceName: {{ $serviceName }}
+              servicePort: {{ $servicePort }}
+              {{ end }}
+
         {{- end }}
   {{- end }}
 {{- end }}
