@@ -41,6 +41,14 @@ injector:
       repository: "gcr.io/google_containers/leader-elector"
       tag: "0.4"
     ttl: 60s
+    resources: {}
+    # resources:
+    #   requests:
+    #     memory: 128Mi
+    #     cpu: 100m
+    #   limits:
+    #     memory: 128Mi
+    #     cpu: 100m
 
   # If true, will enable a node exporter metrics endpoint at /metrics.
   metrics:

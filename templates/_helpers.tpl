@@ -536,6 +536,16 @@ Sets the container resources if the user has set any.
 {{/*
 Sets the container resources if the user has set any.
 */}}
+{{- define "injector.leaderElector.resources" -}}
+  {{- if .Values.injector.leaderElector.resources -}}
+          resources:
+{{ toYaml .Values.injector.leaderElector.resources | indent 12}}
+  {{ end }}
+{{- end -}}
+
+{{/*
+Sets the container resources if the user has set any.
+*/}}
 {{- define "csi.resources" -}}
   {{- if .Values.csi.resources -}}
           resources:

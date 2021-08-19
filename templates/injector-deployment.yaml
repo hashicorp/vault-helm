@@ -147,6 +147,7 @@ spec:
             - --election-namespace={{ .Release.Namespace }}
             - --http=0.0.0.0:4040
             - --ttl={{ .Values.injector.leaderElector.ttl }}
+          {{ template "injector.leaderElector.resources" . }}
           livenessProbe:
             httpGet:
               path: /
