@@ -1,6 +1,6 @@
 ## Unreleased
 
-## 0.15.0 (August 18th, 2021)
+## 0.15.0 (August 19th, 2021)
 
 Improvements:
 * Add imagePullSecrets on server test [GH-572](https://github.com/hashicorp/vault-helm/pull/572)
