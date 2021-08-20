@@ -12,3 +12,18 @@ Your release is named {{ .Release.Name }}. To learn more about the release, try:
   $ helm status {{ .Release.Name }}
   $ helm get manifest {{ .Release.Name }}
 
+{{ if and .Values.global.openshift .Values.csi.enabled }}
+Check that the {{ template "vault.fullname" . }}-csi-provider DaemonSet has
+the correct number of Pods running:
+
+$ kubectl -n {{ .Release.Namespace }} get daemonset {{ template "vault.fullname" . }}-csi-provider
+
+NAME                 DESIRED   CURRENT   READY   UP-TO-DATE   AVAILABLE   NODE SELECTOR   AGE
+{{ template "vault.fullname" . }}-csi-provider   2         2         2       2            2           <none>          17m
+
+If not ask your OpenShift Administrator to apply the `privileged`
+Security Context Control like so:
+
+$ oc adm policy add-scc-to-user privileged \
+   system:serviceaccount:{{ .Release.Namespace }}:{{ template "vault.fullname" . }}-csi-provider
+{{ end }}
