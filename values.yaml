@@ -294,6 +294,9 @@ server:
     labels: {}
     annotations: {}
     host: chart-example.local
+    tls:
+      termination: passthrough
+      # insecureEdgeTerminationPolicy: Redirect
 
   # authDelegator enables a cluster role binding to be attached to the service
   # account.  This cluster role binding can be used to setup Kubernetes auth
