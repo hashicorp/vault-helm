@@ -16,7 +16,7 @@ jobs:
       - image: docker.mirror.hashicorp.services/cimg/go:1.16
     environment:
       BATS_VERSION: "1.3.0"
-      CHART_VERIFIER_VERSION: "1.0.0"
+      CHART_VERIFIER_VERSION: "1.2.1"
     steps:
       - checkout
       - run:
