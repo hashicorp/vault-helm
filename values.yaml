@@ -228,6 +228,8 @@ server:
     # Overrides the default Image Pull Policy
     pullPolicy: IfNotPresent
 
+  uid: 1234
+  gid: 1234
   # Configure the Update Strategy Type for the StatefulSet
   # See https://kubernetes.io/docs/concepts/workloads/controllers/statefulset/#update-strategies
   updateStrategyType: "OnDelete"
@@ -254,22 +256,16 @@ server:
   # If deployment is on OpenShift, the following block is ignored.
   # In order to expose the service, use the route section below
   ingress:
-    enabled: false
+    enabled: true
     labels: {}
       # traffic: external
-    annotations: {}
-      # |
-      # kubernetes.io/ingress.class: nginx
-      # kubernetes.io/tls-acme: "true"
-      #   or
-      # kubernetes.io/ingress.class: nginx
-      # kubernetes.io/tls-acme: "true"
-
-    # When HA mode is enabled and K8s service registration is being used,
-    # configure the ingress to point to the Vault active service.
-    activeService: true
+    annotations:
+      cert-manager.io/cluster-issuer: ca-issuer
+      kubernetes.io/ingress.class: traefik
+      traefik.ingress.kubernetes.io/router.entrypoints: web, websecure
+      traefik.ingress.kubernetes.io/router.tls: "true"
     hosts:
-      - host: chart-example.local
+      - host: vault
         paths: []
     ## Extra paths to prepend to the host configuration. This is useful when working with annotation based services.
     extraPaths: []
@@ -277,10 +273,10 @@ server:
     #   backend:
     #     serviceName: ssl-redirect
     #     servicePort: use-annotation
-    tls: []
-    #  - secretName: chart-example-tls
-    #    hosts:
-    #      - chart-example.local
+    tls:
+     - secretName: vault-ingress-cert
+       hosts:
+         - vault
 
   # OpenShift only - create a route to expose the service
   # The created route will be of type passthrough
@@ -398,17 +394,24 @@ server:
   # volumes is a list of volumes made available to all containers. These are rendered
   # via toYaml rather than pre-processed like the extraVolumes value.
   # The purpose is to make it easy to share volumes between containers.
-  volumes: null
-  #   - name: plugins
-  #     emptyDir: {}
+  volumes:
+    - name: data
+      hostPath:
+        path: /volumes/vault/data/
+        type: Directory
+    - name: audit
+      hostPath:
+        path: /volumes/vault/audit/
+        type: Directory
 
   # volumeMounts is a list of volumeMounts for the main server container. These are rendered
   # via toYaml rather than pre-processed like the extraVolumes value.
   # The purpose is to make it easy to share volumes between containers.
-  volumeMounts: null
-  #   - mountPath: /usr/local/libexec/vault
-  #     name: plugins
-  #     readOnly: true
+  volumeMounts:
+    - name: data
+      mountPath: /vault/data
+    - name: audit
+      mountPath: /vault/audit
 
   # Affinity Settings
   # Commenting out or setting as empty the affinity variable, will allow
@@ -492,7 +495,7 @@ server:
   # storage when using the file or raft backend storage engines.
   # See https://www.vaultproject.io/docs/configuration/storage/index.html to know more
   dataStorage:
-    enabled: true
+    enabled: false
     # Size of the PVC created
     size: 10Gi
     # Location where the PVC will be mounted.
@@ -562,16 +565,6 @@ server:
       storage "file" {
         path = "/vault/data"
       }
-
-      # Example configuration for using auto-unseal, using Google Cloud KMS. The
-      # GKMS keys must already exist, and the cluster must have a service account
-      # that is authorized to access GCP KMS.
-      #seal "gcpckms" {
-      #   project     = "vault-helm-dev"
-      #   region      = "global"
-      #   key_ring    = "vault-helm-unseal-kr"
-      #   crypto_key  = "vault-helm-unseal-key"
-      #}
 
   # Run Vault in "HA" mode. There are no storage requirements unless audit log
   # persistence is required.  In HA mode Vault will configure itself to use Consul
