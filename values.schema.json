@@ -24,6 +24,9 @@
                                     "type": "string"
                                 }
                             }
+                        },
+                        "providersDir": {
+                          "type": "string"
                         }
                     }
                 },
