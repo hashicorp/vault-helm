@@ -10,9 +10,9 @@ injector:
 
   agentImage:
     repository: "registry.connect.redhat.com/hashicorp/vault"
-    tag: "1.8.1-ubi"
+    tag: "1.8.2-ubi"
 
 server:
   image:
     repository: "registry.connect.redhat.com/hashicorp/vault"
-    tag: "1.8.1-ubi"
+    tag: "1.8.2-ubi"
