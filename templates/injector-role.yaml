@@ -21,4 +21,5 @@ rules:
     verbs:
       - "get"
       - "patch"
+      - "delete"
 {{- end }}
