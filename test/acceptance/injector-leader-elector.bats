@@ -22,21 +22,16 @@ load _helpers
   tries=0
   until [ $tries -ge 60 ]
   do
-    leader="$(echo "$(kubectl exec ${pods[0]} -c sidecar-injector -- wget --quiet --output-document - localhost:4040)" | jq -r .name)"
-    [ -n "${leader}" ] && break
-    ((tries++))
+    owner=$(kubectl get configmaps vault-k8s-leader -o json | jq -r .metadata.ownerReferences\[0\].name)
+    leader=$(kubectl get pods $owner -o json | jq -r .metadata.name)
+    [ -n "${leader}" ] && [ "${leader}" != "null" ] && break
+    let "tries=tries+1"
     sleep .5
   done
 
   # Check the leader name is valid - i.e. one of the 3 pods
   [[ " ${pods[@]} " =~ " ${leader} " ]]
 
-  # Check every pod agrees on who the leader is
-  for pod in "${pods[@]}"
-  do
-    pod_leader="$(echo "$(kubectl exec $pod -c sidecar-injector -- wget --quiet --output-document - localhost:4040)" | jq -r .name)"
-    [ "${pod_leader}" == "${leader}" ]
-  done
 }
 
 setup() {

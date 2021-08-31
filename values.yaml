@@ -33,14 +33,10 @@ injector:
   # Configures the port the injector should listen on
   port: 8080
 
-  # If multiple replicas are specified, by default a leader-elector side-car
-  # will be created so that only one injector attempts to create TLS certificates.
+  # If multiple replicas are specified, by default a leader will be determined
+  # so that only one injector attempts to create TLS certificates.
   leaderElector:
     enabled: true
-    image:
-      repository: "gcr.io/google_containers/leader-elector"
-      tag: "0.4"
-    ttl: 60s
 
   # If true, will enable a node exporter metrics endpoint at /metrics.
   metrics:
