@@ -2,9 +2,13 @@
 
 ## 0.15.0 (August 23rd, 2021)
 
+CHANGES:
+* vault-helm 0.15.0 requires version 0.13.0+ of the vault-k8s injector when using multiple replicas and auto-tls, since the chart has dropped support for deploying leader-elector containers.
+
 Improvements:
 * Add imagePullSecrets on server test [GH-572](https://github.com/hashicorp/vault-helm/pull/572)
 * Add injector.webhookAnnotations chart option [GH-584](https://github.com/hashicorp/vault-helm/pull/584)
+* Support vault-k8s internal leader election [GH-568](https://github.com/hashicorp/vault-helm/pull/568)
 
 ## 0.14.0 (July 28th, 2021)
 
