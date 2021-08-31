@@ -1,5 +1,13 @@
 ## Unreleased
 
+## 0.15.0 (August 23rd, 2021)
+
+Improvements:
+* Add imagePullSecrets on server test [GH-572](https://github.com/hashicorp/vault-helm/pull/572)
+* Add injector.webhookAnnotations chart option [GH-584](https://github.com/hashicorp/vault-helm/pull/584)
+
+## 0.14.0 (July 28th, 2021)
+
 Features:
 * Added templateConfig.exitOnRetryFailure annotation for the injector [GH-560](https://github.com/hashicorp/vault-helm/pull/560)
 
@@ -9,6 +17,7 @@ Improvements:
 * Add support for running the acceptance tests against a local `kind` cluster [GH-567](https://github.com/hashicorp/vault-helm/pull/567)
 * Add `server.ingress.activeService` to configure if the ingress should use the active service [GH-570](https://github.com/hashicorp/vault-helm/pull/570)
 * Add `server.route.activeService` to configure if the route should use the active service [GH-570](https://github.com/hashicorp/vault-helm/pull/570)
+* Support configuring `global.imagePullSecrets` from a string array [GH-576](https://github.com/hashicorp/vault-helm/pull/576)
 
 
 ## 0.13.0 (June 17th, 2021)

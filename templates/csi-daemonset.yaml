@@ -77,8 +77,5 @@ spec:
        {{- if .Values.csi.volumes }}
          {{- toYaml .Values.csi.volumes | nindent 8}}
        {{- end }}
-      {{- if .Values.global.imagePullSecrets }}
-      imagePullSecrets:
-        {{- toYaml .Values.global.imagePullSecrets | nindent 8 }}
-      {{- end }}
+      {{- include "imagePullSecrets" . | nindent 6 }}
 {{- end }}

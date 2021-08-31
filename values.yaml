@@ -5,6 +5,7 @@ global:
   # will enable or disable all the components within this chart by default.
   enabled: true
   # Image pull secret to use for registry authentication.
+  # Alternatively, the value may be specified as an array of strings.
   imagePullSecrets: []
   # imagePullSecrets:
   #   - name: image-pull-secret
@@ -48,7 +49,7 @@ injector:
   # image sets the repo and tag of the vault-k8s image to use for the injector.
   image:
     repository: "hashicorp/vault-k8s"
-    tag: "0.10.2"
+    tag: "0.12.0"
     pullPolicy: IfNotPresent
 
   # agentImage sets the repo and tag of the Vault image to use for the Vault Agent
@@ -56,7 +57,7 @@ injector:
   # required.
   agentImage:
     repository: "hashicorp/vault"
-    tag: "1.7.3"
+    tag: "1.8.1"
 
   # The default values for the injected Vault Agent containers.
   agentDefaults:
@@ -114,6 +115,9 @@ injector:
   #
   failurePolicy: Ignore
 
+  # Extra annotations to attach to the webhook
+  webhookAnnotations: {}
+
   certs:
     # secretName is the name of the secret that has the TLS certificate and
     # private key to serve the injector webhook. If this is null, then the
@@ -121,9 +125,10 @@ injector:
     # a service account to the injector to generate its own certificates.
     secretName: null
 
-    # caBundle is a base64-encoded PEM-encoded certificate bundle for the
-    # CA that signed the TLS certificate that the webhook serves. This must
-    # be set if secretName is non-null.
+    # caBundle is a base64-encoded PEM-encoded certificate bundle for the CA
+    # that signed the TLS certificate that the webhook serves. This must be set
+    # if secretName is non-null, unless an external service like cert-manager is
+    # keeping the caBundle updated.
     caBundle: ""
 
     # certName and keyName are the names of the files within the secret for
@@ -215,7 +220,7 @@ server:
 
   image:
     repository: "hashicorp/vault"
-    tag: "1.7.3"
+    tag: "1.8.1"
     # Overrides the default Image Pull Policy
     pullPolicy: IfNotPresent
 

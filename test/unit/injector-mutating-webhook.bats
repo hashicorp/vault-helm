@@ -121,3 +121,35 @@ load _helpers
 
   [ "${actual}" = "\"Fail\"" ]
 }
+
+#--------------------------------------------------------------------
+# annotations
+
+@test "injector/MutatingWebhookConfiguration: default annotations" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      --show-only templates/injector-mutating-webhook.yaml \
+      . | tee /dev/stderr |
+      yq -r '.metadata.annotations' | tee /dev/stderr)
+  [ "${actual}" = "null" ]
+}
+
+@test "injector/MutatingWebhookConfiguration: specify annotations yaml" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      --show-only templates/injector-mutating-webhook.yaml \
+      --set 'injector.webhookAnnotations.foo=bar' \
+      . | tee /dev/stderr |
+      yq -r '.metadata.annotations.foo' | tee /dev/stderr)
+  [ "${actual}" = "bar" ]
+}
+
+@test "injector/MutatingWebhookConfiguration: specify annotations yaml string" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      --show-only templates/injector-mutating-webhook.yaml \
+      --set 'injector.webhookAnnotations=foo: bar' \
+      . | tee /dev/stderr |
+      yq -r '.metadata.annotations.foo' | tee /dev/stderr)
+  [ "${actual}" = "bar" ]
+}

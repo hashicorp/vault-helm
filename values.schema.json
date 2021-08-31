@@ -343,6 +343,12 @@
                         "array",
                         "string"
                     ]
+                },
+                "webhookAnnotations": {
+                    "type": [
+                        "object",
+                        "string"
+                    ]
                 }
             }
         },
