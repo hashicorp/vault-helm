@@ -37,6 +37,13 @@ injector:
   # so that only one injector attempts to create TLS certificates.
   leaderElector:
     enabled: true
+    # Note: The deployment of a separate leader-elector container will soon be
+    # removed from this chart since vault-k8s now uses an internal mechanism to
+    # determine leadership.
+    image:
+      repository: "gcr.io/google_containers/leader-elector"
+      tag: "0.4"
+    ttl: 60s
 
   # If true, will enable a node exporter metrics endpoint at /metrics.
   metrics:
