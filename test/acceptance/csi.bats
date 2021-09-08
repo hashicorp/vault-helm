@@ -9,7 +9,8 @@ load _helpers
   kubectl create namespace acceptance
 
   # Install Secrets Store CSI driver
-  helm install secrets-store-csi-driver https://github.com/kubernetes-sigs/secrets-store-csi-driver/blob/master/charts/secrets-store-csi-driver-0.0.20.tgz?raw=true \
+  CSI_DRIVER_VERSION=0.2.0
+  helm install secrets-store-csi-driver https://github.com/kubernetes-sigs/secrets-store-csi-driver/blob/v${CSI_DRIVER_VERSION}/charts/secrets-store-csi-driver-${CSI_DRIVER_VERSION}.tgz?raw=true \
     --wait --timeout=5m \
     --namespace=acceptance \
     --set linux.image.pullPolicy="IfNotPresent"
