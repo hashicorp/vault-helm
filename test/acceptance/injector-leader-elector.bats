@@ -12,7 +12,8 @@ load _helpers
   helm install "$(name_prefix)" \
     --wait \
     --timeout=5m \
-    --set="injector.replicas=3" .
+    --set="injector.replicas=3" \
+    --set="injector.leaderElector.useContainer=true" .
   kubectl wait --for condition=Ready pod -l app.kubernetes.io/name=vault-agent-injector --timeout=5m
 
   pods=($(kubectl get pods -l app.kubernetes.io/name=vault-agent-injector -o json | jq -r '.items[] | .metadata.name'))

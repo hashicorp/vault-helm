@@ -190,6 +190,7 @@ load _helpers
   local actual=$(helm template \
       --show-only templates/injector-deployment.yaml \
       --set "injector.replicas=2" \
+      --set "injector.leaderElector.useContainer=true" \
       . | tee /dev/stderr |
       yq '.spec.template.spec.containers | length' | tee /dev/stderr)
   [ "${actual}" = "2" ]
@@ -200,6 +201,7 @@ load _helpers
   local actual=$(helm template \
       --show-only templates/injector-deployment.yaml \
       --set "injector.replicas=2" \
+      --set "injector.leaderElector.useContainer=true" \
       --set "injector.leaderElector.image.repository=SomeOtherImage" \
       --set "injector.leaderElector.image.tag=SomeOtherTag" \
       . | tee /dev/stderr |
@@ -213,6 +215,7 @@ load _helpers
   local actual=$(helm template \
       --show-only templates/injector-deployment.yaml \
       --set "injector.replicas=2" \
+      --set "injector.leaderElector.useContainer=true" \
       . | tee /dev/stderr |
       yq -r '.spec.template.spec.containers[1].args[3]' | tee /dev/stderr)
   [ "${actual}" = "--ttl=60s" ]
@@ -221,6 +224,7 @@ load _helpers
   local actual=$(helm template \
       --show-only templates/injector-deployment.yaml \
       --set "injector.replicas=2" \
+      --set "injector.leaderElector.useContainer=true" \
       --set "injector.leaderElector.ttl=30s" \
       . | tee /dev/stderr |
       yq -r '.spec.template.spec.containers[1].args[3]' | tee /dev/stderr)
@@ -262,6 +266,7 @@ load _helpers
   local actual=$( (helm template \
       --show-only templates/injector-leader-endpoint.yaml \
       --set "injector.replicas=2" \
+      --set "injector.leaderElector.useContainer=true" \
       . || echo "---") | tee /dev/stderr |
       yq 'length > 0' | tee /dev/stderr)
   [ "${actual}" = "true" ]

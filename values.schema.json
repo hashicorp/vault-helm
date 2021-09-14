@@ -295,6 +295,9 @@
                         },
                         "ttl": {
                             "type": "string"
+                        },
+                        "useContainer": {
+                            "type": "boolean"
                         }
                     }
                 },
