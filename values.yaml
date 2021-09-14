@@ -758,6 +758,7 @@ csi:
     # YAML-formatted multi-line templated string map of the annotations to apply
     # to the daemonSet.
     annotations: {}
+    # Provider host path (must match the CSI provider's path)
     providersDir: "/etc/kubernetes/secrets-store-csi-providers"
 
   pod:
