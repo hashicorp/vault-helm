@@ -70,10 +70,10 @@ spec:
       volumes:
         - name: providervol
           hostPath:
-            path: "/etc/kubernetes/secrets-store-csi-providers"
+            path: {{ .Values.csi.daemonSet.providersDir }}
         - name: mountpoint-dir
           hostPath:
-            path: /var/lib/kubelet/pods
+            path: {{ .Values.csi.daemonSet.kubeletRootDir }}/pods
        {{- if .Values.csi.volumes }}
          {{- toYaml .Values.csi.volumes | nindent 8}}
        {{- end }}
