@@ -1,7 +1,7 @@
 ## Unreleased
 
 Improvements:
- * Make CSI provider `hostPaths` configurable via `csi.daemonSet.providersDir` and `csi.daemonSet.kubeletRootDir` [GH-603(https://github.com/hashicorp/vault-helm/pull/603)
+ * Make CSI provider `hostPaths` configurable via `csi.daemonSet.providersDir` and `csi.daemonSet.kubeletRootDir` [GH-603](https://github.com/hashicorp/vault-helm/pull/603)
 
 ## 0.15.0 (August 23rd, 2021)
 
