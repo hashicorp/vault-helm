@@ -27,6 +27,9 @@
                         },
                         "providersDir": {
                           "type": "string"
+                        },
+                        "kubeletRootDir": {
+                          "type": "string"
                         }
                     }
                 },

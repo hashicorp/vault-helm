@@ -760,6 +760,8 @@ csi:
     annotations: {}
     # Provider host path (must match the CSI provider's path)
     providersDir: "/etc/kubernetes/secrets-store-csi-providers"
+    # Kubelet host path
+    kubeletRootDir: "/var/lib/kubelet"
 
   pod:
     # Extra annotations for the provider pods. This can either be YAML or a
