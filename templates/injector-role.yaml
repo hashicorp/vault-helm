@@ -9,7 +9,7 @@ metadata:
     app.kubernetes.io/managed-by: {{ .Release.Service }}
 rules:
   - apiGroups: [""]
-    resources: ["secrets", "configmaps"]
+    resources: ["secrets", "configmaps", "endpoints"]
     verbs:
       - "create"
       - "get"
