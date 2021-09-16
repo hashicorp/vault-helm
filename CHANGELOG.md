@@ -1,17 +1,17 @@
 ## Unreleased
 
+CHANGES:
+* Support for deploying a leader-elector container with the [vault-k8s injector](https://github.com/hashicorp/vault-k8s) injector will be removed in version 0.18.0 of this chart since vault-k8s now uses an internal mechanism to determine leadership. To enable the deployment of the leader-elector container for use with vault-k8s 0.12.0 and earlier, set `useContainer=true`.
+
 Improvements:
  * Make CSI provider `hostPaths` configurable via `csi.daemonSet.providersDir` and `csi.daemonSet.kubeletRootDir` [GH-603](https://github.com/hashicorp/vault-helm/pull/603)
+ * Support vault-k8s internal leader election [GH-568](https://github.com/hashicorp/vault-helm/pull/568) [GH-607](https://github.com/hashicorp/vault-helm/pull/607)
 
 ## 0.15.0 (August 23rd, 2021)
-
-CHANGES:
-* vault-helm 0.15.0 requires version 0.13.0+ of the vault-k8s injector when using multiple replicas and auto-tls, since the chart has dropped support for deploying leader-elector containers.
 
 Improvements:
 * Add imagePullSecrets on server test [GH-572](https://github.com/hashicorp/vault-helm/pull/572)
 * Add injector.webhookAnnotations chart option [GH-584](https://github.com/hashicorp/vault-helm/pull/584)
-* Support vault-k8s internal leader election [GH-568](https://github.com/hashicorp/vault-helm/pull/568)
 
 ## 0.14.0 (July 28th, 2021)
 
