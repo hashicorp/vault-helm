@@ -18,6 +18,18 @@ spec:
   {{- if .Values.server.service.type}}
   type: {{ .Values.server.service.type }}
   {{- end}}
+  {{- if .Values.server.service.externalTrafficPolicy }}
+  externalTrafficPolicy: {{ .Values.server.service.externalTrafficPolicy }}
+  {{- end }}
+  {{- if and (eq (.Values.server.serviceType | toString) "LoadBalancer") (.Values.server.loadBalancerSourceRanges) }}
+  loadBalancerSourceRanges:
+    {{- range $cidr := .Values.server.loadBalancerSourceRanges }}
+      - {{ $cidr }}
+    {{- end }}
+  {{- end }}
+  {{- if and (eq (.Values.server.serviceType | toString) "LoadBalancer") (.Values.server.loadBalancerIP) }}
+  loadBalancerIP: {{ .Values.server.loadBalancerIP }}
+  {{- end }}
   {{- if .Values.server.service.clusterIP }}
   clusterIP: {{ .Values.server.service.clusterIP }}
   {{- end }}

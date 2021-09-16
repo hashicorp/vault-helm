@@ -478,8 +478,18 @@ server:
     # clusterIP: None
 
     # Configures the service type for the main Vault service.  Can be ClusterIP
-    # or NodePort.
+    # LoadBalancer or NodePort.
     #type: ClusterIP
+
+    # loadBalancerSourceRanges:
+    #   - 10.0.0.0/16
+    #   - 1.78.23.3/32
+
+    # loadBalancerIP:
+    
+    # set externalTrafficPolicy to Local to preserve Vault Client addresses embedded
+    # in the Vault client requests and responses for LoadBalancer and Node Port
+    # externalTrafficPolicy:
 
     # If type is set to "NodePort", a specific nodePort value can be configured,
     # will be random if left blank.
