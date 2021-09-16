@@ -1,5 +1,7 @@
 ## Unreleased
 
+## 0.16.0 (September 16th, 2021)
+
 CHANGES:
 * Support for deploying a leader-elector container with the [vault-k8s injector](https://github.com/hashicorp/vault-k8s) injector will be removed in version 0.18.0 of this chart since vault-k8s now uses an internal mechanism to determine leadership. To enable the deployment of the leader-elector container for use with vault-k8s 0.12.0 and earlier, set `useContainer=true`.
 
