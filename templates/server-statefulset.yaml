@@ -36,6 +36,7 @@ spec:
       {{ template "vault.annotations" . }}
     spec:
       {{ template "vault.affinity" . }}
+      {{ template "vault.topologySpreadConstraints" . }}
       {{ template "vault.tolerations" . }}
       {{ template "vault.nodeselector" . }}
       {{- if .Values.server.priorityClassName }}

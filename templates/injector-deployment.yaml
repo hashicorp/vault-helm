@@ -29,6 +29,7 @@ spec:
       {{ template "injector.annotations" . }}
     spec:
       {{ template "injector.affinity" . }}
+      {{ template "injector.topologySpreadConstraints" . }}
       {{ template "injector.tolerations" . }}
       {{ template "injector.nodeselector" . }}
       {{- if .Values.injector.priorityClassName }}

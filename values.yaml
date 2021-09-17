@@ -175,6 +175,10 @@ injector:
               component: webhook
           topologyKey: kubernetes.io/hostname
 
+  # Topology settings for injector pods
+  # ref: https://kubernetes.io/docs/concepts/workloads/pods/pod-topology-spread-constraints/
+  topologySpreadConstraints: []
+
   # Toleration Settings for injector pods
   # This should be either a multi-line string or YAML matching the Toleration array
   # in a PodSpec.
@@ -429,6 +433,10 @@ server:
               app.kubernetes.io/instance: "{{ .Release.Name }}"
               component: server
           topologyKey: kubernetes.io/hostname
+
+  # Topology settings for server pods
+  # ref: https://kubernetes.io/docs/concepts/workloads/pods/pod-topology-spread-constraints/
+  topologySpreadConstraints: []
 
   # Toleration Settings for server pods
   # This should be either a multi-line string or YAML matching the Toleration array
