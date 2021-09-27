@@ -436,6 +436,8 @@ server:
 
   # Topology settings for server pods
   # ref: https://kubernetes.io/docs/concepts/workloads/pods/pod-topology-spread-constraints/
+  # This should be either a multi-line string or YAML matching the topologySpreadConstraints array
+  # in a PodSpec.
   topologySpreadConstraints: []
 
   # Toleration Settings for server pods
