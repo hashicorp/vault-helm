@@ -33,10 +33,16 @@ injector:
   # Configures the port the injector should listen on
   port: 8080
 
-  # If multiple replicas are specified, by default a leader-elector side-car
-  # will be created so that only one injector attempts to create TLS certificates.
+  # If multiple replicas are specified, by default a leader will be determined
+  # so that only one injector attempts to create TLS certificates.
   leaderElector:
     enabled: true
+    # Note: The deployment of the leader-elector container will soon be removed
+    # from this chart since vault-k8s now uses an internal mechanism to
+    # determine leadership.
+    # To enable the deployment of the leader-elector container for use with
+    # vault-k8s 0.12.0 and earlier, set `useContainer=true`
+    useContainer: false
     image:
       repository: "gcr.io/google_containers/leader-elector"
       tag: "0.4"
@@ -751,6 +757,10 @@ csi:
     # YAML-formatted multi-line templated string map of the annotations to apply
     # to the daemonSet.
     annotations: {}
+    # Provider host path (must match the CSI provider's path)
+    providersDir: "/etc/kubernetes/secrets-store-csi-providers"
+    # Kubelet host path
+    kubeletRootDir: "/var/lib/kubelet"
 
   pod:
     # Extra annotations for the provider pods. This can either be YAML or a

@@ -24,6 +24,12 @@
                                     "type": "string"
                                 }
                             }
+                        },
+                        "providersDir": {
+                          "type": "string"
+                        },
+                        "kubeletRootDir": {
+                          "type": "string"
                         }
                     }
                 },
@@ -295,6 +301,9 @@
                         },
                         "ttl": {
                             "type": "string"
+                        },
+                        "useContainer": {
+                            "type": "boolean"
                         }
                     }
                 },

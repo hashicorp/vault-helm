@@ -1,5 +1,14 @@
 ## Unreleased
 
+## 0.16.0 (September 16th, 2021)
+
+CHANGES:
+* Support for deploying a leader-elector container with the [vault-k8s injector](https://github.com/hashicorp/vault-k8s) injector will be removed in version 0.18.0 of this chart since vault-k8s now uses an internal mechanism to determine leadership. To enable the deployment of the leader-elector container for use with vault-k8s 0.12.0 and earlier, set `useContainer=true`.
+
+Improvements:
+ * Make CSI provider `hostPaths` configurable via `csi.daemonSet.providersDir` and `csi.daemonSet.kubeletRootDir` [GH-603](https://github.com/hashicorp/vault-helm/pull/603)
+ * Support vault-k8s internal leader election [GH-568](https://github.com/hashicorp/vault-helm/pull/568) [GH-607](https://github.com/hashicorp/vault-helm/pull/607)
+
 ## 0.15.0 (August 23rd, 2021)
 
 Improvements:
