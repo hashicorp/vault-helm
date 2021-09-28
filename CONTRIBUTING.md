@@ -26,7 +26,7 @@ quickly merge or address your contributions.
 
 * Make sure you test against the latest released version. It is possible
   we already fixed the bug you're experiencing. Even better is if you can test
-  against `master`, as bugs are fixed regularly but new versions are only
+  against `main`, as bugs are fixed regularly but new versions are only
   released every few months.
 
 * Provide steps to reproduce the issue, and if possible include the expected
@@ -121,7 +121,7 @@ may not be properly cleaned up. We recommend recycling the Kubernetes cluster to
 start from a clean slate.
 
 **Note:** There is a Terraform configuration in the
-[`test/terraform/`](https://github.com/hashicorp/vault-helm/tree/master/test/terraform) directory
+[`test/terraform/`](https://github.com/hashicorp/vault-helm/tree/main/test/terraform) directory
 that can be used to quickly bring up a GKE cluster and configure
 `kubectl` and `helm` locally. This can be used to quickly spin up a test
 cluster for acceptance tests. Unit tests _do not_ require a running Kubernetes
