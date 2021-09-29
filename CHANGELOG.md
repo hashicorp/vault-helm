@@ -1,5 +1,11 @@
 ## Unreleased
 
+## 0.16.1 (September 29th, 2021)
+
+CHANGES:
+* Vault image default 1.8.3
+* Vault K8s image default 0.13.1
+
 ## 0.16.0 (September 16th, 2021)
 
 CHANGES:
