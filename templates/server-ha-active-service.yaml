@@ -16,7 +16,7 @@ metadata:
 {{ template "vault.service.annotations" .}}
 spec:
   {{- if .Values.server.service.externalTrafficPolicy }}
-  externalTrafficPolicy: {{ .Values.server.service.externalTrafficPolicy | title }}
+  externalTrafficPolicy: {{ .Values.server.service.externalTrafficPolicy | lower | title }}
   {{- end}}
   {{- if .Values.server.service.type}}
   type: {{ .Values.server.service.type }}
