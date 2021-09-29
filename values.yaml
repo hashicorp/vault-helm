@@ -170,7 +170,6 @@ injector:
 
   # Injector service specific config
   service:
-    externalTrafficPolicy: "Cluster"
     # Extra annotations to attach to the injector service
     annotations: {}
 
@@ -396,6 +395,14 @@ server:
 
   # Enables a headless service to be used by the Vault Statefulset
   service:
+    # The externalTrafficPolicy can be set to either Cluster or Local
+    # when service type is NodePort, using Local will not forward packets
+    # to nodes that don't have an active endpoint but will allow preserving the
+    # source ip of the request. If Cluster is being used, whenever a packet
+    # is received on a node with no active endpoint it will be forwarded to
+    # a node which has one (replacing the source ip with internal ip address)
+    # for more information - https://kubernetes.io/docs/tutorials/services/source-ip/#source-ip-for-services-with-type-nodeport
+    externalTrafficPolicy: Cluster
     enabled: true
     # clusterIP controls whether a Cluster IP address is attached to the
     # Vault service within Kubernetes.  By default the Vault service will
