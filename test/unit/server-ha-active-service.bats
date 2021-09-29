@@ -207,15 +207,3 @@ load _helpers
       yq -r '.spec.externalTrafficPolicy' | tee /dev/stderr)
   [ "${actual}" = "Cluster" ]
 }
-
-@test "server/ha-active-Service: vault externalTrafficPolicy set to wrong values, fallback to Cluster" {
-  cd `chart_dir`
-
-  local actual=$(helm template \
-      --show-only templates/server-ha-active-service.yaml \
-      --set 'server.service.externalTrafficPolicy=vault' \
-      --set 'server.ha.enabled=true' \
-      . | tee /dev/stderr |
-      yq -r '.spec.externalTrafficPolicy' | tee /dev/stderr)
-  [ "${actual}" = "Cluster" ]
-}
