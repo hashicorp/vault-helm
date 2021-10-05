@@ -174,6 +174,21 @@ load _helpers
   [ "${actual}" = "RELEASE-NAME-vault" ]
 }
 
+@test "server/ingress: k8s 1.18.3 uses regular service when not ha - yaml" {
+  cd `chart_dir`
+
+  local actual=$(helm template \
+      --show-only templates/server-ingress.yaml \
+      --set 'server.ingress.enabled=true' \
+      --set 'server.dev.enabled=false' \
+      --set 'server.ha.enabled=false' \
+      --set 'server.service.enabled=true' \
+      --kube-version 1.18.3 \
+      . | tee /dev/stderr |
+      yq -r '.spec.rules[0].http.paths[0].backend.serviceName' | tee /dev/stderr)
+  [ "${actual}" = "RELEASE-NAME-vault" ]
+}
+
 @test "server/ingress: uses regular service when not ha and activeService is true - yaml" {
   cd `chart_dir`
 
