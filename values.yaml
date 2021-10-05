@@ -85,6 +85,7 @@ injector:
     # Default values within Agent's template_config stanza.
     templateConfig:
       exitOnRetryFailure: true
+      staticSecretRenderInterval: "5m"
 
   # Mount Path of the Vault Kubernetes Auth Method.
   authPath: "auth/kubernetes"
