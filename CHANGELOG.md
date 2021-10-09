@@ -1,5 +1,8 @@
 ## Unreleased
 
+Improvements:
+* Support Ingress stable networking API [GH-590](https://github.com/hashicorp/vault-helm/pull/590)
+
 ## 0.16.1 (September 29th, 2021)
 
 CHANGES:
