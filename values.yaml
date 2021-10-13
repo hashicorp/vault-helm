@@ -621,6 +621,10 @@ server:
 
         storage "raft" {
           path = "/vault/data"
+          retry_join {
+            auto_join = "provider=k8s label_selector=\"app.kubernetes.io/name={{ include "vault.name" . }},app.kubernetes.io/instance= {{ .Release.Name }},component=server\" namespace={{ .Release.Namespace }}"
+          }
+
         }
 
         service_registration "kubernetes" {}
