@@ -655,3 +655,38 @@ imagePullSecrets:
 {{- end -}}
 {{- end -}}
 {{- end -}}
+
+{{/*
+externalTrafficPolicy sets a Service's externalTrafficPolicy if applicable.
+Supported inputs are Values.server.service and Values.ui
+*/}}
+{{- define "service.externalTrafficPolicy" -}}
+{{- $type := "" -}}
+{{- if .serviceType -}}
+{{- $type = .serviceType -}}
+{{- else if .type -}}
+{{- $type = .type -}}
+{{- end -}}
+{{- if and .externalTrafficPolicy (or (eq $type "LoadBalancer") (eq $type "NodePort")) }}
+  externalTrafficPolicy: {{ .externalTrafficPolicy }}
+{{- else }}
+{{- end }}
+{{- end -}}
+
+{{/*
+loadBalancer configuration for the the UI service.
+Supported inputs are Values.ui
+*/}}
+{{- define "service.loadBalancer" -}}
+{{- if  eq (.serviceType | toString) "LoadBalancer" }}
+{{- if .loadBalancerIP }}
+  loadBalancerIP: {{ .loadBalancerIP }}
+{{- end }}
+{{- with .loadBalancerSourceRanges }}
+  loadBalancerSourceRanges:
+{{- range . }}
+  - {{ . }}
+{{- end }}
+{{- end -}}
+{{- end }}
+{{- end -}}

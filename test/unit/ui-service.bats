@@ -135,6 +135,16 @@ load _helpers
       . | tee /dev/stderr |
       yq -r '.spec.type' | tee /dev/stderr)
   [ "${actual}" = "LoadBalancer" ]
+
+  local actual=$(helm template \
+      --show-only templates/ui-service.yaml  \
+      --set 'server.standalone.enabled=true' \
+      --set 'ui.serviceType=LoadBalancer' \
+      --set 'ui.externalTrafficPolicy=Local' \
+      --set 'ui.enabled=true' \
+      . | tee /dev/stderr |
+      yq -r '.spec.externalTrafficPolicy' | tee /dev/stderr)
+  [ "${actual}" = "Local" ]
 }
 
 @test "ui/Service: LoadBalancerIP set if specified and serviceType == LoadBalancer" {
@@ -180,6 +190,19 @@ load _helpers
       --set 'ui.loadBalancerSourceRanges={"123.123.123.123"}' \
       . | tee /dev/stderr |
       yq -r '.spec.loadBalancerSourceRanges[0]' | tee /dev/stderr)
+  [ "${actual}" = "null" ]
+}
+
+@test "ui/Service: ClusterIP assert no externalTrafficPolicy" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      --show-only templates/ui-service.yaml  \
+      --set 'server.standalone.enabled=true' \
+      --set 'ui.serviceType=ClusterIP' \
+      --set 'ui.externalTrafficPolicy=Foo' \
+      --set 'ui.enabled=true' \
+      . | tee /dev/stderr |
+      yq '.spec.externalTrafficPolicy' | tee /dev/stderr)
   [ "${actual}" = "null" ]
 }
 
@@ -322,4 +345,31 @@ load _helpers
       . | tee /dev/stderr |
       yq -r '.spec.ports[0].nodePort' | tee /dev/stderr)
   [ "${actual}" = "123" ]
+}
+
+@test "ui/Service: LoadBalancer assert externalTrafficPolicy" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      --show-only templates/ui-service.yaml  \
+      --set 'ui.enabled=true' \
+      --set 'server.standalone.enabled=true' \
+      --set 'ui.serviceType=LoadBalancer' \
+      --set 'ui.externalTrafficPolicy=Foo' \
+      . | tee /dev/stderr |
+      yq -r '.spec.externalTrafficPolicy' | tee /dev/stderr)
+  [ "${actual}" = "Foo" ]
+}
+
+@test "ui/Service: LoadBalancer assert no externalTrafficPolicy" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      --show-only templates/ui-service.yaml  \
+      --set 'ui.enabled=true' \
+      --set 'server.standalone.enabled=true' \
+      --set 'ui.serviceType=LoadBalancer' \
+      --set 'ui.externalTrafficPolicy=' \
+      . | tee /dev/stderr |
+      yq '.spec.externalTrafficPolicy' | tee /dev/stderr)
+  [ "${actual}" = "null" ]
+
 }
