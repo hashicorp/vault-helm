@@ -1,5 +1,11 @@
 ## Unreleased
 
+## 0.17.0 (October 21st, 2021)
+
+CHANGES:
+* Vault image default 1.8.4
+* Vault K8s image default 0.14.0
+
 Improvements:
 * Support Ingress stable networking API [GH-590](https://github.com/hashicorp/vault-helm/pull/590)
 * Support setting the `externalTrafficPolicy` for `LoadBalancer` and `NodePort` service types [GH-626](https://github.com/hashicorp/vault-helm/pull/626)
