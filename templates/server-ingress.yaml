@@ -40,6 +40,9 @@ spec:
       secretName: {{ .secretName }}
   {{- end }}
 {{- end }}
+{{- if .Values.server.ingress.ingressClassName }}
+  ingressClassName: {{ .Values.server.ingress.ingressClassName }}
+{{- end }}
   rules:
   {{- range .Values.server.ingress.hosts }}
     - host: {{ .host | quote }}
