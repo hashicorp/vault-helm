@@ -143,6 +143,17 @@ load _helpers
   [ "${actual}" = "nginx" ]
 }
 
+@test "server/ingress: ingressClassName is not added by default" {
+  cd `chart_dir`
+
+  local actual=$(helm template \
+      --show-only templates/server-ingress.yaml \
+      --set 'server.ingress.enabled=true' \
+      . | tee /dev/stderr |
+      yq -r '.spec.ingressClassName' | tee /dev/stderr)
+  [ "${actual}" = "null" ]
+}
+
 @test "server/ingress: uses active service when ha by default - yaml" {
   cd `chart_dir`
 
