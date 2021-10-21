@@ -2,6 +2,10 @@
 
 Improvements:
 * Support Ingress stable networking API [GH-590](https://github.com/hashicorp/vault-helm/pull/590)
+* Support setting the `externalTrafficPolicy` for `LoadBalancer` and `NodePort` service types [GH-626](https://github.com/hashicorp/vault-helm/pull/626)
+
+Bugs:
+* Ensure `kubeletRootDir` volume path and mounts are the same when `csi.daemonSet.kubeletRootDir` is overridden [GH-628](https://github.com/hashicorp/vault-helm/pull/628)
 
 ## 0.16.1 (September 29th, 2021)
 
