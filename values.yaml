@@ -275,6 +275,10 @@ server:
     # See: https://kubernetes.io/docs/concepts/services-networking/ingress/#deprecated-annotation
     ingressClassName: ""
 
+    # If using Kubernetes 1.19+, set the Ingress PathType.
+    # See: https://kubernetes.io/docs/concepts/services-networking/ingress/#path-types
+    pathType: Prefix
+
     # When HA mode is enabled and K8s service registration is being used,
     # configure the ingress to point to the Vault active service.
     activeService: true
