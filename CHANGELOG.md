@@ -2,6 +2,9 @@
 
 ## 0.17.0 (October 21st, 2021)
 
+KNOWN ISSUES:
+* The chart will fail to deploy on Kubernetes 1.19+ with `server.ingress.enabled=true` because no `pathType` is set
+
 CHANGES:
 * Vault image default 1.8.4
 * Vault K8s image default 0.14.0
