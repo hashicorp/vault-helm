@@ -1,5 +1,10 @@
 ## Unreleased
 
+## 0.17.1 (October 25th, 2021)
+
+Improvements:
+  * Add option for Ingress PathType [GH-634](https://github.com/hashicorp/vault-helm/pull/634)
+
 ## 0.17.0 (October 21st, 2021)
 
 KNOWN ISSUES:
