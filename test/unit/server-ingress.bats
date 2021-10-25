@@ -227,7 +227,8 @@ load _helpers
   [ "${actual}" = "RELEASE-NAME-vault" ]
 }
 
-@test "server/ingress: pathType added to object spec - string" {
+@test "server/ingress: pathType is added to Kubernetes version == 1.19.0" {
+
   cd `chart_dir`
 
   local actual=$(helm template \
