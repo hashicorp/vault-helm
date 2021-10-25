@@ -226,3 +226,42 @@ load _helpers
       yq -r '.spec.rules[0].http.paths[0].backend.service.name' | tee /dev/stderr)
   [ "${actual}" = "RELEASE-NAME-vault" ]
 }
+
+@test "server/ingress: pathType is added to Kubernetes version == 1.19.0" {
+  cd `chart_dir`
+
+  local actual=$(helm template \
+      --show-only templates/server-ingress.yaml \
+      --set 'server.ingress.enabled=true' \
+      --set server.ingress.pathType=ImplementationSpecific \
+      --kube-version 1.19.0 \
+      . | tee /dev/stderr |
+      yq -r '.spec.rules[0].http.paths[0].pathType' | tee /dev/stderr)
+  [ "${actual}" = "ImplementationSpecific" ]
+}
+
+@test "server/ingress: pathType is not added to Kubernetes versions < 1.19" {
+  cd `chart_dir`
+
+  local actual=$(helm template \
+      --show-only templates/server-ingress.yaml \
+      --set 'server.ingress.enabled=true' \
+      --set server.ingress.pathType=ImplementationSpecific \
+      --kube-version 1.18.3 \
+      . | tee /dev/stderr |
+      yq -r '.spec.rules[0].http.paths[0].pathType' | tee /dev/stderr)
+  [ "${actual}" = "null" ]
+}
+
+@test "server/ingress: pathType is added to Kubernetes versions > 1.19" {
+  cd `chart_dir`
+
+  local actual=$(helm template \
+      --show-only templates/server-ingress.yaml \
+      --set 'server.ingress.enabled=true' \
+      --set server.ingress.pathType=Prefix \
+      --kube-version 1.20.0 \
+      . | tee /dev/stderr |
+      yq -r '.spec.rules[0].http.paths[0].pathType' | tee /dev/stderr)
+  [ "${actual}" = "Prefix" ]
+}
