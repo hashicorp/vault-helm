@@ -226,3 +226,16 @@ load _helpers
       yq -r '.spec.rules[0].http.paths[0].backend.service.name' | tee /dev/stderr)
   [ "${actual}" = "RELEASE-NAME-vault" ]
 }
+
+@test "server/ingress: pathType added to object spec - string" {
+  cd `chart_dir`
+
+  local actual=$(helm template \
+      --show-only templates/server-ingress.yaml \
+      --set 'server.ingress.enabled=true' \
+      --set server.ingress.ingressClassName=nginx \
+      --set server.ingress.pathType=ImplementationSpecific
+      . | tee /dev/stderr |
+      yq -r '.spec.rules[0].http.paths[0].pathType' | tee /dev/stderr)
+  [ "${actual}" = "ImplementationSpecific" ]
+}
