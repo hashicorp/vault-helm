@@ -275,8 +275,8 @@ server:
     # See: https://kubernetes.io/docs/concepts/services-networking/ingress/#deprecated-annotation
     ingressClassName: ""
 
-    # If using Kubernetes 1.19+, set the Ingress PathType.
-    # See: https://kubernetes.io/docs/concepts/services-networking/ingress/#path-types
+    # As of Kubernetes 1.19, all Ingress Paths must have a pathType configured. The default value below should be sufficient in most cases.
+    # See: https://kubernetes.io/docs/concepts/services-networking/ingress/#path-types for other possible values.
     pathType: Prefix
 
     # When HA mode is enabled and K8s service registration is being used,
