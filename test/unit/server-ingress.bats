@@ -233,7 +233,6 @@ load _helpers
   local actual=$(helm template \
       --show-only templates/server-ingress.yaml \
       --set 'server.ingress.enabled=true' \
-      --set server.ingress.ingressClassName=nginx \
       --set server.ingress.pathType=ImplementationSpecific \
       . | tee /dev/stderr |
       yq -r '.spec.rules[0].http.paths[0].pathType' | tee /dev/stderr)
@@ -246,7 +245,6 @@ load _helpers
   local actual=$(helm template \
       --show-only templates/server-ingress.yaml \
       --set 'server.ingress.enabled=true' \
-      --set server.ingress.ingressClassName=nginx \
       --set server.ingress.pathType=ImplementationSpecific \
       --kube-version 1.18.3 \
       . | tee /dev/stderr |
