@@ -15,4 +15,10 @@ rules:
     - "list"
     - "watch"
     - "patch"
+- apiGroups: [""]
+  resources: ["secrets"]
+  verbs:
+    - "list"
+    - "watch"
+    - "update"
 {{ end }}
