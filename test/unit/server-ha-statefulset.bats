@@ -519,7 +519,7 @@ load _helpers
       yq -r '.spec.template.spec.containers[0].volumeMounts[] | select(.name == "audit")' | tee /dev/stderr)
 }
 
-@test "server/ha-StatefulSet: no data storage" {
+@test "server/ha-StatefulSet: count data storage" {
   cd `chart_dir`
   local actual=$(helm template \
       --show-only templates/server-statefulset.yaml  \
@@ -528,7 +528,7 @@ load _helpers
       --set 'server.dataStorage.enabled=true' \
       . | tee /dev/stderr |
       yq -r '.spec.volumeClaimTemplates | length' | tee /dev/stderr)
-  [ "${actual}" = "0" ]
+  [ "${actual}" = "1" ]
 
   local actual=$(helm template \
       --show-only templates/server-statefulset.yaml  \
@@ -537,7 +537,7 @@ load _helpers
       --set 'server.dataStorage.enabled=true' \
       . | tee /dev/stderr |
       yq -r '.spec.volumeClaimTemplates | length' | tee /dev/stderr)
-  [ "${actual}" = "1" ]
+  [ "${actual}" = "2" ]
 }
 
 @test "server/ha-StatefulSet: tolerations not set by default" {
