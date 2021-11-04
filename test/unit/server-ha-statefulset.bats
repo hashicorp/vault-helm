@@ -463,7 +463,7 @@ load _helpers
 }
 
 
-@test "server/ha-StatefulSet: cant set data storage" {
+@test "server/ha-StatefulSet: can set data storageClass" {
   cd `chart_dir`
   local actual=$(helm template \
       --show-only templates/server-statefulset.yaml  \
@@ -471,11 +471,11 @@ load _helpers
       --set 'server.dataStorage.enabled=true' \
       --set 'server.dataStorage.storageClass=foo' \
       . | tee /dev/stderr |
-      yq -r '.spec.volumeClaimTemplates' | tee /dev/stderr)
-  [ "${actual}" = "null" ]
+      yq -r '.spec.volumeClaimTemplates[0].spec.storageClassName' | tee /dev/stderr)
+  [ "${actual}" = "foo" ]
 }
 
-@test "server/ha-StatefulSet: can set storageClass" {
+@test "server/ha-StatefulSet: can set audit storageClass" {
   cd `chart_dir`
   local actual=$(helm template \
       --show-only templates/server-statefulset.yaml  \
