@@ -452,14 +452,14 @@ load _helpers
 #--------------------------------------------------------------------
 # storage class
 
-@test "server/ha-StatefulSet: no storage by default" {
+@test "server/ha-StatefulSet: one storage by default" {
   cd `chart_dir`
   local actual=$(helm template \
       --show-only templates/server-statefulset.yaml  \
       --set 'server.ha.enabled=true' \
       . | tee /dev/stderr |
       yq -r '.spec.volumeClaimTemplates | length' | tee /dev/stderr)
-  [ "${actual}" = "0" ]
+  [ "${actual}" = "1" ]
 }
 
 
