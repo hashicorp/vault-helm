@@ -1,5 +1,8 @@
 ## Unreleased
 
+Improvements:
+* Added templateConfig.staticSecretRenderInterval annotation for the injector [GH-621](https://github.com/hashicorp/vault-helm/pull/621)
+
 ## 0.17.1 (October 25th, 2021)
 
 Improvements:

@@ -168,7 +168,7 @@ load _helpers
   [ "${value}" = "RELEASE-NAME-vault-agent-injector-svc,RELEASE-NAME-vault-agent-injector-svc.${namespace:-default},RELEASE-NAME-vault-agent-injector-svc.${namespace:-default}.svc" ]
 }
 
-@test "injector/deployment: manual TLS adds volume mount" { 
+@test "injector/deployment: manual TLS adds volume mount" {
    cd `chart_dir`
    local object=$(helm template \
        --show-only templates/injector-deployment.yaml  \
@@ -695,4 +695,29 @@ load _helpers
   local value=$(echo $object |
       yq -r 'map(select(.name=="AGENT_INJECT_TEMPLATE_CONFIG_EXIT_ON_RETRY_FAILURE")) | .[] .value' | tee /dev/stderr)
   [ "${value}" = "false" ]
+}
+
+@test "injector/deployment: agent default template_config.static_secret_render_interval" {
+  cd `chart_dir`
+  local object=$(helm template \
+      --show-only templates/injector-deployment.yaml  \
+      . | tee /dev/stderr |
+      yq -r '.spec.template.spec.containers[0].env' | tee /dev/stderr)
+
+  local value=$(echo $object |
+      yq -r 'map(select(.name=="AGENT_INJECT_TEMPLATE_STATIC_SECRET_RENDER_INTERVAL")) | .[] .value' | tee /dev/stderr)
+  [ "${value}" = "" ]
+}
+
+@test "injector/deployment: can set agent template_config.static_secret_render_interval" {
+  cd `chart_dir`
+  local object=$(helm template \
+      --show-only templates/injector-deployment.yaml  \
+      --set='injector.agentDefaults.templateConfig.staticSecretRenderInterval=1m' \
+      . | tee /dev/stderr |
+      yq -r '.spec.template.spec.containers[0].env' | tee /dev/stderr)
+
+  local value=$(echo $object |
+      yq -r 'map(select(.name=="AGENT_INJECT_TEMPLATE_STATIC_SECRET_RENDER_INTERVAL")) | .[] .value' | tee /dev/stderr)
+  [ "${value}" = "1m" ]
 }

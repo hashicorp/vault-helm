@@ -205,6 +205,9 @@
                             "properties": {
                                 "exitOnRetryFailure": {
                                     "type": "boolean"
+                                },
+                                "staticSecretRenderInterval": {
+                                    "type": "string"
                                 }
                             }
                         }
