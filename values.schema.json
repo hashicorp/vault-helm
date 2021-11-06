@@ -611,6 +611,9 @@
                                 }
                             }
                         },
+                        "ingressClassName": {
+                            "type": "string"
+                        },
                         "labels": {
                             "type": "object"
                         },

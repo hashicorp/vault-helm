@@ -384,3 +384,43 @@ load _helpers
       yq -r '.spec.ports | map(select(.port==8200)) | .[] .name' | tee /dev/stderr)
   [ "${actual}" = "https" ]
 }
+
+# duplicated in server-ha-active-service.bats
+@test "server/Service: NodePort assert externalTrafficPolicy" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      --show-only templates/server-service.yaml \
+      --set 'server.ha.enabled=true' \
+      --set 'server.service.type=NodePort' \
+      --set 'server.service.externalTrafficPolicy=Foo' \
+      . | tee /dev/stderr |
+      yq -r '.spec.externalTrafficPolicy' | tee /dev/stderr)
+  [ "${actual}" = "Foo" ]
+}
+
+# duplicated in server-ha-active-service.bats
+@test "server/ha-active-Service: NodePort assert no externalTrafficPolicy" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      --show-only templates/server-service.yaml \
+      --set 'server.ha.enabled=true' \
+      --set 'server.service.type=NodePort' \
+      --set 'server.service.externalTrafficPolicy=' \
+      . | tee /dev/stderr |
+      yq '.spec.externalTrafficPolicy' | tee /dev/stderr)
+  [ "${actual}" = "null" ]
+}
+
+# duplicated in server-ha-active-service.bats
+@test "server/Service: ClusterIP assert no externalTrafficPolicy" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      --show-only templates/server-service.yaml \
+      --set 'server.ha.enabled=true' \
+      --set 'server.service.type=ClusterIP' \
+      --set 'server.service.externalTrafficPolicy=Foo' \
+      . | tee /dev/stderr |
+      yq '.spec.externalTrafficPolicy' | tee /dev/stderr)
+  [ "${actual}" = "null" ]
+}
+
