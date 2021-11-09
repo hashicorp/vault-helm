@@ -198,6 +198,16 @@ injector:
   service:
     # Extra annotations to attach to the injector service
     annotations: {}
+  networkPolicy:
+    enabled: false
+    egress: [ ]
+    # egress:
+    # - to:
+    #   - ipBlock:
+    #       cidr: 10.0.0.0/24
+    #   ports:
+    #   - protocol: TCP
+    #     port: 8080
 
 server:
   # If not set to true, Vault server will not be installed. See vault.mode in _helpers.tpl for implementation details
