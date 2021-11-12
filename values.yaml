@@ -321,6 +321,7 @@ server:
   # extraInitContainers is a list of init containers. Specified as a YAML list.
   # This is useful if you need to run a script to provision TLS certificates or
   # write out configuration files in a dynamic way.
+  # This should be either a multi-line string or YAML matching the PodSpec's initContainers section
   extraInitContainers: null
     # # This example installs a plugin pulled from github into the /usr/local/libexec/vault/oauthapp folder,
     # # which is defined in the volumes value.
