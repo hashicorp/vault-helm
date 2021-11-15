@@ -2,6 +2,41 @@
 
 load _helpers
 
+#--------------------------------------------------------------------
+# disable / enable server deployment
+
+@test "server/StatefulSet: disabled server.enabled" {
+  cd `chart_dir`
+  local actual=$( (helm template \
+      --show-only templates/server-statefulset.yaml  \
+      --set 'server.enabled=false' \
+      . || echo "---") | tee /dev/stderr |
+      yq 'length > 0' | tee /dev/stderr)
+  [ "${actual}" = "false" ]
+}
+
+@test "server/StatefulSet: disabled server.enabled random string" {
+  cd `chart_dir`
+  local actual=$( (helm template \
+      --show-only templates/server-statefulset.yaml  \
+      --set 'server.enabled=blabla' \
+      . || echo "---") | tee /dev/stderr |
+      yq 'length > 0' | tee /dev/stderr)
+  [ "${actual}" = "false" ]
+}
+
+@test "server/StatefulSet: enabled server.enabled explicit true" {
+  cd `chart_dir`
+  local actual=$( (helm template \
+      --show-only templates/server-statefulset.yaml  \
+      --set 'server.enabled=true' \
+      . || echo "---") | tee /dev/stderr |
+      yq 'length > 0' | tee /dev/stderr)
+  [ "${actual}" = "true" ]
+}
+
+#--------------------------------------------------------------------
+
 @test "server/standalone-StatefulSet: default server.standalone.enabled" {
   cd `chart_dir`
   local actual=$(helm template \
@@ -110,6 +145,32 @@ load _helpers
       --set 'global.imagePullSecrets[1].name=bar' \
       . | tee /dev/stderr |
       yq -r '.spec.template.spec.imagePullSecrets' | tee /dev/stderr)
+
+  local actual=$(echo $object |
+     yq -r '. | length' | tee /dev/stderr)
+  [ "${actual}" = "2" ]
+
+  local actual=$(echo $object |
+     yq -r '.[0].name' | tee /dev/stderr)
+  [ "${actual}" = "foo" ]
+
+  local actual=$(echo $object |
+      yq -r '.[1].name' | tee /dev/stderr)
+  [ "${actual}" = "bar" ]
+}
+
+@test "server/standalone-StatefulSet: Custom imagePullSecrets - string array" {
+  cd `chart_dir`
+  local object=$(helm template \
+      --show-only templates/server-statefulset.yaml  \
+      --set 'global.imagePullSecrets[0]=foo' \
+      --set 'global.imagePullSecrets[1]=bar' \
+      . | tee /dev/stderr |
+      yq -r '.spec.template.spec.imagePullSecrets' | tee /dev/stderr)
+
+  local actual=$(echo $object |
+     yq -r '. | length' | tee /dev/stderr)
+  [ "${actual}" = "2" ]
 
   local actual=$(echo $object |
      yq -r '.[0].name' | tee /dev/stderr)
@@ -414,6 +475,62 @@ load _helpers
 }
 
 #--------------------------------------------------------------------
+# log level
+
+@test "server/standalone-StatefulSet: default log level to empty" {
+  cd `chart_dir`
+  local objects=$(helm template \
+      --show-only templates/server-statefulset.yaml  \
+      . | tee /dev/stderr |
+      yq -r '.spec.template.spec.containers[0].env' | tee /dev/stderr)
+
+  local value=$(echo $objects |
+      yq -r 'map(select(.name=="VAULT_LOG_LEVEL")) | .[] .name' | tee /dev/stderr)
+  [ "${value}" = "" ]
+}
+
+@test "server/standalone-StatefulSet: log level can be changed" {
+  cd `chart_dir`
+  local objects=$(helm template \
+      --show-only templates/server-statefulset.yaml  \
+      --set='server.logLevel=debug' \
+      . | tee /dev/stderr |
+      yq -r '.spec.template.spec.containers[0].env' | tee /dev/stderr)
+
+  local value=$(echo $objects |
+      yq -r 'map(select(.name=="VAULT_LOG_LEVEL")) | .[] .value' | tee /dev/stderr)
+  [ "${value}" = "debug" ]
+}
+
+#--------------------------------------------------------------------
+# log format
+
+@test "server/standalone-StatefulSet: default log format to empty" {
+  cd `chart_dir`
+  local objects=$(helm template \
+      --show-only templates/server-statefulset.yaml  \
+      . | tee /dev/stderr |
+      yq -r '.spec.template.spec.containers[0].env' | tee /dev/stderr)
+
+  local value=$(echo $objects |
+      yq -r 'map(select(.name=="VAULT_LOG_FORMAT")) | .[] .name' | tee /dev/stderr)
+  [ "${value}" = "" ]
+}
+
+@test "server/standalone-StatefulSet: can set log format" {
+  cd `chart_dir`
+  local objects=$(helm template \
+      --show-only templates/server-statefulset.yaml  \
+      --set='server.logFormat=json' \
+      . | tee /dev/stderr |
+      yq -r '.spec.template.spec.containers[0].env' | tee /dev/stderr)
+
+  local value=$(echo $objects |
+      yq -r 'map(select(.name=="VAULT_LOG_FORMAT")) | .[] .value' | tee /dev/stderr)
+  [ "${value}" = "json" ]
+}
+
+#--------------------------------------------------------------------
 # extraEnvironmentVars
 
 @test "server/standalone-StatefulSet: set extraEnvironmentVars" {
@@ -426,21 +543,13 @@ load _helpers
       . | tee /dev/stderr |
       yq -r '.spec.template.spec.containers[0].env' | tee /dev/stderr)
 
-  local actual=$(echo $object |
-     yq -r '.[11].name' | tee /dev/stderr)
-  [ "${actual}" = "FOO" ]
+  local name=$(echo $object |
+      yq -r 'map(select(.name=="FOO")) | .[] .value' | tee /dev/stderr)
+  [ "${name}" = "bar" ]
 
-  local actual=$(echo $object |
-      yq -r '.[11].value' | tee /dev/stderr)
-  [ "${actual}" = "bar" ]
-
-  local actual=$(echo $object |
-      yq -r '.[12].name' | tee /dev/stderr)
-  [ "${actual}" = "FOOBAR" ]
-
-  local actual=$(echo $object |
-      yq -r '.[12].value' | tee /dev/stderr)
-  [ "${actual}" = "foobar" ]
+  local name=$(echo $object |
+      yq -r 'map(select(.name=="FOOBAR")) | .[] .value' | tee /dev/stderr)
+  [ "${name}" = "foobar" ]
 
   local object=$(helm template \
       --show-only templates/server-statefulset.yaml  \
@@ -449,21 +558,13 @@ load _helpers
       . | tee /dev/stderr |
       yq -r '.spec.template.spec.containers[0].env' | tee /dev/stderr)
 
-  local actual=$(echo $object |
-     yq -r '.[11].name' | tee /dev/stderr)
-  [ "${actual}" = "FOO" ]
+  local name=$(echo $object |
+      yq -r 'map(select(.name=="FOO")) | .[] .value' | tee /dev/stderr)
+  [ "${name}" = "bar" ]
 
-  local actual=$(echo $object |
-      yq -r '.[11].value' | tee /dev/stderr)
-  [ "${actual}" = "bar" ]
-
-  local actual=$(echo $object |
-      yq -r '.[12].name' | tee /dev/stderr)
-  [ "${actual}" = "FOOBAR" ]
-
-  local actual=$(echo $object |
-      yq -r '.[12].value' | tee /dev/stderr)
-  [ "${actual}" = "foobar" ]
+  local name=$(echo $object |
+      yq -r 'map(select(.name=="FOOBAR")) | .[] .value' | tee /dev/stderr)
+  [ "${name}" = "foobar" ]
 }
 
 #--------------------------------------------------------------------
@@ -663,7 +764,7 @@ load _helpers
   [ "${actual}" = "true" ]
 }
 
-@test "server/standalone-StatefulSet: affinity can be set" {
+@test "server/standalone-StatefulSet: affinity can be set as string" {
   cd `chart_dir`
   local actual=$(helm template \
       --show-only templates/server-statefulset.yaml  \
@@ -672,6 +773,17 @@ load _helpers
       yq '.spec.template.spec.affinity == "foobar"' | tee /dev/stderr)
   [ "${actual}" = "true" ]
 }
+
+@test "server/standalone-StatefulSet: affinity can be set as YAML" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      --show-only templates/server-statefulset.yaml  \
+      --set 'server.affinity.podAntiAffinity=foobar' \
+      . | tee /dev/stderr |
+      yq '.spec.template.spec.affinity.podAntiAffinity == "foobar"' | tee /dev/stderr)
+  [ "${actual}" = "true" ]
+}
+
 
 @test "server/standalone-StatefulSet: tolerations not set by default" {
   cd `chart_dir`
@@ -682,13 +794,23 @@ load _helpers
   [ "${actual}" = "true" ]
 }
 
-@test "server/standalone-StatefulSet: tolerations can be set" {
+@test "server/standalone-StatefulSet: tolerations can be set as string" {
   cd `chart_dir`
   local actual=$(helm template \
       --show-only templates/server-statefulset.yaml  \
       --set 'server.tolerations=foobar' \
       . | tee /dev/stderr |
       yq '.spec.template.spec.tolerations == "foobar"' | tee /dev/stderr)
+  [ "${actual}" = "true" ]
+}
+
+@test "server/standalone-StatefulSet: tolerations can be set as YAML" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      --show-only templates/server-statefulset.yaml  \
+      --set "server.tolerations[0].foo=bar,server.tolerations[1].baz=qux" \
+      . | tee /dev/stderr |
+      yq '.spec.template.spec.tolerations == [{"foo": "bar"}, {"baz": "qux"}]' | tee /dev/stderr)
   [ "${actual}" = "true" ]
 }
 
@@ -701,7 +823,7 @@ load _helpers
   [ "${actual}" = "null" ]
 }
 
-@test "server/standalone-StatefulSet: specified nodeSelector" {
+@test "server/standalone-StatefulSet: specified nodeSelector as string" {
   cd `chart_dir`
   local actual=$(helm template \
       --show-only templates/server-statefulset.yaml \
@@ -709,6 +831,16 @@ load _helpers
       . | tee /dev/stderr |
       yq -r '.spec.template.spec.nodeSelector' | tee /dev/stderr)
   [ "${actual}" = "testing" ]
+}
+
+@test "server/standalone-StatefulSet: nodeSelector can be set as YAML" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      --show-only templates/server-statefulset.yaml  \
+      --set "server.nodeSelector.beta\.kubernetes\.io/arch=amd64" \
+      . | tee /dev/stderr |
+      yq '.spec.template.spec.nodeSelector == {"beta.kubernetes.io/arch": "amd64"}' | tee /dev/stderr)
+  [ "${actual}" = "true" ]
 }
 
 #--------------------------------------------------------------------
@@ -1490,4 +1622,60 @@ load _helpers
   [ "${actual}" = "RELEASE-NAME-vault" ]
 
 
+}
+
+#--------------------------------------------------------------------
+# enterprise license autoload support
+@test "server/StatefulSet: adds volume for license secret when enterprise license secret name and key are provided" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      -s templates/server-statefulset.yaml  \
+      --set 'server.enterpriseLicense.secretName=foo' \
+      --set 'server.enterpriseLicense.secretKey=bar' \
+      . | tee /dev/stderr |
+      yq -r -c '.spec.template.spec.volumes[] | select(.name == "vault-license")' | tee /dev/stderr)
+      [ "${actual}" = '{"name":"vault-license","secret":{"secretName":"foo","defaultMode":288}}' ]
+}
+
+@test "server/StatefulSet: adds volume mount for license secret when enterprise license secret name and key are provided" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      -s templates/server-statefulset.yaml  \
+      --set 'server.enterpriseLicense.secretName=foo' \
+      --set 'server.enterpriseLicense.secretKey=bar' \
+      . | tee /dev/stderr |
+      yq -r -c '.spec.template.spec.containers[0].volumeMounts[] | select(.name == "vault-license")' | tee /dev/stderr)
+      [ "${actual}" = '{"name":"vault-license","mountPath":"/vault/license","readOnly":true}' ]
+}
+
+@test "server/StatefulSet: adds env var for license path when enterprise license secret name and key are provided" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      -s templates/server-statefulset.yaml  \
+      --set 'server.enterpriseLicense.secretName=foo' \
+      --set 'server.enterpriseLicense.secretKey=bar' \
+      . | tee /dev/stderr |
+      yq -r -c '.spec.template.spec.containers[0].env[] | select(.name == "VAULT_LICENSE_PATH")' | tee /dev/stderr)
+      [ "${actual}" = '{"name":"VAULT_LICENSE_PATH","value":"/vault/license/bar"}' ]
+}
+
+@test "server/StatefulSet: blank secretName does not set env var" {
+  cd `chart_dir`
+
+  # setting secretName=null
+  local actual=$(helm template \
+      -s templates/server-statefulset.yaml  \
+      --set 'server.enterpriseLicense.secretName=null' \
+      --set 'server.enterpriseLicense.secretKey=bar' \
+      . | tee /dev/stderr |
+      yq -r -c '.spec.template.spec.containers[0].env[] | select(.name == "VAULT_LICENSE_PATH")' | tee /dev/stderr)
+      [ "${actual}" = '' ]
+
+  # omitting secretName
+  local actual=$(helm template \
+      -s templates/server-statefulset.yaml  \
+      --set 'server.enterpriseLicense.secretKey=bar' \
+      . | tee /dev/stderr |
+      yq -r -c '.spec.template.spec.containers[0].env[] | select(.name == "VAULT_LICENSE_PATH")' | tee /dev/stderr)
+      [ "${actual}" = '' ]
 }

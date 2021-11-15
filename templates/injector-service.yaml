@@ -11,8 +11,9 @@ metadata:
   {{ template "injector.service.annotations" . }}
 spec:
   ports:
-  - port: 443
-    targetPort: 8080
+  - name: https
+    port: 443
+    targetPort: {{ .Values.injector.port }}
   selector:
     app.kubernetes.io/name: {{ include "vault.name" . }}-agent-injector
     app.kubernetes.io/instance: {{ .Release.Name }}

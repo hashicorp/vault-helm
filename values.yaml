@@ -5,6 +5,7 @@ global:
   # will enable or disable all the components within this chart by default.
   enabled: true
   # Image pull secret to use for registry authentication.
+  # Alternatively, the value may be specified as an array of strings.
   imagePullSecrets: []
   # imagePullSecrets:
   #   - name: image-pull-secret
@@ -27,6 +28,26 @@ injector:
   # True if you want to enable vault agent injection.
   enabled: true
 
+  replicas: 1
+
+  # Configures the port the injector should listen on
+  port: 8080
+
+  # If multiple replicas are specified, by default a leader will be determined
+  # so that only one injector attempts to create TLS certificates.
+  leaderElector:
+    enabled: true
+    # Note: The deployment of the leader-elector container will soon be removed
+    # from this chart since vault-k8s now uses an internal mechanism to
+    # determine leadership.
+    # To enable the deployment of the leader-elector container for use with
+    # vault-k8s 0.12.0 and earlier, set `useContainer=true`
+    useContainer: false
+    image:
+      repository: "gcr.io/google_containers/leader-elector"
+      tag: "0.4"
+    ttl: 60s
+
   # If true, will enable a node exporter metrics endpoint at /metrics.
   metrics:
     enabled: false
@@ -38,20 +59,39 @@ injector:
   # image sets the repo and tag of the vault-k8s image to use for the injector.
   image:
     repository: "hashicorp/vault-k8s"
-    tag: "0.6.0"
+    tag: "0.14.0"
     pullPolicy: IfNotPresent
 
   # agentImage sets the repo and tag of the Vault image to use for the Vault Agent
   # containers.  This should be set to the official Vault image.  Vault 1.3.1+ is
   # required.
   agentImage:
-    repository: "vault"
-    tag: "1.5.4"
+    repository: "hashicorp/vault"
+    tag: "1.8.4"
+
+  # The default values for the injected Vault Agent containers.
+  agentDefaults:
+    # For more information on configuring resources, see the K8s documentation:
+    # https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/
+    cpuLimit: "500m"
+    cpuRequest: "250m"
+    memLimit: "128Mi"
+    memRequest: "64Mi"
+
+    # Default template type for secrets when no custom template is specified.
+    # Possible values include: "json" and "map".
+    template: "map"
+
+    # Default values within Agent's template_config stanza.
+    templateConfig:
+      exitOnRetryFailure: true
+      staticSecretRenderInterval: ""
 
   # Mount Path of the Vault Kubernetes Auth Method.
   authPath: "auth/kubernetes"
 
-  # Configures the log verbosity of the injector. Supported log levels: Trace, Debug, Error, Warn, Info
+  # Configures the log verbosity of the injector.
+  # Supported log levels include: trace, debug, info, warn, error
   logLevel: "info"
 
   # Configures the log format of the injector. Supported log formats: "standard", "json".
@@ -69,6 +109,15 @@ injector:
   #    matchLabels:
   #      sidecar-injector: enabled
   namespaceSelector: {}
+  # objectSelector is the selector for restricting the webhook to only
+  # specific labels.
+  # See https://kubernetes.io/docs/reference/access-authn-authz/extensible-admission-controllers/#matching-requests-objectselector
+  # for more details.
+  # Example:
+  # objectSelector:
+  #    matchLabels:
+  #      vault-sidecar-injector: enabled
+  objectSelector: {}
 
   # Configures failurePolicy of the webhook. The "unspecified" default behaviour deoends on the
   # API Version of the WebHook.
@@ -77,6 +126,9 @@ injector:
   #
   failurePolicy: Ignore
 
+  # Extra annotations to attach to the webhook
+  webhookAnnotations: {}
+
   certs:
     # secretName is the name of the secret that has the TLS certificate and
     # private key to serve the injector webhook. If this is null, then the
@@ -84,9 +136,10 @@ injector:
     # a service account to the injector to generate its own certificates.
     secretName: null
 
-    # caBundle is a base64-encoded PEM-encoded certificate bundle for the
-    # CA that signed the TLS certificate that the webhook serves. This must
-    # be set if secretName is non-null.
+    # caBundle is a base64-encoded PEM-encoded certificate bundle for the CA
+    # that signed the TLS certificate that the webhook serves. This must be set
+    # if secretName is non-null, unless an external service like cert-manager is
+    # keeping the caBundle updated.
     caBundle: ""
 
     # certName and keyName are the names of the files within the secret for
@@ -110,21 +163,30 @@ injector:
     # KUBERNETES_SERVICE_HOST: kubernetes.default.svc
 
   # Affinity Settings for injector pods
-  # This should be a multi-line string matching the affinity section of a
-  # PodSpec.
-  affinity: null
+  # This can either be multi-line string or YAML matching the PodSpec's affinity field.
+  # Commenting out or setting as empty the affinity variable, will allow
+  # deployment of multiple replicas to single node services such as Minikube.
+  affinity: |
+    podAntiAffinity:
+      requiredDuringSchedulingIgnoredDuringExecution:
+        - labelSelector:
+            matchLabels:
+              app.kubernetes.io/name: {{ template "vault.name" . }}-agent-injector
+              app.kubernetes.io/instance: "{{ .Release.Name }}"
+              component: webhook
+          topologyKey: kubernetes.io/hostname
 
   # Toleration Settings for injector pods
-  # This should be a multi-line string matching the Toleration array
+  # This should be either a multi-line string or YAML matching the Toleration array
   # in a PodSpec.
-  tolerations: null
+  tolerations: []
 
-  # nodeSelector labels for injector pod assignment, formatted as a muli-line string.
+  # nodeSelector labels for server pod assignment, formatted as a multi-line string or YAML map.
   # ref: https://kubernetes.io/docs/concepts/configuration/assign-pod-node/#nodeselector
   # Example:
-  # nodeSelector: |
+  # nodeSelector:
   #   beta.kubernetes.io/arch: amd64
-  nodeSelector: null
+  nodeSelector: {}
 
   # Priority class for injector pods
   priorityClassName: ""
@@ -138,25 +200,52 @@ injector:
   # This should be a YAML map of the labels to apply to the injector
   extraLabels: {}
 
+  # Should the injector pods run on the host network (useful when using
+  # an alternate CNI in EKS)
+  hostNetwork: false
+
   # Injector service specific config
   service:
     # Extra annotations to attach to the injector service
     annotations: {}
 
 server:
+  # If not set to true, Vault server will not be installed. See vault.mode in _helpers.tpl for implementation details
+  enabled: true
+
+  # [Enterprise Only] This value refers to a Kubernetes secret that you have
+  # created that contains your enterprise license. If you are not using an
+  # enterprise image or if you plan to introduce the license key via another
+  # route, then leave secretName blank ("") or set it to null.
+  # Requires Vault Enterprise 1.8 or later.
+  enterpriseLicense:
+    # The name of the Kubernetes secret that holds the enterprise license. The
+    # secret must be in the same namespace that Vault is installed into.
+    secretName: ""
+    # The key within the Kubernetes secret that holds the enterprise license.
+    secretKey: "license"
+
   # Resource requests, limits, etc. for the server cluster placement. This
   # should map directly to the value of the resources field for a PodSpec.
   # By default no direct resource request is made.
 
   image:
-    repository: "vault"
-    tag: "1.5.4"
+    repository: "hashicorp/vault"
+    tag: "1.8.4"
     # Overrides the default Image Pull Policy
     pullPolicy: IfNotPresent
 
   # Configure the Update Strategy Type for the StatefulSet
   # See https://kubernetes.io/docs/concepts/workloads/controllers/statefulset/#update-strategies
   updateStrategyType: "OnDelete"
+
+  # Configure the logging verbosity for the Vault server.
+  # Supported log levels include: trace, debug, info, warn, error
+  logLevel: ""
+
+  # Configure the logging format for the Vault server.
+  # Supported log formats include: standard, json
+  logFormat: ""
 
   resources: {}
   # resources:
@@ -182,10 +271,29 @@ server:
       #   or
       # kubernetes.io/ingress.class: nginx
       # kubernetes.io/tls-acme: "true"
+
+    # Optionally use ingressClassName instead of deprecated annotation.
+    # See: https://kubernetes.io/docs/concepts/services-networking/ingress/#deprecated-annotation
+    ingressClassName: ""
+
+    # As of Kubernetes 1.19, all Ingress Paths must have a pathType configured. The default value below should be sufficient in most cases.
+    # See: https://kubernetes.io/docs/concepts/services-networking/ingress/#path-types for other possible values.
+    pathType: Prefix
+
+    # When HA mode is enabled and K8s service registration is being used,
+    # configure the ingress to point to the Vault active service.
+    activeService: true
     hosts:
       - host: chart-example.local
         paths: []
-
+    ## Extra paths to prepend to the host configuration. This is useful when working with annotation based services.
+    extraPaths: []
+    # - path: /*
+    #   backend:
+    #     service:
+    #       name: ssl-redirect
+    #       port:
+    #         number: use-annotation
     tls: []
     #  - secretName: chart-example-tls
     #    hosts:
@@ -195,6 +303,11 @@ server:
   # The created route will be of type passthrough
   route:
     enabled: false
+    # When HA mode is enabled and K8s service registration is being used,
+    # configure the route to point to the Vault active service.
+    activeService: true
+
+    labels: {}
     annotations: {}
     labels: {}
     # Host name for the Route
@@ -298,6 +411,7 @@ server:
     #   secretName: vault
     #   secretKey: AWS_SECRET_ACCESS_KEY
 
+  # Deprecated: please use 'volumes' instead.
   # extraVolumes is a list of extra volumes to mount. These will be exposed
   # to Vault in the path `/vault/userconfig/<name>/`. The value below is
   # an array of objects, examples are shown below.
@@ -321,10 +435,10 @@ server:
   #     name: plugins
   #     readOnly: true
 
-
   # Affinity Settings
   # Commenting out or setting as empty the affinity variable, will allow
   # deployment to single node services such as Minikube
+  # This should be either a multi-line string or YAML matching the PodSpec's affinity field.
   affinity: |
     podAntiAffinity:
       requiredDuringSchedulingIgnoredDuringExecution:
@@ -336,20 +450,28 @@ server:
           topologyKey: kubernetes.io/hostname
 
   # Toleration Settings for server pods
-  # This should be a multi-line string matching the Toleration array
+  # This should be either a multi-line string or YAML matching the Toleration array
   # in a PodSpec.
-  tolerations: null
+  tolerations: []
 
-  # nodeSelector labels for server pod assignment, formatted as a muli-line string.
+  # nodeSelector labels for server pod assignment, formatted as a multi-line string or YAML map.
   # ref: https://kubernetes.io/docs/concepts/configuration/assign-pod-node/#nodeselector
   # Example:
-  # nodeSelector: |
+  # nodeSelector:
   #   beta.kubernetes.io/arch: amd64
-  nodeSelector: null
+  nodeSelector: {}
 
   # Enables network policy for server pods
   networkPolicy:
     enabled: false
+    egress: []
+    # egress:
+    # - to:
+    #   - ipBlock:
+    #       cidr: 10.0.0.0/24
+    #   ports:
+    #   - protocol: TCP
+    #     port: 443
 
   # Priority class for server pods
   priorityClassName: ""
@@ -377,6 +499,12 @@ server:
     # Configures the service type for the main Vault service.  Can be ClusterIP
     # or NodePort.
     #type: ClusterIP
+
+    # The externalTrafficPolicy can be set to either Cluster or Local
+    # and is only valid for LoadBalancer and NodePort service types.
+    # The default value is Cluster.
+    # ref: https://kubernetes.io/docs/concepts/services-networking/service/#external-traffic-policy
+    externalTrafficPolicy: Cluster
 
     # If type is set to "NodePort", a specific nodePort value can be configured,
     # will be random if left blank.
@@ -597,8 +725,15 @@ ui:
   serviceType: "ClusterIP"
   serviceNodePort: null
   externalPort: 8200
+  targetPort: 8200
 
-  # loadBalancerSourceRanges:
+  # The externalTrafficPolicy can be set to either Cluster or Local
+  # and is only valid for LoadBalancer and NodePort service types.
+  # The default value is Cluster.
+  # ref: https://kubernetes.io/docs/concepts/services-networking/service/#external-traffic-policy
+  externalTrafficPolicy: Cluster
+
+  #loadBalancerSourceRanges:
   #   - 10.0.0.0/16
   #   - 1.78.23.3/32
 
@@ -608,3 +743,107 @@ ui:
   # This can either be YAML or a YAML-formatted multi-line templated string map
   # of the annotations to apply to the ui service
   annotations: {}
+
+# secrets-store-csi-driver-provider-vault
+csi:
+  # True if you want to install a secrets-store-csi-driver-provider-vault daemonset.
+  #
+  # Requires installing the secrets-store-csi-driver separately, see:
+  # https://github.com/kubernetes-sigs/secrets-store-csi-driver#install-the-secrets-store-csi-driver
+  #
+  # With the driver and provider installed, you can mount Vault secrets into volumes
+  # similar to the Vault Agent injector, and you can also sync those secrets into
+  # Kubernetes secrets.
+  enabled: false
+
+  image:
+    repository: "hashicorp/vault-csi-provider"
+    tag: "0.3.0"
+    pullPolicy: IfNotPresent
+
+  # volumes is a list of volumes made available to all containers. These are rendered
+  # via toYaml rather than pre-processed like the extraVolumes value.
+  # The purpose is to make it easy to share volumes between containers.
+  volumes: null
+  # - name: tls
+  #   secret:
+  #     secretName: vault-tls
+
+  # volumeMounts is a list of volumeMounts for the main server container. These are rendered
+  # via toYaml rather than pre-processed like the extraVolumes value.
+  # The purpose is to make it easy to share volumes between containers.
+  volumeMounts: null
+  # - name: tls
+  #   mountPath: "/vault/tls"
+  #   readOnly: true
+
+  resources: {}
+  # resources:
+  #   requests:
+  #     cpu: 50m
+  #     memory: 128Mi
+  #   limits:
+  #     cpu: 50m
+  #     memory: 128Mi
+
+  # Settings for the daemonSet used to run the provider.
+  daemonSet:
+    updateStrategy:
+      type: RollingUpdate
+      maxUnavailable: ""
+    # Extra annotations for the daemonSet. This can either be YAML or a
+    # YAML-formatted multi-line templated string map of the annotations to apply
+    # to the daemonSet.
+    annotations: {}
+    # Provider host path (must match the CSI provider's path)
+    providersDir: "/etc/kubernetes/secrets-store-csi-providers"
+    # Kubelet host path
+    kubeletRootDir: "/var/lib/kubelet"
+
+  pod:
+    # Extra annotations for the provider pods. This can either be YAML or a
+    # YAML-formatted multi-line templated string map of the annotations to apply
+    # to the pod.
+    annotations: {}
+
+    # Toleration Settings for provider pods
+    # This should be either a multi-line string or YAML matching the Toleration array
+    # in a PodSpec.
+    tolerations: []
+
+  serviceAccount:
+    # Extra annotations for the serviceAccount definition. This can either be
+    # YAML or a YAML-formatted multi-line templated string map of the
+    # annotations to apply to the serviceAccount.
+    annotations: {}
+
+  # Used to configure readinessProbe for the pods.
+  readinessProbe:
+    # When a probe fails, Kubernetes will try failureThreshold times before giving up
+    failureThreshold: 2
+    # Number of seconds after the container has started before probe initiates
+    initialDelaySeconds: 5
+    # How often (in seconds) to perform the probe
+    periodSeconds: 5
+    # Minimum consecutive successes for the probe to be considered successful after having failed
+    successThreshold: 1
+    # Number of seconds after which the probe times out.
+    timeoutSeconds: 3
+  # Used to configure livenessProbe for the pods.
+  livenessProbe:
+    # When a probe fails, Kubernetes will try failureThreshold times before giving up
+    failureThreshold: 2
+    # Number of seconds after the container has started before probe initiates
+    initialDelaySeconds: 5
+    # How often (in seconds) to perform the probe
+    periodSeconds: 5
+    # Minimum consecutive successes for the probe to be considered successful after having failed
+    successThreshold: 1
+    # Number of seconds after which the probe times out.
+    timeoutSeconds: 3
+
+  # Enables debug logging.
+  debug: false
+
+  # Pass arbitrary additional arguments to vault-csi-provider.
+  extraArgs: []

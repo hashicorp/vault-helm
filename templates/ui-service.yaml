@@ -25,21 +25,13 @@ spec:
   ports:
     - name: {{ include "vault.scheme" . }}
       port: {{ .Values.ui.externalPort }}
-      targetPort: 8200
+      targetPort: {{ .Values.ui.targetPort }}
       {{- if .Values.ui.serviceNodePort }}
       nodePort: {{ .Values.ui.serviceNodePort }}
       {{- end }}
   type: {{ .Values.ui.serviceType }}
-  {{- if and (eq (.Values.ui.serviceType | toString) "LoadBalancer") (.Values.ui.loadBalancerSourceRanges) }}
-  loadBalancerSourceRanges:
-    {{- range $cidr := .Values.ui.loadBalancerSourceRanges }}
-      - {{ $cidr }}
-    {{- end }}
-  {{- end }}
-  {{- if and (eq (.Values.ui.serviceType | toString) "LoadBalancer") (.Values.ui.loadBalancerIP) }}
-  loadBalancerIP: {{ .Values.ui.loadBalancerIP }}
-  {{- end }}
+  {{- include "service.externalTrafficPolicy" .Values.ui }}
+  {{- include "service.loadBalancer" .Values.ui }}
 {{- end -}}
-
 {{- end }}
 {{- end }}

@@ -6,14 +6,36 @@ jobs:
   bats-unit-test:
     docker:
       # This image is built from test/docker/Test.dockerfile
-      - image: docker.mirror.hashicorp.services/hashicorpdev/vault-helm-test:0.1.0
+      - image: docker.mirror.hashicorp.services/hashicorpdev/vault-helm-test:0.2.0
     steps:
       - checkout
       - run: bats ./test/unit -t
+
+  chart-verifier:
+    docker:
+      - image: docker.mirror.hashicorp.services/cimg/go:1.16
+    environment:
+      BATS_VERSION: "1.3.0"
+      CHART_VERIFIER_VERSION: "1.2.1"
+    steps:
+      - checkout
+      - run:
+          name: install chart-verifier
+          command: go get github.com/redhat-certification/chart-verifier@${CHART_VERIFIER_VERSION}
+      - run:
+          name: install bats
+          command: |
+            curl -sSL https://github.com/bats-core/bats-core/archive/v${BATS_VERSION}.tar.gz -o /tmp/bats.tgz
+            tar -zxf /tmp/bats.tgz -C /tmp
+            sudo /bin/bash /tmp/bats-core-${BATS_VERSION}/install.sh /usr/local
+      - run:
+          name: run chart-verifier tests
+          command: bats ./test/chart -t
+
   acceptance:
     docker:
       # This image is build from test/docker/Test.dockerfile
-      - image: docker.mirror.hashicorp.services/hashicorpdev/vault-helm-test:0.1.0
+      - image: docker.mirror.hashicorp.services/hashicorpdev/vault-helm-test:0.2.0
 
     steps:
       - checkout
@@ -66,16 +88,17 @@ workflows:
   build_and_test:
     jobs:
       - bats-unit-test
+      - chart-verifier
       - acceptance:
           requires:
             - bats-unit-test
           filters:
             branches:
-              only: master
+              only: main
   update-helm-charts-index:
     jobs:
       - update-helm-charts-index:
-          context: helm-charts-trigger
+          context: helm-charts-trigger-vault
           filters:
             tags:
               only: /^v.*/
