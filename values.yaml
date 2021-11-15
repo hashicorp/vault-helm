@@ -310,8 +310,7 @@ server:
 
     labels: {}
     annotations: {}
-    host: chart-example.local
-
+  
   # authDelegator enables a cluster role binding to be attached to the service
   # account.  This cluster role binding can be used to setup Kubernetes auth
   # method.  https://www.vaultproject.io/docs/auth/kubernetes.html
