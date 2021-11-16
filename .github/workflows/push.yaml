@@ -98,3 +98,10 @@ jobs:
       uses: ad-m/github-push-action@master
       with:
         github_token: ${{ secrets.STAKATER_GITHUB_TOKEN }}
+      
+    - name: Push Latest Tag
+      uses: anothrNick/github-tag-action@1.26.0
+      env:
+        GITHUB_TOKEN: ${{ secrets.STAKATER_GITHUB_TOKEN }}
+        WITH_V: true
+        DEFAULT_BUMP: patch
