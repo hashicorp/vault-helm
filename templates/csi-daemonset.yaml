@@ -67,6 +67,10 @@ spec:
             periodSeconds: {{ .Values.csi.readinessProbe.periodSeconds }}
             successThreshold: {{ .Values.csi.readinessProbe.successThreshold }}
             timeoutSeconds: {{ .Values.csi.readinessProbe.timeoutSeconds }}
+          {{- if .Values.global.openshift }}
+          securityContext:
+            privileged: true
+          {{- end }}  
       volumes:
         - name: providervol
           hostPath:
