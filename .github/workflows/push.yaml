@@ -1,0 +1,100 @@
+name: Push
+
+on:
+  push:
+    branches:
+      - add-gh-actions
+    paths-ignore:
+    - 'README.md'      
+
+env:
+  CHART_NAME: "vault"
+
+  KUBERNETES_VERSION: "1.18.0"
+  KIND_VERSION: "0.7.0"
+
+jobs:
+  build:
+    name: Build
+    if: "! contains(toJSON(github.event.commits.*.message), '[skip-ci]')"
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Check out code
+      uses: actions/checkout@v2
+      with:
+        persist-credentials: false # otherwise, the token used is the GITHUB_TOKEN, instead of your personal token
+        fetch-depth: 0 # otherwise, you will fail to push refs to dest repo
+
+    - name: Install kubectl
+      run: |
+        curl -LO "https://storage.googleapis.com/kubernetes-release/release/v${KUBERNETES_VERSION}/bin/linux/amd64/kubectl"
+        sudo install ./kubectl /usr/local/bin/ && rm kubectl
+        kubectl version --short --client
+        kubectl version --short --client | grep -q ${KUBERNETES_VERSION}
+    - name: Install Kind
+      run: |
+        curl -L -o kind https://github.com/kubernetes-sigs/kind/releases/download/v${KIND_VERSION}/kind-linux-amd64
+        sudo install ./kind /usr/local/bin && rm kind
+        kind version
+        kind version | grep -q ${KIND_VERSION}
+    - name: Create Kind Cluster
+      run: |
+        kind create cluster
+    # Generate tag for chart without "v" prefix
+    - name: Generate Tag
+      id: generate_tag
+      uses: anothrNick/github-tag-action@1.26.0
+      env:
+        GITHUB_TOKEN: ${{ secrets.STAKATER_GITHUB_TOKEN }}
+        WITH_V: false
+        DEFAULT_BUMP: patch
+        DRY_RUN: true
+
+    # Update chart tag to the latest semver tag
+    - name: Update Chart Version
+      env:
+        VERSION: ${{ steps.generate_tag.outputs.new_tag }}
+      run: make bump-chart
+
+    # Set Up Helm
+    - name: Set up Helm
+      uses: azure/setup-helm@v1
+      with:
+        version: v3.4.0
+
+    # Lint
+    - name: Helm Lint
+      run: |
+        helm lint ${CHART_NAME}
+    # Dry run to ensure that manifests are generated successfully 
+    - name: Dry Run Chart
+      run: |
+        helm install ${CHART_NAME} ${CHART_NAME} --dry-run --debug
+    # Publish helm chart
+    - name: Publish Helm chart
+      uses: stefanprodan/helm-gh-pages@master
+      with:
+        branch: master
+        repository: stakater-charts
+        target_dir: docs
+        token: ${{ secrets.STAKATER_GITHUB_TOKEN }}
+        charts_dir: .
+        charts_url: https://stakater.github.io/stakater-charts
+        owner: stakater
+        linting: off 
+        commit_username: stakater-user
+        commit_email: stakater@gmail.com
+
+    # Commit back changes
+    - name: Commit files
+      run: |
+        git config --local user.email "stakater@gmail.com"
+        git config --local user.name "stakater-user"
+        git status 
+        git add .
+        git commit -m "[skip-ci] Update artifacts" -a
+    - name: Push changes
+      uses: ad-m/github-push-action@master
+      with:
+        github_token: ${{ secrets.STAKATER_GITHUB_TOKEN }}
