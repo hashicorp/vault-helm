@@ -3,7 +3,7 @@ name: Push
 on:
   push:
     branches:
-      - add-gh-actions
+      - master
     paths-ignore:
     - 'README.md'      
 
