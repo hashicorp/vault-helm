@@ -1,10 +1,14 @@
 ## Unreleased
 
+## 0.18.0 (November 17th, 2021)
+
 CHANGES:
 * Removed support for deploying a leader-elector container with the [vault-k8s injector](https://github.com/hashicorp/vault-k8s) injector since vault-k8s now uses an internal mechanism to determine leadership [GH-649](https://github.com/hashicorp/vault-helm/pull/649)
+* Vault image default 1.9.0
+* Vault K8s image default 0.14.1
 
 Improvements:
-* Added templateConfig.staticSecretRenderInterval annotation for the injector [GH-621](https://github.com/hashicorp/vault-helm/pull/621)
+* Added templateConfig.staticSecretRenderInterval chart option for the injector [GH-621](https://github.com/hashicorp/vault-helm/pull/621)
 
 ## 0.17.1 (October 25th, 2021)
 
@@ -52,7 +56,7 @@ Improvements:
 ## 0.14.0 (July 28th, 2021)
 
 Features:
-* Added templateConfig.exitOnRetryFailure annotation for the injector [GH-560](https://github.com/hashicorp/vault-helm/pull/560)
+* Added templateConfig.exitOnRetryFailure chart option for the injector [GH-560](https://github.com/hashicorp/vault-helm/pull/560)
 
 Improvements:
 * Support configuring pod tolerations, pod affinity, and node selectors as YAML [GH-565](https://github.com/hashicorp/vault-helm/pull/565)
