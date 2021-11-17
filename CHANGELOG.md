@@ -1,5 +1,8 @@
 ## Unreleased
 
+CHANGES:
+* Removed support for deploying a leader-elector container with the [vault-k8s injector](https://github.com/hashicorp/vault-k8s) injector since vault-k8s now uses an internal mechanism to determine leadership [GH-649](https://github.com/hashicorp/vault-helm/pull/649)
+
 Improvements:
 * Added templateConfig.staticSecretRenderInterval annotation for the injector [GH-621](https://github.com/hashicorp/vault-helm/pull/621)
 
