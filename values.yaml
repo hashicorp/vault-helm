@@ -328,6 +328,7 @@ server:
     #       mountPath: /usr/local/libexec/vault
 
   # extraContainers is a list of sidecar containers. Specified as a YAML list.
+  # if the value is of type string then it is evaluated as a template.
   extraContainers: null
 
   # shareProcessNamespace enables process namespace sharing between Vault and the extraContainers
