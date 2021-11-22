@@ -44,7 +44,7 @@ spec:
             - name: providervol
               mountPath: "/provider"
             - name: mountpoint-dir
-              mountPath: /var/lib/kubelet/pods
+              mountPath: {{ .Values.csi.daemonSet.kubeletRootDir }}/pods
               mountPropagation: HostToContainer
             {{- if .Values.csi.volumeMounts }}
               {{- toYaml .Values.csi.volumeMounts | nindent 12}}

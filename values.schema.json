@@ -205,6 +205,9 @@
                             "properties": {
                                 "exitOnRetryFailure": {
                                     "type": "boolean"
+                                },
+                                "staticSecretRenderInterval": {
+                                    "type": "string"
                                 }
                             }
                         }
@@ -286,23 +289,6 @@
                     "type": "object",
                     "properties": {
                         "enabled": {
-                            "type": "boolean"
-                        },
-                        "image": {
-                            "type": "object",
-                            "properties": {
-                                "repository": {
-                                    "type": "string"
-                                },
-                                "tag": {
-                                    "type": "string"
-                                }
-                            }
-                        },
-                        "ttl": {
-                            "type": "string"
-                        },
-                        "useContainer": {
                             "type": "boolean"
                         }
                     }
@@ -613,6 +599,9 @@
                                     }
                                 }
                             }
+                        },
+                        "ingressClassName": {
+                            "type": "string"
                         },
                         "labels": {
                             "type": "object"
