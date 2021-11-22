@@ -370,8 +370,7 @@
                 "topologySpreadConstraints": {
                     "type": [
                         "null",
-                        "array",
-                        "string"
+                        "array"
                     ]
                 },
                 "webhookAnnotations": {

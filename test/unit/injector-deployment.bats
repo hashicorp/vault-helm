@@ -168,7 +168,7 @@ load _helpers
   [ "${value}" = "RELEASE-NAME-vault-agent-injector-svc,RELEASE-NAME-vault-agent-injector-svc.${namespace:-default},RELEASE-NAME-vault-agent-injector-svc.${namespace:-default}.svc" ]
 }
 
-@test "injector/deployment: manual TLS adds volume mount" { 
+@test "injector/deployment: manual TLS adds volume mount" {
    cd `chart_dir`
    local object=$(helm template \
        --show-only templates/injector-deployment.yaml  \
@@ -449,6 +449,27 @@ load _helpers
       --set 'injector.affinity.podAntiAffinity=foobar' \
       . | tee /dev/stderr |
       yq '.spec.template.spec.affinity.podAntiAffinity == "foobar"' | tee /dev/stderr)
+  [ "${actual}" = "true" ]
+}
+
+#--------------------------------------------------------------------
+# topologySpreadConstraints
+
+@test "injector/deployment: topologySpreadConstraints is null by default" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      --show-only templates/injector-deployment.yaml  \
+      . | tee /dev/stderr |
+      yq '.spec.template.spec | .topologySpreadConstraints? == null' | tee /dev/stderr)
+}
+
+@test "injector/deployment: topologySpreadConstraints can be set as YAML" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      --show-only templates/injector-deployment.yaml \
+      --set "injector.topologySpreadConstraints[0].foo=bar,injector.topologySpreadConstraints[1].baz=qux" \
+      . | tee /dev/stderr |
+      yq '.spec.template.spec.topologySpreadConstraints == [{"foo": "bar"}, {"baz": "qux"}]' | tee /dev/stderr)
   [ "${actual}" = "true" ]
 }
 
