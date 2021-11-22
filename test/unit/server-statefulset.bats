@@ -784,6 +784,29 @@ load _helpers
   [ "${actual}" = "true" ]
 }
 
+#--------------------------------------------------------------------
+# topologySpreadConstraints
+
+@test "server/standalone-StatefulSet: topologySpreadConstraints is null by default" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      --show-only templates/server-statefulset.yaml  \
+      . | tee /dev/stderr |
+      yq '.spec.template.spec | .topologySpreadConstraints? == null' | tee /dev/stderr)
+}
+
+@test "server/standalone-StatefulSet: topologySpreadConstraints can be set as YAML" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      --show-only templates/server-statefulset.yaml \
+      --set "server.topologySpreadConstraints[0].foo=bar,server.topologySpreadConstraints[1].baz=qux" \
+      . | tee /dev/stderr |
+      yq '.spec.template.spec.topologySpreadConstraints == [{"foo": "bar"}, {"baz": "qux"}]' | tee /dev/stderr)
+  [ "${actual}" = "true" ]
+}
+
+#--------------------------------------------------------------------
+# tolerations
 
 @test "server/standalone-StatefulSet: tolerations not set by default" {
   cd `chart_dir`
