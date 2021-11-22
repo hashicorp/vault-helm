@@ -13,9 +13,7 @@ spec:
       app.kubernetes.io/instance: {{ .Release.Name }}
       component: webhook
   ingress:
-    - from:
-        - namespaceSelector: {}
-      ports:
-      - port: 8080
-        protocol: TCP
+{{- if .Values.injector.networkPolicy.ingress }}
+{{- toYaml .Values.injector.networkPolicy.ingress | nindent 4 }}
+{{ end }}
 {{ end }}
