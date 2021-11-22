@@ -458,7 +458,7 @@ load _helpers
 @test "injector/deployment: topologySpreadConstraints is null by default" {
   cd `chart_dir`
   local actual=$(helm template \
-      --show-only templates/injector-deployment.yaml  \
+      --show-only templates/injector-deployment.yaml \
       . | tee /dev/stderr |
       yq '.spec.template.spec | .topologySpreadConstraints? == null' | tee /dev/stderr)
 }

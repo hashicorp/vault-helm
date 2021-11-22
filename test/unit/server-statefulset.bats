@@ -790,7 +790,7 @@ load _helpers
 @test "server/standalone-StatefulSet: topologySpreadConstraints is null by default" {
   cd `chart_dir`
   local actual=$(helm template \
-      --show-only templates/server-statefulset.yaml  \
+      --show-only templates/server-statefulset.yaml \
       . | tee /dev/stderr |
       yq '.spec.template.spec | .topologySpreadConstraints? == null' | tee /dev/stderr)
 }
