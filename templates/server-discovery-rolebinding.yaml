@@ -1,6 +1,6 @@
 {{ template "vault.mode" . }}
 {{- if ne .mode "external" }}
-{{- if and (eq .mode "ha" ) (eq (.Values.global.enabled | toString) "true") }}
+{{- if and (eq .mode "ha" ) (eq (.Values.global.enabled | toString) "true") (eq (.Values.global.rbac | toString) "true") }}
 {{- if .Capabilities.APIVersions.Has "rbac.authorization.k8s.io/v1" -}}
 apiVersion: rbac.authorization.k8s.io/v1
 {{- else }}

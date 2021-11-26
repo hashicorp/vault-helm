@@ -4,6 +4,9 @@ global:
   # enabled is the master enabled switch. Setting this to true or false
   # will enable or disable all the components within this chart by default.
   enabled: true
+  # Toggle RBAC creation. This is useful in more restricted environments where
+  # RBAC configuration is managed some other way.
+  rbac: true
   # Image pull secret to use for registry authentication.
   # Alternatively, the value may be specified as an array of strings.
   imagePullSecrets: []
