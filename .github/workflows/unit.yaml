@@ -1,0 +1,20 @@
+name: Unit Tests
+
+on:
+  push:
+  workflow_dispatch:
+  workflow_call:
+
+jobs:
+  setup-test-tools:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: hashicorp/vault-helm/.github/workflows/setup-test-tools.yaml@$GITHUB_SHA
+
+  bats-unit-tests:
+    needs: setup-test-tools
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - run: bats ./test/unit -t
