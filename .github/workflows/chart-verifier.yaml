@@ -1,22 +1,18 @@
 name: Chart Verifier Tests
 
-on:
-  push:
-  workflow_dispatch:
+on: [push, workflow_dispatch]
 
 jobs:
-  setup-test-tools:
-    uses: $GITHUB_REPOSITORY/.github/workflows/setup-test-tools.yaml@$GITHUB_SHA
-
   chart-verifier:
     needs: setup-test-tools
     runs-on: ubuntu-latest
     env:
       CHART_VERIFIER_VERSION: '1.2.1'
     steps:
-      - uses: actions/checkout@v2
+      - uses: ./.github/workflows/setup-test-tools
       - uses: actions/setup-go@v2
         with:
           go-version: '1.17.2'
+      - uses: actions/checkout@v2
       - run: go get github.com/redhat-certification/chart-verifier@${CHART_VERIFIER_VERSION}
       - run: bats ./test/chart -t
