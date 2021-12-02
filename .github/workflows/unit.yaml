@@ -6,6 +6,6 @@ jobs:
   bats-unit-tests:
     runs-on: ubuntu-latest
     steps:
-      - uses: ./.github/workflows/setup-test-tools
       - uses: actions/checkout@v2
+      - uses: ./.github/workflows/setup-test-tools
       - run: bats ./test/unit -t
