@@ -1,7 +1,6 @@
 name: Setup common testing tools
 
-on:
-  workflow_call:
+on: [workflow_call]
 
 jobs:
   # setup bats and python-yq

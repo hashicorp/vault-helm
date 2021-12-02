@@ -5,12 +5,8 @@ on:
   workflow_dispatch:
 
 jobs:
-  # setup bats and python-yq
   setup-test-tools:
-    runs-on: ubuntu-latest
-    steps:
-      # - uses: actions/checkout@v2
-      - uses: ./.github/workflows/setup-test-tools.yaml
+    uses: ./.github/workflows/setup-test-tools.yaml@$GITHUB_SHA
 
   chart-verifier:
     needs: setup-test-tools
