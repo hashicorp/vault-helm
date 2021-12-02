@@ -7,21 +7,7 @@ on:
   workflow_dispatch:
 
 jobs:
-  setup-test-tools:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v2
-      - uses: ./.github/workflows/setup-test-tools.yaml
-
-  bats-unit-tests:
-    needs: setup-test-tools
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v2
-      - uses: hashicorp/vault-helm/.github/unit.yaml
-
   kind-acceptance-tests:
-    needs: [setup-test-tools, bats-unit-tests]
     strategy:
       fail-fast: false
       matrix:
@@ -29,8 +15,8 @@ jobs:
         kind-k8s-version: [1.14.10, 1.22.4]
     runs-on: ubuntu-latest
     steps:
-      - name: checkout vault-helm
-        uses: actions/checkout@v2
+      - uses: actions/checkout@v2
+      - uses: ./.github/workflows/setup-test-tools
 
       - name: Create K8s Kind Cluster
         uses: helm/kind-action@v1.2.0
@@ -46,6 +32,4 @@ jobs:
       - if: ${{ env.K8S_MINOR < 16 }}
         run: echo "SKIP_CSI=true" >> $GITHUB_ENV
 
-      - run: printenv
-      - name: tests
-        run: bats ./test/acceptance -t
+      - run: bats ./test/acceptance -t

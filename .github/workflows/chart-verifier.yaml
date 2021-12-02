@@ -4,7 +4,6 @@ on: [push, workflow_dispatch]
 
 jobs:
   chart-verifier:
-    needs: setup-test-tools
     runs-on: ubuntu-latest
     env:
       CHART_VERIFIER_VERSION: '1.2.1'
