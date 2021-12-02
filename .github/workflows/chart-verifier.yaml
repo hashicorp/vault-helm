@@ -6,7 +6,7 @@ on:
 
 jobs:
   setup-test-tools:
-    uses: ./.github/workflows/setup-test-tools.yaml@$GITHUB_SHA
+    uses: ./.github/workflows/setup-test-tools.yaml
 
   chart-verifier:
     needs: setup-test-tools

@@ -4,7 +4,7 @@ on: [push, workflow_dispatch, workflow_call]
 
 jobs:
   setup-test-tools:
-    uses: ./.github/workflows/setup-test-tools.yaml@$GITHUB_SHA
+    uses: ./.github/workflows/setup-test-tools.yaml
 
   bats-unit-tests:
     needs: setup-test-tools
