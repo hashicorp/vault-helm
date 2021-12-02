@@ -7,16 +7,16 @@ on:
   workflow_dispatch:
 
 jobs:
-  kind-acceptance-tests:
+  kind:
     strategy:
       fail-fast: false
       matrix:
-        # kind-k8s-version: [1.14.10, 1.16.15, 1.19.11, 1.21.2, 1.22.4]
         kind-k8s-version: [1.14.10, 1.19.11, 1.22.4]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-      - uses: ./.github/workflows/setup-test-tools
+      - name: Setup test tools
+        uses: ./.github/workflows/setup-test-tools
 
       - name: Create K8s Kind Cluster
         uses: helm/kind-action@v1.2.0
@@ -33,3 +33,5 @@ jobs:
         run: echo "SKIP_CSI=true" >> $GITHUB_ENV
 
       - run: bats ./test/acceptance -t
+        env:
+          VAULT_LICENSE_CI: ${{ secrets.VAULT_LICENSE_CI }}
