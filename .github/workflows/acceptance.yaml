@@ -2,8 +2,8 @@ name: Acceptance Tests
 
 on:
   push:
-    branches:
-      - main
+    # branches:
+    #   - main
   workflow_dispatch:
 
 jobs:
@@ -12,7 +12,7 @@ jobs:
       fail-fast: false
       matrix:
         # kind-k8s-version: [1.14.10, 1.16.15, 1.19.11, 1.21.2, 1.22.4]
-        kind-k8s-version: [1.14.10, 1.22.4]
+        kind-k8s-version: [1.14.10, 1.19.11, 1.22.4]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
@@ -22,8 +22,8 @@ jobs:
         uses: helm/kind-action@v1.2.0
         with:
           config: test/kind/config.yaml
-          node_image: kindest/node:v${{matrix.kind-k8s-version}}
-          kubectl_version: v${{matrix.kind-k8s-version}}
+          node_image: kindest/node:v${{ matrix.kind-k8s-version }}
+          kubectl_version: v${{ matrix.kind-k8s-version }}
 
       - run: kubectl get nodes
 
