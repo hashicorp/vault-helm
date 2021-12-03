@@ -100,6 +100,11 @@ setup() {
 teardown() {
   if [[ ${CLEANUP:-true} == "true" ]]
   then
+      # If the test failed, print some debug output
+      if [[ "$BATS_ERROR_STATUS" -ne 0 ]]; then
+          kubectl logs -l app=consul
+          kubectl logs -l app.kubernetes.io/name=vault
+      fi
       helm delete vault
       helm delete consul
       kubectl delete --all pvc
