@@ -17,11 +17,12 @@ check_skip_csi() {
   kubectl create namespace acceptance
 
   # Install Secrets Store CSI driver
-  CSI_DRIVER_VERSION=0.2.0
-  helm install secrets-store-csi-driver https://github.com/kubernetes-sigs/secrets-store-csi-driver/blob/v${CSI_DRIVER_VERSION}/charts/secrets-store-csi-driver-${CSI_DRIVER_VERSION}.tgz?raw=true \
+  CSI_DRIVER_VERSION=1.0.0
+  helm install secrets-store-csi-driver https://kubernetes-sigs.github.io/secrets-store-csi-driver/charts/secrets-store-csi-driver-${CSI_DRIVER_VERSION}.tgz?raw=true \
     --wait --timeout=5m \
     --namespace=acceptance \
-    --set linux.image.pullPolicy="IfNotPresent"
+    --set linux.image.pullPolicy="IfNotPresent" \
+    --set syncSecret.enabled=true
   # Install Vault and Vault provider
   helm install vault \
     --wait --timeout=5m \
