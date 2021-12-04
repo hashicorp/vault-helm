@@ -40,9 +40,9 @@ helm_install_ha() {
         ${BATS_TEST_DIRNAME}/../..
 }
 
-# wait for consul to be running
+# wait for consul to be ready
 wait_for_running_consul() {
-    kubectl wait --for=condition=Running --timeout=1m pod -l app=consul,component=client
+    kubectl wait --for=condition=Ready --timeout=5m pod -l app=consul,component=client
 }
 
 wait_for_sealed_vault() {
