@@ -20,6 +20,6 @@ jobs:
         uses: ./.github/workflows/setup-test-tools
       - uses: actions/setup-go@v2
         with:
-          go-version: '1.17.2'
+          go-version: '1.17.4'
       - run: go install github.com/redhat-certification/chart-verifier@${CHART_VERIFIER_VERSION}
       - run: bats ./test/chart -t

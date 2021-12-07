@@ -15,6 +15,6 @@ kubeadmConfigPatches:
       name: config
     apiServer:
       extraArgs:
-        "service-account-issuer": "kubernetes/serviceaccount"
+        "service-account-issuer": "https://kubernetes.default.svc.cluster.local"
         "service-account-signing-key-file": "/etc/kubernetes/pki/sa.key"
-        "service-account-api-audiences": "https://kubernetes.default.svc"
+        "service-account-api-audiences": "https://kubernetes.default.svc.cluster.local"
