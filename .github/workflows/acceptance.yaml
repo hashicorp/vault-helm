@@ -2,9 +2,9 @@ name: Acceptance Tests
 
 on:
   push:
-    # branches:
-    #   - main
-  workflow_dispatch:
+    branches:
+      - main
+  workflow_dispatch: {}
 
 jobs:
   kind:
