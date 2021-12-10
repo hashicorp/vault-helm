@@ -1,5 +1,8 @@
 ## Unreleased
 
+## 0.18.1 (December 10th, 2021)
+* Vault image default 1.9.1
+
 ## 0.18.0 (November 17th, 2021)
 
 CHANGES:
