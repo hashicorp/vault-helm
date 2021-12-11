@@ -15,9 +15,7 @@ load _helpers
   wait_for_running "$(name_prefix)-east-0"
 
   # Sealed, not initialized
-  local sealed_status=$(kubectl exec "$(name_prefix)-east-0" -- vault status -format=json |
-    jq -r '.sealed' )
-  [ "${sealed_status}" == "true" ]
+  wait_for_sealed_vault $(name_prefix)-east-0
 
   local init_status=$(kubectl exec "$(name_prefix)-east-0" -- vault status -format=json |
     jq -r '.initialized')
@@ -50,7 +48,7 @@ load _helpers
       fi
   done
 
-  # Sealed, not initialized
+  # Unsealed, initialized
   local sealed_status=$(kubectl exec "$(name_prefix)-east-0" -- vault status -format=json |
     jq -r '.sealed' )
   [ "${sealed_status}" == "false" ]
@@ -84,9 +82,7 @@ load _helpers
   wait_for_running "$(name_prefix)-west-0"
 
   # Sealed, not initialized
-  local sealed_status=$(kubectl exec "$(name_prefix)-west-0" -- vault status -format=json |
-    jq -r '.sealed' )
-  [ "${sealed_status}" == "true" ]
+  wait_for_sealed_vault $(name_prefix)-west-0
 
   local init_status=$(kubectl exec "$(name_prefix)-west-0" -- vault status -format=json |
     jq -r '.initialized')
@@ -119,7 +115,7 @@ load _helpers
       fi
   done
 
-  # Sealed, not initialized
+  # Unsealed, initialized
   local sealed_status=$(kubectl exec "$(name_prefix)-west-0" -- vault status -format=json |
     jq -r '.sealed' )
   [ "${sealed_status}" == "false" ]
