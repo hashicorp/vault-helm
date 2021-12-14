@@ -205,12 +205,14 @@ injector:
   # podDisruptionBudget:
   #   maxUnavailable: 1
 
-  # strategy for updating the deployment. This can be a multi-line string or a YAML map.
-  strategy: |
-    rollingUpdate:
-      maxSurge: 25%
-      maxUnavailable: 25%
-    type: RollingUpdate
+  # strategy for updating the deployment. This can be a multi-line string or a
+  # YAML map.
+  strategy: {}
+  # strategy: |
+  #   rollingUpdate:
+  #     maxSurge: 25%
+  #     maxUnavailable: 25%
+  #   type: RollingUpdate
 
 server:
   # If not set to true, Vault server will not be installed. See vault.mode in _helpers.tpl for implementation details

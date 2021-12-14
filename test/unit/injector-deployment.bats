@@ -727,8 +727,8 @@ load _helpers
   local actual=$(helm template \
       --show-only templates/injector-deployment.yaml  \
       . | tee /dev/stderr |
-      yq -r '.spec.strategy.rollingUpdate.maxUnavailable' | tee /dev/stderr)
-  [ "${actual}" = "25%" ]
+      yq -r '.spec.strategy' | tee /dev/stderr)
+  [ "${actual}" = "null" ]
 }
 
 @test "injector/deployment: strategy set as string" {

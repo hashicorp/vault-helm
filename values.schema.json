@@ -349,6 +349,12 @@
                         }
                     }
                 },
+                "strategy": {
+                    "type": [
+                        "object",
+                        "string"
+                    ]
+                },
                 "tolerations": {
                     "type": [
                         "null",
