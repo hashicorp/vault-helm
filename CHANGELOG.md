@@ -2,6 +2,7 @@
 
 Features:
 * Added configurable podDisruptionBudget for injector [GH-653](https://github.com/hashicorp/vault-helm/pull/653)
+* Added configurable update strategy for injector [GH-661](https://github.com/hashicorp/vault-helm/pull/661)
 
 ## 0.18.0 (November 17th, 2021)
 
