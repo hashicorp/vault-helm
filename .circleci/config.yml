@@ -94,7 +94,7 @@ workflows:
             - bats-unit-test
           filters:
             branches:
-              only: master
+              only: main
   update-helm-charts-index:
     jobs:
       - update-helm-charts-index:

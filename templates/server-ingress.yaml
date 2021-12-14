@@ -8,7 +8,11 @@
 {{- $serviceName = printf "%s-%s" $serviceName "active" -}}
 {{- end }}
 {{- $servicePort := .Values.server.service.port -}}
-{{ if .Capabilities.APIVersions.Has "networking.k8s.io/v1beta1" }}
+{{- $pathType := .Values.server.ingress.pathType -}}
+{{- $kubeVersion := .Capabilities.KubeVersion.Version }}
+{{ if semverCompare ">= 1.19.0-0" $kubeVersion }}
+apiVersion: networking.k8s.io/v1
+{{ else if .Capabilities.APIVersions.Has "networking.k8s.io/v1beta1" }}
 apiVersion: networking.k8s.io/v1beta1
 {{ else }}
 apiVersion: extensions/v1beta1
@@ -37,6 +41,9 @@ spec:
       secretName: {{ .secretName }}
   {{- end }}
 {{- end }}
+{{- if .Values.server.ingress.ingressClassName }}
+  ingressClassName: {{ .Values.server.ingress.ingressClassName }}
+{{- end }}
   rules:
   {{- range .Values.server.ingress.hosts }}
     - host: {{ .host | quote }}
@@ -47,9 +54,19 @@ spec:
 {{- end }}
         {{- range (.paths | default (list "/")) }}
           - path: {{ . }}
+            {{ if semverCompare ">= 1.19.0-0" $kubeVersion }}
+            pathType: {{ $pathType }}
+            {{ end }}
             backend:
+              {{ if semverCompare ">= 1.19.0-0" $kubeVersion }}
+              service:
+                name: {{ $serviceName }}
+                port:
+                  number: {{ $servicePort }}
+              {{ else }}
               serviceName: {{ $serviceName }}
               servicePort: {{ $servicePort }}
+              {{ end }}
         {{- end }}
   {{- end }}
 {{- end }}

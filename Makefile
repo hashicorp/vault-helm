@@ -40,6 +40,7 @@ else
 	-e GOOGLE_CREDENTIALS=${GOOGLE_CREDENTIALS} \
 	-e CLOUDSDK_CORE_PROJECT=${CLOUDSDK_CORE_PROJECT} \
 	-e KUBECONFIG=/helm-test/.kube/config \
+	-e VAULT_LICENSE_CI=${VAULT_LICENSE_CI} \
 	-w /helm-test \
 	$(TEST_IMAGE) \
 	make acceptance

@@ -24,6 +24,12 @@
                                     "type": "string"
                                 }
                             }
+                        },
+                        "providersDir": {
+                          "type": "string"
+                        },
+                        "kubeletRootDir": {
+                          "type": "string"
                         }
                     }
                 },
@@ -199,6 +205,9 @@
                             "properties": {
                                 "exitOnRetryFailure": {
                                     "type": "boolean"
+                                },
+                                "staticSecretRenderInterval": {
+                                    "type": "string"
                                 }
                             }
                         }
@@ -281,20 +290,6 @@
                     "properties": {
                         "enabled": {
                             "type": "boolean"
-                        },
-                        "image": {
-                            "type": "object",
-                            "properties": {
-                                "repository": {
-                                    "type": "string"
-                                },
-                                "tag": {
-                                    "type": "string"
-                                }
-                            }
-                        },
-                        "ttl": {
-                            "type": "string"
                         }
                     }
                 },
@@ -323,6 +318,9 @@
                     ]
                 },
                 "objectSelector": {
+                    "type": "object"
+                },
+                "podDisruptionBudget": {
                     "type": "object"
                 },
                 "port": {
@@ -598,6 +596,9 @@
                                     }
                                 }
                             }
+                        },
+                        "ingressClassName": {
+                            "type": "string"
                         },
                         "labels": {
                             "type": "object"

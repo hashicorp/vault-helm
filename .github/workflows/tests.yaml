@@ -1,0 +1,25 @@
+name: Tests
+
+on: [push, workflow_dispatch]
+
+jobs:
+  bats-unit-tests:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: ./.github/workflows/setup-test-tools
+      - run: bats ./test/unit -t
+
+  chart-verifier:
+    runs-on: ubuntu-latest
+    env:
+      CHART_VERIFIER_VERSION: '1.2.1'
+    steps:
+      - uses: actions/checkout@v2
+      - name: Setup test tools
+        uses: ./.github/workflows/setup-test-tools
+      - uses: actions/setup-go@v2
+        with:
+          go-version: '1.17.4'
+      - run: go install github.com/redhat-certification/chart-verifier@${CHART_VERIFIER_VERSION}
+      - run: bats ./test/chart -t
