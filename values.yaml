@@ -199,6 +199,12 @@ injector:
     # Extra annotations to attach to the injector service
     annotations: {}
 
+  # A disruption budget limits the number of pods of a replicated application
+  # that are down simultaneously from voluntary disruptions
+  podDisruptionBudget: {}
+  # podDisruptionBudget:
+  #   maxUnavailable: 1
+
 server:
   # If not set to true, Vault server will not be installed. See vault.mode in _helpers.tpl for implementation details
   enabled: true
