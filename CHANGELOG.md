@@ -1,7 +1,9 @@
 ## Unreleased
 
-## 0.18.1 (December 10th, 2021)
+
+## 0.18.1 (December 14th, 2021)
 * Vault image default 1.9.1
+* Added configurable podDisruptionBudget for injector [GH-653](https://github.com/hashicorp/vault-helm/pull/653)
 
 ## 0.18.0 (November 17th, 2021)
 
