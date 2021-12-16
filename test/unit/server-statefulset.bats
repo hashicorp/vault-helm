@@ -1386,6 +1386,27 @@ load _helpers
 }
 
 #--------------------------------------------------------------------
+# terminationGracePeriodSeconds
+@test "server/standalone-StatefulSet: terminationGracePeriodSeconds default" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      --show-only templates/server-statefulset.yaml \
+      . | tee /dev/stderr |
+       yq -r '.spec.template.spec.terminationGracePeriodSeconds' | tee /dev/stderr)
+  [[ "${actual}" = "10" ]]
+}
+
+@test "server/standalone-StatefulSet: terminationGracePeriodSeconds 30" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      --show-only templates/server-statefulset.yaml \
+      --set 'server.terminationGracePeriodSeconds=30' \
+      . | tee /dev/stderr |
+       yq -r '.spec.template.spec.terminationGracePeriodSeconds' | tee /dev/stderr)
+  [[ "${actual}" = "30" ]]
+}
+
+#--------------------------------------------------------------------
 # preStop
 @test "server/standalone-StatefulSet: preStop sleep duration default" {
   cd `chart_dir`

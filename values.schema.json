@@ -14,6 +14,12 @@
                                 "string"
                             ]
                         },
+                        "kubeletRootDir": {
+                            "type": "string"
+                        },
+                        "providersDir": {
+                            "type": "string"
+                        },
                         "updateStrategy": {
                             "type": "object",
                             "properties": {
@@ -24,12 +30,6 @@
                                     "type": "string"
                                 }
                             }
-                        },
-                        "providersDir": {
-                          "type": "string"
-                        },
-                        "kubeletRootDir": {
-                          "type": "string"
                         }
                     }
                 },
@@ -609,6 +609,9 @@
                         "labels": {
                             "type": "object"
                         },
+                        "pathType": {
+                            "type": "string"
+                        },
                         "tls": {
                             "type": "array"
                         }
@@ -734,6 +737,9 @@
                         "enabled": {
                             "type": "boolean"
                         },
+                        "externalTrafficPolicy": {
+                            "type": "string"
+                        },
                         "port": {
                             "type": "integer"
                         },
@@ -787,6 +793,9 @@
                         }
                     }
                 },
+                "terminationGracePeriodSeconds": {
+                    "type": "integer"
+                },
                 "tolerations": {
                     "type": [
                         "null",
@@ -828,6 +837,9 @@
                 },
                 "externalPort": {
                     "type": "integer"
+                },
+                "externalTrafficPolicy": {
+                    "type": "string"
                 },
                 "publishNotReadyAddresses": {
                     "type": "boolean"
