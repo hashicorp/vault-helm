@@ -109,7 +109,7 @@ injector:
   #      vault-sidecar-injector: enabled
   objectSelector: {}
 
-  # Configures failurePolicy of the webhook. The "unspecified" default behaviour deoends on the
+  # Configures failurePolicy of the webhook. The "unspecified" default behaviour depends on the
   # API Version of the WebHook.
   # To block pod creation while webhook is unavailable, set the policy to `Fail` below.
   # See https://kubernetes.io/docs/reference/access-authn-authz/extensible-admission-controllers/#failure-policy
@@ -128,7 +128,7 @@ injector:
 
     # caBundle is a base64-encoded PEM-encoded certificate bundle for the CA
     # that signed the TLS certificate that the webhook serves. This must be set
-    # if secretName is non-null, unless an external service like cert-manager is
+    # if secretName is non-null unless an external service like cert-manager is
     # keeping the caBundle updated.
     caBundle: ""
 
@@ -153,7 +153,7 @@ injector:
     # KUBERNETES_SERVICE_HOST: kubernetes.default.svc
 
   # Affinity Settings for injector pods
-  # This can either be multi-line string or YAML matching the PodSpec's affinity field.
+  # This can either be a multi-line string or YAML matching the PodSpec's affinity field.
   # Commenting out or setting as empty the affinity variable, will allow
   # deployment of multiple replicas to single node services such as Minikube.
   affinity: |
@@ -346,7 +346,7 @@ server:
   extraContainers: null
 
   # shareProcessNamespace enables process namespace sharing between Vault and the extraContainers
-  # This is useful if Vault must be signaled, e.g. to send a SIGHUP for log rotation
+  # This is useful if Vault must be signaled, e.g. to send a SIGHUP for a log rotation
   shareProcessNamespace: false
 
   # extraArgs is a string containing additional Vault server arguments.
@@ -490,10 +490,10 @@ server:
   service:
     enabled: true
     # clusterIP controls whether a Cluster IP address is attached to the
-    # Vault service within Kubernetes.  By default the Vault service will
+    # Vault service within Kubernetes.  By default, the Vault service will
     # be given a Cluster IP address, set to None to disable.  When disabled
     # Kubernetes will create a "headless" service.  Headless services can be
-    # used to communicate with pods directly through DNS instead of a round robin
+    # used to communicate with pods directly through DNS instead of a round-robin
     # load balancer.
     # clusterIP: None
 
@@ -538,7 +538,7 @@ server:
     annotations: {}
 
   # This configures the Vault Statefulset to create a PVC for audit
-  # logs.  Once Vault is deployed, initialized and unseal, Vault must
+  # logs.  Once Vault is deployed, initialized, and unseal, Vault must
   # be configured to use this for audit logs.  This will be mounted to
   # /vault/audit
   # See https://www.vaultproject.io/docs/audit/index.html to know more
@@ -605,7 +605,7 @@ server:
       #   crypto_key  = "vault-helm-unseal-key"
       #}
 
-  # Run Vault in "HA" mode. There are no storage requirements unless audit log
+  # Run Vault in "HA" mode. There are no storage requirements unless the audit log
   # persistence is required.  In HA mode Vault will configure itself to use Consul
   # for its storage backend.  The default configuration provided will work the Consul
   # Helm project by default.  It is possible to manually configure Vault to use a
