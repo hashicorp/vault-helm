@@ -27,6 +27,9 @@ spec:
         app.kubernetes.io/instance: {{ .Release.Name }}
       {{ template "csi.pod.annotations" . }}
     spec:
+      {{- if .Values.csi.priorityClassName }}
+      priorityClassName: {{ .Values.csi.priorityClassName }}
+      {{- end }}
       serviceAccountName: {{ template "vault.fullname" . }}-csi-provider
       {{- template "csi.pod.tolerations" . }}
       containers:

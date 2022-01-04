@@ -812,6 +812,9 @@ csi:
     # in a PodSpec.
     tolerations: []
 
+  # Priority class for csi pods
+  priorityClassName: ""
+
   serviceAccount:
     # Extra annotations for the serviceAccount definition. This can either be
     # YAML or a YAML-formatted multi-line templated string map of the

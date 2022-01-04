@@ -33,6 +33,9 @@
                         }
                     }
                 },
+                "priorityClassName": {
+                    "type": "string"
+                },
                 "debug": {
                     "type": "boolean"
                 },
