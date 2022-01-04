@@ -36,6 +36,7 @@ load _helpers
   cd `chart_dir`
   local actual=$(helm template \
       --show-only templates/csi-daemonset.yaml  \
+      --set "csi.enabled=true" \
       . | tee /dev/stderr |
       yq '.spec.template.spec | .priorityClassName? == null' | tee /dev/stderr)
   [ "${actual}" = "true" ]
@@ -46,6 +47,7 @@ load _helpers
   local actual=$(helm template \
       --show-only templates/csi-daemonset.yaml  \
       --set 'csi.priorityClassName=armaggeddon' \
+      --set "csi.enabled=true" \
       . | tee /dev/stderr |
       yq '.spec.template.spec | .priorityClassName == "armaggeddon"' | tee /dev/stderr)
   [ "${actual}" = "true" ]
