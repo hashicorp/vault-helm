@@ -159,3 +159,83 @@ load _helpers
       yq -r '.spec.containers[0].resources' | tee /dev/stderr)
   [ "${actual}" = "null" ]
 }
+
+#--------------------------------------------------------------------
+# volumes
+
+@test "server/standalone-server-test-Pod: server.volumes adds volume" {
+  cd `chart_dir`
+
+  # Test that it defines it
+  local object=$(helm template \
+      --show-only templates/tests/server-test.yaml  \
+      --set 'server.volumes[0].name=plugins' \
+      --set 'server.volumes[0].emptyDir=\{\}' \
+      . | tee /dev/stderr |
+      yq -r '.spec.volumes[] | select(.name == "plugins")' | tee /dev/stderr)
+
+  local actual=$(echo $object |
+      yq -r '.emptyDir' | tee /dev/stderr)
+  [ "${actual}" = "{}" ]
+}
+
+#--------------------------------------------------------------------
+# volumeMounts
+
+@test "server/standalone-server-test-Pod: server.volumeMounts adds volumeMount" {
+  cd `chart_dir`
+
+  # Test that it defines it
+  local object=$(helm template \
+      --show-only templates/tests/server-test.yaml  \
+      --set 'server.volumeMounts[0].name=plugins' \
+      --set 'server.volumeMounts[0].mountPath=/usr/local/libexec/vault' \
+      --set 'server.volumeMounts[0].readOnly=true' \
+      . | tee /dev/stderr |
+      yq -r '.spec.containers[0].volumeMounts[] | select(.name == "plugins")' | tee /dev/stderr)
+
+  local actual=$(echo $object |
+      yq -r '.mountPath' | tee /dev/stderr)
+  [ "${actual}" = "/usr/local/libexec/vault" ]
+
+  local actual=$(echo $object |
+      yq -r '.readOnly' | tee /dev/stderr)
+  [ "${actual}" = "true" ]
+}
+
+#--------------------------------------------------------------------
+# extraEnvironmentVars
+
+@test "server/standalone-server-test-Pod: set extraEnvironmentVars" {
+  cd `chart_dir`
+  local object=$(helm template \
+      --show-only templates/tests/server-test.yaml  \
+      --set 'server.standalone.enabled=true' \
+      --set 'server.extraEnvironmentVars.FOO=bar' \
+      --set 'server.extraEnvironmentVars.FOOBAR=foobar' \
+      . | tee /dev/stderr |
+      yq -r '.spec.containers[0].env' | tee /dev/stderr)
+
+  local name=$(echo $object |
+      yq -r 'map(select(.name=="FOO")) | .[] .value' | tee /dev/stderr)
+  [ "${name}" = "bar" ]
+
+  local name=$(echo $object |
+      yq -r 'map(select(.name=="FOOBAR")) | .[] .value' | tee /dev/stderr)
+  [ "${name}" = "foobar" ]
+
+  local object=$(helm template \
+      --show-only templates/tests/server-test.yaml  \
+      --set 'server.extraEnvironmentVars.FOO=bar' \
+      --set 'server.extraEnvironmentVars.FOOBAR=foobar' \
+      . | tee /dev/stderr |
+      yq -r '.spec.containers[0].env' | tee /dev/stderr)
+
+  local name=$(echo $object |
+      yq -r 'map(select(.name=="FOO")) | .[] .value' | tee /dev/stderr)
+  [ "${name}" = "bar" ]
+
+  local name=$(echo $object |
+      yq -r 'map(select(.name=="FOOBAR")) | .[] .value' | tee /dev/stderr)
+  [ "${name}" = "foobar" ]
+}
