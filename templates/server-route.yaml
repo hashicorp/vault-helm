@@ -27,7 +27,7 @@ spec:
   port:
     targetPort: 8200
   tls:
-    termination: passthrough
+    termination: {{ .Values.server.route.termination }}
 {{- end }}
 {{- end }}
 {{- end }}
