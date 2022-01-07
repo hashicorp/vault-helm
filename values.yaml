@@ -538,7 +538,7 @@ server:
     annotations: {}
 
   # This configures the Vault Statefulset to create a PVC for audit
-  # logs.  Once Vault is deployed, initialized and unseal, Vault must
+  # logs.  Once Vault is deployed, initialized and unsealed, Vault must
   # be configured to use this for audit logs.  This will be mounted to
   # /vault/audit
   # See https://www.vaultproject.io/docs/audit/index.html to know more
