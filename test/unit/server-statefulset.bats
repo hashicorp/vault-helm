@@ -537,7 +537,7 @@ load _helpers
   cd `chart_dir`
   local object=$(helm template \
       --show-only templates/server-statefulset.yaml  \
-      --set 'server.stanadlone.enabled=true' \
+      --set 'server.standalone.enabled=true' \
       --set 'server.extraEnvironmentVars.FOO=bar' \
       --set 'server.extraEnvironmentVars.FOOBAR=foobar' \
       . | tee /dev/stderr |
