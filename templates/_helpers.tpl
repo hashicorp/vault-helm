@@ -384,6 +384,33 @@ Sets extra injector webhook annotations
 {{- end -}}
 
 {{/*
+Create the name of the injector service account to use
+*/}}
+{{- define "injector.serviceAccount.name" -}}
+{{- if .Values.injector.serviceAccount.create -}}
+    {{- $defaultInjectorAccountName := printf "%s-%s" (include "vault.fullname" .) "agent-injector" -}}
+    {{ default $defaultInjectorAccountName .Values.injector.serviceAccount.name }}
+{{- else -}}
+    {{ default "default" .Values.injector.serviceAccount.name }}
+{{- end -}}
+{{- end -}}
+
+{{/*
+Sets extra injector service account annotations
+*/}}
+{{- define "injector.serviceAccount.annotations" -}}
+  {{- if and (ne .mode "dev") .Values.injector.serviceAccount.annotations }}
+  annotations:
+    {{- $tp := typeOf .Values.injector.serviceAccount.annotations }}
+    {{- if eq $tp "string" }}
+      {{- tpl .Values.injector.serviceAccount.annotations . | nindent 4 }}
+    {{- else }}
+      {{- toYaml .Values.injector.serviceAccount.annotations | nindent 4 }}
+    {{- end }}
+  {{- end }}
+{{- end -}}
+
+{{/*
 Sets extra ui service annotations
 */}}
 {{- define "vault.ui.annotations" -}}
@@ -601,6 +628,19 @@ Sets extra CSI provider pod annotations
         {{- toYaml .Values.csi.pod.annotations | nindent 8 }}
       {{- end }}
   {{- end }}
+{{- end -}}
+
+
+{{/*
+Create the name of the CSI service account to use
+*/}}
+{{- define "csi.serviceAccount.name" -}}
+{{- if .Values.csi.serviceAccount.create -}}
+    {{- $defaultCsiAccountName := printf "%s-%s" (include "vault.fullname" .) "csi-provider" -}}
+    {{ default $defaultCsiAccountName .Values.csi.serviceAccount.name }}
+{{- else -}}
+    {{ default "default" .Values.csi.serviceAccount.name }}
+{{- end -}}
 {{- end -}}
 
 {{/*

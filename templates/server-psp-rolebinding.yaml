@@ -15,5 +15,5 @@ roleRef:
   apiGroup: rbac.authorization.k8s.io
 subjects:
   - kind: ServiceAccount
-    name: {{ template "vault.fullname" . }}
+    name: {{ template "vault.serviceAccount.name" . }}
 {{- end }}

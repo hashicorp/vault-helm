@@ -166,3 +166,22 @@ load _helpers
       yq 'length > 0' | tee /dev/stderr)
   [ "${actual}" = "true" ]
 }
+
+# RoleBinding service account name
+@test "injector/rolebinding: service account name" {
+  cd `chart_dir`
+  local actual=$( (helm template \
+      --show-only templates/injector-rolebinding.yaml \
+      --set "injector.replicas=2" \
+      . || echo "---") | tee /dev/stderr |
+      yq -r '.subjects[0].name' | tee /dev/stderr)
+  [ "${actual}" = "RELEASE-NAME-vault-agent-injector" ]
+
+  local actual=$( (helm template \
+      --show-only templates/injector-rolebinding.yaml \
+      --set "injector.replicas=2" \
+      --set 'injector.serviceAccount.name=user-defined-injector-ksa' \
+      . || echo "---") | tee /dev/stderr |
+      yq -r '.subjects[0].name' | tee /dev/stderr)
+  [ "${actual}" = "user-defined-injector-ksa" ]
+}

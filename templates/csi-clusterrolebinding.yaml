@@ -13,6 +13,6 @@ roleRef:
   name: {{ template "vault.fullname" . }}-csi-provider-clusterrole
 subjects:
 - kind: ServiceAccount
-  name: {{ template "vault.fullname" . }}-csi-provider
+  name: {{ template "csi.serviceAccount.name" . }}
   namespace: {{ .Release.Namespace }}
 {{- end }}

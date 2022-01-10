@@ -750,3 +750,20 @@ load _helpers
       yq -r '.spec.strategy.rollingUpdate.maxUnavailable' | tee /dev/stderr)
   [ "${actual}" = "1" ]
 }
+
+# serviceAccountName name
+@test "injector/deployment: serviceAccountName name" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      --show-only templates/injector-deployment.yaml \
+      . | tee /dev/stderr |
+      yq -r '.spec.template.spec.serviceAccountName' | tee /dev/stderr)
+  [ "${actual}" = "RELEASE-NAME-vault-agent-injector" ]
+
+  local actual=$(helm template \
+      --show-only templates/injector-deployment.yaml \
+      --set 'injector.serviceAccount.name=user-defined-injector-ksa' \
+      . | tee /dev/stderr |
+      yq -r '.spec.template.spec.serviceAccountName' | tee /dev/stderr)
+  [ "${actual}" = "user-defined-injector-ksa" ]
+}

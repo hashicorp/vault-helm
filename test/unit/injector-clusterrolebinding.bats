@@ -20,3 +20,20 @@ load _helpers
       yq 'length > 0' | tee /dev/stderr)
   [ "${actual}" = "false" ]
 }
+
+# ClusterRoleBinding service account name
+@test "injector/ClusterRoleBinding: service account name" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      --show-only templates/injector-clusterrolebinding.yaml \
+      . | tee /dev/stderr |
+      yq -r '.subjects[0].name' | tee /dev/stderr)
+  [ "${actual}" = "RELEASE-NAME-vault-agent-injector" ]
+
+  local actual=$(helm template \
+      --show-only templates/injector-clusterrolebinding.yaml \
+      --set 'injector.serviceAccount.name=user-defined-injector-ksa' \
+      . | tee /dev/stderr |
+      yq -r '.subjects[0].name' | tee /dev/stderr)
+  [ "${actual}" = "user-defined-injector-ksa" ]
+}

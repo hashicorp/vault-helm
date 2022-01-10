@@ -62,6 +62,14 @@ load _helpers
       . | tee /dev/stderr |
       yq -r '.spec.template.spec.serviceAccountName' | tee /dev/stderr)
   [ "${actual}" = "RELEASE-NAME-vault-csi-provider" ]
+
+  local actual=$(helm template \
+      --show-only templates/csi-daemonset.yaml \
+      --set "csi.enabled=true" \
+      --set 'csi.serviceAccount.name=user-defined-csi-ksa' \
+      . | tee /dev/stderr |
+      yq -r '.spec.template.spec.serviceAccountName' | tee /dev/stderr)
+  [ "${actual}" = "user-defined-csi-ksa" ]
 }
 
 # Image

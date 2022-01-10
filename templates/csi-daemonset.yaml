@@ -30,7 +30,7 @@ spec:
       {{- if .Values.csi.priorityClassName }}
       priorityClassName: {{ .Values.csi.priorityClassName }}
       {{- end }}
-      serviceAccountName: {{ template "vault.fullname" . }}-csi-provider
+      serviceAccountName: {{ template "csi.serviceAccount.name" . }}
       {{- template "csi.pod.tolerations" . }}
       containers:
         - name: {{ include "vault.name" . }}-csi-provider

@@ -13,6 +13,6 @@ roleRef:
   name: {{ template "vault.fullname" . }}-agent-injector-clusterrole
 subjects:
 - kind: ServiceAccount
-  name: {{ template "vault.fullname" . }}-agent-injector
+  name: {{ template "injector.serviceAccount.name" . }}
   namespace: {{ .Release.Namespace }}
 {{ end }}
