@@ -85,16 +85,7 @@ jobs:
 
 workflows:
   version: 2
-  build_and_test:
-    jobs:
-      - bats-unit-test
-      - chart-verifier
-      - acceptance:
-          requires:
-            - bats-unit-test
-          filters:
-            branches:
-              only: main
+  # Note: unit and acceptance tests are now being run in GitHub Actions
   update-helm-charts-index:
     jobs:
       - update-helm-charts-index:
