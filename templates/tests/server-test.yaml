@@ -46,6 +46,7 @@ spec:
     {{- if .Values.server.volumes }}
       {{- toYaml .Values.server.volumes | nindent 4}}
     {{- end }}
+  {{- include "imagePullSecrets" . | nindent 2 }}
   restartPolicy: Never
 {{- end }}
 {{- end }}

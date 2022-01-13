@@ -147,6 +147,59 @@ load _helpers
   [ "${actual}" = "Always" ]
 }
 
+@test "server/standalone-server-test-Pod: Custom imagePullSecrets" {
+  cd `chart_dir`
+  local object=$(helm template \
+      --show-only templates/tests/server-test.yaml  \
+      --set 'global.imagePullSecrets[0].name=foo' \
+      --set 'global.imagePullSecrets[1].name=bar' \
+      . | tee /dev/stderr |
+      yq -r '.spec.imagePullSecrets' | tee /dev/stderr)
+
+  local actual=$(echo $object |
+     yq -r '. | length' | tee /dev/stderr)
+  [ "${actual}" = "2" ]
+
+  local actual=$(echo $object |
+     yq -r '.[0].name' | tee /dev/stderr)
+  [ "${actual}" = "foo" ]
+
+  local actual=$(echo $object |
+      yq -r '.[1].name' | tee /dev/stderr)
+  [ "${actual}" = "bar" ]
+}
+
+@test "server/standalone-server-test-Pod: Custom imagePullSecrets - string array" {
+  cd `chart_dir`
+  local object=$(helm template \
+      --show-only templates/tests/server-test.yaml  \
+      --set 'global.imagePullSecrets[0]=foo' \
+      --set 'global.imagePullSecrets[1]=bar' \
+      . | tee /dev/stderr |
+      yq -r '.spec.imagePullSecrets' | tee /dev/stderr)
+
+  local actual=$(echo $object |
+     yq -r '. | length' | tee /dev/stderr)
+  [ "${actual}" = "2" ]
+
+  local actual=$(echo $object |
+     yq -r '.[0].name' | tee /dev/stderr)
+  [ "${actual}" = "foo" ]
+
+  local actual=$(echo $object |
+      yq -r '.[1].name' | tee /dev/stderr)
+  [ "${actual}" = "bar" ]
+}
+
+@test "server/standalone-server-test-Pod: default imagePullSecrets" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      --show-only templates/tests/server-test.yaml  \
+      . | tee /dev/stderr |
+      yq -r '.spec.imagePullSecrets' | tee /dev/stderr)
+  [ "${actual}" = "null" ]
+}
+
 #--------------------------------------------------------------------
 # resources
 
