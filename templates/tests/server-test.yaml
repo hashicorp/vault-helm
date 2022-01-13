@@ -17,6 +17,14 @@ spec:
       env:
         - name: VAULT_ADDR
           value: {{ include "vault.scheme" . }}://{{ template "vault.fullname" . }}.{{ .Release.Namespace }}.svc:{{ .Values.server.service.port }}
+        {{- if .Values.server.logLevel }}
+        - name: VAULT_LOG_LEVEL
+          value: "{{ .Values.server.logLevel }}"
+        {{- end }}
+        {{- if .Values.server.logFormat }}
+        - name: VAULT_LOG_FORMAT
+          value: "{{ .Values.server.logFormat }}"
+        {{- end }}
         {{- include "vault.extraEnvironmentVars" .Values.server | nindent 8 }}
       command:
         - /bin/sh

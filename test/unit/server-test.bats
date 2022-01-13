@@ -257,6 +257,62 @@ load _helpers
 }
 
 #--------------------------------------------------------------------
+# log level
+
+@test "server/standalone-server-test-Pod: default log level to empty" {
+  cd `chart_dir`
+  local objects=$(helm template \
+      --show-only templates/tests/server-test.yaml  \
+      . | tee /dev/stderr |
+      yq -r '.spec.containers[0].env' | tee /dev/stderr)
+
+  local value=$(echo $objects |
+      yq -r 'map(select(.name=="VAULT_LOG_LEVEL")) | .[] .name' | tee /dev/stderr)
+  [ "${value}" = "" ]
+}
+
+@test "server/standalone-server-test-Pod: log level can be changed" {
+  cd `chart_dir`
+  local objects=$(helm template \
+      --show-only templates/tests/server-test.yaml  \
+      --set='server.logLevel=debug' \
+      . | tee /dev/stderr |
+      yq -r '.spec.containers[0].env' | tee /dev/stderr)
+
+  local value=$(echo $objects |
+      yq -r 'map(select(.name=="VAULT_LOG_LEVEL")) | .[] .value' | tee /dev/stderr)
+  [ "${value}" = "debug" ]
+}
+
+#--------------------------------------------------------------------
+# log format
+
+@test "server/standalone-server-test-Pod: default log format to empty" {
+  cd `chart_dir`
+  local objects=$(helm template \
+      --show-only templates/tests/server-test.yaml  \
+      . | tee /dev/stderr |
+      yq -r '.spec.containers[0].env' | tee /dev/stderr)
+
+  local value=$(echo $objects |
+      yq -r 'map(select(.name=="VAULT_LOG_FORMAT")) | .[] .name' | tee /dev/stderr)
+  [ "${value}" = "" ]
+}
+
+@test "server/standalone-server-test-Pod: can set log format" {
+  cd `chart_dir`
+  local objects=$(helm template \
+      --show-only templates/tests/server-test.yaml  \
+      --set='server.logFormat=json' \
+      . | tee /dev/stderr |
+      yq -r '.spec.containers[0].env' | tee /dev/stderr)
+
+  local value=$(echo $objects |
+      yq -r 'map(select(.name=="VAULT_LOG_FORMAT")) | .[] .value' | tee /dev/stderr)
+  [ "${value}" = "json" ]
+}
+
+#--------------------------------------------------------------------
 # extraEnvironmentVars
 
 @test "server/standalone-server-test-Pod: set extraEnvironmentVars" {
