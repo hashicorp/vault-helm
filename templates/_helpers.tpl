@@ -190,6 +190,13 @@ storage might be desired by the user.
       {{- if and (eq (.Values.server.dataStorage.enabled | toString) "true") (or (eq .mode "standalone") (eq (.Values.server.ha.raft.enabled | toString ) "true" )) }}
     - metadata:
         name: data
+        labels:
+          app.kubernetes.io/name: {{ include "vault.name" . }}
+          app.kubernetes.io/instance: {{ .Release.Name }}
+          app.kubernetes.io/managed-by: {{ .Release.Service }}
+          {{- if .Values.server.extraLabels -}}
+            {{- toYaml .Values.server.extraLabels | nindent 10 -}}
+          {{- end -}}
         {{- include "vault.dataVolumeClaim.annotations" . | nindent 6 }}
       spec:
         accessModes:
@@ -204,6 +211,13 @@ storage might be desired by the user.
       {{- if eq (.Values.server.auditStorage.enabled | toString) "true" }}
     - metadata:
         name: audit
+        labels:
+          app.kubernetes.io/name: {{ include "vault.name" . }}
+          app.kubernetes.io/instance: {{ .Release.Name }}
+          app.kubernetes.io/managed-by: {{ .Release.Service }}
+          {{- if .Values.server.extraLabels -}}
+            {{- toYaml .Values.server.extraLabels | nindent 10 -}}
+          {{- end -}}
         {{- include "vault.auditVolumeClaim.annotations" . | nindent 6 }}
       spec:
         accessModes:
