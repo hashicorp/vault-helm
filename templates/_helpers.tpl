@@ -339,6 +339,20 @@ Sets extra pod annotations
 {{- end -}}
 
 {{/*
+Sets extra helm.sh/hook:test pod annotations
+*/}}
+{{- define "vault.testHookPod.annotations" -}}
+  {{- if .Values.server.annotations }}
+    {{- $tp := typeOf .Values.server.annotations }}
+    {{- if eq $tp "string" }}
+      {{- tpl .Values.server.annotations . | nindent 4 }}
+    {{- else }}
+      {{- toYaml .Values.server.annotations | nindent 4 }}
+    {{- end }}
+  {{- end }}
+{{- end -}}
+
+{{/*
 Sets extra injector pod annotations
 */}}
 {{- define "injector.annotations" -}}

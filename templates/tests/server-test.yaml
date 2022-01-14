@@ -8,6 +8,7 @@ metadata:
   namespace: {{ .Release.Namespace }}
   annotations:
     "helm.sh/hook": test
+    {{- template "vault.testHookPod.annotations" . }}
 spec:
   {{- include "imagePullSecrets" . | nindent 2 }}
   {{- if not .Values.global.openshift }}

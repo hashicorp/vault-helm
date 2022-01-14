@@ -409,6 +409,18 @@ load _helpers
 }
 
 #--------------------------------------------------------------------
+# annotations
+@test "server/standalone-server-test-Pod: generic annotations string" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      --show-only templates/tests/server-test.yaml \
+      --set 'server.annotations=vaultIsAwesome: true' \
+      . | tee /dev/stderr |
+      yq -r '.metadata.annotations["vaultIsAwesome"]' | tee /dev/stderr)
+  [ "${actual}" = "true" ]
+}
+
+#--------------------------------------------------------------------
 # OpenShift
 
 @test "server/standalone-server-test-Pod: OpenShift - runAsUser disabled" {
