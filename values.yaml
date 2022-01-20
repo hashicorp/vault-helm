@@ -305,7 +305,7 @@ server:
     #      - chart-example.local
 
   # OpenShift only - create a route to expose the service
-  # The created route will be of type passthrough
+  # By default the created route will be of type passthrough
   route:
     enabled: false
 
@@ -316,6 +316,11 @@ server:
     labels: {}
     annotations: {}
     host: chart-example.local
+    # tls will be passed directly to the route's TLS config, which
+    # can be used to configure other termination methods that terminate
+    # TLS at the router
+    tls:
+      termination: passthrough
 
   # authDelegator enables a cluster role binding to be attached to the service
   # account.  This cluster role binding can be used to setup Kubernetes auth

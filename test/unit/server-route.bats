@@ -141,3 +141,41 @@ load _helpers
       yq -r '.spec.to.name' | tee /dev/stderr)
   [ "${actual}" = "RELEASE-NAME-vault" ]
 }
+
+@test "server/route: OpenShift - route termination mode set to default passthrough" {
+  cd `chart_dir`
+
+  local actual=$(helm template \
+      --show-only templates/server-route.yaml \
+      --set 'global.openshift=true' \
+      --set 'server.route.enabled=true' \
+      . | tee /dev/stderr |
+      yq -r '.spec.tls.termination' | tee /dev/stderr)
+  [ "${actual}" = "passthrough" ]
+}
+
+@test "server/route: OpenShift - route termination mode set to edge" {
+  cd `chart_dir`
+
+  local actual=$(helm template \
+      --show-only templates/server-route.yaml \
+      --set 'global.openshift=true' \
+      --set 'server.route.enabled=true' \
+      --set 'server.route.tls.termination=edge' \
+      . | tee /dev/stderr |
+      yq -r '.spec.tls.termination' | tee /dev/stderr)
+  [ "${actual}" = "edge" ]
+}
+
+@test "server/route: OpenShift - route custom tls entry" {
+  cd `chart_dir`
+
+  local actual=$(helm template \
+      --show-only templates/server-route.yaml \
+      --set 'global.openshift=true' \
+      --set 'server.route.enabled=true' \
+      --set 'server.route.tls.insecureEdgeTerminationPolicy=Redirect' \
+      . | tee /dev/stderr |
+      yq -r '.spec.tls.insecureEdgeTerminationPolicy' | tee /dev/stderr)
+  [ "${actual}" = "Redirect" ]
+}

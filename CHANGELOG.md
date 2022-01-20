@@ -9,6 +9,7 @@ Features:
 Improvements:
 * Set the namespace on the OpenShift Route [GH-679](https://github.com/hashicorp/vault-helm/pull/679)
 * Add volumes and env vars to helm hook test pod [GH-673](https://github.com/hashicorp/vault-helm/pull/673)
+* Make TLS configurable for OpenShift routes [GH-686](https://github.com/hashicorp/vault-helm/pull/686)
 
 ## 0.18.0 (November 17th, 2021)
 
