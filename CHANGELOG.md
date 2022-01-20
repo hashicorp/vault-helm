@@ -6,6 +6,9 @@ Features:
 * Added configurable update strategy for injector [GH-661](https://github.com/hashicorp/vault-helm/pull/661)
 * csi: ability to set priorityClassName for CSI daemonset pods [GH-670](https://github.com/hashicorp/vault-helm/pull/670)
 
+Improvements:
+* Add volumes and env vars to helm hook test pod [GH-673](https://github.com/hashicorp/vault-helm/pull/673)
+
 ## 0.18.0 (November 17th, 2021)
 
 CHANGES:
