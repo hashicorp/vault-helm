@@ -1,7 +1,10 @@
 {{ template "vault.mode" . }}
-{{- if ne .mode "external" }}
-{{- if and (ne .mode "") (and (eq (.Values.global.enabled | toString) "true") (eq (.Values.server.authDelegator.enabled | toString) "true")) }}
+{{- if and (ne .mode "") (eq (.Values.global.enabled | toString) "true") (eq (.Values.server.authDelegator.enabled | toString) "true") }}
+{{- if .Capabilities.APIVersions.Has "rbac.authorization.k8s.io/v1" -}}
+apiVersion: rbac.authorization.k8s.io/v1
+{{- else }}
 apiVersion: rbac.authorization.k8s.io/v1beta1
+{{- end }}
 kind: ClusterRoleBinding
 metadata:
   name: {{ template "vault.fullname" . }}-server-binding
@@ -18,5 +21,4 @@ subjects:
 - kind: ServiceAccount
   name: {{ template "vault.serviceAccount.name" . }}
   namespace: {{ .Release.Namespace }}
-{{ end }}
 {{ end }}

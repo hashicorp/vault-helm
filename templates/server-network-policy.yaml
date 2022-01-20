@@ -19,4 +19,8 @@ spec:
         protocol: TCP
       - port: 8201
         protocol: TCP
+  {{- if .Values.server.networkPolicy.egress }}
+  egress:
+  {{- toYaml .Values.server.networkPolicy.egress | nindent 4 }}
+  {{ end }}
 {{ end }}

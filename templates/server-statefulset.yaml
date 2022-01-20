@@ -41,7 +41,7 @@ spec:
       {{- if .Values.server.priorityClassName }}
       priorityClassName: {{ .Values.server.priorityClassName }}
       {{- end }}
-      terminationGracePeriodSeconds: 10
+      terminationGracePeriodSeconds: {{ .Values.server.terminationGracePeriodSeconds }}
       serviceAccountName: {{ template "vault.serviceAccount.name" . }}
       {{ if  .Values.server.shareProcessNamespace }}
       shareProcessNamespace: true
@@ -66,8 +66,14 @@ spec:
           {{ template "vault.resources" . }}
           image: {{ .Values.server.image.repository }}:{{ .Values.server.image.tag | default "latest" }}
           imagePullPolicy: {{ .Values.server.image.pullPolicy }}
-          command: {{ template "vault.command" . }}
+          command:
+          - "/bin/sh"
+          - "-ec"
           args: {{ template "vault.args" . }}
+          {{- if not .Values.global.openshift }}
+          securityContext:
+            allowPrivilegeEscalation: false
+          {{- end }}
           env:
             - name: HOST_IP
               valueFrom:
@@ -111,6 +117,18 @@ spec:
             {{- end }}
             - name: HOME
               value: "/home/vault"
+            {{- if .Values.server.logLevel }}
+            - name: VAULT_LOG_LEVEL
+              value: "{{ .Values.server.logLevel }}"
+            {{- end }}
+            {{- if .Values.server.logFormat }}
+            - name: VAULT_LOG_FORMAT
+              value: "{{ .Values.server.logFormat }}"
+            {{- end }}
+            {{- if (and .Values.server.enterpriseLicense.secretName .Values.server.enterpriseLicense.secretKey) }}
+            - name: VAULT_LICENSE_PATH
+              value: /vault/license/{{ .Values.server.enterpriseLicense.secretKey }}
+            {{- end }}
             {{ template "vault.envs" . }}
             {{- include "vault.extraEnvironmentVars" .Values.server | nindent 12 }}
             {{- include "vault.extraSecretEnvironmentVars" .Values.server | nindent 12 }}
@@ -184,10 +202,7 @@ spec:
         {{- if .Values.server.extraContainers }}
           {{ toYaml .Values.server.extraContainers | nindent 8}}
         {{- end }}
-      {{- if .Values.global.imagePullSecrets }}
-      imagePullSecrets:
-        {{- toYaml .Values.global.imagePullSecrets | nindent 8 }}
-      {{- end }}
+      {{- include "imagePullSecrets" . | nindent 6 }}
   {{ template "vault.volumeclaims" . }}
 {{ end }}
 {{ end }}
