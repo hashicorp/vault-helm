@@ -1,5 +1,11 @@
 ## Unreleased
 
+## 0.19.0 (January 20th, 2022)
+
+CHANGES:
+* Vault image default 1.9.2
+* Vault K8s image default 0.14.2
+
 Features:
 * Added configurable podDisruptionBudget for injector [GH-653](https://github.com/hashicorp/vault-helm/pull/653)
 * Make terminationGracePeriodSeconds configurable for server [GH-659](https://github.com/hashicorp/vault-helm/pull/659)
