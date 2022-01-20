@@ -1,4 +1,6 @@
-{{- if .Values.server.enabled }}
+{{ template "vault.mode" . }}
+{{- if ne .mode "external" }}
+{{- if and (ne .mode "") (eq (.Values.global.enabled | toString) "true") }}
 apiVersion: v1
 kind: Pod
 metadata:
@@ -15,6 +17,7 @@ spec:
       env:
         - name: VAULT_ADDR
           value: {{ include "vault.scheme" . }}://{{ template "vault.fullname" . }}.{{ .Release.Namespace }}.svc:{{ .Values.server.service.port }}
+        {{- include "vault.extraEnvironmentVars" .Values.server | nindent 8 }}
       command:
         - /bin/sh
         - -c
@@ -35,6 +38,14 @@ spec:
           fi
 
           exit 0
-
+      volumeMounts:
+        {{- if .Values.server.volumeMounts }}
+          {{- toYaml .Values.server.volumeMounts | nindent 8}}
+        {{- end }}
+  volumes:
+    {{- if .Values.server.volumes }}
+      {{- toYaml .Values.server.volumes | nindent 4}}
+    {{- end }}
   restartPolicy: Never
+{{- end }}
 {{- end }}
