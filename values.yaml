@@ -109,7 +109,7 @@ injector:
   #      vault-sidecar-injector: enabled
   objectSelector: {}
 
-  # Configures failurePolicy of the webhook. The "unspecified" default behaviour deoends on the
+  # Configures failurePolicy of the webhook. The "unspecified" default behaviour depends on the
   # API Version of the WebHook.
   # To block pod creation while webhook is unavailable, set the policy to `Fail` below.
   # See https://kubernetes.io/docs/reference/access-authn-authz/extensible-admission-controllers/#failure-policy
