@@ -854,5 +854,9 @@ csi:
   # Enables debug logging.
   debug: false
 
+  # Extra labels to attach to the vault-csi-provider
+  # This should be a YAML map of the labels to apply to the csi provider
+  extraLabels: {}
+
   # Pass arbitrary additional arguments to vault-csi-provider.
   extraArgs: []

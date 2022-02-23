@@ -8,6 +8,9 @@ metadata:
     app.kubernetes.io/name: {{ include "vault.name" . }}-csi-provider
     app.kubernetes.io/instance: {{ .Release.Name }}
     app.kubernetes.io/managed-by: {{ .Release.Service }}
+    {{- if  .Values.csi.extraLabels -}}
+      {{- toYaml .Values.csi.extraLabels | nindent 8 -}}
+    {{- end -}}
   {{ template "csi.daemonSet.annotations" . }}
 spec:
   updateStrategy:

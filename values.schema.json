@@ -45,6 +45,9 @@
                 "extraArgs": {
                     "type": "array"
                 },
+                "extraLabels": {
+                    "type": "object"
+                },
                 "image": {
                     "type": "object",
                     "properties": {
