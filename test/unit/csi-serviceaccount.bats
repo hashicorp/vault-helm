@@ -57,3 +57,18 @@ load _helpers
       yq -r '.metadata.annotations["foo"]' | tee /dev/stderr)
   [ "${actual}" = "bar" ]
 }
+
+# serviceAccount extraLabels
+
+@test "csi/serviceAccount: specify csi.serviceAccount.extraLabels" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      --show-only templates/csi-serviceaccount.yaml \
+      --set 'csi.enabled=true' \
+      --set 'csi.serviceAccount.extraLabels.foo=bar' \
+      . | tee /dev/stderr |
+      yq -r '.metadata.labels.foo' | tee /dev/stderr)
+  [ "${actual}" = "bar" ]
+}
+
+

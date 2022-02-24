@@ -319,6 +319,32 @@ load _helpers
 }
 
 #--------------------------------------------------------------------
+# Extra Labels
+
+@test "csi/daemonset: specify csi.daemonSet.extraLabels" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      --show-only templates/csi-daemonset.yaml \
+      --set 'csi.enabled=true' \
+      --set 'csi.daemonSet.extraLabels.foo=bar' \
+      . | tee /dev/stderr |
+      yq -r '.metadata.labels.foo' | tee /dev/stderr)
+  [ "${actual}" = "bar" ]
+}
+
+@test "csi/daemonset: specify csi.pod.extraLabels" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      --show-only templates/csi-daemonset.yaml \
+      --set 'csi.enabled=true' \
+      --set 'csi.pod.extraLabels.foo=bar' \
+      . | tee /dev/stderr |
+      yq -r '.spec.template.metadata.labels.foo' | tee /dev/stderr)
+  [ "${actual}" = "bar" ]
+}
+
+
+#--------------------------------------------------------------------
 # volumes
 
 @test "csi/daemonset: csi.volumes adds volume" {

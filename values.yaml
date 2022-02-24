@@ -805,6 +805,9 @@ csi:
     providersDir: "/etc/kubernetes/secrets-store-csi-providers"
     # Kubelet host path
     kubeletRootDir: "/var/lib/kubelet"
+    # Extra labels to attach to the vault-csi-provider daemonSet
+    # This should be a YAML map of the labels to apply to the csi provider daemonSet
+    extraLabels: {}
 
   pod:
     # Extra annotations for the provider pods. This can either be YAML or a
@@ -817,6 +820,12 @@ csi:
     # in a PodSpec.
     tolerations: []
 
+    # Extra labels to attach to the vault-csi-provider pod
+    # This should be a YAML map of the labels to apply to the csi provider pod
+    extraLabels: {}
+
+   
+
   # Priority class for csi pods
   priorityClassName: ""
 
@@ -825,6 +834,10 @@ csi:
     # YAML or a YAML-formatted multi-line templated string map of the
     # annotations to apply to the serviceAccount.
     annotations: {}
+
+    # Extra labels to attach to the vault-csi-provider serviceAccount
+    # This should be a YAML map of the labels to apply to the csi provider serviceAccount
+    extraLabels: {}
 
   # Used to configure readinessProbe for the pods.
   readinessProbe:
@@ -853,10 +866,6 @@ csi:
 
   # Enables debug logging.
   debug: false
-
-  # Extra labels to attach to the vault-csi-provider
-  # This should be a YAML map of the labels to apply to the csi provider
-  extraLabels: {}
 
   # Pass arbitrary additional arguments to vault-csi-provider.
   extraArgs: []
