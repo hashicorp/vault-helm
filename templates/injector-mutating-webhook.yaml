@@ -14,10 +14,11 @@ metadata:
   {{- template "injector.webhookAnnotations" . }}
 webhooks:
   - name: vault.hashicorp.com
+    failurePolicy: {{ .Values.injector.webhook.failurePolicy }}
+    matchPolicy: {{ .Values.injector.webhook.matchPolicy }}
     sideEffects: None
-    admissionReviewVersions:
-    - "v1beta1"
-    - "v1"
+    timeoutSeconds: {{ .Values.injector.webhook.timeoutSeconds }}
+    admissionReviewVersions: {{ .Values.injector.webhook.admissionReviewVersions }}
     clientConfig:
       service:
         name: {{ template "vault.fullname" . }}-agent-injector-svc
@@ -29,15 +30,12 @@ webhooks:
         apiGroups: [""]
         apiVersions: ["v1"]
         resources: ["pods"]
-{{- if .Values.injector.namespaceSelector }}
+{{- if .Values.injector.webhook.namespaceSelector }}
     namespaceSelector:
-{{ toYaml .Values.injector.namespaceSelector | indent 6}}
+{{ toYaml .Values.injector.webhook.namespaceSelector | indent 6}}
 {{ end }}
-{{- if .Values.injector.objectSelector }}
+{{- if .Values.injector.webhook.objectSelector }}
     objectSelector:
-{{ toYaml .Values.injector.objectSelector | indent 6}}
-{{ end }}
-{{- with .Values.injector.failurePolicy }}
-    failurePolicy: {{.}}
+{{ toYaml .Values.injector.webhook.objectSelector | indent 6}}
 {{ end }}
 {{ end }}
