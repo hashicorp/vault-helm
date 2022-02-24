@@ -90,34 +90,62 @@ injector:
   # Configures all Vault Agent sidecars to revoke their token when shutting down
   revokeOnShutdown: false
 
-  # namespaceSelector is the selector for restricting the webhook to only
-  # specific namespaces.
-  # See https://kubernetes.io/docs/reference/access-authn-authz/extensible-admission-controllers/#matching-requests-namespaceselector
-  # for more details.
-  # Example:
-  # namespaceSelector:
-  #    matchLabels:
-  #      sidecar-injector: enabled
-  namespaceSelector: {}
-  # objectSelector is the selector for restricting the webhook to only
-  # specific labels.
-  # See https://kubernetes.io/docs/reference/access-authn-authz/extensible-admission-controllers/#matching-requests-objectselector
-  # for more details.
-  # Example:
-  # objectSelector:
-  #    matchLabels:
-  #      vault-sidecar-injector: enabled
-  objectSelector: {}
+  webhook: 
+    # Configures failurePolicy of the webhook. The "unspecified" default behaviour depends on the
+    # API Version of the WebHook.
+    # To block pod creation while webhook is unavailable, set the policy to `Fail` below.
+    # See https://kubernetes.io/docs/reference/access-authn-authz/extensible-admission-controllers/#failure-policy
+    #
+    failurePolicy: Ignore
 
-  # Configures failurePolicy of the webhook. The "unspecified" default behaviour deoends on the
-  # API Version of the WebHook.
-  # To block pod creation while webhook is unavailable, set the policy to `Fail` below.
-  # See https://kubernetes.io/docs/reference/access-authn-authz/extensible-admission-controllers/#failure-policy
-  #
-  failurePolicy: Ignore
+    # matchPolicy specifies the approach to accepting changes based on the rules of 
+    # the MutatingWebhookConfiguration.
+    # See https://kubernetes.io/docs/reference/access-authn-authz/extensible-admission-controllers/#matching-requests-matchpolicy
+    # for more details.
+    #
+    matchPolicy: Exact
 
-  # Extra annotations to attach to the webhook
-  webhookAnnotations: {}
+    # namespaceSelector is the selector for restricting the webhook to only
+    # specific namespaces.
+    # See https://kubernetes.io/docs/reference/access-authn-authz/extensible-admission-controllers/#matching-requests-namespaceselector
+    # for more details.
+    # Example:
+    # namespaceSelector:
+    #    matchLabels:
+    #      sidecar-injector: enabled
+    namespaceSelector: {}
+
+    # objectSelector is the selector for restricting the webhook to only
+    # specific labels.
+    # See https://kubernetes.io/docs/reference/access-authn-authz/extensible-admission-controllers/#matching-requests-objectselector
+    # for more details.
+    # Example:
+    # objectSelector:
+    #    matchLabels:
+    #      vault-sidecar-injector: enabled
+    objectSelector: {}
+
+    # timeoutSeconds is the amount of seconds before the webhook request will be ignored
+    # or fails.
+    # If it is ignored or fails depends on the failurePolicy
+    # See https://kubernetes.io/docs/reference/access-authn-authz/extensible-admission-controllers/#timeouts
+    # for more details.
+    #
+    timeoutSeconds: 30
+
+    # sideEffects reflects if the webhook changes (side effects) and is sometimes used by webhooks to reconcile.
+    # See https://kubernetes.io/docs/reference/access-authn-authz/extensible-admission-controllers/#side-effects
+    # for more details.
+    #
+    sideEffects: None
+    
+    # admissionReviewVersions specifies an ordered list of preferred `AdmissionReview` versions the webhook expects.
+    # See https://github.com/kubernetes/api/blob/v0.23.4/admissionregistration/v1beta1/types.go#L314
+    # for more details.
+    admissionReviewVersions: ["v1", "v1beta1"]
+
+    # Extra annotations to attach to the webhook
+    annotations: {}
 
   certs:
     # secretName is the name of the secret that has the TLS certificate and
