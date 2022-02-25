@@ -61,7 +61,7 @@ load _helpers
       --set "csi.enabled=true" \
       . | tee /dev/stderr |
       yq -r '.spec.template.spec.serviceAccountName' | tee /dev/stderr)
-  [ "${actual}" = "RELEASE-NAME-vault-csi-provider" ]
+  [ "${actual}" = "release-name-vault-csi-provider" ]
 }
 
 # Image
