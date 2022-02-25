@@ -197,3 +197,20 @@ load _helpers
   [ "${actual}" = "null" ]
 }
 
+@test "server/ha-active-Service: publishNotReadyAddresses can be changed" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      --show-only templates/server-ha-active-service.yaml \
+      --set 'server.ha.enabled=true' \
+      . | tee /dev/stderr |
+      yq -r '.spec.publishNotReadyAddresses' | tee /dev/stderr)
+  [ "${actual}" = "true" ]
+
+  local actual=$(helm template \
+      --show-only templates/server-ha-active-service.yaml \
+      --set 'server.ha.enabled=true' \
+      --set 'server.service.publishNotReadyAddresses=false' \
+      . | tee /dev/stderr |
+      yq -r '.spec.publishNotReadyAddresses' | tee /dev/stderr)
+  [ "${actual}" = "false" ]
+}

@@ -175,6 +175,13 @@ load _helpers
       . | tee /dev/stderr |
       yq -r '.spec.publishNotReadyAddresses' | tee /dev/stderr)
   [ "${actual}" = "true" ]
+
+  local actual=$(helm template \
+      --show-only templates/server-service.yaml \
+      --set 'server.service.publishNotReadyAddresses=false' \
+      . | tee /dev/stderr |
+      yq -r '.spec.publishNotReadyAddresses' | tee /dev/stderr)
+  [ "${actual}" = "false" ]
 }
 
 @test "server/Service: type empty by default" {
