@@ -157,7 +157,7 @@ load _helpers
 
   local value=$(echo $object |
       yq -r 'map(select(.name=="AGENT_INJECT_TLS_AUTO")) | .[] .value' | tee /dev/stderr)
-  [ "${value}" = "RELEASE-NAME-vault-agent-injector-cfg" ]
+  [ "${value}" = "release-name-vault-agent-injector-cfg" ]
 
   # helm template does uses current context namespace and ignores namespace flags, so
   # discover the targeted namespace so we can check the rendered value correctly.
@@ -165,7 +165,7 @@ load _helpers
 
   local value=$(echo $object |
       yq -r 'map(select(.name=="AGENT_INJECT_TLS_AUTO_HOSTS")) | .[] .value' | tee /dev/stderr)
-  [ "${value}" = "RELEASE-NAME-vault-agent-injector-svc,RELEASE-NAME-vault-agent-injector-svc.${namespace:-default},RELEASE-NAME-vault-agent-injector-svc.${namespace:-default}.svc" ]
+  [ "${value}" = "release-name-vault-agent-injector-svc,release-name-vault-agent-injector-svc.${namespace:-default},release-name-vault-agent-injector-svc.${namespace:-default}.svc" ]
 }
 
 @test "injector/deployment: manual TLS adds volume mount" {
