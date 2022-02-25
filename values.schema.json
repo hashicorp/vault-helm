@@ -14,6 +14,9 @@
                                 "string"
                             ]
                         },
+                        "extraLabels": {
+                            "type": "object"
+                        },
                         "kubeletRootDir": {
                             "type": "string"
                         },
@@ -88,6 +91,9 @@
                                 "string"
                             ]
                         },
+                        "extraLabels": {
+                            "type": "object"
+                        },
                         "tolerations": {
                             "type": [
                                 "null",
@@ -128,6 +134,9 @@
                                 "object",
                                 "string"
                             ]
+                        },
+                        "extraLabels": {
+                            "type": "object"
                         }
                     }
                 },
