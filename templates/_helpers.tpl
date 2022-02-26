@@ -372,13 +372,13 @@ Sets extra injector service annotations
 Sets extra injector webhook annotations
 */}}
 {{- define "injector.webhookAnnotations" -}}
-  {{- if .Values.injector.webhook.webhookAnnotations }}
+  {{- if or (((.Values.injector.webhook)).annotations) (.Values.injector.webhookAnnotations)  }}
   annotations:
-    {{- $tp := typeOf .Values.injector.webhook.webhookAnnotations }}
+    {{- $tp := typeOf (or (((.Values.injector.webhook)).annotations) (.Values.injector.webhookAnnotations)) }}
     {{- if eq $tp "string" }}
-      {{- tpl .Values.injector.webhook.webhookAnnotations . | nindent 4 }}
+      {{- tpl (((.Values.injector.webhook)).annotations | default .Values.injector.webhookAnnotations) . | nindent 4 }}
     {{- else }}
-      {{- toYaml .Values.injector.webhook.webhookAnnotations | nindent 4 }}
+      {{- toYaml (((.Values.injector.webhook)).annotations | default .Values.injector.webhookAnnotations) | nindent 4 }}
     {{- end }}
   {{- end }}
 {{- end -}}
