@@ -70,6 +70,7 @@ load _helpers
   local actual=$(helm template \
       --show-only templates/injector-mutating-webhook.yaml  \
       --set 'injector.enabled=true' \
+      --set 'injector.webhook=null' \
       --set 'injector.failurePolicy=Fail' \
       . | tee /dev/stderr |
       yq '.webhooks[0].failurePolicy' | tee /dev/stderr)
@@ -202,7 +203,6 @@ load _helpers
   local actual=$(helm template \
       --show-only templates/injector-mutating-webhook.yaml \
       --set 'injector.enabled=true' \
-      --set 'injector.webhook=null' \
       --set 'injector.webhook.annotations.foo=bar' \
       --set 'injector.webhookAnnotations.invalid=invalid' \
       . | tee /dev/stderr |
