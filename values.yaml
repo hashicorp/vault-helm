@@ -136,6 +136,7 @@ injector:
     # Extra annotations to attach to the webhook
     annotations: {}
 
+  # Deprecated: please use 'webhook.failurePolicy' instead
   # Configures failurePolicy of the webhook. The "unspecified" default behaviour depends on the
   # API Version of the WebHook.
   # To block pod creation while webhook is unavailable, set the policy to `Fail` below.
