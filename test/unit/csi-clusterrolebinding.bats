@@ -29,7 +29,7 @@ load _helpers
       --set "csi.enabled=true" \
       . | tee /dev/stderr |
       yq -r '.roleRef.name' | tee /dev/stderr)
-  [ "${actual}" = "RELEASE-NAME-vault-csi-provider-clusterrole" ]
+  [ "${actual}" = "release-name-vault-csi-provider-clusterrole" ]
 }
 
 # ClusterRoleBinding service account name
@@ -40,5 +40,5 @@ load _helpers
       --set "csi.enabled=true" \
       . | tee /dev/stderr |
       yq -r '.subjects[0].name' | tee /dev/stderr)
-  [ "${actual}" = "RELEASE-NAME-vault-csi-provider" ]
+  [ "${actual}" = "release-name-vault-csi-provider" ]
 }

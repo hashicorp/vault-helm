@@ -1640,7 +1640,7 @@ load _helpers
       --set 'server.serviceAccount.create=true' \
       . | tee /dev/stderr |
       yq -r '.spec.template.spec.serviceAccountName' | tee /dev/stderr)
-  [ "${actual}" = "RELEASE-NAME-vault" ]
+  [ "${actual}" = "release-name-vault" ]
 
 
 }
