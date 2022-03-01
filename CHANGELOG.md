@@ -1,5 +1,8 @@
 ## Unreleased
 
+Improvements:
+* CSI: Set `extraLabels` for daemonset, pods, and service account [GH-690](https://github.com/hashicorp/vault-helm/pull/690)
+
 ## 0.19.0 (January 20th, 2022)
 
 CHANGES:
