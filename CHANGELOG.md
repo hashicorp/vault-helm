@@ -4,6 +4,9 @@ CHANGES:
 * Vault default image to 1.9.3
 * CSI provider default image to 1.0.0
 
+Improvements:
+* CSI: Set `extraLabels` for daemonset, pods, and service account [GH-690](https://github.com/hashicorp/vault-helm/pull/690)
+
 ## 0.19.0 (January 20th, 2022)
 
 CHANGES:
