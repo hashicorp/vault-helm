@@ -1,5 +1,9 @@
 ## Unreleased
 
+CHANGES:
+* Vault default image to 1.9.3
+* CSI provider default image to 1.0.0
+
 ## 0.19.0 (January 20th, 2022)
 
 CHANGES:
