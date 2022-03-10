@@ -1,5 +1,29 @@
 ## Unreleased
 
+CHANGES:
+* Vault default image to 1.9.3
+* CSI provider default image to 1.0.0
+
+Improvements:
+* CSI: Set `extraLabels` for daemonset, pods, and service account [GH-690](https://github.com/hashicorp/vault-helm/pull/690)
+
+## 0.19.0 (January 20th, 2022)
+
+CHANGES:
+* Vault image default 1.9.2
+* Vault K8s image default 0.14.2
+
+Features:
+* Added configurable podDisruptionBudget for injector [GH-653](https://github.com/hashicorp/vault-helm/pull/653)
+* Make terminationGracePeriodSeconds configurable for server [GH-659](https://github.com/hashicorp/vault-helm/pull/659)
+* Added configurable update strategy for injector [GH-661](https://github.com/hashicorp/vault-helm/pull/661)
+* csi: ability to set priorityClassName for CSI daemonset pods [GH-670](https://github.com/hashicorp/vault-helm/pull/670)
+
+Improvements:
+* Set the namespace on the OpenShift Route [GH-679](https://github.com/hashicorp/vault-helm/pull/679)
+* Add volumes and env vars to helm hook test pod [GH-673](https://github.com/hashicorp/vault-helm/pull/673)
+* Make TLS configurable for OpenShift routes [GH-686](https://github.com/hashicorp/vault-helm/pull/686)
+
 ## 0.18.0 (November 17th, 2021)
 
 CHANGES:

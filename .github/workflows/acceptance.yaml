@@ -1,0 +1,34 @@
+name: Acceptance Tests
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch: {}
+
+jobs:
+  kind:
+    strategy:
+      fail-fast: false
+      matrix:
+        kind-k8s-version: [1.14.10, 1.19.11, 1.20.7, 1.21.2, 1.22.4]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Setup test tools
+        uses: ./.github/workflows/setup-test-tools
+
+      - name: Create K8s Kind Cluster
+        uses: helm/kind-action@v1.2.0
+        with:
+          config: test/kind/config.yaml
+          node_image: kindest/node:v${{ matrix.kind-k8s-version }}
+
+      # Skip CSI tests if K8s version < 1.16.x
+      - run: echo K8S_MINOR=$(kubectl version -o json | jq -r .serverVersion.minor) >> $GITHUB_ENV
+      - if: ${{ env.K8S_MINOR < 16 }}
+        run: echo "SKIP_CSI=true" >> $GITHUB_ENV
+
+      - run: bats ./test/acceptance -t
+        env:
+          VAULT_LICENSE_CI: ${{ secrets.VAULT_LICENSE_CI }}

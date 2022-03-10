@@ -49,7 +49,7 @@ injector:
   # image sets the repo and tag of the vault-k8s image to use for the injector.
   image:
     repository: "hashicorp/vault-k8s"
-    tag: "0.14.1"
+    tag: "0.14.2"
     pullPolicy: IfNotPresent
 
   # agentImage sets the repo and tag of the Vault image to use for the Vault Agent
@@ -57,7 +57,7 @@ injector:
   # required.
   agentImage:
     repository: "hashicorp/vault"
-    tag: "1.9.0"
+    tag: "1.9.3"
 
   # The default values for the injected Vault Agent containers.
   agentDefaults:
@@ -199,6 +199,21 @@ injector:
     # Extra annotations to attach to the injector service
     annotations: {}
 
+  # A disruption budget limits the number of pods of a replicated application
+  # that are down simultaneously from voluntary disruptions
+  podDisruptionBudget: {}
+  # podDisruptionBudget:
+  #   maxUnavailable: 1
+
+  # strategy for updating the deployment. This can be a multi-line string or a
+  # YAML map.
+  strategy: {}
+  # strategy: |
+  #   rollingUpdate:
+  #     maxSurge: 25%
+  #     maxUnavailable: 25%
+  #   type: RollingUpdate
+
 server:
   # If not set to true, Vault server will not be installed. See vault.mode in _helpers.tpl for implementation details
   enabled: true
@@ -221,7 +236,7 @@ server:
 
   image:
     repository: "hashicorp/vault"
-    tag: "1.9.0"
+    tag: "1.9.3"
     # Overrides the default Image Pull Policy
     pullPolicy: IfNotPresent
 
@@ -290,7 +305,7 @@ server:
     #      - chart-example.local
 
   # OpenShift only - create a route to expose the service
-  # The created route will be of type passthrough
+  # By default the created route will be of type passthrough
   route:
     enabled: false
 
@@ -301,6 +316,11 @@ server:
     labels: {}
     annotations: {}
     host: chart-example.local
+    # tls will be passed directly to the route's TLS config, which
+    # can be used to configure other termination methods that terminate
+    # TLS at the router
+    tls:
+      termination: passthrough
 
   # authDelegator enables a cluster role binding to be attached to the service
   # account.  This cluster role binding can be used to setup Kubernetes auth
@@ -368,6 +388,10 @@ server:
     successThreshold: 1
     # Number of seconds after which the probe times out.
     timeoutSeconds: 3
+
+  # Optional duration in seconds the pod needs to terminate gracefully.
+  # See: https://kubernetes.io/docs/concepts/containers/container-lifecycle-hooks/
+  terminationGracePeriodSeconds: 10
 
   # Used to set the sleep time during the preStop step
   preStopSleepSeconds: 5
@@ -520,7 +544,7 @@ server:
     annotations: {}
 
   # This configures the Vault Statefulset to create a PVC for audit
-  # logs.  Once Vault is deployed, initialized and unseal, Vault must
+  # logs.  Once Vault is deployed, initialized and unsealed, Vault must
   # be configured to use this for audit logs.  This will be mounted to
   # /vault/audit
   # See https://www.vaultproject.io/docs/audit/index.html to know more
@@ -741,7 +765,7 @@ csi:
 
   image:
     repository: "hashicorp/vault-csi-provider"
-    tag: "0.3.0"
+    tag: "1.0.0"
     pullPolicy: IfNotPresent
 
   # volumes is a list of volumes made available to all containers. These are rendered
@@ -782,6 +806,9 @@ csi:
     providersDir: "/etc/kubernetes/secrets-store-csi-providers"
     # Kubelet host path
     kubeletRootDir: "/var/lib/kubelet"
+    # Extra labels to attach to the vault-csi-provider daemonSet
+    # This should be a YAML map of the labels to apply to the csi provider daemonSet
+    extraLabels: {}
 
   pod:
     # Extra annotations for the provider pods. This can either be YAML or a
@@ -794,11 +821,24 @@ csi:
     # in a PodSpec.
     tolerations: []
 
+    # Extra labels to attach to the vault-csi-provider pod
+    # This should be a YAML map of the labels to apply to the csi provider pod
+    extraLabels: {}
+
+   
+
+  # Priority class for csi pods
+  priorityClassName: ""
+
   serviceAccount:
     # Extra annotations for the serviceAccount definition. This can either be
     # YAML or a YAML-formatted multi-line templated string map of the
     # annotations to apply to the serviceAccount.
     annotations: {}
+
+    # Extra labels to attach to the vault-csi-provider serviceAccount
+    # This should be a YAML map of the labels to apply to the csi provider serviceAccount
+    extraLabels: {}
 
   # Used to configure readinessProbe for the pods.
   readinessProbe:
