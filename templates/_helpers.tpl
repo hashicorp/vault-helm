@@ -32,6 +32,55 @@ Expand the name of the chart.
 {{- end -}}
 
 {{/*
+Compute if the csi driver is enabled.
+*/}}
+{{- define "vault.csiEnabled" -}}
+{{- (or
+  (and (ne (.Values.csi.enabled | toString) "-") .Values.csi.enabled)
+  (and (eq (.Values.csi.enabled | toString) "-") .Values.global.enabled)) -}}
+{{- end -}}
+
+{{/*
+Compute if the injector is enabled.
+*/}}
+{{- define "vault.injectorEnabled" -}}
+{{- (or
+  (and (ne (.Values.injector.enabled | toString) "-") .Values.injector.enabled)
+  (and (eq (.Values.injector.enabled | toString) "-") .Values.global.enabled)) -}}
+{{- end -}}
+
+{{/*
+Compute if the server is enabled.
+*/}}
+{{- define "vault.serverEnabled" -}}
+{{- (or
+  (and (ne (.Values.server.enabled | toString) "-") .Values.server.enabled)
+  (and (eq (.Values.server.enabled | toString) "-") .Values.global.enabled)) -}}
+{{- end -}}
+
+{{/*
+Compute if the server service is enabled.
+*/}}
+{{- define "vault.serverServiceEnabled" -}}
+{{- (and
+      (or
+        (and (ne (.Values.server.enabled | toString) "-") .Values.server.enabled)
+        (and (eq (.Values.server.enabled | toString) "-") .Values.global.enabled))
+      (or
+        (and (ne (.Values.server.service.enabled | toString) "-") .Values.server.service.enabled)
+        (and (eq (.Values.server.service.enabled | toString) "-") .Values.global.enabled))) -}}
+{{- end -}}
+
+{{/*
+Compute if the ui is enabled.
+*/}}
+{{- define "vault.uiEnabled" -}}
+{{- (or
+  (and (ne (.Values.ui.enabled | toString) "-") .Values.ui.enabled)
+  (and (eq (.Values.ui.enabled | toString) "-") .Values.global.enabled)) -}}
+{{- end -}}
+
+{{/*
 Compute the maximum number of unavailable replicas for the PodDisruptionBudget.
 This defaults to (n/2)-1 where n is the number of members of the server cluster.
 Add a special case for replicas=1, where it should default to 0 as well.

@@ -22,15 +22,17 @@ RUN apk update && apk add --no-cache --virtual .build-deps \
     py-pip \
     git \
     make \
-    jq
+    jq \
+    gcompat
 
 # yq
 RUN pip install yq
 
 # gcloud
-RUN curl -OL https://dl.google.com/dl/cloudsdk/channels/rapid/install_google_cloud_sdk.bash && \
-    bash install_google_cloud_sdk.bash --disable-prompts --install-dir='/root/' && \
-    ln -s /root/google-cloud-sdk/bin/gcloud /usr/local/bin/gcloud
+#RUN curl -OL https://dl.google.com/dl/cloudsdk/channels/rapid/install_google_cloud_sdk.bash && \
+#    cat install_google_cloud_sdk.bash && \
+#    bash install_google_cloud_sdk.bash --disable-prompts --install-dir='/root' && \
+#    ln -s /root/google-cloud-sdk/bin/gcloud /usr/local/bin/gcloud
 
 # terraform
 RUN curl -sSL https://releases.hashicorp.com/terraform/${TERRAFORM_VERSION}/terraform_${TERRAFORM_VERSION}_linux_amd64.zip -o /tmp/tf.zip \

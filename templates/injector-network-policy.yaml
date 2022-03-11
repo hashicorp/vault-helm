@@ -1,4 +1,5 @@
-{{- if and (eq (.Values.injector.enabled | toString) "true" ) (eq (.Values.global.enabled | toString) "true") (eq (.Values.global.openshift | toString) "true") }}
+{{- if eq (include "vault.injectorEnabled" . | toString) "true" -}}
+{{- if eq (.Values.global.openshift | toString) "true" }}
 apiVersion: networking.k8s.io/v1
 kind: NetworkPolicy
 metadata:
@@ -18,4 +19,5 @@ spec:
       ports:
       - port: 8080
         protocol: TCP
+{{ end }}
 {{ end }}

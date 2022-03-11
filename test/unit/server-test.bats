@@ -74,7 +74,7 @@ load _helpers
       --set 'server.standalone.enabled=true' \
       . || echo "---") | tee /dev/stderr |
       yq 'length > 0' | tee /dev/stderr)
-  [ "${actual}" = "false" ]
+  [ "${actual}" = "true" ]
 }
 
 @test "server/standalone-server-test-Pod: disable with injector.externalVaultAddr" {

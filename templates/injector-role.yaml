@@ -1,4 +1,5 @@
-{{- if and (eq (.Values.injector.enabled | toString) "true" ) (eq (.Values.global.enabled | toString) "true") (eq (.Values.injector.leaderElector.enabled | toString) "true") (gt (.Values.injector.replicas | int) 1) }}
+{{- if eq (include "vault.injectorEnabled" . | toString) "true" -}}
+{{- if and (eq (.Values.injector.leaderElector.enabled | toString) "true") (gt (.Values.injector.replicas | int) 1) }}
 apiVersion: rbac.authorization.k8s.io/v1
 kind: Role
 metadata:
@@ -23,4 +24,5 @@ rules:
       - "get"
       - "patch"
       - "delete"
+{{- end }}
 {{- end }}

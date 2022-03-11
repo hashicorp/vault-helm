@@ -43,7 +43,10 @@
                     "type": "boolean"
                 },
                 "enabled": {
-                    "type": "boolean"
+                    "type": [
+                        "boolean",
+                        "string"
+                    ]
                 },
                 "extraArgs": {
                     "type": "array"
@@ -266,7 +269,10 @@
                     }
                 },
                 "enabled": {
-                    "type": "boolean"
+                    "type": [
+                        "boolean",
+                        "string"
+                    ]
                 },
                 "externalVaultAddr": {
                     "type": "string"
@@ -481,7 +487,10 @@
                     }
                 },
                 "enabled": {
-                    "type": "boolean"
+                    "type": [
+                        "boolean",
+                        "string"
+                    ]
                 },
                 "enterpriseLicense": {
                     "type": "object",
@@ -747,7 +756,10 @@
                             ]
                         },
                         "enabled": {
-                            "type": "boolean"
+                            "type": [
+                                "boolean",
+                                "string"
+                            ]
                         },
                         "publishNotReadyAddresses": {
                             "type": "boolean"
@@ -848,7 +860,10 @@
                     ]
                 },
                 "enabled": {
-                    "type": "boolean"
+                    "type": [
+                        "boolean",
+                        "string"
+                    ]
                 },
                 "externalPort": {
                     "type": "integer"

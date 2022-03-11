@@ -26,7 +26,8 @@ global:
 
 injector:
   # True if you want to enable vault agent injection.
-  enabled: true
+  # @default: global.enabled
+  enabled: "-"
 
   replicas: 1
 
@@ -216,7 +217,7 @@ injector:
 
 server:
   # If not set to true, Vault server will not be installed. See vault.mode in _helpers.tpl for implementation details
-  enabled: true
+  enabled: "-"
 
   # [Enterprise Only] This value refers to a Kubernetes secret that you have
   # created that contains your enterprise license. If you are not using an
@@ -493,7 +494,8 @@ server:
 
   # Enables a headless service to be used by the Vault Statefulset
   service:
-    enabled: true
+    # @default: global.enabled
+    enabled: "-"
     # clusterIP controls whether a Cluster IP address is attached to the
     # Vault service within Kubernetes.  By default the Vault service will
     # be given a Cluster IP address, set to None to disable.  When disabled
@@ -580,6 +582,7 @@ server:
   # the "file" backend.  This mode is not highly available and should not be scaled
   # past a single replica.
   standalone:
+    # @default: global.enabled
     enabled: "-"
 
     # config is a raw string of default configuration when using a Stateful
@@ -827,7 +830,7 @@ csi:
     # This should be a YAML map of the labels to apply to the csi provider pod
     extraLabels: {}
 
-   
+
 
   # Priority class for csi pods
   priorityClassName: ""
