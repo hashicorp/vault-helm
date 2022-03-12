@@ -1,4 +1,5 @@
-{{- if eq (include "vault.csiEnabled" . | toString) "true" -}}
+{{- template "vault.csiEnabled" . -}}
+{{- if .csiEnabled -}}
 apiVersion: apps/v1
 kind: DaemonSet
 metadata:

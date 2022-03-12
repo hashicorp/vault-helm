@@ -1,6 +1,7 @@
 {{ template "vault.mode" . }}
 {{- if ne .mode "external" }}
-{{- if eq (include "vault.serverServiceEnabled" . | toString) "true" -}}
+{{- template "vault.serverServiceEnabled" . -}}
+{{- if .serverServiceEnabled -}}
 {{- if eq .mode "ha" }}
 # Service for standby Vault pod
 apiVersion: v1

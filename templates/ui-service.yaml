@@ -1,6 +1,9 @@
 {{ template "vault.mode" . }}
+# {{ .mode }}
 {{- if ne .mode "external" }}
-{{- if eq (include "vault.uiEnabled" . | toString) "true" -}}
+{{- template "vault.uiEnabled" . -}}
+# {{ .uiEnabled }}
+{{- if .uiEnabled -}}
 
 apiVersion: v1
 kind: Service

@@ -1,6 +1,7 @@
 {{ template "vault.mode" . }}
 {{- if ne .mode "external" -}}
-{{- if eq (include "vault.serverEnabled" . | toString) "true" -}}
+{{- template "vault.serverEnabled" . -}}
+{{- if .serverEnabled -}}
 {{- if and (eq .mode "ha") (eq (.Values.server.ha.disruptionBudget.enabled | toString) "true") -}}
 # PodDisruptionBudget to prevent degrading the server cluster through
 # voluntary cluster changes.

@@ -66,15 +66,26 @@ load _helpers
   [ "${actual}" = "true" ]
 }
 
+@test "server/standalone-server-test-Pod: not disabled with global.enabled" {
+  cd `chart_dir`
+  local actual=$( (helm template \
+      --show-only templates/tests/server-test.yaml  \
+      --set 'global.enabled=false' \
+      --set 'server.enabled=true' \
+      --set 'server.standalone.enabled=true' \
+      . || echo "---") | tee /dev/stderr |
+      yq 'length > 0' | tee /dev/stderr)
+  [ "${actual}" = "true" ]
+}
+
 @test "server/standalone-server-test-Pod: disable with global.enabled" {
   cd `chart_dir`
   local actual=$( (helm template \
       --show-only templates/tests/server-test.yaml  \
       --set 'global.enabled=false' \
-      --set 'server.standalone.enabled=true' \
       . || echo "---") | tee /dev/stderr |
       yq 'length > 0' | tee /dev/stderr)
-  [ "${actual}" = "true" ]
+  [ "${actual}" = "false" ]
 }
 
 @test "server/standalone-server-test-Pod: disable with injector.externalVaultAddr" {

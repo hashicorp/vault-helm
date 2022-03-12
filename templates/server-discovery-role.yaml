@@ -1,6 +1,7 @@
 {{ template "vault.mode" . }}
 {{- if ne .mode "external" }}
-{{- if eq (include "vault.serverEnabled" . | toString) "true" -}}
+{{- template "vault.serverEnabled" . -}}
+{{- if .serverEnabled -}}
 {{- if eq .mode "ha" }}
 apiVersion: rbac.authorization.k8s.io/v1
 kind: Role

@@ -1,6 +1,7 @@
 {{ template "vault.mode" . }}
 {{- if ne .mode "external" }}
-{{- if eq (include "vault.serverServiceEnabled" . | toString) "true" -}}
+{{- template "vault.serverServiceEnabled" . -}}
+{{- if .serverServiceEnabled -}}
 # Service for Vault cluster
 apiVersion: v1
 kind: Service

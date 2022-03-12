@@ -4,7 +4,8 @@
 {{- if .Values.server.ingress.enabled -}}
 {{- $extraPaths := .Values.server.ingress.extraPaths -}}
 {{- $serviceName := include "vault.fullname" . -}}
-{{- if eq (include "vault.serverServiceEnabled" . | toString) "true" -}}
+{{- template "vault.serverServiceEnabled" . -}}
+{{- if .serverServiceEnabled -}}
 {{- if and (eq .mode "ha" ) (eq (.Values.server.ingress.activeService | toString) "true") }}
 {{- $serviceName = printf "%s-%s" $serviceName "active" -}}
 {{- end }}

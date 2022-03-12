@@ -1,4 +1,5 @@
-{{- if eq (include "vault.injectorEnabled" . | toString) "true" -}}
+{{- template "vault.injectorEnabled" . -}}
+{{- if .injectorEnabled -}}
 {{- if .Capabilities.APIVersions.Has "admissionregistration.k8s.io/v1" }}
 apiVersion: admissionregistration.k8s.io/v1
 {{- else }}

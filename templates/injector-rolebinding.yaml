@@ -1,4 +1,5 @@
-{{- if eq (include "vault.injectorEnabled" . | toString) "true" -}}
+{{- template "vault.injectorEnabled" . -}}
+{{- if .injectorEnabled -}}
 {{- if and (eq (.Values.injector.leaderElector.enabled | toString) "true") (gt (.Values.injector.replicas | int) 1) }}
 apiVersion: rbac.authorization.k8s.io/v1
 kind: RoleBinding

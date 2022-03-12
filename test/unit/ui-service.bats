@@ -58,7 +58,7 @@ load _helpers
   local actual=$(helm template \
       --show-only templates/ui-service.yaml  \
       --set 'global.enabled=false' \
-      --set 'server.dev.enabled=true' \
+      --set 'server.enabled=true' \
       --set 'ui.enabled=true' \
       . | tee /dev/stderr |
       yq -r 'length > 0' | tee /dev/stderr)

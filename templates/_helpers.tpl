@@ -35,49 +35,49 @@ Expand the name of the chart.
 Compute if the csi driver is enabled.
 */}}
 {{- define "vault.csiEnabled" -}}
-{{- (or
-  (and (ne (.Values.csi.enabled | toString) "-") .Values.csi.enabled)
-  (and (eq (.Values.csi.enabled | toString) "-") .Values.global.enabled)) -}}
+{{- $_ := set . "csiEnabled" (or
+  (and (ne (.Values.csi.enabled | toString) "-") (eq (.Values.csi.enabled | toString) "true"))
+  (and (eq (.Values.csi.enabled | toString) "-") (eq (.Values.global.enabled | toString) "true"))) -}}
 {{- end -}}
 
 {{/*
 Compute if the injector is enabled.
 */}}
 {{- define "vault.injectorEnabled" -}}
-{{- (or
-  (and (ne (.Values.injector.enabled | toString) "-") .Values.injector.enabled)
-  (and (eq (.Values.injector.enabled | toString) "-") .Values.global.enabled)) -}}
+{{- $_ := set . "injectorEnabled" (or
+  (and (ne (.Values.injector.enabled | toString) "-") (eq (.Values.injector.enabled | toString) "true"))
+  (and (eq (.Values.injector.enabled | toString) "-") (eq (.Values.global.enabled | toString) "true"))) -}}
 {{- end -}}
 
 {{/*
 Compute if the server is enabled.
 */}}
 {{- define "vault.serverEnabled" -}}
-{{- (or
-  (and (ne (.Values.server.enabled | toString) "-") .Values.server.enabled)
-  (and (eq (.Values.server.enabled | toString) "-") .Values.global.enabled)) -}}
+{{- $_ := set . "serverEnabled" (or
+  (and (ne (.Values.server.enabled | toString) "-") (eq (.Values.server.enabled | toString) "true"))
+  (and (eq (.Values.server.enabled | toString) "-") (eq (.Values.global.enabled | toString) "true"))) -}}
 {{- end -}}
 
 {{/*
 Compute if the server service is enabled.
 */}}
 {{- define "vault.serverServiceEnabled" -}}
-{{- (and
+{{- $_ := set . "serverServiceEnabled" (and
       (or
-        (and (ne (.Values.server.enabled | toString) "-") .Values.server.enabled)
-        (and (eq (.Values.server.enabled | toString) "-") .Values.global.enabled))
+        (and (ne (.Values.server.enabled | toString) "-") (eq (.Values.server.enabled | toString) "true"))
+        (and (eq (.Values.server.enabled | toString) "-") (eq (.Values.global.enabled | toString) "true")))
       (or
-        (and (ne (.Values.server.service.enabled | toString) "-") .Values.server.service.enabled)
-        (and (eq (.Values.server.service.enabled | toString) "-") .Values.global.enabled))) -}}
+        (and (ne (.Values.server.service.enabled | toString) "-") (eq (.Values.server.service.enabled | toString) "true"))
+        (and (eq (.Values.server.service.enabled | toString) "-") (eq (.Values.global.enabled | toString) "true")))) -}}
 {{- end -}}
 
 {{/*
 Compute if the ui is enabled.
 */}}
 {{- define "vault.uiEnabled" -}}
-{{- (or
-  (and (ne (.Values.ui.enabled | toString) "-") .Values.ui.enabled)
-  (and (eq (.Values.ui.enabled | toString) "-") .Values.global.enabled)) -}}
+{{- $_ := set . "uiEnabled" (or
+  (and (ne (.Values.ui.enabled | toString) "-") (eq (.Values.ui.enabled | toString) "true"))
+  (and (eq (.Values.ui.enabled | toString) "-") (eq (.Values.global.enabled | toString) "true"))) -}}
 {{- end -}}
 
 {{/*
@@ -100,9 +100,10 @@ Set the variable 'mode' to the server mode requested by the user to simplify
 template logic.
 */}}
 {{- define "vault.mode" -}}
+  {{- template "vault.serverEnabled" . -}}
   {{- if .Values.injector.externalVaultAddr -}}
     {{- $_ := set . "mode" "external" -}}
-  {{- else if ne (.Values.server.enabled | toString) "true" -}}
+  {{- else if not .serverEnabled -}}
     {{- $_ := set . "mode" "external" -}}
   {{- else if eq (.Values.server.dev.enabled | toString) "true" -}}
     {{- $_ := set . "mode" "dev" -}}
