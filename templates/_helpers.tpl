@@ -36,7 +36,7 @@ Compute if the csi driver is enabled.
 */}}
 {{- define "vault.csiEnabled" -}}
 {{- $_ := set . "csiEnabled" (or
-  (and (ne (.Values.csi.enabled | toString) "-") (eq (.Values.csi.enabled | toString) "true"))
+  (eq (.Values.csi.enabled | toString) "true")
   (and (eq (.Values.csi.enabled | toString) "-") (eq (.Values.global.enabled | toString) "true"))) -}}
 {{- end -}}
 
@@ -45,7 +45,7 @@ Compute if the injector is enabled.
 */}}
 {{- define "vault.injectorEnabled" -}}
 {{- $_ := set . "injectorEnabled" (or
-  (and (ne (.Values.injector.enabled | toString) "-") (eq (.Values.injector.enabled | toString) "true"))
+  (eq (.Values.injector.enabled | toString) "true")
   (and (eq (.Values.injector.enabled | toString) "-") (eq (.Values.global.enabled | toString) "true"))) -}}
 {{- end -}}
 
@@ -54,7 +54,7 @@ Compute if the server is enabled.
 */}}
 {{- define "vault.serverEnabled" -}}
 {{- $_ := set . "serverEnabled" (or
-  (and (ne (.Values.server.enabled | toString) "-") (eq (.Values.server.enabled | toString) "true"))
+  (eq (.Values.server.enabled | toString) "true")
   (and (eq (.Values.server.enabled | toString) "-") (eq (.Values.global.enabled | toString) "true"))) -}}
 {{- end -}}
 
@@ -64,10 +64,10 @@ Compute if the server service is enabled.
 {{- define "vault.serverServiceEnabled" -}}
 {{- $_ := set . "serverServiceEnabled" (and
       (or
-        (and (ne (.Values.server.enabled | toString) "-") (eq (.Values.server.enabled | toString) "true"))
+        (eq (.Values.server.enabled | toString) "true")
         (and (eq (.Values.server.enabled | toString) "-") (eq (.Values.global.enabled | toString) "true")))
       (or
-        (and (ne (.Values.server.service.enabled | toString) "-") (eq (.Values.server.service.enabled | toString) "true"))
+        (eq (.Values.server.service.enabled | toString) "true")
         (and (eq (.Values.server.service.enabled | toString) "-") (eq (.Values.global.enabled | toString) "true")))) -}}
 {{- end -}}
 
@@ -76,7 +76,7 @@ Compute if the ui is enabled.
 */}}
 {{- define "vault.uiEnabled" -}}
 {{- $_ := set . "uiEnabled" (or
-  (and (ne (.Values.ui.enabled | toString) "-") (eq (.Values.ui.enabled | toString) "true"))
+  (eq (.Values.ui.enabled | toString) "true")
   (and (eq (.Values.ui.enabled | toString) "-") (eq (.Values.global.enabled | toString) "true"))) -}}
 {{- end -}}
 
