@@ -87,6 +87,17 @@ load _helpers
   [ "${actual}" = "true" ]
 }
 
+@test "injector/certs-secret: namespace is set" {
+  cd `chart_dir`
+  local actual=$( (helm template \
+      --show-only templates/injector-certs-secret.yaml \
+      --set "injector.replicas=2" \
+      --namespace foo \
+      . || echo "---") | tee /dev/stderr |
+      yq '.metadata.namespace' | tee /dev/stderr)
+  [ "${actual}" = "\"foo\"" ]
+}
+
 @test "injector/role: created/skipped as appropriate" {
   cd `chart_dir`
   local actual=$( (helm template \
@@ -127,6 +138,17 @@ load _helpers
   [ "${actual}" = "true" ]
 }
 
+@test "injector/role: namespace is set" {
+  cd `chart_dir`
+  local actual=$( (helm template \
+      --show-only templates/injector-role.yaml \
+      --set "injector.replicas=2" \
+      --namespace foo \
+      . || echo "---") | tee /dev/stderr |
+      yq '.metadata.namespace' | tee /dev/stderr)
+  [ "${actual}" = "\"foo\"" ]
+}
+
 @test "injector/rolebinding: created/skipped as appropriate" {
   cd `chart_dir`
   local actual=$( (helm template \
@@ -165,4 +187,15 @@ load _helpers
       . || echo "---") | tee /dev/stderr |
       yq 'length > 0' | tee /dev/stderr)
   [ "${actual}" = "true" ]
+}
+
+@test "injector/rolebinding: namespace is set" {
+  cd `chart_dir`
+  local actual=$( (helm template \
+      --show-only templates/injector-rolebinding.yaml \
+      --set "injector.replicas=2" \
+      --namespace foo \
+      . || echo "---") | tee /dev/stderr |
+      yq '.metadata.namespace' | tee /dev/stderr)
+  [ "${actual}" = "\"foo\"" ]
 }
