@@ -6,6 +6,7 @@ CHANGES:
 
 Improvements:
 * CSI: Set `extraLabels` for daemonset, pods, and service account [GH-690](https://github.com/hashicorp/vault-helm/pull/690)
+* Add namespace to injector-leader-elector role, rolebinding and secret [GH-683](https://github.com/hashicorp/vault-helm/pull/683)
 
 ## 0.19.0 (January 20th, 2022)
 
