@@ -216,7 +216,8 @@ injector:
   #   type: RollingUpdate
 
 server:
-  # If not set to true, Vault server will not be installed. See vault.mode in _helpers.tpl for implementation details
+  # If true, or "-" with global.enabled true, Vault server will be installed.
+  # See vault.mode in _helpers.tpl for implementation details.
   enabled: "-"
 
   # [Enterprise Only] This value refers to a Kubernetes secret that you have
@@ -581,7 +582,6 @@ server:
   # the "file" backend.  This mode is not highly available and should not be scaled
   # past a single replica.
   standalone:
-    # @default: global.enabled
     enabled: "-"
 
     # config is a raw string of default configuration when using a Stateful

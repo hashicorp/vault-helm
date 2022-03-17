@@ -756,10 +756,7 @@
                             ]
                         },
                         "enabled": {
-                            "type": [
-                                "boolean",
-                                "string"
-                            ]
+                            "type": "boolean"
                         },
                         "publishNotReadyAddresses": {
                             "type": "boolean"

@@ -1,12 +1,15 @@
 ## Unreleased
 
 CHANGES:
+* `global.enabled` now works as documented, that is, setting `global.enabled` to false will disable everything, with individual components able to turned on individually
+* Default value of `-` used for csi, injector, server, and ui to indicate that they follow `global.enabled`.
 * Vault default image to 1.9.3
 * CSI provider default image to 1.0.0
 
 Improvements:
 * CSI: Set `extraLabels` for daemonset, pods, and service account [GH-690](https://github.com/hashicorp/vault-helm/pull/690)
 * Add namespace to injector-leader-elector role, rolebinding and secret [GH-683](https://github.com/hashicorp/vault-helm/pull/683)
+* Added helper functions for checking if csi, injector, server, server service, and ui are enabled in [tmeplates/_helpers.tpl](templates/_helpers.tpl) and made corresponding changes to use them
 
 ## 0.19.0 (January 20th, 2022)
 

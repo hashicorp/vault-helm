@@ -62,10 +62,9 @@ Compute if the server is enabled.
 Compute if the server service is enabled.
 */}}
 {{- define "vault.serverServiceEnabled" -}}
+{{- template "vault.serverEnabled" . -}}
 {{- $_ := set . "serverServiceEnabled" (and
-      (or
-        (eq (.Values.server.enabled | toString) "true")
-        (and (eq (.Values.server.enabled | toString) "-") (eq (.Values.global.enabled | toString) "true")))
+      .serverEnabled
       (or
         (eq (.Values.server.service.enabled | toString) "true")
         (and (eq (.Values.server.service.enabled | toString) "-") (eq (.Values.global.enabled | toString) "true")))) -}}

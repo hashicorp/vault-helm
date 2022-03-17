@@ -1,8 +1,6 @@
 {{ template "vault.mode" . }}
-# {{ .mode }}
 {{- if ne .mode "external" }}
 {{- template "vault.uiEnabled" . -}}
-# {{ .uiEnabled }}
 {{- if .uiEnabled -}}
 
 apiVersion: v1
