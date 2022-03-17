@@ -22,7 +22,7 @@ spec:
   clusterIP: {{ .Values.server.service.clusterIP }}
   {{- end }}
   {{- include "service.externalTrafficPolicy" .Values.server.service }}
-  publishNotReadyAddresses: true
+  publishNotReadyAddresses: {{ .Values.server.service.publishNotReadyAddresses }}
   ports:
     - name: {{ include "vault.scheme" . }}
       port: {{ .Values.server.service.port }}

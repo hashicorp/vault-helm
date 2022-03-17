@@ -749,6 +749,9 @@
                         "enabled": {
                             "type": "boolean"
                         },
+                        "publishNotReadyAddresses": {
+                            "type": "boolean"
+                        },
                         "externalTrafficPolicy": {
                             "type": "string"
                         },

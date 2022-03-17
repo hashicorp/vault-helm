@@ -16,7 +16,7 @@ metadata:
 {{ template "vault.service.annotations" .}}
 spec:
   clusterIP: None
-  publishNotReadyAddresses: true
+  publishNotReadyAddresses: {{ .Values.server.service.publishNotReadyAddresses }}
   ports:
     - name: "{{ include "vault.scheme" . }}"
       port: {{ .Values.server.service.port }}
