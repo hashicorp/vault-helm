@@ -1,7 +1,7 @@
 ## Unreleased
 
 CHANGES:
-* `global.enabled` now works as documented, that is, setting `global.enabled` to false will disable everything, with individual components able to turned on individually
+* `global.enabled` now works as documented, that is, setting `global.enabled` to false will disable everything, with individual components able to be turned on individually [GH-703](https://github.com/hashicorp/vault-helm/pull/703)
 * Default value of `-` used for csi, injector, server, and ui to indicate that they follow `global.enabled`.
 * Vault default image to 1.9.3
 * CSI provider default image to 1.0.0
