@@ -53,18 +53,191 @@ load _helpers
   [ "${actual}" = "\"\"" ]
 }
 
-@test "injector/MutatingWebhookConfiguration: namespaceSelector empty by default" {
+@test "injector/MutatingWebhookConfiguration: failurePolicy 'Ignore' by default (deprecated)" {
   cd `chart_dir`
   local actual=$(helm template \
       --show-only templates/injector-mutating-webhook.yaml  \
       --set 'injector.enabled=true' \
+      --set 'injector.webhook=null' \
+      --namespace foo \
+      . | tee /dev/stderr |
+      yq '.webhooks[0].failurePolicy' | tee /dev/stderr)
+  [ "${actual}" = "\"Ignore\"" ]
+}
+
+@test "injector/MutatingWebhookConfiguration: can set failurePolicy (deprecated)" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      --show-only templates/injector-mutating-webhook.yaml  \
+      --set 'injector.enabled=true' \
+      --set 'injector.webhook=null' \
+      --set 'injector.failurePolicy=Fail' \
+      . | tee /dev/stderr |
+      yq '.webhooks[0].failurePolicy' | tee /dev/stderr)
+
+  [ "${actual}" = "\"Fail\"" ]
+}
+
+@test "injector/MutatingWebhookConfiguration: webhook.failurePolicy 'Ignore' by default" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      --show-only templates/injector-mutating-webhook.yaml  \
+      --set 'injector.enabled=true' \
+      --set 'injector.failurePolicy=Invalid' \
+      . | tee /dev/stderr |
+      yq '.webhooks[0].failurePolicy' | tee /dev/stderr)
+
+  [ "${actual}" = "\"Ignore\"" ]
+}
+
+@test "injector/MutatingWebhookConfiguration: can set webhook.failurePolicy" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      --show-only templates/injector-mutating-webhook.yaml  \
+      --set 'injector.enabled=true' \
+      --set 'injector.webhook.failurePolicy=Fail' \
+      --set 'injector.failurePolicy=Invalid' \
+      . | tee /dev/stderr |
+      yq '.webhooks[0].failurePolicy' | tee /dev/stderr)
+
+  [ "${actual}" = "\"Fail\"" ]
+}
+
+@test "injector/MutatingWebhookConfiguration: webhook.matchPolicy 'Exact' by default" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      --show-only templates/injector-mutating-webhook.yaml  \
+      --set 'injector.enabled=true' \
+      . | tee /dev/stderr |
+      yq '.webhooks[0].matchPolicy' | tee /dev/stderr)
+
+  [ "${actual}" = "\"Exact\"" ]
+}
+
+@test "injector/MutatingWebhookConfiguration: can set webhook.matchPolicy" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      --show-only templates/injector-mutating-webhook.yaml  \
+      --set 'injector.enabled=true' \
+      --set 'injector.webhook.matchPolicy=Equivalent' \
+      . | tee /dev/stderr |
+      yq '.webhooks[0].matchPolicy' | tee /dev/stderr)
+
+  [ "${actual}" = "\"Equivalent\"" ]
+}
+
+@test "injector/MutatingWebhookConfiguration: timeoutSeconds by default 30" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      --show-only templates/injector-mutating-webhook.yaml  \
+      --set 'injector.enabled=true' \
+      --set 'injector.webhook=null' \
+      . | tee /dev/stderr |
+      yq '.webhooks[0].timeoutSeconds' | tee /dev/stderr)
+
+  [ "${actual}" = "30" ]
+}
+
+@test "injector/MutatingWebhookConfiguration: can set webhook.timeoutSeconds" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      --show-only templates/injector-mutating-webhook.yaml  \
+      --set 'injector.enabled=true' \
+      --set 'injector.webhook.timeoutSeconds=50' \
+      . | tee /dev/stderr |
+      yq '.webhooks[0].timeoutSeconds' | tee /dev/stderr)
+
+  [ "${actual}" = "50" ]
+}
+
+#--------------------------------------------------------------------
+# annotations
+
+@test "injector/MutatingWebhookConfiguration: default webhookAnnotations (deprecated)" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      --show-only templates/injector-mutating-webhook.yaml \
+      --set 'injector.enabled=true' \
+      --set 'injector.webhook=null' \
+      . | tee /dev/stderr |
+      yq -r '.metadata.annotations' | tee /dev/stderr)
+  [ "${actual}" = "null" ]
+}
+
+@test "injector/MutatingWebhookConfiguration: specify webhookAnnotations yaml (deprecated)" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      --show-only templates/injector-mutating-webhook.yaml \
+      --set 'injector.enabled=true' \
+      --set 'injector.webhook=null' \
+      --set 'injector.webhookAnnotations.foo=bar' \
+      . | tee /dev/stderr |
+      yq -r '.metadata.annotations.foo' | tee /dev/stderr)
+  [ "${actual}" = "bar" ]
+}
+
+@test "injector/MutatingWebhookConfiguration: specify webhookAnnotations yaml string (deprecated)" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      --show-only templates/injector-mutating-webhook.yaml \
+      --set 'injector.enabled=true' \
+      --set 'injector.webhook=null' \
+      --set 'injector.webhookAnnotations=foo: bar' \
+      . | tee /dev/stderr |
+      yq -r '.metadata.annotations.foo' | tee /dev/stderr)
+  [ "${actual}" = "bar" ]
+}
+
+@test "injector/MutatingWebhookConfiguration: default webhook.annotations" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      --show-only templates/injector-mutating-webhook.yaml \
+      --set 'injector.enabled=true' \
+      . | tee /dev/stderr |
+      yq -r '.metadata.annotations' | tee /dev/stderr)
+  [ "${actual}" = "null" ]
+}
+
+@test "injector/MutatingWebhookConfiguration: specify webhook.annotations yaml" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      --show-only templates/injector-mutating-webhook.yaml \
+      --set 'injector.enabled=true' \
+      --set 'injector.webhook.annotations.foo=bar' \
+      --set 'injector.webhookAnnotations.invalid=invalid' \
+      . | tee /dev/stderr |
+      yq -r '.metadata.annotations.foo' | tee /dev/stderr)
+  [ "${actual}" = "bar" ]
+}
+
+@test "injector/MutatingWebhookConfiguration: specify webhook.annotations yaml string" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      --show-only templates/injector-mutating-webhook.yaml \
+      --set 'injector.enabled=true' \
+      --set 'injector.webhook.annotations=foo: bar' \
+      --set 'injector.webhookAnnotations=invalid: invalid' \
+      . | tee /dev/stderr |
+      yq -r '.metadata.annotations.foo' | tee /dev/stderr)
+  [ "${actual}" = "bar" ]
+}
+
+#--------------------------------------------------------------------
+# namespaceSelector
+
+@test "injector/MutatingWebhookConfiguration: namespaceSelector empty by default (deprecated)" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      --show-only templates/injector-mutating-webhook.yaml  \
+      --set 'injector.enabled=true' \
+      --set 'injector.webhook=null' \
       --namespace foo \
       . | tee /dev/stderr |
       yq '.webhooks[0].namespaceSelector' | tee /dev/stderr)
   [ "${actual}" = "null" ]
 }
 
-@test "injector/MutatingWebhookConfiguration: can set namespaceSelector" {
+@test "injector/MutatingWebhookConfiguration: can set namespaceSelector (deprecated)" {
   cd `chart_dir`
   local actual=$(helm template \
       --show-only templates/injector-mutating-webhook.yaml  \
@@ -76,7 +249,59 @@ load _helpers
   [ "${actual}" = "true" ]
 }
 
-@test "injector/MutatingWebhookConfiguration: objectSelector empty by default" {
+@test "injector/MutatingWebhookConfiguration: webhook.namespaceSelector empty by default" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      --show-only templates/injector-mutating-webhook.yaml  \
+      --set 'injector.enabled=true' \
+      --namespace foo \
+      . | tee /dev/stderr |
+      yq '.webhooks[0].namespaceSelector' | tee /dev/stderr)
+  [ "${actual}" = "null" ]
+}
+
+@test "injector/MutatingWebhookConfiguration: can set set webhook.namespaceSelector" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      --show-only templates/injector-mutating-webhook.yaml  \
+      --set 'injector.enabled=true' \
+      --set 'injector.webhook.namespaceSelector.matchLabels.injector=true' \
+      --set 'injector.namespaceSelector.matchLabels.injector=false' \
+      . | tee /dev/stderr |
+      yq '.webhooks[0].namespaceSelector.matchLabels.injector' | tee /dev/stderr)
+
+  [ "${actual}" = "true" ]
+}
+
+#--------------------------------------------------------------------
+# objectSelector
+
+@test "injector/MutatingWebhookConfiguration: objectSelector empty by default (deprecated)" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      --show-only templates/injector-mutating-webhook.yaml  \
+      --set 'injector.enabled=true' \
+      --set 'injector.webhook=null' \
+      --namespace foo \
+      . | tee /dev/stderr |
+      yq '.webhooks[0].objectSelector' | tee /dev/stderr)
+  [ "${actual}" = "null" ]
+}
+
+@test "injector/MutatingWebhookConfiguration: can set objectSelector (deprecated)" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      --show-only templates/injector-mutating-webhook.yaml  \
+      --set 'injector.enabled=true' \
+      --set 'injector.webhook=null' \
+      --set 'injector.objectSelector.matchLabels.injector=true' \
+      . | tee /dev/stderr |
+      yq '.webhooks[0].objectSelector.matchLabels.injector' | tee /dev/stderr)
+
+  [ "${actual}" = "true" ]
+}
+
+@test "injector/MutatingWebhookConfiguration: webhook.objectSelector empty by default" {
   cd `chart_dir`
   local actual=$(helm template \
       --show-only templates/injector-mutating-webhook.yaml  \
@@ -87,69 +312,15 @@ load _helpers
   [ "${actual}" = "null" ]
 }
 
-@test "injector/MutatingWebhookConfiguration: can set objectSelector" {
+@test "injector/MutatingWebhookConfiguration: can set webhook.objectSelector" {
   cd `chart_dir`
   local actual=$(helm template \
       --show-only templates/injector-mutating-webhook.yaml  \
       --set 'injector.enabled=true' \
-      --set 'injector.objectSelector.matchLabels.injector=true' \
+      --set 'injector.webhook.objectSelector.matchLabels.injector=true' \
+      --set 'injector.objectSelector.matchLabels.injector=false' \
       . | tee /dev/stderr |
       yq '.webhooks[0].objectSelector.matchLabels.injector' | tee /dev/stderr)
 
   [ "${actual}" = "true" ]
-}
-
-@test "injector/MutatingWebhookConfiguration: failurePolicy 'Ignore' by default" {
-  cd `chart_dir`
-  local actual=$(helm template \
-      --show-only templates/injector-mutating-webhook.yaml  \
-      --set 'injector.enabled=true' \
-      --namespace foo \
-      . | tee /dev/stderr |
-      yq '.webhooks[0].failurePolicy' | tee /dev/stderr)
-  [ "${actual}" = "\"Ignore\"" ]
-}
-
-@test "injector/MutatingWebhookConfiguration: can set failurePolicy" {
-  cd `chart_dir`
-  local actual=$(helm template \
-      --show-only templates/injector-mutating-webhook.yaml  \
-      --set 'injector.enabled=true' \
-      --set 'injector.failurePolicy=Fail' \
-      . | tee /dev/stderr |
-      yq '.webhooks[0].failurePolicy' | tee /dev/stderr)
-
-  [ "${actual}" = "\"Fail\"" ]
-}
-
-#--------------------------------------------------------------------
-# annotations
-
-@test "injector/MutatingWebhookConfiguration: default annotations" {
-  cd `chart_dir`
-  local actual=$(helm template \
-      --show-only templates/injector-mutating-webhook.yaml \
-      . | tee /dev/stderr |
-      yq -r '.metadata.annotations' | tee /dev/stderr)
-  [ "${actual}" = "null" ]
-}
-
-@test "injector/MutatingWebhookConfiguration: specify annotations yaml" {
-  cd `chart_dir`
-  local actual=$(helm template \
-      --show-only templates/injector-mutating-webhook.yaml \
-      --set 'injector.webhookAnnotations.foo=bar' \
-      . | tee /dev/stderr |
-      yq -r '.metadata.annotations.foo' | tee /dev/stderr)
-  [ "${actual}" = "bar" ]
-}
-
-@test "injector/MutatingWebhookConfiguration: specify annotations yaml string" {
-  cd `chart_dir`
-  local actual=$(helm template \
-      --show-only templates/injector-mutating-webhook.yaml \
-      --set 'injector.webhookAnnotations=foo: bar' \
-      . | tee /dev/stderr |
-      yq -r '.metadata.annotations.foo' | tee /dev/stderr)
-  [ "${actual}" = "bar" ]
 }
