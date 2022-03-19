@@ -399,6 +399,33 @@ Sets extra ui service annotations
 {{- end -}}
 
 {{/*
+Create the name of the service account to use for injector
+*/}}
+{{- define "vault.injector.serviceAccount.name" -}}
+{{- if .Values.injector.serviceAccount.create -}}
+     {{- $name := (list (include "vault.fullname" .) "agent-injector"  | join "-") -}}
+    {{ .Values.injector.serviceAccount.name | default $name }}
+{{- else -}}
+    {{ default "default" .Values.injector.serviceAccount.name }}
+{{- end -}}
+{{- end -}}
+
+{{/*
+Sets extra service account annotations for injector
+*/}}
+{{- define "vault.injector.serviceAccount.annotations" -}}
+  {{- if .Values.injector.serviceAccount.annotations }}
+  annotations:
+    {{- $tp := typeOf .Values.injector.serviceAccount.annotations }}
+    {{- if eq $tp "string" }}
+      {{- tpl .Values.injector.serviceAccount.annotations . | nindent 4 }}
+    {{- else }}
+      {{- toYaml .Values.injector.serviceAccount.annotations | nindent 4 }}
+    {{- end }}
+  {{- end }}
+{{- end -}}
+
+{{/*
 Create the name of the service account to use
 */}}
 {{- define "vault.serviceAccount.name" -}}

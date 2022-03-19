@@ -14,5 +14,5 @@ roleRef:
   apiGroup: rbac.authorization.k8s.io
 subjects:
   - kind: ServiceAccount
-    name: {{ template "vault.fullname" . }}-agent-injector
+    name:  {{ template "vault.injector.serviceAccount.name" . }}
 {{- end }}
