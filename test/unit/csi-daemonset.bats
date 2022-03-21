@@ -27,7 +27,7 @@ load _helpers
       --set "global.enabled=false" \
       . || echo "---") | tee /dev/stderr |
       yq 'length > 0' | tee /dev/stderr)
-  [ "${actual}" = "false" ]
+  [ "${actual}" = "true" ]
 }
 
 # priorityClassName

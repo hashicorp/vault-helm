@@ -26,7 +26,8 @@ global:
 
 injector:
   # True if you want to enable vault agent injection.
-  enabled: true
+  # @default: global.enabled
+  enabled: "-"
 
   replicas: 1
 
@@ -266,8 +267,9 @@ injector:
   #   type: RollingUpdate
 
 server:
-  # If not set to true, Vault server will not be installed. See vault.mode in _helpers.tpl for implementation details
-  enabled: true
+  # If true, or "-" with global.enabled true, Vault server will be installed.
+  # See vault.mode in _helpers.tpl for implementation details.
+  enabled: "-"
 
   # [Enterprise Only] This value refers to a Kubernetes secret that you have
   # created that contains your enterprise license. If you are not using an
@@ -878,7 +880,7 @@ csi:
     # This should be a YAML map of the labels to apply to the csi provider pod
     extraLabels: {}
 
-   
+
 
   # Priority class for csi pods
   priorityClassName: ""

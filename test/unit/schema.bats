@@ -7,9 +7,9 @@ load _helpers
 # schema, setting it as a string fails 'helm template'.
 @test "schema: csi enabled datatype" {
   cd `chart_dir`
-  run helm template . --set csi.enabled="nope"
+  run helm template . --set csi.enabled="123"
   [ "$status" -eq 1 ]
-  [ "${lines[2]}" = "- csi.enabled: Invalid type. Expected: boolean, given: string" ]
+  [ "${lines[2]}" = "- csi.enabled: Invalid type. Expected: [boolean,string], given: integer" ]
 
   run helm template . --set csi.enabled=true
   [ "$status" -eq 0 ]
@@ -17,9 +17,9 @@ load _helpers
 
 @test "schema: injector enabled datatype" {
   cd `chart_dir`
-  run helm template . --set injector.enabled="nope"
+  run helm template . --set injector.enabled="123"
   [ "$status" -eq 1 ]
-  [ "${lines[2]}" = "- injector.enabled: Invalid type. Expected: boolean, given: string" ]
+  [ "${lines[2]}" = "- injector.enabled: Invalid type. Expected: [boolean,string], given: integer" ]
 
   run helm template . --set injector.enabled=true
   [ "$status" -eq 0 ]
@@ -27,9 +27,9 @@ load _helpers
 
 @test "schema: server enabled datatype" {
   cd `chart_dir`
-  run helm template . --set server.enabled="nope"
+  run helm template . --set server.enabled="123"
   [ "$status" -eq 1 ]
-  [ "${lines[2]}" = "- server.enabled: Invalid type. Expected: boolean, given: string" ]
+  [ "${lines[2]}" = "- server.enabled: Invalid type. Expected: [boolean,string], given: integer" ]
 
   run helm template . --set server.enabled=true
   [ "$status" -eq 0 ]
@@ -37,9 +37,9 @@ load _helpers
 
 @test "schema: ui enabled datatype" {
   cd `chart_dir`
-  run helm template . --set ui.enabled="nope"
+  run helm template . --set ui.enabled="123"
   [ "$status" -eq 1 ]
-  [ "${lines[2]}" = "- ui.enabled: Invalid type. Expected: boolean, given: string" ]
+  [ "${lines[2]}" = "- ui.enabled: Invalid type. Expected: [boolean,string], given: integer" ]
 
   run helm template . --set ui.enabled=true
   [ "$status" -eq 0 ]

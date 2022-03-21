@@ -26,10 +26,20 @@ load _helpers
   local actual=$( (helm template \
       --show-only templates/injector-deployment.yaml  \
       --set 'global.enabled=false' \
-      --set 'injector.enabled=true' \
       . || echo "---") | tee /dev/stderr |
       yq 'length > 0' | tee /dev/stderr)
   [ "${actual}" = "false" ]
+}
+
+@test "injector/deployment: enable with injector.enabled true and global.enabled false" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      --show-only templates/injector-deployment.yaml  \
+      --set 'injector.enabled=true' \
+      --set 'global.enabled=false' \
+      . | tee /dev/stderr |
+      yq 'length > 0' | tee /dev/stderr)
+  [ "${actual}" = "true" ]
 }
 
 @test "injector/deployment: image defaults to injector.image" {

@@ -1,4 +1,5 @@
-{{- if and (eq (.Values.injector.enabled | toString) "true" ) (eq (.Values.global.enabled | toString) "true") }}
+{{- template "vault.injectorEnabled" . -}}
+{{- if .injectorEnabled -}}
 apiVersion: v1
 kind: Service
 metadata:

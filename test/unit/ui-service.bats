@@ -53,6 +53,18 @@ load _helpers
   [ "${actual}" = "false" ]
 }
 
+@test "ui/Service: 'disable with global, enable with ui.enabled'" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      --show-only templates/ui-service.yaml  \
+      --set 'global.enabled=false' \
+      --set 'server.enabled=true' \
+      --set 'ui.enabled=true' \
+      . | tee /dev/stderr |
+      yq -r 'length > 0' | tee /dev/stderr)
+  [ "${actual}" = "true" ]
+}
+
 @test "ui/Service: disable with injector.externalVaultAddr" {
   cd `chart_dir`
   local actual=$( (helm template \

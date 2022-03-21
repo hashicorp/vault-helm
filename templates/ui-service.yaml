@@ -1,7 +1,8 @@
 {{ template "vault.mode" . }}
 {{- if ne .mode "external" }}
-{{- if and (ne .mode "") (eq (.Values.global.enabled | toString) "true") }}
-{{- if eq (.Values.ui.enabled | toString) "true" }}
+{{- template "vault.uiEnabled" . -}}
+{{- if .uiEnabled -}}
+
 apiVersion: v1
 kind: Service
 metadata:
@@ -33,5 +34,4 @@ spec:
   {{- include "service.externalTrafficPolicy" .Values.ui }}
   {{- include "service.loadBalancer" .Values.ui }}
 {{- end -}}
-{{- end }}
 {{- end }}

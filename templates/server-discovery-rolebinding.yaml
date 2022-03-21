@@ -1,6 +1,8 @@
 {{ template "vault.mode" . }}
 {{- if ne .mode "external" }}
-{{- if and (eq .mode "ha" ) (eq (.Values.global.enabled | toString) "true") }}
+{{- template "vault.serverEnabled" . -}}
+{{- if .serverEnabled -}}
+{{- if eq .mode "ha" }}
 {{- if .Capabilities.APIVersions.Has "rbac.authorization.k8s.io/v1" -}}
 apiVersion: rbac.authorization.k8s.io/v1
 {{- else }}
@@ -23,5 +25,6 @@ subjects:
 - kind: ServiceAccount
   name: {{ template "vault.serviceAccount.name" . }}
   namespace: {{ .Release.Namespace }}
+{{ end }}
 {{ end }}
 {{ end }}
