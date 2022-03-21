@@ -3,6 +3,7 @@
 CHANGES:
 * Vault default image to 1.9.3
 * CSI provider default image to 1.0.0
+* Earliest Kubernetes version tested is now 1.16
 
 Improvements:
 * CSI: Set `extraLabels` for daemonset, pods, and service account [GH-690](https://github.com/hashicorp/vault-helm/pull/690)
