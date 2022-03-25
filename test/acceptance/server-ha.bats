@@ -10,9 +10,7 @@ load _helpers
   wait_for_running $(name_prefix)-0
 
   # Sealed, not initialized
-  local sealed_status=$(kubectl exec "$(name_prefix)-0" -- vault status -format=json |
-    jq -r '.sealed' )
-  [ "${sealed_status}" == "true" ]
+  wait_for_sealed_vault $(name_prefix)-0
 
   local init_status=$(kubectl exec "$(name_prefix)-0" -- vault status -format=json |
     jq -r '.initialized')
@@ -90,8 +88,8 @@ setup() {
   kubectl config set-context --current --namespace=acceptance
 
   helm install consul \
-    https://github.com/hashicorp/consul-helm/archive/v0.16.2.tar.gz \
-    --set 'ui.enabled=false' \
+    https://github.com/hashicorp/consul-helm/archive/v0.28.0.tar.gz \
+    --set 'ui.enabled=false'
 
   wait_for_running_consul
 }
@@ -100,6 +98,11 @@ setup() {
 teardown() {
   if [[ ${CLEANUP:-true} == "true" ]]
   then
+      # If the test failed, print some debug output
+      if [[ "$BATS_ERROR_STATUS" -ne 0 ]]; then
+          kubectl logs -l app=consul
+          kubectl logs -l app.kubernetes.io/name=vault
+      fi
       helm delete vault
       helm delete consul
       kubectl delete --all pvc

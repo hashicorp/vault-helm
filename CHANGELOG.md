@@ -1,5 +1,172 @@
 ## Unreleased
 
+CHANGES:
+* `global.enabled` now works as documented, that is, setting `global.enabled` to false will disable everything, with individual components able to be turned on individually [GH-703](https://github.com/hashicorp/vault-helm/pull/703)
+* Default value of `-` used for injector and server to indicate that they follow `global.enabled`. [GH-703](https://github.com/hashicorp/vault-helm/pull/703)
+* Vault default image to 1.9.3
+* CSI provider default image to 1.0.0
+* Earliest Kubernetes version tested is now 1.16
+
+Improvements:
+* CSI: Set `extraLabels` for daemonset, pods, and service account [GH-690](https://github.com/hashicorp/vault-helm/pull/690)
+* Add namespace to injector-leader-elector role, rolebinding and secret [GH-683](https://github.com/hashicorp/vault-helm/pull/683)
+
+## 0.19.0 (January 20th, 2022)
+
+CHANGES:
+* Vault image default 1.9.2
+* Vault K8s image default 0.14.2
+
+Features:
+* Added configurable podDisruptionBudget for injector [GH-653](https://github.com/hashicorp/vault-helm/pull/653)
+* Make terminationGracePeriodSeconds configurable for server [GH-659](https://github.com/hashicorp/vault-helm/pull/659)
+* Added configurable update strategy for injector [GH-661](https://github.com/hashicorp/vault-helm/pull/661)
+* csi: ability to set priorityClassName for CSI daemonset pods [GH-670](https://github.com/hashicorp/vault-helm/pull/670)
+
+Improvements:
+* Set the namespace on the OpenShift Route [GH-679](https://github.com/hashicorp/vault-helm/pull/679)
+* Add volumes and env vars to helm hook test pod [GH-673](https://github.com/hashicorp/vault-helm/pull/673)
+* Make TLS configurable for OpenShift routes [GH-686](https://github.com/hashicorp/vault-helm/pull/686)
+
+## 0.18.0 (November 17th, 2021)
+
+CHANGES:
+* Removed support for deploying a leader-elector container with the [vault-k8s injector](https://github.com/hashicorp/vault-k8s) injector since vault-k8s now uses an internal mechanism to determine leadership [GH-649](https://github.com/hashicorp/vault-helm/pull/649)
+* Vault image default 1.9.0
+* Vault K8s image default 0.14.1
+
+Improvements:
+* Added templateConfig.staticSecretRenderInterval chart option for the injector [GH-621](https://github.com/hashicorp/vault-helm/pull/621)
+
+## 0.17.1 (October 25th, 2021)
+
+Improvements:
+  * Add option for Ingress PathType [GH-634](https://github.com/hashicorp/vault-helm/pull/634)
+
+## 0.17.0 (October 21st, 2021)
+
+KNOWN ISSUES:
+* The chart will fail to deploy on Kubernetes 1.19+ with `server.ingress.enabled=true` because no `pathType` is set
+
+CHANGES:
+* Vault image default 1.8.4
+* Vault K8s image default 0.14.0
+
+Improvements:
+* Support Ingress stable networking API [GH-590](https://github.com/hashicorp/vault-helm/pull/590)
+* Support setting the `externalTrafficPolicy` for `LoadBalancer` and `NodePort` service types [GH-626](https://github.com/hashicorp/vault-helm/pull/626)
+* Support setting ingressClassName on server Ingress [GH-630](https://github.com/hashicorp/vault-helm/pull/630)
+
+Bugs:
+* Ensure `kubeletRootDir` volume path and mounts are the same when `csi.daemonSet.kubeletRootDir` is overridden [GH-628](https://github.com/hashicorp/vault-helm/pull/628)
+
+## 0.16.1 (September 29th, 2021)
+
+CHANGES:
+* Vault image default 1.8.3
+* Vault K8s image default 0.13.1
+
+## 0.16.0 (September 16th, 2021)
+
+CHANGES:
+* Support for deploying a leader-elector container with the [vault-k8s injector](https://github.com/hashicorp/vault-k8s) injector will be removed in version 0.18.0 of this chart since vault-k8s now uses an internal mechanism to determine leadership. To enable the deployment of the leader-elector container for use with vault-k8s 0.12.0 and earlier, set `useContainer=true`.
+
+Improvements:
+ * Make CSI provider `hostPaths` configurable via `csi.daemonSet.providersDir` and `csi.daemonSet.kubeletRootDir` [GH-603](https://github.com/hashicorp/vault-helm/pull/603)
+ * Support vault-k8s internal leader election [GH-568](https://github.com/hashicorp/vault-helm/pull/568) [GH-607](https://github.com/hashicorp/vault-helm/pull/607)
+
+## 0.15.0 (August 23rd, 2021)
+
+Improvements:
+* Add imagePullSecrets on server test [GH-572](https://github.com/hashicorp/vault-helm/pull/572)
+* Add injector.webhookAnnotations chart option [GH-584](https://github.com/hashicorp/vault-helm/pull/584)
+
+## 0.14.0 (July 28th, 2021)
+
+Features:
+* Added templateConfig.exitOnRetryFailure chart option for the injector [GH-560](https://github.com/hashicorp/vault-helm/pull/560)
+
+Improvements:
+* Support configuring pod tolerations, pod affinity, and node selectors as YAML [GH-565](https://github.com/hashicorp/vault-helm/pull/565)
+* Set the default vault image to come from the hashicorp organization [GH-567](https://github.com/hashicorp/vault-helm/pull/567)
+* Add support for running the acceptance tests against a local `kind` cluster [GH-567](https://github.com/hashicorp/vault-helm/pull/567)
+* Add `server.ingress.activeService` to configure if the ingress should use the active service [GH-570](https://github.com/hashicorp/vault-helm/pull/570)
+* Add `server.route.activeService` to configure if the route should use the active service [GH-570](https://github.com/hashicorp/vault-helm/pull/570)
+* Support configuring `global.imagePullSecrets` from a string array [GH-576](https://github.com/hashicorp/vault-helm/pull/576)
+
+
+## 0.13.0 (June 17th, 2021)
+
+Improvements:
+* Added a helm test for vault server [GH-531](https://github.com/hashicorp/vault-helm/pull/531)
+* Added server.enterpriseLicense option [GH-547](https://github.com/hashicorp/vault-helm/pull/547)
+* Added OpenShift overrides [GH-549](https://github.com/hashicorp/vault-helm/pull/549)
+
+Bugs:
+* Fix ui.serviceNodePort schema [GH-537](https://github.com/hashicorp/vault-helm/pull/537)
+* Fix server.ha.disruptionBudget.maxUnavailable schema [GH-535](https://github.com/hashicorp/vault-helm/pull/535)
+* Added webhook-certs volume mount to sidecar injector [GH-545](https://github.com/hashicorp/vault-helm/pull/545)
+
+## 0.12.0 (May 25th, 2021)
+
+Features:
+* Pass additional arguments to `vault-csi-provider` using `csi.extraArgs` [GH-526](https://github.com/hashicorp/vault-helm/pull/526)
+
+Improvements:
+* Set chart kubeVersion and added chart-verifier tests [GH-510](https://github.com/hashicorp/vault-helm/pull/510)
+* Added values json schema [GH-513](https://github.com/hashicorp/vault-helm/pull/513)
+* Ability to set tolerations for CSI daemonset pods [GH-521](https://github.com/hashicorp/vault-helm/pull/521)
+* UI target port is now configurable [GH-437](https://github.com/hashicorp/vault-helm/pull/437)
+
+Bugs:
+* CSI: `global.imagePullSecrets` are now also used for CSI daemonset [GH-519](https://github.com/hashicorp/vault-helm/pull/519)
+
+## 0.11.0 (April 14th, 2021)
+
+Features:
+* Added `server.enabled` to explicitly skip installing a Vault server [GH-486](https://github.com/hashicorp/vault-helm/pull/486)
+* Injector now supports enabling host network [GH-471](https://github.com/hashicorp/vault-helm/pull/471)
+* Injector port is now configurable [GH-489](https://github.com/hashicorp/vault-helm/pull/489)
+* Injector Vault Agent resource defaults are now configurable [GH-493](https://github.com/hashicorp/vault-helm/pull/493)
+* Extra paths can now be added to the Vault ingress service [GH-460](https://github.com/hashicorp/vault-helm/pull/460)
+* Log level and format can now be set directly using `server.logFormat` and `server.logLevel` [GH-488](https://github.com/hashicorp/vault-helm/pull/488)
+
+Improvements:
+* Added `https` name to injector service port [GH-495](https://github.com/hashicorp/vault-helm/pull/495)
+
+Bugs:
+* CSI: Fix ClusterRole name and DaemonSet's service account to properly match deployment name [GH-486](https://github.com/hashicorp/vault-helm/pull/486)
+
+## 0.10.0 (March 25th, 2021)
+
+Features:
+* Add support for [Vault CSI provider](https://github.com/hashicorp/vault-csi-provider) [GH-461](https://github.com/hashicorp/vault-helm/pull/461)
+
+Improvements:
+* `objectSelector` can now be set on the mutating admission webhook [GH-456](https://github.com/hashicorp/vault-helm/pull/456)
+
+## 0.9.1 (February 2nd, 2021)
+
+Bugs:
+* Injector: fix labels for default anti-affinity rule [GH-441](https://github.com/hashicorp/vault-helm/pull/441), [GH-442](https://github.com/hashicorp/vault-helm/pull/442)
+* Set VAULT_DEV_LISTEN_ADDRESS in dev mode [GH-446](https://github.com/hashicorp/vault-helm/pull/446)
+
+## 0.9.0 (January 5th, 2021)
+
+Features:
+* Injector now supports configurable number of replicas [GH-436](https://github.com/hashicorp/vault-helm/pull/436)
+* Injector now supports auto TLS for multiple replicas using leader elections [GH-436](https://github.com/hashicorp/vault-helm/pull/436)
+
+Improvements:
+* Dev mode now supports `server.extraArgs` [GH-421](https://github.com/hashicorp/vault-helm/pull/421)
+* Dev mode root token is now configurable with `server.dev.devRootToken` [GH-415](https://github.com/hashicorp/vault-helm/pull/415)
+* ClusterRoleBinding updated to `v1` [GH-395](https://github.com/hashicorp/vault-helm/pull/395)
+* MutatingWebhook updated to `v1` [GH-408](https://github.com/hashicorp/vault-helm/pull/408)
+* Injector service now supports `injector.service.annotations` [425](https://github.com/hashicorp/vault-helm/pull/425)
+* Injector now supports `injector.extraLabels` [428](https://github.com/hashicorp/vault-helm/pull/428)
+* Added `allowPrivilegeEscalation: false` to Vault and Injector containers [429](https://github.com/hashicorp/vault-helm/pull/429)
+* Network Policy now supports `server.networkPolicy.egress` [389](https://github.com/hashicorp/vault-helm/pull/389)
+
 ## 0.8.0 (October 20th, 2020)
 
 Improvements:

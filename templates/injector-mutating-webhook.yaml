@@ -1,5 +1,10 @@
-{{- if and (eq (.Values.injector.enabled | toString) "true" ) (eq (.Values.global.enabled | toString) "true") }}
+{{- template "vault.injectorEnabled" . -}}
+{{- if .injectorEnabled -}}
+{{- if .Capabilities.APIVersions.Has "admissionregistration.k8s.io/v1" }}
+apiVersion: admissionregistration.k8s.io/v1
+{{- else }}
 apiVersion: admissionregistration.k8s.io/v1beta1
+{{- end }}
 kind: MutatingWebhookConfiguration
 metadata:
   name: {{ template "vault.fullname" . }}-agent-injector-cfg
@@ -7,8 +12,14 @@ metadata:
     app.kubernetes.io/name: {{ include "vault.name" . }}-agent-injector
     app.kubernetes.io/instance: {{ .Release.Name }}
     app.kubernetes.io/managed-by: {{ .Release.Service }}
+  {{- template "injector.webhookAnnotations" . }}
 webhooks:
   - name: vault.hashicorp.com
+    failurePolicy: {{ ((.Values.injector.webhook)).failurePolicy | default .Values.injector.failurePolicy }}
+    matchPolicy: {{ ((.Values.injector.webhook)).matchPolicy | default "Exact" }}
+    sideEffects: None
+    timeoutSeconds: {{ ((.Values.injector.webhook)).timeoutSeconds | default "30" }}
+    admissionReviewVersions: ["v1", "v1beta1"]
     clientConfig:
       service:
         name: {{ template "vault.fullname" . }}-agent-injector-svc
@@ -20,11 +31,12 @@ webhooks:
         apiGroups: [""]
         apiVersions: ["v1"]
         resources: ["pods"]
-{{- if .Values.injector.namespaceSelector }}
+{{- if or (.Values.injector.namespaceSelector) (((.Values.injector.webhook)).namespaceSelector) }}
     namespaceSelector:
-{{ toYaml .Values.injector.namespaceSelector | indent 6}}
+{{ toYaml (((.Values.injector.webhook)).namespaceSelector | default .Values.injector.namespaceSelector) | indent 6}}
 {{ end }}
-{{- with .Values.injector.failurePolicy }}
-    failurePolicy: {{.}}
+{{- if or (((.Values.injector.webhook)).objectSelector) (.Values.injector.objectSelector) }}
+    objectSelector:
+{{ toYaml (((.Values.injector.webhook)).objectSelector | default .Values.injector.objectSelector) | indent 6}}
 {{ end }}
 {{ end }}

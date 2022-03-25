@@ -52,9 +52,46 @@ load _helpers
       --set 'server.ingress.hosts[0].host=test.com' \
       --set 'server.ingress.hosts[0].paths[0]=/' \
       . | tee /dev/stderr |
-      yq  -r '.spec.rules[0].http.paths[0].backend.serviceName  | length > 0' | tee /dev/stderr)
+      yq  -r '.spec.rules[0].http.paths[0].backend.service.name  | length > 0' | tee /dev/stderr)
   [ "${actual}" = "true" ]
 
+}
+
+@test "server/ingress: extra paths prepend host configuration" {
+  cd `chart_dir`
+
+  local actual=$(helm template \
+      --show-only templates/server-ingress.yaml \
+      --set 'server.ingress.enabled=true' \
+      --set 'server.ingress.hosts[0].host=test.com' \
+      --set 'server.ingress.hosts[0].paths[0]=/' \
+      --set 'server.ingress.extraPaths[0].path=/annotation-service' \
+      --set 'server.ingress.extraPaths[0].backend.service.name=ssl-redirect' \
+      . | tee /dev/stderr |
+      yq  -r '.spec.rules[0].http.paths[0].backend.service.name' | tee /dev/stderr)
+  [ "${actual}" = 'ssl-redirect' ]
+
+  local actual=$(helm template \
+      --show-only templates/server-ingress.yaml \
+      --set 'server.ingress.enabled=true' \
+      --set 'server.ingress.hosts[0].host=test.com' \
+      --set 'server.ingress.hosts[0].paths[0]=/' \
+      --set 'server.ingress.extraPaths[0].path=/annotation-service' \
+      --set 'server.ingress.extraPaths[0].backend.service.name=ssl-redirect' \
+      . | tee /dev/stderr |
+      yq  -r '.spec.rules[0].http.paths[0].path' | tee /dev/stderr)
+  [ "${actual}" = '/annotation-service' ]
+
+  local actual=$(helm template \
+      --show-only templates/server-ingress.yaml \
+      --set 'server.ingress.enabled=true' \
+      --set 'server.ingress.hosts[0].host=test.com' \
+      --set 'server.ingress.hosts[0].paths[0]=/' \
+      --set 'server.ingress.extraPaths[0].path=/annotation-service' \
+      --set 'server.ingress.extraPaths[0].backend.service.name=ssl-redirect' \
+      . | tee /dev/stderr |
+      yq  -r '.spec.rules[0].http.paths[1].path' | tee /dev/stderr)
+  [ "${actual}" = '/' ]
 }
 
 @test "server/ingress: labels gets added to object" {
@@ -94,7 +131,30 @@ load _helpers
   [ "${actual}" = "nginx" ]
 }
 
-@test "server/ingress: uses active service when ha - yaml" {
+@test "server/ingress: ingressClassName added to object spec - string" {
+  cd `chart_dir`
+
+  local actual=$(helm template \
+      --show-only templates/server-ingress.yaml \
+      --set 'server.ingress.enabled=true' \
+      --set server.ingress.ingressClassName=nginx \
+      . | tee /dev/stderr |
+      yq -r '.spec.ingressClassName' | tee /dev/stderr)
+  [ "${actual}" = "nginx" ]
+}
+
+@test "server/ingress: ingressClassName is not added by default" {
+  cd `chart_dir`
+
+  local actual=$(helm template \
+      --show-only templates/server-ingress.yaml \
+      --set 'server.ingress.enabled=true' \
+      . | tee /dev/stderr |
+      yq -r '.spec.ingressClassName' | tee /dev/stderr)
+  [ "${actual}" = "null" ]
+}
+
+@test "server/ingress: uses active service when ha by default - yaml" {
   cd `chart_dir`
 
   local actual=$(helm template \
@@ -104,8 +164,23 @@ load _helpers
       --set 'server.ha.enabled=true' \
       --set 'server.service.enabled=true' \
       . | tee /dev/stderr |
-      yq -r '.spec.rules[0].http.paths[0].backend.serviceName' | tee /dev/stderr)
-  [ "${actual}" = "RELEASE-NAME-vault-active" ]
+      yq -r '.spec.rules[0].http.paths[0].backend.service.name' | tee /dev/stderr)
+  [ "${actual}" = "release-name-vault-active" ]
+}
+
+@test "server/ingress: uses regular service when configured with ha - yaml" {
+  cd `chart_dir`
+
+  local actual=$(helm template \
+      --show-only templates/server-ingress.yaml \
+      --set 'server.ingress.enabled=true' \
+      --set 'server.ingress.activeService=false' \
+      --set 'server.dev.enabled=false' \
+      --set 'server.ha.enabled=true' \
+      --set 'server.service.enabled=true' \
+      . | tee /dev/stderr |
+      yq -r '.spec.rules[0].http.paths[0].backend.service.name' | tee /dev/stderr)
+  [ "${actual}" = "release-name-vault" ]
 }
 
 @test "server/ingress: uses regular service when not ha - yaml" {
@@ -118,6 +193,75 @@ load _helpers
       --set 'server.ha.enabled=false' \
       --set 'server.service.enabled=true' \
       . | tee /dev/stderr |
+      yq -r '.spec.rules[0].http.paths[0].backend.service.name' | tee /dev/stderr)
+  [ "${actual}" = "release-name-vault" ]
+}
+
+@test "server/ingress: k8s 1.18.3 uses regular service when not ha - yaml" {
+  cd `chart_dir`
+
+  local actual=$(helm template \
+      --show-only templates/server-ingress.yaml \
+      --set 'server.ingress.enabled=true' \
+      --set 'server.dev.enabled=false' \
+      --set 'server.ha.enabled=false' \
+      --set 'server.service.enabled=true' \
+      --kube-version 1.18.3 \
+      . | tee /dev/stderr |
       yq -r '.spec.rules[0].http.paths[0].backend.serviceName' | tee /dev/stderr)
-  [ "${actual}" = "RELEASE-NAME-vault" ]
+  [ "${actual}" = "release-name-vault" ]
+}
+
+@test "server/ingress: uses regular service when not ha and activeService is true - yaml" {
+  cd `chart_dir`
+
+  local actual=$(helm template \
+      --show-only templates/server-ingress.yaml \
+      --set 'server.ingress.enabled=true' \
+      --set 'server.ingress.activeService=true' \
+      --set 'server.dev.enabled=false' \
+      --set 'server.ha.enabled=false' \
+      --set 'server.service.enabled=true' \
+      . | tee /dev/stderr |
+      yq -r '.spec.rules[0].http.paths[0].backend.service.name' | tee /dev/stderr)
+  [ "${actual}" = "release-name-vault" ]
+}
+
+@test "server/ingress: pathType is added to Kubernetes version == 1.19.0" {
+  cd `chart_dir`
+
+  local actual=$(helm template \
+      --show-only templates/server-ingress.yaml \
+      --set 'server.ingress.enabled=true' \
+      --set server.ingress.pathType=ImplementationSpecific \
+      --kube-version 1.19.0 \
+      . | tee /dev/stderr |
+      yq -r '.spec.rules[0].http.paths[0].pathType' | tee /dev/stderr)
+  [ "${actual}" = "ImplementationSpecific" ]
+}
+
+@test "server/ingress: pathType is not added to Kubernetes versions < 1.19" {
+  cd `chart_dir`
+
+  local actual=$(helm template \
+      --show-only templates/server-ingress.yaml \
+      --set 'server.ingress.enabled=true' \
+      --set server.ingress.pathType=ImplementationSpecific \
+      --kube-version 1.18.3 \
+      . | tee /dev/stderr |
+      yq -r '.spec.rules[0].http.paths[0].pathType' | tee /dev/stderr)
+  [ "${actual}" = "null" ]
+}
+
+@test "server/ingress: pathType is added to Kubernetes versions > 1.19" {
+  cd `chart_dir`
+
+  local actual=$(helm template \
+      --show-only templates/server-ingress.yaml \
+      --set 'server.ingress.enabled=true' \
+      --set server.ingress.pathType=Prefix \
+      --kube-version 1.20.0 \
+      . | tee /dev/stderr |
+      yq -r '.spec.rules[0].http.paths[0].pathType' | tee /dev/stderr)
+  [ "${actual}" = "Prefix" ]
 }

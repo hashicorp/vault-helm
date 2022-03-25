@@ -1,6 +1,7 @@
 {{ template "vault.mode" . }}
 {{- if ne .mode "external" }}
-{{- if and (eq (.Values.server.service.enabled | toString) "true" ) (eq (.Values.global.enabled | toString) "true") }}
+{{- template "vault.serverServiceEnabled" . -}}
+{{- if .serverServiceEnabled -}}
 # Service for Vault cluster
 apiVersion: v1
 kind: Service
@@ -16,7 +17,7 @@ metadata:
 {{ template "vault.service.annotations" .}}
 spec:
   clusterIP: None
-  publishNotReadyAddresses: true
+  publishNotReadyAddresses: {{ .Values.server.service.publishNotReadyAddresses }}
   ports:
     - name: "{{ include "vault.scheme" . }}"
       port: {{ .Values.server.service.port }}

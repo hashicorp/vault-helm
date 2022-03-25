@@ -1,0 +1,27 @@
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: nginx
+---
+kind: Pod
+apiVersion: v1
+metadata:
+  name: nginx
+spec:
+  terminationGracePeriodSeconds: 0
+  serviceAccountName: nginx
+  containers:
+  - image: docker.mirror.hashicorp.services/nginx
+    name: nginx
+    volumeMounts:
+    - name: secrets-store-inline
+      mountPath: "/mnt/secrets-store"
+      readOnly: true
+  volumes:
+    - name: secrets-store-inline
+      csi:
+        driver: secrets-store.csi.k8s.io
+        readOnly: true
+        volumeAttributes:
+          secretProviderClass: "vault-kv"
