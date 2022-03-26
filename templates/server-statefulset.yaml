@@ -109,7 +109,6 @@ spec:
               valueFrom:
                 fieldRef:
                   fieldPath: metadata.name
-
             - name: VAULT_CLUSTER_ADDR
               {{- if .Values.server.ha.clusterAddr }}
               value: {{ .Values.server.ha.clusterAddr }}
