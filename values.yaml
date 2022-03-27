@@ -682,7 +682,7 @@ server:
 
     # Set the cluster_addr confuguration for Vault HA
     # See https://www.vaultproject.io/docs/configuration#cluster_addr
-    # If set to nul, this will be set to https://$(HOSTNAME).{{ template "vault.fullname" . }}-internal:8201
+    # If set to null, this will be set to https://$(HOSTNAME).{{ template "vault.fullname" . }}-internal:8201
     clusterAddr: null
 
     # Enables Vault's integrated Raft storage.  Unlike the typical HA modes where
