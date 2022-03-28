@@ -566,7 +566,10 @@
                             ]
                         },
                         "config": {
-                            "type": "string"
+                            "type": [
+                                "string",
+                                "object"
+                            ]
                         },
                         "disruptionBudget": {
                             "type": "object",
@@ -589,7 +592,10 @@
                             "type": "object",
                             "properties": {
                                 "config": {
-                                    "type": "string"
+                                    "type": [
+                                        "string",
+                                        "object"
+                                    ]
                                 },
                                 "enabled": {
                                     "type": "boolean"
@@ -822,7 +828,10 @@
                     "type": "object",
                     "properties": {
                         "config": {
-                            "type": "string"
+                            "type": [
+                                "string",
+                                "object"
+                            ]
                         },
                         "enabled": {
                             "type": [
