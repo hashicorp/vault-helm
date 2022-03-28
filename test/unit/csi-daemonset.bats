@@ -27,7 +27,30 @@ load _helpers
       --set "global.enabled=false" \
       . || echo "---") | tee /dev/stderr |
       yq 'length > 0' | tee /dev/stderr)
-  [ "${actual}" = "false" ]
+  [ "${actual}" = "true" ]
+}
+
+# priorityClassName
+
+@test "csi/daemonset: priorityClassName not set by default" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      --show-only templates/csi-daemonset.yaml  \
+      --set "csi.enabled=true" \
+      . | tee /dev/stderr |
+      yq '.spec.template.spec | .priorityClassName? == null' | tee /dev/stderr)
+  [ "${actual}" = "true" ]
+}
+
+@test "csi/daemonset: priorityClassName can be set" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      --show-only templates/csi-daemonset.yaml  \
+      --set 'csi.priorityClassName=armaggeddon' \
+      --set "csi.enabled=true" \
+      . | tee /dev/stderr |
+      yq '.spec.template.spec | .priorityClassName == "armaggeddon"' | tee /dev/stderr)
+  [ "${actual}" = "true" ]
 }
 
 # serviceAccountName reference name
@@ -38,7 +61,7 @@ load _helpers
       --set "csi.enabled=true" \
       . | tee /dev/stderr |
       yq -r '.spec.template.spec.serviceAccountName' | tee /dev/stderr)
-  [ "${actual}" = "RELEASE-NAME-vault-csi-provider" ]
+  [ "${actual}" = "release-name-vault-csi-provider" ]
 }
 
 # Image
@@ -296,6 +319,32 @@ load _helpers
 }
 
 #--------------------------------------------------------------------
+# Extra Labels
+
+@test "csi/daemonset: specify csi.daemonSet.extraLabels" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      --show-only templates/csi-daemonset.yaml \
+      --set 'csi.enabled=true' \
+      --set 'csi.daemonSet.extraLabels.foo=bar' \
+      . | tee /dev/stderr |
+      yq -r '.metadata.labels.foo' | tee /dev/stderr)
+  [ "${actual}" = "bar" ]
+}
+
+@test "csi/daemonset: specify csi.pod.extraLabels" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      --show-only templates/csi-daemonset.yaml \
+      --set 'csi.enabled=true' \
+      --set 'csi.pod.extraLabels.foo=bar' \
+      . | tee /dev/stderr |
+      yq -r '.spec.template.metadata.labels.foo' | tee /dev/stderr)
+  [ "${actual}" = "bar" ]
+}
+
+
+#--------------------------------------------------------------------
 # volumes
 
 @test "csi/daemonset: csi.volumes adds volume" {
@@ -313,6 +362,68 @@ load _helpers
   local actual=$(echo $object |
       yq -r '.emptyDir' | tee /dev/stderr)
   [ "${actual}" = "{}" ]
+}
+
+@test "csi/daemonset: csi providersDir default" {
+  cd `chart_dir`
+
+  # Test that it defines it
+  local object=$(helm template \
+      --show-only templates/csi-daemonset.yaml  \
+      --set 'csi.enabled=true' \
+      . | tee /dev/stderr |
+      yq -r '.spec.template.spec.volumes[] | select(.name == "providervol")' | tee /dev/stderr)
+
+  local actual=$(echo $object |
+      yq -r '.hostPath.path' | tee /dev/stderr)
+  [ "${actual}" = "/etc/kubernetes/secrets-store-csi-providers" ]
+}
+
+@test "csi/daemonset: csi kubeletRootDir default" {
+  cd `chart_dir`
+
+  # Test that it defines it
+  local object=$(helm template \
+      --show-only templates/csi-daemonset.yaml  \
+      --set 'csi.enabled=true' \
+      . | tee /dev/stderr |
+      yq -r '.spec.template.spec.volumes[] | select(.name == "mountpoint-dir")' | tee /dev/stderr)
+
+  local actual=$(echo $object |
+      yq -r '.hostPath.path' | tee /dev/stderr)
+  [ "${actual}" = "/var/lib/kubelet/pods" ]
+}
+
+@test "csi/daemonset: csi providersDir override " {
+  cd `chart_dir`
+
+  # Test that it defines it
+  local object=$(helm template \
+      --show-only templates/csi-daemonset.yaml  \
+      --set 'csi.enabled=true' \
+      --set 'csi.daemonSet.providersDir=/alt/csi-prov-dir' \
+      . | tee /dev/stderr |
+      yq -r '.spec.template.spec.volumes[] | select(.name == "providervol")' | tee /dev/stderr)
+
+  local actual=$(echo $object |
+      yq -r '.hostPath.path' | tee /dev/stderr)
+  [ "${actual}" = "/alt/csi-prov-dir" ]
+}
+
+@test "csi/daemonset: csi kubeletRootDir override" {
+  cd `chart_dir`
+
+  # Test that it defines it
+  local object=$(helm template \
+      --show-only templates/csi-daemonset.yaml  \
+      --set 'csi.enabled=true' \
+      --set 'csi.daemonSet.kubeletRootDir=/alt/kubelet-root' \
+      . | tee /dev/stderr |
+      yq -r '.spec.template.spec.volumes[] | select(.name == "mountpoint-dir")' | tee /dev/stderr)
+
+  local actual=$(echo $object |
+      yq -r '.hostPath.path' | tee /dev/stderr)
+  [ "${actual}" = "/alt/kubelet-root/pods" ]
 }
 
 #--------------------------------------------------------------------

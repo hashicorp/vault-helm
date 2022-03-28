@@ -1,6 +1,8 @@
 {{ template "vault.mode" . }}
 {{- if ne .mode "external" }}
-{{- if and (ne .mode "") (eq (.Values.global.enabled | toString) "true") }}
+{{- if ne .mode "" }}
+{{- template "vault.serverEnabled" . -}}
+{{- if .serverEnabled -}}
 # StatefulSet to run the actual vault server cluster.
 apiVersion: apps/v1
 kind: StatefulSet
@@ -41,7 +43,7 @@ spec:
       {{- if .Values.server.priorityClassName }}
       priorityClassName: {{ .Values.server.priorityClassName }}
       {{- end }}
-      terminationGracePeriodSeconds: 10
+      terminationGracePeriodSeconds: {{ .Values.server.terminationGracePeriodSeconds }}
       serviceAccountName: {{ template "vault.serviceAccount.name" . }}
       {{ if  .Values.server.shareProcessNamespace }}
       shareProcessNamespace: true
@@ -204,5 +206,6 @@ spec:
         {{- end }}
       {{- include "imagePullSecrets" . | nindent 6 }}
   {{ template "vault.volumeclaims" . }}
+{{ end }}
 {{ end }}
 {{ end }}

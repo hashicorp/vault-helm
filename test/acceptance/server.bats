@@ -13,9 +13,7 @@ load _helpers
   wait_for_running $(name_prefix)-0
 
   # Sealed, not initialized
-  local sealed_status=$(kubectl exec "$(name_prefix)-0" -- vault status -format=json |
-    jq -r '.sealed' )
-  [ "${sealed_status}" == "true" ]
+  wait_for_sealed_vault $(name_prefix)-0
 
   local init_status=$(kubectl exec "$(name_prefix)-0" -- vault status -format=json |
     jq -r '.initialized')

@@ -32,6 +32,50 @@ Expand the name of the chart.
 {{- end -}}
 
 {{/*
+Compute if the csi driver is enabled.
+*/}}
+{{- define "vault.csiEnabled" -}}
+{{- $_ := set . "csiEnabled" (or
+  (eq (.Values.csi.enabled | toString) "true")
+  (and (eq (.Values.csi.enabled | toString) "-") (eq (.Values.global.enabled | toString) "true"))) -}}
+{{- end -}}
+
+{{/*
+Compute if the injector is enabled.
+*/}}
+{{- define "vault.injectorEnabled" -}}
+{{- $_ := set . "injectorEnabled" (or
+  (eq (.Values.injector.enabled | toString) "true")
+  (and (eq (.Values.injector.enabled | toString) "-") (eq (.Values.global.enabled | toString) "true"))) -}}
+{{- end -}}
+
+{{/*
+Compute if the server is enabled.
+*/}}
+{{- define "vault.serverEnabled" -}}
+{{- $_ := set . "serverEnabled" (or
+  (eq (.Values.server.enabled | toString) "true")
+  (and (eq (.Values.server.enabled | toString) "-") (eq (.Values.global.enabled | toString) "true"))) -}}
+{{- end -}}
+
+{{/*
+Compute if the server service is enabled.
+*/}}
+{{- define "vault.serverServiceEnabled" -}}
+{{- template "vault.serverEnabled" . -}}
+{{- $_ := set . "serverServiceEnabled" (and .serverEnabled (eq (.Values.server.service.enabled | toString) "true")) -}}
+{{- end -}}
+
+{{/*
+Compute if the ui is enabled.
+*/}}
+{{- define "vault.uiEnabled" -}}
+{{- $_ := set . "uiEnabled" (or
+  (eq (.Values.ui.enabled | toString) "true")
+  (and (eq (.Values.ui.enabled | toString) "-") (eq (.Values.global.enabled | toString) "true"))) -}}
+{{- end -}}
+
+{{/*
 Compute the maximum number of unavailable replicas for the PodDisruptionBudget.
 This defaults to (n/2)-1 where n is the number of members of the server cluster.
 Add a special case for replicas=1, where it should default to 0 as well.
@@ -51,9 +95,10 @@ Set the variable 'mode' to the server mode requested by the user to simplify
 template logic.
 */}}
 {{- define "vault.mode" -}}
+  {{- template "vault.serverEnabled" . -}}
   {{- if .Values.injector.externalVaultAddr -}}
     {{- $_ := set . "mode" "external" -}}
-  {{- else if ne (.Values.server.enabled | toString) "true" -}}
+  {{- else if not .serverEnabled -}}
     {{- $_ := set . "mode" "external" -}}
   {{- else if eq (.Values.server.dev.enabled | toString) "true" -}}
     {{- $_ := set . "mode" "dev" -}}
@@ -309,6 +354,21 @@ Sets the injector node selector for pod placement
 {{- end -}}
 
 {{/*
+Sets the injector deployment update strategy
+*/}}
+{{- define "injector.strategy" -}}
+  {{- if .Values.injector.strategy }}
+  strategy:
+  {{- $tp := typeOf .Values.injector.strategy }}
+  {{- if eq $tp "string" }}
+    {{ tpl .Values.injector.strategy . | nindent 4 | trim }}
+  {{- else }}
+    {{- toYaml .Values.injector.strategy | nindent 4 }}
+  {{- end }}
+  {{- end }}
+{{- end -}}
+
+{{/*
 Sets extra pod annotations
 */}}
 {{- define "vault.annotations" -}}
@@ -357,13 +417,13 @@ Sets extra injector service annotations
 Sets extra injector webhook annotations
 */}}
 {{- define "injector.webhookAnnotations" -}}
-  {{- if .Values.injector.webhookAnnotations }}
+  {{- if or (((.Values.injector.webhook)).annotations) (.Values.injector.webhookAnnotations)  }}
   annotations:
-    {{- $tp := typeOf .Values.injector.webhookAnnotations }}
+    {{- $tp := typeOf (or (((.Values.injector.webhook)).annotations) (.Values.injector.webhookAnnotations)) }}
     {{- if eq $tp "string" }}
-      {{- tpl .Values.injector.webhookAnnotations . | nindent 4 }}
+      {{- tpl (((.Values.injector.webhook)).annotations | default .Values.injector.webhookAnnotations) . | nindent 4 }}
     {{- else }}
-      {{- toYaml .Values.injector.webhookAnnotations | nindent 4 }}
+      {{- toYaml (((.Values.injector.webhook)).annotations | default .Values.injector.webhookAnnotations) | nindent 4 }}
     {{- end }}
   {{- end }}
 {{- end -}}
@@ -654,4 +714,39 @@ imagePullSecrets:
 {{- end }}
 {{- end -}}
 {{- end -}}
+{{- end -}}
+
+{{/*
+externalTrafficPolicy sets a Service's externalTrafficPolicy if applicable.
+Supported inputs are Values.server.service and Values.ui
+*/}}
+{{- define "service.externalTrafficPolicy" -}}
+{{- $type := "" -}}
+{{- if .serviceType -}}
+{{- $type = .serviceType -}}
+{{- else if .type -}}
+{{- $type = .type -}}
+{{- end -}}
+{{- if and .externalTrafficPolicy (or (eq $type "LoadBalancer") (eq $type "NodePort")) }}
+  externalTrafficPolicy: {{ .externalTrafficPolicy }}
+{{- else }}
+{{- end }}
+{{- end -}}
+
+{{/*
+loadBalancer configuration for the the UI service.
+Supported inputs are Values.ui
+*/}}
+{{- define "service.loadBalancer" -}}
+{{- if  eq (.serviceType | toString) "LoadBalancer" }}
+{{- if .loadBalancerIP }}
+  loadBalancerIP: {{ .loadBalancerIP }}
+{{- end }}
+{{- with .loadBalancerSourceRanges }}
+  loadBalancerSourceRanges:
+{{- range . }}
+  - {{ . }}
+{{- end }}
+{{- end -}}
+{{- end }}
 {{- end -}}

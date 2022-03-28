@@ -428,7 +428,7 @@ load _helpers
 
   local value=$(echo $object |
       yq -r 'map(select(.name=="VAULT_CLUSTER_ADDR")) | .[] .value' | tee /dev/stderr)
-  [ "${value}" = 'https://$(HOSTNAME).RELEASE-NAME-vault-internal:8201' ]
+  [ "${value}" = 'https://$(HOSTNAME).release-name-vault-internal:8201' ]
 }
 
 #--------------------------------------------------------------------

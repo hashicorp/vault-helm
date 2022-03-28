@@ -25,7 +25,7 @@ load _helpers
     owner=$(kubectl get configmaps vault-k8s-leader -o json | jq -r .metadata.ownerReferences\[0\].name)
     leader=$(kubectl get pods $owner -o json | jq -r .metadata.name)
     [ -n "${leader}" ] && [ "${leader}" != "null" ] && break
-    let "tries=tries+1"
+    ((++tries))
     sleep .5
   done
 

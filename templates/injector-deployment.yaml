@@ -1,4 +1,5 @@
-{{- if and (eq (.Values.injector.enabled | toString) "true" ) (eq (.Values.global.enabled | toString) "true") }}
+{{- template "vault.injectorEnabled" . -}}
+{{- if .injectorEnabled -}}
 # Deployment for the injector
 apiVersion: apps/v1
 kind: Deployment
@@ -17,6 +18,7 @@ spec:
       app.kubernetes.io/name: {{ template "vault.name" . }}-agent-injector
       app.kubernetes.io/instance: {{ .Release.Name }}
       component: webhook
+  {{ template "injector.strategy" . }}
   template:
     metadata:
       labels:
@@ -109,6 +111,10 @@ spec:
               value: "{{ .Values.injector.agentDefaults.template }}"
             - name: AGENT_INJECT_TEMPLATE_CONFIG_EXIT_ON_RETRY_FAILURE
               value: "{{ .Values.injector.agentDefaults.templateConfig.exitOnRetryFailure }}"
+            {{- if .Values.injector.agentDefaults.templateConfig.staticSecretRenderInterval }}
+            - name: AGENT_INJECT_TEMPLATE_STATIC_SECRET_RENDER_INTERVAL
+              value: "{{ .Values.injector.agentDefaults.templateConfig.staticSecretRenderInterval }}"
+            {{- end }}
             {{- include "vault.extraEnvironmentVars" .Values.injector | nindent 12 }}
             - name: POD_NAME
               valueFrom:
