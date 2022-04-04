@@ -1,6 +1,5 @@
 {{ template "vault.mode" . }}
 {{- if ne .mode "external" }}
-{{- template "vault.serverEnabled" . -}}
 {{- if .serverEnabled -}}
 {{- if eq .mode "ha" }}
 apiVersion: rbac.authorization.k8s.io/v1
