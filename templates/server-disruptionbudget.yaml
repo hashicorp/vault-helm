@@ -5,7 +5,7 @@
 {{- if and (eq .mode "ha") (eq (.Values.server.ha.disruptionBudget.enabled | toString) "true") -}}
 # PodDisruptionBudget to prevent degrading the server cluster through
 # voluntary cluster changes.
-apiVersion: policy/v1beta1
+apiVersion: {{ ge .Capabilities.KubeVersion.Minor "21" | ternary "policy/v1" "policy/v1beta1" }}
 kind: PodDisruptionBudget
 metadata:
   name: {{ template "vault.fullname" . }}
