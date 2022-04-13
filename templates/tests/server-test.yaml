@@ -1,6 +1,5 @@
 {{ template "vault.mode" . }}
 {{- if ne .mode "external" }}
-{{- template "vault.serverEnabled" . -}}
 {{- if .serverEnabled -}}
 apiVersion: v1
 kind: Pod

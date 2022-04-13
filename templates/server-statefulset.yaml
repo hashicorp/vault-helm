@@ -1,7 +1,6 @@
 {{ template "vault.mode" . }}
 {{- if ne .mode "external" }}
 {{- if ne .mode "" }}
-{{- template "vault.serverEnabled" . -}}
 {{- if .serverEnabled -}}
 # StatefulSet to run the actual vault server cluster.
 apiVersion: apps/v1
