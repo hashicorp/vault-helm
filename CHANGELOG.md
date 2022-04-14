@@ -11,6 +11,7 @@ Improvements:
 * CSI: Set `extraLabels` for daemonset, pods, and service account [GH-690](https://github.com/hashicorp/vault-helm/pull/690)
 * Add namespace to injector-leader-elector role, rolebinding and secret [GH-683](https://github.com/hashicorp/vault-helm/pull/683)
 * Support policy/v1 PodDisruptionBudget in Kubernetes 1.21+ for server and injector [GH-710](https://github.com/hashicorp/vault-helm/pull/710)
+* Make the Cluster Address (CLUSTER_ADDR) configurable [GH-629](https://github.com/hashicorp/vault-helm/pull/709)
 
 ## 0.19.0 (January 20th, 2022)
 
