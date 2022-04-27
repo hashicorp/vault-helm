@@ -17,7 +17,7 @@ check_skip_csi() {
   kubectl create namespace acceptance
 
   # Install Secrets Store CSI driver
-  CSI_DRIVER_VERSION=1.1.2
+  CSI_DRIVER_VERSION=1.0.0
   helm install secrets-store-csi-driver https://kubernetes-sigs.github.io/secrets-store-csi-driver/charts/secrets-store-csi-driver-${CSI_DRIVER_VERSION}.tgz?raw=true \
     --wait --timeout=5m \
     --namespace=acceptance \
