@@ -14,6 +14,15 @@
                                 "string"
                             ]
                         },
+                        "extraLabels": {
+                            "type": "object"
+                        },
+                        "kubeletRootDir": {
+                            "type": "string"
+                        },
+                        "providersDir": {
+                            "type": "string"
+                        },
                         "updateStrategy": {
                             "type": "object",
                             "properties": {
@@ -24,20 +33,20 @@
                                     "type": "string"
                                 }
                             }
-                        },
-                        "providersDir": {
-                          "type": "string"
-                        },
-                        "kubeletRootDir": {
-                          "type": "string"
                         }
                     }
+                },
+                "priorityClassName": {
+                    "type": "string"
                 },
                 "debug": {
                     "type": "boolean"
                 },
                 "enabled": {
-                    "type": "boolean"
+                    "type": [
+                        "boolean",
+                        "string"
+                    ]
                 },
                 "extraArgs": {
                     "type": "array"
@@ -85,6 +94,9 @@
                                 "string"
                             ]
                         },
+                        "extraLabels": {
+                            "type": "object"
+                        },
                         "tolerations": {
                             "type": [
                                 "null",
@@ -125,6 +137,9 @@
                                 "object",
                                 "string"
                             ]
+                        },
+                        "extraLabels": {
+                            "type": "object"
                         }
                     }
                 },
@@ -254,7 +269,10 @@
                     }
                 },
                 "enabled": {
-                    "type": "boolean"
+                    "type": [
+                        "boolean",
+                        "string"
+                    ]
                 },
                 "externalVaultAddr": {
                     "type": "string"
@@ -320,6 +338,9 @@
                 "objectSelector": {
                     "type": "object"
                 },
+                "podDisruptionBudget": {
+                    "type": "object"
+                },
                 "port": {
                     "type": "integer"
                 },
@@ -346,6 +367,12 @@
                         }
                     }
                 },
+                "strategy": {
+                    "type": [
+                        "object",
+                        "string"
+                    ]
+                },
                 "tolerations": {
                     "type": [
                         "null",
@@ -359,6 +386,32 @@
                         "array",
                         "string"
                     ]
+                },
+                "webhook": {
+                    "type": "object",
+                    "properties": {
+                        "annotations": {
+                            "type": [
+                                "object",
+                                "string"
+                            ]
+                        },
+                        "failurePolicy": {
+                            "type": "string"
+                        },
+                        "matchPolicy": {
+                            "type": "string"
+                        },
+                        "namespaceSelector": {
+                            "type": "object"
+                        },
+                        "objectSelector": {
+                            "type": "object"
+                        },
+                        "timeoutSeconds": {
+                            "type": "integer"
+                        }
+                    }
                 },
                 "webhookAnnotations": {
                     "type": [
@@ -467,7 +520,10 @@
                     }
                 },
                 "enabled": {
-                    "type": "boolean"
+                    "type": [
+                        "boolean",
+                        "string"
+                    ]
                 },
                 "enterpriseLicense": {
                     "type": "object",
@@ -517,7 +573,10 @@
                             ]
                         },
                         "config": {
-                            "type": "string"
+                            "type": [
+                                "string",
+                                "object"
+                            ]
                         },
                         "disruptionBudget": {
                             "type": "object",
@@ -540,7 +599,10 @@
                             "type": "object",
                             "properties": {
                                 "config": {
-                                    "type": "string"
+                                    "type": [
+                                        "string",
+                                        "object"
+                                    ]
                                 },
                                 "enabled": {
                                     "type": "boolean"
@@ -606,6 +668,9 @@
                         },
                         "labels": {
                             "type": "object"
+                        },
+                        "pathType": {
+                            "type": "string"
                         },
                         "tls": {
                             "type": "array"
@@ -732,6 +797,12 @@
                         "enabled": {
                             "type": "boolean"
                         },
+                        "publishNotReadyAddresses": {
+                            "type": "boolean"
+                        },
+                        "externalTrafficPolicy": {
+                            "type": "string"
+                        },
                         "port": {
                             "type": "integer"
                         },
@@ -764,7 +835,10 @@
                     "type": "object",
                     "properties": {
                         "config": {
-                            "type": "string"
+                            "type": [
+                                "string",
+                                "object"
+                            ]
                         },
                         "enabled": {
                             "type": [
@@ -784,6 +858,9 @@
                             ]
                         }
                     }
+                },
+                "terminationGracePeriodSeconds": {
+                    "type": "integer"
                 },
                 "tolerations": {
                     "type": [
@@ -822,10 +899,16 @@
                     ]
                 },
                 "enabled": {
-                    "type": "boolean"
+                    "type": [
+                        "boolean",
+                        "string"
+                    ]
                 },
                 "externalPort": {
                     "type": "integer"
+                },
+                "externalTrafficPolicy": {
+                    "type": "string"
                 },
                 "publishNotReadyAddresses": {
                     "type": "boolean"

@@ -11,9 +11,7 @@ load _helpers
   wait_for_running $(name_prefix)-0
 
   # Sealed, not initialized
-  local sealed_status=$(kubectl exec "$(name_prefix)-0" -- vault status -format=json |
-    jq -r '.sealed' )
-  [ "${sealed_status}" == "true" ]
+  wait_for_sealed_vault $(name_prefix)-0
 
   local init_status=$(kubectl exec "$(name_prefix)-0" -- vault status -format=json |
     jq -r '.initialized')
@@ -112,6 +110,10 @@ setup() {
 teardown() {
   if [[ ${CLEANUP:-true} == "true" ]]
   then
+      # If the test failed, print some debug output
+      if [[ "$BATS_ERROR_STATUS" -ne 0 ]]; then
+          kubectl logs -l app.kubernetes.io/name=vault
+      fi
       helm delete vault
       kubectl delete --all pvc
       kubectl delete namespace acceptance --ignore-not-found=true

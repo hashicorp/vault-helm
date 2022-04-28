@@ -13,12 +13,13 @@ rules to get in the way of that.
 That said, if you want to ensure that a pull request is likely to be merged,
 talk to us! You can find out our thoughts and ensure that your contribution
 won't clash or be obviated by Vault's normal direction. A great way to do this
-is via the [Vault Google Group][2]. Sometimes Vault devs are in `#vault-tool`
-on Freenode, too.
+is via the [Vault Discussion Forum][1].
 
 This document will cover what we're looking for in terms of reporting issues.
 By addressing all the points we're looking for, it raises the chances we can
 quickly merge or address your contributions.
+
+[1]: https://discuss.hashicorp.com/c/vault
 
 ## Issues
 
@@ -237,3 +238,10 @@ Here are some examples of common test patterns:
     ```
     Here we are check the length of the command output to see if the anything is rendered.
     This style can easily be switched to check that a file is rendered instead.
+
+## Contributor License Agreement
+
+We require that all contributors sign our Contributor License Agreement ("CLA")
+before we can accept the contribution.
+
+[Learn more about why HashiCorp requires a CLA and what the CLA includes](https://www.hashicorp.com/cla)

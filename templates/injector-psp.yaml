@@ -1,4 +1,6 @@
-{{- if and (eq (.Values.injector.enabled | toString) "true" ) (eq (.Values.global.enabled | toString) "true") (eq (.Values.global.psp.enable | toString) "true") }}
+{{- template "vault.injectorEnabled" . -}}
+{{- if .injectorEnabled -}}
+{{- if eq (.Values.global.psp.enable | toString) "true" }}
 apiVersion: policy/v1beta1
 kind: PodSecurityPolicy
 metadata:
@@ -40,4 +42,5 @@ spec:
       - min: 1
         max: 65535
   readOnlyRootFilesystem: false
+{{- end }}
 {{- end }}

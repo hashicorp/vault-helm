@@ -1,6 +1,8 @@
 {{ template "vault.mode" . }}
 {{- if ne .mode "external" }}
-{{- if and (eq .mode "ha" ) (eq (.Values.server.service.enabled | toString) "true" ) (eq (.Values.global.enabled | toString) "true") }}
+{{- template "vault.serverServiceEnabled" . -}}
+{{- if .serverServiceEnabled -}}
+{{- if eq .mode "ha" }}
 # Service for standby Vault pod
 apiVersion: v1
 kind: Service
@@ -22,7 +24,7 @@ spec:
   clusterIP: {{ .Values.server.service.clusterIP }}
   {{- end }}
   {{- include "service.externalTrafficPolicy" .Values.server.service }}
-  publishNotReadyAddresses: true
+  publishNotReadyAddresses: {{ .Values.server.service.publishNotReadyAddresses }}
   ports:
     - name: {{ include "vault.scheme" . }}
       port: {{ .Values.server.service.port }}
@@ -38,5 +40,6 @@ spec:
     app.kubernetes.io/instance: {{ .Release.Name }}
     component: server
     vault-active: "false"
+{{- end }}
 {{- end }}
 {{- end }}

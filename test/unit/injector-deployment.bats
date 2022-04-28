@@ -26,10 +26,20 @@ load _helpers
   local actual=$( (helm template \
       --show-only templates/injector-deployment.yaml  \
       --set 'global.enabled=false' \
-      --set 'injector.enabled=true' \
       . || echo "---") | tee /dev/stderr |
       yq 'length > 0' | tee /dev/stderr)
   [ "${actual}" = "false" ]
+}
+
+@test "injector/deployment: enable with injector.enabled true and global.enabled false" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      --show-only templates/injector-deployment.yaml  \
+      --set 'injector.enabled=true' \
+      --set 'global.enabled=false' \
+      . | tee /dev/stderr |
+      yq 'length > 0' | tee /dev/stderr)
+  [ "${actual}" = "true" ]
 }
 
 @test "injector/deployment: image defaults to injector.image" {
@@ -157,7 +167,7 @@ load _helpers
 
   local value=$(echo $object |
       yq -r 'map(select(.name=="AGENT_INJECT_TLS_AUTO")) | .[] .value' | tee /dev/stderr)
-  [ "${value}" = "RELEASE-NAME-vault-agent-injector-cfg" ]
+  [ "${value}" = "release-name-vault-agent-injector-cfg" ]
 
   # helm template does uses current context namespace and ignores namespace flags, so
   # discover the targeted namespace so we can check the rendered value correctly.
@@ -165,7 +175,7 @@ load _helpers
 
   local value=$(echo $object |
       yq -r 'map(select(.name=="AGENT_INJECT_TLS_AUTO_HOSTS")) | .[] .value' | tee /dev/stderr)
-  [ "${value}" = "RELEASE-NAME-vault-agent-injector-svc,RELEASE-NAME-vault-agent-injector-svc.${namespace:-default},RELEASE-NAME-vault-agent-injector-svc.${namespace:-default}.svc" ]
+  [ "${value}" = "release-name-vault-agent-injector-svc,release-name-vault-agent-injector-svc.${namespace:-default},release-name-vault-agent-injector-svc.${namespace:-default}.svc" ]
 }
 
 @test "injector/deployment: manual TLS adds volume mount" {
@@ -741,4 +751,33 @@ load _helpers
   local value=$(echo $object |
       yq -r 'map(select(.name=="AGENT_INJECT_TEMPLATE_STATIC_SECRET_RENDER_INTERVAL")) | .[] .value' | tee /dev/stderr)
   [ "${value}" = "1m" ]
+}
+
+@test "injector/deployment: strategy default" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      --show-only templates/injector-deployment.yaml  \
+      . | tee /dev/stderr |
+      yq -r '.spec.strategy' | tee /dev/stderr)
+  [ "${actual}" = "null" ]
+}
+
+@test "injector/deployment: strategy set as string" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      --show-only templates/injector-deployment.yaml  \
+      --set="injector.strategy=testing"  \
+      . | tee /dev/stderr |
+      yq -r '.spec.strategy' | tee /dev/stderr)
+  [ "${actual}" = "testing" ]
+}
+
+@test "injector/deployment: strategy can be set as YAML" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      --show-only templates/injector-deployment.yaml \
+      --set 'injector.strategy.rollingUpdate.maxUnavailable=1' \
+      . | tee /dev/stderr |
+      yq -r '.spec.strategy.rollingUpdate.maxUnavailable' | tee /dev/stderr)
+  [ "${actual}" = "1" ]
 }

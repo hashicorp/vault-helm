@@ -1,5 +1,6 @@
 {{ template "vault.mode" . }}
-{{- if and (ne .mode "") (eq (.Values.global.enabled | toString) "true") (eq (.Values.server.authDelegator.enabled | toString) "true") }}
+{{- if .serverEnabled -}}
+{{- if and (ne .mode "") (eq (.Values.server.authDelegator.enabled | toString) "true") }}
 {{- if .Capabilities.APIVersions.Has "rbac.authorization.k8s.io/v1" -}}
 apiVersion: rbac.authorization.k8s.io/v1
 {{- else }}
@@ -21,4 +22,5 @@ subjects:
 - kind: ServiceAccount
   name: {{ template "vault.serviceAccount.name" . }}
   namespace: {{ .Release.Namespace }}
+{{ end }}
 {{ end }}
