@@ -380,6 +380,13 @@
                         "string"
                     ]
                 },
+                "topologySpreadConstraints": {
+                    "type": [
+                        "null",
+                        "array",
+                        "string"
+                    ]
+                },
                 "webhook": {
                     "type": "object",
                     "properties": {

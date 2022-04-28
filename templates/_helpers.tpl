@@ -294,6 +294,37 @@ Sets the injector affinity for pod placement
 {{- end -}}
 
 {{/*
+Sets the topologySpreadConstraints when running in standalone and HA modes.
+*/}}
+{{- define "vault.topologySpreadConstraints" -}}
+  {{- if and (ne .mode "dev") .Values.server.topologySpreadConstraints }}
+      topologySpreadConstraints:
+        {{ $tp := typeOf .Values.server.topologySpreadConstraints }}
+        {{- if eq $tp "string" }}
+          {{- tpl .Values.server.topologySpreadConstraints . | nindent 8 | trim }}
+        {{- else }}
+          {{- toYaml .Values.server.topologySpreadConstraints | nindent 8 }}
+        {{- end }}
+  {{ end }}
+{{- end -}}
+
+
+{{/*
+Sets the injector topologySpreadConstraints for pod placement
+*/}}
+{{- define "injector.topologySpreadConstraints" -}}
+  {{- if .Values.injector.topologySpreadConstraints }}
+      topologySpreadConstraints:
+        {{ $tp := typeOf .Values.injector.topologySpreadConstraints }}
+        {{- if eq $tp "string" }}
+          {{- tpl .Values.injector.topologySpreadConstraints . | nindent 8 | trim }}
+        {{- else }}
+          {{- toYaml .Values.injector.topologySpreadConstraints | nindent 8 }}
+        {{- end }}
+  {{ end }}
+{{- end -}}
+
+{{/*
 Sets the toleration for pod placement when running in standalone and HA modes.
 */}}
 {{- define "vault.tolerations" -}}
