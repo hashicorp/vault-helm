@@ -18,8 +18,7 @@ check_skip_csi() {
 
   # Install Secrets Store CSI driver
   CSI_DRIVER_VERSION=1.0.0
-  helm install secrets-store-csi-driver secrets-store-csi-driver --repo https://kubernetes-sigs.github.io/secrets-store-csi-driver/charts \
-    --version="${CSI_DRIVER_VERSION}"
+  helm install secrets-store-csi-driver https://kubernetes-sigs.github.io/secrets-store-csi-driver/charts/secrets-store-csi-driver-${CSI_DRIVER_VERSION}.tgz?raw=true \
     --wait --timeout=5m \
     --namespace=acceptance \
     --set linux.image.pullPolicy="IfNotPresent" \
