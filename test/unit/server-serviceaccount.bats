@@ -67,7 +67,7 @@ load _helpers
 @test "server/ServiceAccount: disable with global.enabled false" {
   cd `chart_dir`
   local actual=$( (helm template \
-      --show-only templates/server-service.yaml  \
+      --show-only templates/server-serviceaccount.yaml  \
       --set 'server.dev.enabled=true' \
       --set 'global.enabled=false' \
       . || echo "---") | tee /dev/stderr |
@@ -75,7 +75,7 @@ load _helpers
   [ "${actual}" = "false" ]
 
   local actual=$( (helm template \
-      --show-only templates/server-service.yaml  \
+      --show-only templates/server-serviceaccount.yaml  \
       --set 'server.ha.enabled=true' \
       --set 'global.enabled=false' \
       . || echo "---") | tee /dev/stderr |
@@ -83,7 +83,7 @@ load _helpers
   [ "${actual}" = "false" ]
 
   local actual=$( (helm template \
-      --show-only templates/server-service.yaml  \
+      --show-only templates/server-serviceaccount.yaml  \
       --set 'server.standalone.enabled=true' \
       --set 'global.enabled=false' \
       . || echo "---") | tee /dev/stderr |
@@ -94,7 +94,7 @@ load _helpers
 @test "server/ServiceAccount: disable by injector.externalVaultAddr" {
   cd `chart_dir`
   local actual=$( (helm template \
-      --show-only templates/server-service.yaml  \
+      --show-only templates/server-serviceaccount.yaml  \
       --set 'server.dev.enabled=true' \
       --set 'injector.externalVaultAddr=http://vault-outside' \
       . || echo "---") | tee /dev/stderr |
@@ -102,7 +102,7 @@ load _helpers
   [ "${actual}" = "false" ]
 
   local actual=$( (helm template \
-      --show-only templates/server-service.yaml  \
+      --show-only templates/server-serviceaccount.yaml  \
       --set 'server.ha.enabled=true' \
       --set 'injector.externalVaultAddr=http://vault-outside' \
       . || echo "---") | tee /dev/stderr |
@@ -110,7 +110,7 @@ load _helpers
   [ "${actual}" = "false" ]
 
   local actual=$( (helm template \
-      --show-only templates/server-service.yaml  \
+      --show-only templates/server-serviceaccount.yaml  \
       --set 'server.standalone.enabled=true' \
       --set 'injector.externalVaultAddr=http://vault-outside' \
       . || echo "---") | tee /dev/stderr |
