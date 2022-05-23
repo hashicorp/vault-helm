@@ -59,6 +59,32 @@ Compute if the server is enabled.
 {{- end -}}
 
 {{/*
+Compute if the server auth delegator serviceaccount is enabled.
+*/}}
+{{- define "vault.serverServiceAccountEnabled" -}}
+{{- $_ := set . "serverServiceAccountEnabled"
+  (and
+    (eq (.Values.server.serviceAccount.create | toString) "true" )
+    (or
+      (eq (.Values.server.enabled | toString) "true")
+      (eq (.Values.global.enabled | toString) "true"))) -}}
+{{- end -}}
+
+{{/*
+Compute if the server auth delegator serviceaccount is enabled.
+*/}}
+{{- define "vault.serverAuthDelegator" -}}
+{{- $_ := set . "serverAuthDelegator"
+  (and
+    (eq (.Values.server.authDelegator.enabled | toString) "true" )
+    (or (eq (.Values.server.serviceAccount.create | toString) "true")
+        (not (eq .Values.server.serviceAccount.name "")))
+    (or
+      (eq (.Values.server.enabled | toString) "true")
+      (eq (.Values.global.enabled | toString) "true"))) -}}
+{{- end -}}
+
+{{/*
 Compute if the server service is enabled.
 */}}
 {{- define "vault.serverServiceEnabled" -}}

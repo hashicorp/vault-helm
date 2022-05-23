@@ -1,5 +1,8 @@
 ## Unreleased
 
+CHANGES:
+* `vault` service account is now created even if the server is set to disabled, as per before 0.20.0
+
 ## 0.20.0 (May 16th, 2022)
 
 CHANGES:
