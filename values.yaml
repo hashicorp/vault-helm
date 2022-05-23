@@ -91,7 +91,7 @@ injector:
   # Configures all Vault Agent sidecars to revoke their token when shutting down
   revokeOnShutdown: false
 
-  webhook: 
+  webhook:
     # Configures failurePolicy of the webhook. The "unspecified" default behaviour depends on the
     # API Version of the WebHook.
     # To block pod creation while webhook is unavailable, set the policy to `Fail` below.
@@ -99,7 +99,7 @@ injector:
     #
     failurePolicy: Ignore
 
-    # matchPolicy specifies the approach to accepting changes based on the rules of 
+    # matchPolicy specifies the approach to accepting changes based on the rules of
     # the MutatingWebhookConfiguration.
     # See https://kubernetes.io/docs/reference/access-authn-authz/extensible-admission-controllers/#matching-requests-matchpolicy
     # for more details.
@@ -113,7 +113,7 @@ injector:
     # for more details.
     #
     timeoutSeconds: 30
-    
+
     # namespaceSelector is the selector for restricting the webhook to only
     # specific namespaces.
     # See https://kubernetes.io/docs/reference/access-authn-authz/extensible-admission-controllers/#matching-requests-namespaceselector
@@ -132,7 +132,12 @@ injector:
     # objectSelector:
     #    matchLabels:
     #      vault-sidecar-injector: enabled
-    objectSelector: {}
+    objectSelector: |
+      matchExpressions:
+      - key: app.kubernetes.io/name
+        operator: NotIn
+        values:
+        - {{ template "vault.name" . }}-agent-injector
 
     # Extra annotations to attach to the webhook
     annotations: {}

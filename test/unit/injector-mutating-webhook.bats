@@ -301,15 +301,15 @@ load _helpers
   [ "${actual}" = "true" ]
 }
 
-@test "injector/MutatingWebhookConfiguration: webhook.objectSelector empty by default" {
+@test "injector/MutatingWebhookConfiguration: webhook.objectSelector not empty by default" {
   cd `chart_dir`
   local actual=$(helm template \
       --show-only templates/injector-mutating-webhook.yaml  \
       --set 'injector.enabled=true' \
       --namespace foo \
       . | tee /dev/stderr |
-      yq '.webhooks[0].objectSelector' | tee /dev/stderr)
-  [ "${actual}" = "null" ]
+      yq -r '.webhooks[0].objectSelector.matchExpressions[0].key' | tee /dev/stderr)
+  [ "${actual}" = "app.kubernetes.io/name" ]
 }
 
 @test "injector/MutatingWebhookConfiguration: can set webhook.objectSelector" {

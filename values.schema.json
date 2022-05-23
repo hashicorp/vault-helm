@@ -336,7 +336,10 @@
                     ]
                 },
                 "objectSelector": {
-                    "type": "object"
+                    "type": [
+                        "object",
+                        "string"
+                    ]
                 },
                 "podDisruptionBudget": {
                     "type": "object"
@@ -406,7 +409,10 @@
                             "type": "object"
                         },
                         "objectSelector": {
-                            "type": "object"
+                            "type": [
+                                "object",
+                                "string"
+                            ]
                         },
                         "timeoutSeconds": {
                             "type": "integer"
