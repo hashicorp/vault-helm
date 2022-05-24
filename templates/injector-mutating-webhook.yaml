@@ -35,8 +35,5 @@ webhooks:
     namespaceSelector:
 {{ toYaml (((.Values.injector.webhook)).namespaceSelector | default .Values.injector.namespaceSelector) | indent 6}}
 {{ end }}
-{{- if or (((.Values.injector.webhook)).objectSelector) (.Values.injector.objectSelector) }}
-    objectSelector:
-{{ toYaml (((.Values.injector.webhook)).objectSelector | default .Values.injector.objectSelector) | indent 6}}
-{{ end }}
+{{- template "injector.objectSelector" . -}}
 {{ end }}

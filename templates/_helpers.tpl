@@ -486,6 +486,22 @@ Sets extra injector webhook annotations
 {{- end -}}
 
 {{/*
+Set's the injector webhook objectSelector
+*/}}
+{{- define "injector.objectSelector" -}}
+  {{- $v := or (((.Values.injector.webhook)).objectSelector) (.Values.injector.objectSelector) -}}
+  {{ if $v }}
+    objectSelector:
+    {{- $tp := typeOf $v -}}
+    {{ if eq $tp "string" }}
+      {{ tpl $v . | indent 6 | trim }}
+    {{ else }}
+      {{ toYaml $v | indent 6 | trim }}
+    {{ end }}
+  {{ end }}
+{{ end }}
+
+{{/*
 Sets extra ui service annotations
 */}}
 {{- define "vault.ui.annotations" -}}
