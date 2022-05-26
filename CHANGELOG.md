@@ -1,8 +1,14 @@
 ## Unreleased
 
+## 0.20.1 (May 25th, 2022)
 CHANGES:
-* `vault` service account is now created even if the server is set to disabled, as per before 0.20.0 [GH-737](https://github.com/hashicorp/vault-helm/pull/737)
+* `vault-k8s` updated to 0.16.1
+
+Improvements:
 * Mutating webhook will no longer target the agent injector pod [GH-736](https://github.com/hashicorp/vault-helm/pull/736)
+
+Bugs:
+* `vault` service account is now created even if the server is set to disabled, as per before 0.20.0 [GH-737](https://github.com/hashicorp/vault-helm/pull/737)
 
 ## 0.20.0 (May 16th, 2022)
 
