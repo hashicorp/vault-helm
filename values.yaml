@@ -324,6 +324,13 @@ server:
   #   limits:
   #     memory: 256Mi
   #     cpu: 250m
+  
+  
+  #Values.server.securityContext.seccompProfile.type
+  securityContext: {}
+  #  seccompProfile:
+  #    type: RuntimeDefault
+
 
   # Ingress allows ingress services to be created to allow external access
   # from Kubernetes to access Vault pods.

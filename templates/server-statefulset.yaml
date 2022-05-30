@@ -75,6 +75,7 @@ spec:
           {{- if not .Values.global.openshift }}
           securityContext:
             allowPrivilegeEscalation: false
+            {{ .Values.server.securityContext }}
           {{- end }}
           env:
             - name: HOST_IP
