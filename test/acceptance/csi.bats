@@ -2,17 +2,9 @@
 
 load _helpers
 
-check_skip_csi() {
-  if [ ! -z ${SKIP_CSI} ]; then
-    skip "Skipping CSI tests"
-  fi
-}
-
 @test "csi: testing deployment" {
-  check_skip_csi
-
   cd `chart_dir`
-  
+
   kubectl delete namespace acceptance --ignore-not-found=true
   kubectl create namespace acceptance
 
@@ -58,8 +50,6 @@ check_skip_csi() {
 
 # Clean up
 teardown() {
-  check_skip_csi
-
   if [[ ${CLEANUP:-true} == "true" ]]
   then
       echo "helm/pvc teardown"
