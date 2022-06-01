@@ -1,5 +1,8 @@
 ## Unreleased
 
+CHANGES:
+* Start testing against Kubernetes 1.24
+
 ## 0.20.1 (May 25th, 2022)
 CHANGES:
 * `vault-k8s` updated to 0.16.1
