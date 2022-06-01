@@ -58,7 +58,11 @@ spec:
       volumes:
         {{ template "vault.volumes" . }}
         - name: home
-          emptyDir: {}
+          emptyDir:
+            medium : Memory
+        - name: tmp
+          emptyDir:
+            medium : Memory
       {{- if .Values.server.extraInitContainers }}
       initContainers:
         {{ toYaml .Values.server.extraInitContainers | nindent 8}}
@@ -75,7 +79,7 @@ spec:
           {{- if not .Values.global.openshift }}
           securityContext:
             allowPrivilegeEscalation: false
-            {{ .Values.server.securityContext }}
+            readOnlyRootFilesystem: true
           {{- end }}
           env:
             - name: HOST_IP
@@ -143,6 +147,8 @@ spec:
           {{ template "vault.mounts" . }}
             - name: home
               mountPath: /home/vault
+            - name: tmp
+              mountPath: /tmp
           ports:
             - containerPort: 8200
               name: {{ include "vault.scheme" . }}
