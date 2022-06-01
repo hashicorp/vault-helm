@@ -5,6 +5,7 @@
         "csi": {
             "type": "object",
             "properties": {
+<<<<<<< HEAD
                 "agent": {
                     "type": "object",
                     "properties": {
@@ -39,6 +40,8 @@
                         }
                     }
                 },
+=======
+>>>>>>> c4ab664 (feat(DATAGO-27002): Upgrade vault to version 1.7.9 (#12))
                 "daemonSet": {
                     "type": "object",
                     "properties": {
@@ -48,6 +51,7 @@
                                 "string"
                             ]
                         },
+<<<<<<< HEAD
                         "extraLabels": {
                             "type": "object"
                         },
@@ -74,6 +78,8 @@
                                 }
                             }
                         },
+=======
+>>>>>>> c4ab664 (feat(DATAGO-27002): Upgrade vault to version 1.7.9 (#12))
                         "updateStrategy": {
                             "type": "object",
                             "properties": {
@@ -91,10 +97,14 @@
                     "type": "boolean"
                 },
                 "enabled": {
+<<<<<<< HEAD
                     "type": [
                         "boolean",
                         "string"
                     ]
+=======
+                    "type": "boolean"
+>>>>>>> c4ab664 (feat(DATAGO-27002): Upgrade vault to version 1.7.9 (#12))
                 },
                 "extraArgs": {
                     "type": "array"
@@ -142,6 +152,7 @@
                                 "string"
                             ]
                         },
+<<<<<<< HEAD
                         "extraLabels": {
                             "type": "object"
                         },
@@ -157,6 +168,13 @@
                 "priorityClassName": {
                     "type": "string"
                 },
+=======
+                        "tolerations": {
+                            "type": ["null", "string"]
+                        }
+                    }
+                },
+>>>>>>> c4ab664 (feat(DATAGO-27002): Upgrade vault to version 1.7.9 (#12))
                 "readinessProbe": {
                     "type": "object",
                     "properties": {
@@ -188,9 +206,12 @@
                                 "object",
                                 "string"
                             ]
+<<<<<<< HEAD
                         },
                         "extraLabels": {
                             "type": "object"
+=======
+>>>>>>> c4ab664 (feat(DATAGO-27002): Upgrade vault to version 1.7.9 (#12))
                         }
                     }
                 },
@@ -214,9 +235,12 @@
                 "enabled": {
                     "type": "boolean"
                 },
+<<<<<<< HEAD
                 "externalVaultAddr": {
                     "type": "string"
                 },
+=======
+>>>>>>> c4ab664 (feat(DATAGO-27002): Upgrade vault to version 1.7.9 (#12))
                 "imagePullSecrets": {
                     "type": "array"
                 },
@@ -246,10 +270,14 @@
             "type": "object",
             "properties": {
                 "affinity": {
+<<<<<<< HEAD
                     "type": [
                         "object",
                         "string"
                     ]
+=======
+                    "type": "string"
+>>>>>>> c4ab664 (feat(DATAGO-27002): Upgrade vault to version 1.7.9 (#12))
                 },
                 "agentDefaults": {
                     "type": "object",
@@ -268,6 +296,7 @@
                         },
                         "template": {
                             "type": "string"
+<<<<<<< HEAD
                         },
                         "templateConfig": {
                             "type": "object",
@@ -279,6 +308,8 @@
                                     "type": "string"
                                 }
                             }
+=======
+>>>>>>> c4ab664 (feat(DATAGO-27002): Upgrade vault to version 1.7.9 (#12))
                         }
                     }
                 },
@@ -323,10 +354,14 @@
                     }
                 },
                 "enabled": {
+<<<<<<< HEAD
                     "type": [
                         "boolean",
                         "string"
                     ]
+=======
+                    "type": "boolean"
+>>>>>>> c4ab664 (feat(DATAGO-27002): Upgrade vault to version 1.7.9 (#12))
                 },
                 "externalVaultAddr": {
                     "type": "string"
@@ -362,6 +397,23 @@
                     "properties": {
                         "enabled": {
                             "type": "boolean"
+<<<<<<< HEAD
+=======
+                        },
+                        "image": {
+                            "type": "object",
+                            "properties": {
+                                "repository": {
+                                    "type": "string"
+                                },
+                                "tag": {
+                                    "type": "string"
+                                }
+                            }
+                        },
+                        "ttl": {
+                            "type": "string"
+>>>>>>> c4ab664 (feat(DATAGO-27002): Upgrade vault to version 1.7.9 (#12))
                         }
                     }
                 },
@@ -383,6 +435,7 @@
                     "type": "object"
                 },
                 "nodeSelector": {
+<<<<<<< HEAD
                     "type": [
                         "null",
                         "object",
@@ -396,6 +449,11 @@
                     ]
                 },
                 "podDisruptionBudget": {
+=======
+                    "type": ["null", "string"]
+                },
+                "objectSelector": {
+>>>>>>> c4ab664 (feat(DATAGO-27002): Upgrade vault to version 1.7.9 (#12))
                     "type": "object"
                 },
                 "port": {
@@ -413,6 +471,7 @@
                 "revokeOnShutdown": {
                     "type": "boolean"
                 },
+<<<<<<< HEAD
                 "securityContext": {
                     "type": "object",
                     "properties": {
@@ -430,6 +489,8 @@
                         }
                     }
                 },
+=======
+>>>>>>> c4ab664 (feat(DATAGO-27002): Upgrade vault to version 1.7.9 (#12))
                 "service": {
                     "type": "object",
                     "properties": {
@@ -441,6 +502,7 @@
                         }
                     }
                 },
+<<<<<<< HEAD
                 "serviceAccount": {
                     "type": "object",
                     "properties": {
@@ -504,6 +566,11 @@
                 "webhookAnnotations": {
                     "type": [
                         "object",
+=======
+                "tolerations": {
+                    "type": [
+                        "null",
+>>>>>>> c4ab664 (feat(DATAGO-27002): Upgrade vault to version 1.7.9 (#12))
                         "string"
                     ]
                 }
@@ -513,10 +580,14 @@
             "type": "object",
             "properties": {
                 "affinity": {
+<<<<<<< HEAD
                     "type": [
                         "object",
                         "string"
                     ]
+=======
+                    "type": "string"
+>>>>>>> c4ab664 (feat(DATAGO-27002): Upgrade vault to version 1.7.9 (#12))
                 },
                 "annotations": {
                     "type": [
@@ -608,10 +679,14 @@
                     }
                 },
                 "enabled": {
+<<<<<<< HEAD
                     "type": [
                         "boolean",
                         "string"
                     ]
+=======
+                    "type": "boolean"
+>>>>>>> c4ab664 (feat(DATAGO-27002): Upgrade vault to version 1.7.9 (#12))
                 },
                 "enterpriseLicense": {
                     "type": "object",
@@ -627,12 +702,15 @@
                 "extraArgs": {
                     "type": "string"
                 },
+<<<<<<< HEAD
                 "extraPorts": {
                     "type": [
                         "null",
                         "array"
                     ]
                 },
+=======
+>>>>>>> c4ab664 (feat(DATAGO-27002): Upgrade vault to version 1.7.9 (#12))
                 "extraContainers": {
                     "type": [
                         "null",
@@ -666,6 +744,7 @@
                                 "string"
                             ]
                         },
+<<<<<<< HEAD
                         "clusterAddr": {
                             "type": [
                                 "null",
@@ -677,6 +756,10 @@
                                 "string",
                                 "object"
                             ]
+=======
+                        "config": {
+                            "type": "string"
+>>>>>>> c4ab664 (feat(DATAGO-27002): Upgrade vault to version 1.7.9 (#12))
                         },
                         "disruptionBudget": {
                             "type": "object",
@@ -699,10 +782,14 @@
                             "type": "object",
                             "properties": {
                                 "config": {
+<<<<<<< HEAD
                                     "type": [
                                         "string",
                                         "object"
                                     ]
+=======
+                                    "type": "string"
+>>>>>>> c4ab664 (feat(DATAGO-27002): Upgrade vault to version 1.7.9 (#12))
                                 },
                                 "enabled": {
                                     "type": "boolean"
@@ -734,9 +821,12 @@
                 "ingress": {
                     "type": "object",
                     "properties": {
+<<<<<<< HEAD
                         "activeService": {
                             "type": "boolean"
                         },
+=======
+>>>>>>> c4ab664 (feat(DATAGO-27002): Upgrade vault to version 1.7.9 (#12))
                         "annotations": {
                             "type": [
                                 "object",
@@ -763,6 +853,7 @@
                                 }
                             }
                         },
+<<<<<<< HEAD
                         "ingressClassName": {
                             "type": "string"
                         },
@@ -772,6 +863,11 @@
                         "pathType": {
                             "type": "string"
                         },
+=======
+                        "labels": {
+                            "type": "object"
+                        },
+>>>>>>> c4ab664 (feat(DATAGO-27002): Upgrade vault to version 1.7.9 (#12))
                         "tls": {
                             "type": "array"
                         }
@@ -823,7 +919,10 @@
                 "nodeSelector": {
                     "type": [
                         "null",
+<<<<<<< HEAD
                         "object",
+=======
+>>>>>>> c4ab664 (feat(DATAGO-27002): Upgrade vault to version 1.7.9 (#12))
                         "string"
                     ]
                 },
@@ -865,9 +964,12 @@
                 "route": {
                     "type": "object",
                     "properties": {
+<<<<<<< HEAD
                         "activeService": {
                             "type": "boolean"
                         },
+=======
+>>>>>>> c4ab664 (feat(DATAGO-27002): Upgrade vault to version 1.7.9 (#12))
                         "annotations": {
                             "type": [
                                 "object",
@@ -882,15 +984,19 @@
                         },
                         "labels": {
                             "type": "object"
+<<<<<<< HEAD
                         },
                         "tls": {
                             "type": "object"
+=======
+>>>>>>> c4ab664 (feat(DATAGO-27002): Upgrade vault to version 1.7.9 (#12))
                         }
                     }
                 },
                 "service": {
                     "type": "object",
                     "properties": {
+<<<<<<< HEAD
                         "active": {
                             "type": "object",
                             "properties": {
@@ -899,6 +1005,8 @@
                                 }
                             }
                         },
+=======
+>>>>>>> c4ab664 (feat(DATAGO-27002): Upgrade vault to version 1.7.9 (#12))
                         "annotations": {
                             "type": [
                                 "object",
@@ -908,6 +1016,7 @@
                         "enabled": {
                             "type": "boolean"
                         },
+<<<<<<< HEAD
                         "externalTrafficPolicy": {
                             "type": "string"
                         },
@@ -944,6 +1053,13 @@
                         },
                         "standbyNodePort": {
                             "type": "integer"
+=======
+                        "port": {
+                            "type": "integer"
+                        },
+                        "targetPort": {
+                            "type": "integer"
+>>>>>>> c4ab664 (feat(DATAGO-27002): Upgrade vault to version 1.7.9 (#12))
                         }
                     }
                 },
@@ -959,6 +1075,7 @@
                         "create": {
                             "type": "boolean"
                         },
+<<<<<<< HEAD
                         "extraLabels": {
                             "type": "object"
                         },
@@ -972,6 +1089,10 @@
                                     "type": "boolean"
                                 }
                             }
+=======
+                        "name": {
+                            "type": "string"
+>>>>>>> c4ab664 (feat(DATAGO-27002): Upgrade vault to version 1.7.9 (#12))
                         }
                     }
                 },
@@ -982,10 +1103,14 @@
                     "type": "object",
                     "properties": {
                         "config": {
+<<<<<<< HEAD
                             "type": [
                                 "string",
                                 "object"
                             ]
+=======
+                            "type": "string"
+>>>>>>> c4ab664 (feat(DATAGO-27002): Upgrade vault to version 1.7.9 (#12))
                         },
                         "enabled": {
                             "type": [
@@ -1003,6 +1128,7 @@
                                 "object",
                                 "string"
                             ]
+<<<<<<< HEAD
                         },
                         "securityContext": {
                             "type": "object",
@@ -1037,6 +1163,14 @@
                     "type": [
                         "null",
                         "array",
+=======
+                        }
+                    }
+                },
+                "tolerations": {
+                    "type": [
+                        "null",
+>>>>>>> c4ab664 (feat(DATAGO-27002): Upgrade vault to version 1.7.9 (#12))
                         "string"
                     ]
                 },
@@ -1054,9 +1188,12 @@
                         "null",
                         "array"
                     ]
+<<<<<<< HEAD
                 },
                 "hostNetwork": {
                     "type": "boolean"
+=======
+>>>>>>> c4ab664 (feat(DATAGO-27002): Upgrade vault to version 1.7.9 (#12))
                 }
             }
         },
@@ -1073,17 +1210,24 @@
                     ]
                 },
                 "enabled": {
+<<<<<<< HEAD
                     "type": [
                         "boolean",
                         "string"
                     ]
+=======
+                    "type": "boolean"
+>>>>>>> c4ab664 (feat(DATAGO-27002): Upgrade vault to version 1.7.9 (#12))
                 },
                 "externalPort": {
                     "type": "integer"
                 },
+<<<<<<< HEAD
                 "externalTrafficPolicy": {
                     "type": "string"
                 },
+=======
+>>>>>>> c4ab664 (feat(DATAGO-27002): Upgrade vault to version 1.7.9 (#12))
                 "publishNotReadyAddresses": {
                     "type": "boolean"
                 },

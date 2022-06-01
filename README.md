@@ -46,6 +46,7 @@ Please see the many options supported in the `values.yaml`
 file. These are also fully documented directly on the
 [Vault website](https://www.vaultproject.io/docs/platform/k8s/helm.html).
 
+
 ## Customizations
 
 This Helm chart has been customized in the following ways:

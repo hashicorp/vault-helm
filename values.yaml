@@ -212,6 +212,15 @@ injector:
   #    matchLabels:
   #      sidecar-injector: enabled
   namespaceSelector: {}
+  # objectSelector is the selector for restricting the webhook to only
+  # specific labels.
+  # See https://kubernetes.io/docs/reference/access-authn-authz/extensible-admission-controllers/#matching-requests-objectselector
+  # for more details.
+  # Example:
+  # objectSelector:
+  #    matchLabels:
+  #      vault-sidecar-injector: enabled
+  objectSelector: {}
 
   # Deprecated: please use 'webhook.objectSelector' instead
   # objectSelector is the selector for restricting the webhook to only

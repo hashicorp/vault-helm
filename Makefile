@@ -4,6 +4,7 @@ CLOUDSDK_CORE_PROJECT?=vault-helm-dev-246514
 # set to run a single test - e.g acceptance/server-ha-enterprise-dr.bats
 ACCEPTANCE_TESTS?=acceptance
 
+<<<<<<< HEAD
 # filter bats unit tests to run.
 UNIT_TESTS_FILTER?='.*'
 
@@ -16,6 +17,8 @@ KIND_CLUSTER_NAME?=vault-helm
 # kind k8s version
 KIND_K8S_VERSION?=v1.26.3
 
+=======
+>>>>>>> c4ab664 (feat(DATAGO-27002): Upgrade vault to version 1.7.9 (#12))
 # Generate json schema for chart values. See test/README.md for more details.
 values-schema:
 	helm schema-gen values.yaml > values.schema.json
