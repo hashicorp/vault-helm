@@ -85,6 +85,7 @@ provision-cluster:
 destroy-cluster:
 	terraform destroy -auto-approve
 
+<<<<<<< HEAD
 # create a kind cluster for running the acceptance tests locally
 setup-kind:
 	kind get clusters | grep -q "^${KIND_CLUSTER_NAME}$$" || \
@@ -98,4 +99,6 @@ setup-kind:
 delete-kind:
 	kind delete cluster --name ${KIND_CLUSTER_NAME} || :
 
+=======
+>>>>>>> c4ab664 (feat(DATAGO-27002): Upgrade vault to version 1.7.9 (#12))
 .PHONY: values-schema test-image test-unit test-bats test test-acceptance test-destroy test-provision acceptance provision-cluster destroy-cluster
