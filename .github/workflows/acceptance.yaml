@@ -11,7 +11,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        kind-k8s-version: [1.16.15, 1.20.15, 1.21.10, 1.22.7, 1.23.4]
+        kind-k8s-version: [1.16.15, 1.20.15, 1.21.12, 1.22.9, 1.23.6, 1.24.1]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
@@ -23,11 +23,7 @@ jobs:
         with:
           config: test/kind/config.yaml
           node_image: kindest/node:v${{ matrix.kind-k8s-version }}
-
-      # Skip CSI tests if K8s version < 1.16.x
-      - run: echo K8S_MINOR=$(kubectl version -o json | jq -r .serverVersion.minor) >> $GITHUB_ENV
-      - if: ${{ env.K8S_MINOR < 16 }}
-        run: echo "SKIP_CSI=true" >> $GITHUB_ENV
+          version: v0.14.0
 
       - run: bats ./test/acceptance -t
         env:
