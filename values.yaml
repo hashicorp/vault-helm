@@ -307,6 +307,14 @@ server:
   # Configure the Update Strategy Type for the StatefulSet
   # See https://kubernetes.io/docs/concepts/workloads/controllers/statefulset/#update-strategies
   updateStrategyType: "OnDelete"
+  
+  # Setting readOnlyRootFilesystem requires tmp dir to be moved to a volume mount.
+  # Setting this to true creates an in-memory emptyDir and mounts this to /tmp.
+  readOnlyRootFilesystem: false
+
+  securityContext: {}
+    #seccomp: RuntimeDefault
+
 
   # Configure the logging verbosity for the Vault server.
   # Supported log levels include: trace, debug, info, warn, error

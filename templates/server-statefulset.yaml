@@ -58,11 +58,13 @@ spec:
       volumes:
         {{ template "vault.volumes" . }}
         - name: home
-          emptyDir:
-            medium : Memory
+          emptyDir: {}
+        {{- if .Values.server.readOnlyRootFilesystem -}}
         - name: tmp
           emptyDir:
             medium : Memory
+        {{- else -}}
+        {{- end }}
       {{- if .Values.server.extraInitContainers }}
       initContainers:
         {{ toYaml .Values.server.extraInitContainers | nindent 8}}
@@ -78,8 +80,13 @@ spec:
           args: {{ template "vault.args" . }}
           {{- if not .Values.global.openshift }}
           securityContext:
-            allowPrivilegeEscalation: false
+            {{- if  .Values.server.readOnlyRootFilesystem }}
             readOnlyRootFilesystem: true
+            {{- end -}}
+            allowPrivilegeEscalation: false
+            {{- if .Values.server.securityContext }}
+            {{ toYaml .Values.server.securityContext | nindent 8 }}
+            {{- end}}
           {{- end }}
           env:
             - name: HOST_IP
