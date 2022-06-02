@@ -19,8 +19,10 @@ CHANGES:
 * CSI provider default image to 1.1.0
 * Vault K8s default image to 0.16.0
 * Earliest Kubernetes version tested is now 1.16
+* Helm 3.6+ now required
+
+Features:
 * Support topologySpreadConstraints in server and injector. [GH-652](https://github.com/hashicorp/vault-helm/pull/652)
-* Maintain default MutatingWebhookConfiguration values from `v1beta1` [GH-692](https://github.com/hashicorp/vault-helm/pull/692)
 
 Improvements:
 * CSI: Set `extraLabels` for daemonset, pods, and service account [GH-690](https://github.com/hashicorp/vault-helm/pull/690)
@@ -29,6 +31,7 @@ Improvements:
 * Make the Cluster Address (CLUSTER_ADDR) configurable [GH-629](https://github.com/hashicorp/vault-helm/pull/709)
 * server: Make `publishNotReadyAddresses` configurable for services [GH-694](https://github.com/hashicorp/vault-helm/pull/694)
 * server: Allow config to be defined as a YAML object in the values file [GH-684](https://github.com/hashicorp/vault-helm/pull/684)
+* Maintain default MutatingWebhookConfiguration values from `v1beta1` [GH-692](https://github.com/hashicorp/vault-helm/pull/692)
 
 ## 0.19.0 (January 20th, 2022)
 
