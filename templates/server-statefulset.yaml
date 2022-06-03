@@ -79,9 +79,9 @@ spec:
           args: {{ template "vault.args" . }}
           {{- if not .Values.global.openshift }}
           securityContext:
-            {{ if  .Values.server.readOnlyRootFilesystem }}
+            {{- if  .Values.server.readOnlyRootFilesystem }}
             readOnlyRootFilesystem: true
-            {{ end }}
+            {{- end }}
             allowPrivilegeEscalation: false
             {{- if .Values.server.securityContext }}
             {{ toYaml .Values.server.securityContext | nindent 8 }}
