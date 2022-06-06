@@ -2,6 +2,8 @@
 
 CHANGES:
 * Start testing against Kubernetes 1.24
+* Deprecated `injector.externalVaultAddr`. Added `global.externalVaultAddr`, which applies to both the Injector and the CSI Provider.
+* CSI Provider pods now set the `VAULT_ADDR` environment variable to either the internal Vault service or the configured external address.
 
 ## 0.20.1 (May 25th, 2022)
 CHANGES:

@@ -50,6 +50,13 @@ spec:
             {{- if .Values.csi.extraArgs }}
               {{- toYaml .Values.csi.extraArgs | nindent 12 }}
             {{- end }}
+          env:
+            - name: VAULT_ADDR
+            {{- if .Values.global.externalVaultAddr }}
+              value: "{{ .Values.global.externalVaultAddr }}"
+            {{- else }}
+              value: {{ include "vault.scheme" . }}://{{ template "vault.fullname" . }}.{{ .Release.Namespace }}.svc:{{ .Values.server.service.port }}
+            {{- end }}
           volumeMounts:
             - name: providervol
               mountPath: "/provider"
