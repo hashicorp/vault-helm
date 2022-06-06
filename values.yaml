@@ -953,4 +953,6 @@ csi:
   debug: false
 
   # Pass arbitrary additional arguments to vault-csi-provider.
+  # See https://www.vaultproject.io/docs/platform/k8s/csi/configurations#command-line-arguments
+  # for the available command line flags.
   extraArgs: []
