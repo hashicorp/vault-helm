@@ -122,7 +122,7 @@ template logic.
 */}}
 {{- define "vault.mode" -}}
   {{- template "vault.serverEnabled" . -}}
-  {{- if .Values.injector.externalVaultAddr -}}
+  {{- if or (.Values.injector.externalVaultAddr) (.Values.global.externalVaultAddr) -}}
     {{- $_ := set . "mode" "external" -}}
   {{- else if not .serverEnabled -}}
     {{- $_ := set . "mode" "external" -}}
