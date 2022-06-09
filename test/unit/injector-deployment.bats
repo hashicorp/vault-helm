@@ -623,12 +623,19 @@ load _helpers
 
 @test "injector/deployment: specify extraLabels" {
   cd `chart_dir`
-  local actual=$(helm template \
+  local object=$(helm template \
       --show-only templates/injector-deployment.yaml \
       --set 'injector.extraLabels.foo=bar' \
       . | tee /dev/stderr |
+      yq -r '.' | tee /dev/stderr)
+
+  local value=$(echo $object |
       yq -r '.spec.template.metadata.labels.foo' | tee /dev/stderr)
-  [ "${actual}" = "bar" ]
+  [ "${value}" = "bar" ]
+
+  local value=$(echo $object |
+      yq -r '.metadata.labels.foo' | tee /dev/stderr)
+  [ "${value}" = "bar" ]
 }
 
 #--------------------------------------------------------------------

@@ -1047,12 +1047,30 @@ load _helpers
 
 @test "server/standalone-StatefulSet: specify extraLabels" {
   cd `chart_dir`
-  local actual=$(helm template \
+  local object=$(helm template \
       --show-only templates/server-statefulset.yaml \
+      --set 'server.auditStorage.enabled=true' \
       --set 'server.extraLabels.foo=bar' \
       . | tee /dev/stderr |
+      yq -r '.' | tee /dev/stderr)
+
+  local value=$(echo $object |
       yq -r '.spec.template.metadata.labels.foo' | tee /dev/stderr)
-  [ "${actual}" = "bar" ]
+  [ "${value}" = "bar" ]
+
+  local value=$(echo $object |
+      yq -r '.metadata.labels.foo' | tee /dev/stderr)
+  [ "${value}" = "bar" ]
+
+  # inspect audit PVC template
+  local value=$(echo $object |
+      yq -r '.spec.volumeClaimTemplates[0].metadata.labels["foo"]' | tee /dev/stderr)
+  [ "${value}" = "bar" ]
+
+  # inspect data PVC template
+  local value=$(echo $object |
+      yq -r '.spec.volumeClaimTemplates[1].metadata.labels["foo"]' | tee /dev/stderr)
+  [ "${value}" = "bar" ]
 }
 
 # extra annotations
@@ -1492,6 +1510,27 @@ load _helpers
       . | tee /dev/stderr |
       yq -r '.spec.template.spec.containers[0].ports | map(select(.containerPort==8202)) | .[] .name' | tee /dev/stderr)
   [ "${actual}" = "https-rep" ]
+}
+
+#--------------------------------------------------------------------
+# volumeClaimTemplate labels
+@test "server/standalone-StatefulSet: auditStorage volumeClaim labels" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      --show-only templates/server-statefulset.yaml \
+      --set 'server.auditStorage.enabled=true' \
+      . | tee /dev/stderr |
+      yq -r '.spec.volumeClaimTemplates[1].metadata.labels | length' | tee /dev/stderr)
+  [ "${actual}" = "3" ]
+}
+
+@test "server/standalone-StatefulSet: dataStorage volumeClaim labels" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      --show-only templates/server-statefulset.yaml \
+      . | tee /dev/stderr |
+      yq -r '.spec.volumeClaimTemplates[0].metadata.labels | length' | tee /dev/stderr)
+  [ "${actual}" = "3" ]
 }
 
 #--------------------------------------------------------------------

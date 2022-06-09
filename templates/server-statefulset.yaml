@@ -12,6 +12,9 @@ metadata:
     app.kubernetes.io/name: {{ include "vault.name" . }}
     app.kubernetes.io/instance: {{ .Release.Name }}
     app.kubernetes.io/managed-by: {{ .Release.Service }}
+    {{- if .Values.server.extraLabels -}}
+      {{- toYaml .Values.server.extraLabels | nindent 4 -}}
+    {{- end -}}
   {{- template "vault.statefulSet.annotations" . }}
 spec:
   serviceName: {{ template "vault.fullname" . }}-internal

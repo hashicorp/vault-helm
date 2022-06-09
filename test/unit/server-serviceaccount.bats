@@ -117,3 +117,16 @@ load _helpers
       yq 'length > 0' | tee /dev/stderr)
   [ "${actual}" = "false" ]
 }
+
+#--------------------------------------------------------------------
+# extra labels
+
+@test "server/ServiceAccount: specify extraLabels" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      --show-only templates/server-serviceaccount.yaml \
+      --set 'server.extraLabels.foo=bar' \
+      . | tee /dev/stderr |
+      yq -r '.metadata.labels.foo' | tee /dev/stderr)
+  [ "${actual}" = "bar" ]
+}
