@@ -563,3 +563,32 @@ load _helpers
       yq -r '.timeoutSeconds' | tee /dev/stderr)
   [ "${actual}" = "14" ]
 }
+
+@test "csi/daemonset: with only injector.externalVaultAddr" {
+  cd `chart_dir`
+  local object=$(helm template \
+      --show-only templates/csi-daemonset.yaml \
+      --set 'csi.enabled=true' \
+      --release-name not-external-test \
+      --set 'injector.externalVaultAddr=http://vault-outside' \
+      . | tee /dev/stderr |
+      yq -r '.spec.template.spec.containers[0].env' | tee /dev/stderr)
+
+  local value=$(echo $object |
+      yq -r 'map(select(.name=="VAULT_ADDR")) | .[] .value' | tee /dev/stderr)
+  [ "${value}" = "http://not-external-test-vault.default.svc:8200" ]
+}
+
+@test "csi/daemonset: with global.externalVaultAddr" {
+  cd `chart_dir`
+  local object=$(helm template \
+      --show-only templates/csi-daemonset.yaml \
+      --set 'csi.enabled=true' \
+      --set 'global.externalVaultAddr=http://vault-outside' \
+      . | tee /dev/stderr |
+      yq -r '.spec.template.spec.containers[0].env' | tee /dev/stderr)
+
+  local value=$(echo $object |
+      yq -r 'map(select(.name=="VAULT_ADDR")) | .[] .value' | tee /dev/stderr)
+  [ "${value}" = "http://vault-outside" ]
+}

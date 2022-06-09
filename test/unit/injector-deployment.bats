@@ -209,6 +209,33 @@ load _helpers
   [ "${value}" = "http://vault-outside" ]
 }
 
+@test "injector/deployment: with global.externalVaultAddr" {
+  cd `chart_dir`
+  local object=$(helm template \
+      --show-only templates/injector-deployment.yaml  \
+      --set 'global.externalVaultAddr=http://vault-outside' \
+      . | tee /dev/stderr |
+      yq -r '.spec.template.spec.containers[0].env' | tee /dev/stderr)
+
+  local value=$(echo $object |
+      yq -r 'map(select(.name=="AGENT_INJECT_VAULT_ADDR")) | .[] .value' | tee /dev/stderr)
+  [ "${value}" = "http://vault-outside" ]
+}
+
+@test "injector/deployment: global.externalVaultAddr takes precendence over injector.externalVaultAddr" {
+  cd `chart_dir`
+  local object=$(helm template \
+      --show-only templates/injector-deployment.yaml  \
+      --set 'global.externalVaultAddr=http://global-vault-outside' \
+      --set 'injector.externalVaultAddr=http://injector-vault-outside' \
+      . | tee /dev/stderr |
+      yq -r '.spec.template.spec.containers[0].env' | tee /dev/stderr)
+
+  local value=$(echo $object |
+      yq -r 'map(select(.name=="AGENT_INJECT_VAULT_ADDR")) | .[] .value' | tee /dev/stderr)
+  [ "${value}" = "http://global-vault-outside" ]
+}
+
 @test "injector/deployment: without externalVaultAddr" {
   cd `chart_dir`
   local object=$(helm template \

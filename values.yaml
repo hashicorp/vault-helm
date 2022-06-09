@@ -4,15 +4,23 @@ global:
   # enabled is the master enabled switch. Setting this to true or false
   # will enable or disable all the components within this chart by default.
   enabled: true
+
   # Image pull secret to use for registry authentication.
   # Alternatively, the value may be specified as an array of strings.
   imagePullSecrets: []
   # imagePullSecrets:
   #   - name: image-pull-secret
+
   # TLS for end-to-end encrypted transport
   tlsDisable: true
+
+  # External vault server address for the injector and CSI provider to use.
+  # Setting this will disable deployment of a vault server.
+  externalVaultAddr: ""
+
   # If deploying to OpenShift
   openshift: false
+
   # Create PodSecurityPolicy for pods
   psp:
     enable: false
@@ -43,8 +51,7 @@ injector:
   metrics:
     enabled: false
 
-  # External vault server address for the injector to use. Setting this will
-  # disable deployment of a vault server along with the injector.
+  # Deprecated: Please use global.externalVaultAddr instead.
   externalVaultAddr: ""
 
   # image sets the repo and tag of the vault-k8s image to use for the injector.
@@ -958,4 +965,6 @@ csi:
   debug: false
 
   # Pass arbitrary additional arguments to vault-csi-provider.
+  # See https://www.vaultproject.io/docs/platform/k8s/csi/configurations#command-line-arguments
+  # for the available command line flags.
   extraArgs: []
