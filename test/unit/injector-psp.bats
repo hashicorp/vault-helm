@@ -22,7 +22,7 @@ load _helpers
   [ "${actual}" = "true" ]
 }
 
-@test "injector/PodSecurityPolicy: disable with global.enabled" {
+@test "injector/PodSecurityPolicy: ignore global.enabled" {
   cd `chart_dir`
   local actual=$( (helm template \
       --show-only templates/injector-psp.yaml  \
@@ -31,7 +31,7 @@ load _helpers
       --set 'global.psp.enable=true' \
       . || echo "---") | tee /dev/stderr |
       yq 'length > 0' | tee /dev/stderr)
-  [ "${actual}" = "false" ]
+  [ "${actual}" = "true" ]
 }
 
 @test "injector/PodSecurityPolicy: annotations are templated correctly by default" {

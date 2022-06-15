@@ -32,6 +32,76 @@ Expand the name of the chart.
 {{- end -}}
 
 {{/*
+Compute if the csi driver is enabled.
+*/}}
+{{- define "vault.csiEnabled" -}}
+{{- $_ := set . "csiEnabled" (or
+  (eq (.Values.csi.enabled | toString) "true")
+  (and (eq (.Values.csi.enabled | toString) "-") (eq (.Values.global.enabled | toString) "true"))) -}}
+{{- end -}}
+
+{{/*
+Compute if the injector is enabled.
+*/}}
+{{- define "vault.injectorEnabled" -}}
+{{- $_ := set . "injectorEnabled" (or
+  (eq (.Values.injector.enabled | toString) "true")
+  (and (eq (.Values.injector.enabled | toString) "-") (eq (.Values.global.enabled | toString) "true"))) -}}
+{{- end -}}
+
+{{/*
+Compute if the server is enabled.
+*/}}
+{{- define "vault.serverEnabled" -}}
+{{- $_ := set . "serverEnabled" (or
+  (eq (.Values.server.enabled | toString) "true")
+  (and (eq (.Values.server.enabled | toString) "-") (eq (.Values.global.enabled | toString) "true"))) -}}
+{{- end -}}
+
+{{/*
+Compute if the server auth delegator serviceaccount is enabled.
+*/}}
+{{- define "vault.serverServiceAccountEnabled" -}}
+{{- $_ := set . "serverServiceAccountEnabled"
+  (and
+    (eq (.Values.server.serviceAccount.create | toString) "true" )
+    (or
+      (eq (.Values.server.enabled | toString) "true")
+      (eq (.Values.global.enabled | toString) "true"))) -}}
+{{- end -}}
+
+{{/*
+Compute if the server auth delegator serviceaccount is enabled.
+*/}}
+{{- define "vault.serverAuthDelegator" -}}
+{{- $_ := set . "serverAuthDelegator"
+  (and
+    (eq (.Values.server.authDelegator.enabled | toString) "true" )
+    (or (eq (.Values.server.serviceAccount.create | toString) "true")
+        (not (eq .Values.server.serviceAccount.name "")))
+    (or
+      (eq (.Values.server.enabled | toString) "true")
+      (eq (.Values.global.enabled | toString) "true"))) -}}
+{{- end -}}
+
+{{/*
+Compute if the server service is enabled.
+*/}}
+{{- define "vault.serverServiceEnabled" -}}
+{{- template "vault.serverEnabled" . -}}
+{{- $_ := set . "serverServiceEnabled" (and .serverEnabled (eq (.Values.server.service.enabled | toString) "true")) -}}
+{{- end -}}
+
+{{/*
+Compute if the ui is enabled.
+*/}}
+{{- define "vault.uiEnabled" -}}
+{{- $_ := set . "uiEnabled" (or
+  (eq (.Values.ui.enabled | toString) "true")
+  (and (eq (.Values.ui.enabled | toString) "-") (eq (.Values.global.enabled | toString) "true"))) -}}
+{{- end -}}
+
+{{/*
 Compute the maximum number of unavailable replicas for the PodDisruptionBudget.
 This defaults to (n/2)-1 where n is the number of members of the server cluster.
 Add a special case for replicas=1, where it should default to 0 as well.
@@ -51,9 +121,10 @@ Set the variable 'mode' to the server mode requested by the user to simplify
 template logic.
 */}}
 {{- define "vault.mode" -}}
-  {{- if .Values.injector.externalVaultAddr -}}
+  {{- template "vault.serverEnabled" . -}}
+  {{- if or (.Values.injector.externalVaultAddr) (.Values.global.externalVaultAddr) -}}
     {{- $_ := set . "mode" "external" -}}
-  {{- else if ne (.Values.server.enabled | toString) "true" -}}
+  {{- else if not .serverEnabled -}}
     {{- $_ := set . "mode" "external" -}}
   {{- else if eq (.Values.server.dev.enabled | toString) "true" -}}
     {{- $_ := set . "mode" "dev" -}}
@@ -102,6 +173,12 @@ extra volumes the user may have specified (such as a secret with TLS).
   {{- end }}
   {{- if .Values.server.volumes }}
     {{- toYaml .Values.server.volumes | nindent 8}}
+  {{- end }}
+  {{- if (and .Values.server.enterpriseLicense.secretName .Values.server.enterpriseLicense.secretKey) }}
+        - name: vault-license
+          secret:
+            secretName: {{ .Values.server.enterpriseLicense.secretName }}
+            defaultMode: 0440
   {{- end }}
 {{- end -}}
 
@@ -166,6 +243,11 @@ based on the mode configured.
   {{- if .Values.server.volumeMounts }}
     {{- toYaml .Values.server.volumeMounts | nindent 12}}
   {{- end }}
+  {{- if (and .Values.server.enterpriseLicense.secretName .Values.server.enterpriseLicense.secretKey) }}
+            - name: vault-license
+              mountPath: /vault/license
+              readOnly: true
+  {{- end }}
 {{- end -}}
 
 {{/*
@@ -213,7 +295,12 @@ Set's the affinity for pod placement when running in standalone and HA modes.
 {{- define "vault.affinity" -}}
   {{- if and (ne .mode "dev") .Values.server.affinity }}
       affinity:
-        {{ tpl .Values.server.affinity . | nindent 8 | trim }}
+        {{ $tp := typeOf .Values.server.affinity }}
+        {{- if eq $tp "string" }}
+          {{- tpl .Values.server.affinity . | nindent 8 | trim }}
+        {{- else }}
+          {{- toYaml .Values.server.affinity | nindent 8 }}
+        {{- end }}
   {{ end }}
 {{- end -}}
 
@@ -223,17 +310,58 @@ Sets the injector affinity for pod placement
 {{- define "injector.affinity" -}}
   {{- if .Values.injector.affinity }}
       affinity:
-        {{ tpl .Values.injector.affinity . | nindent 8 | trim }}
+        {{ $tp := typeOf .Values.injector.affinity }}
+        {{- if eq $tp "string" }}
+          {{- tpl .Values.injector.affinity . | nindent 8 | trim }}
+        {{- else }}
+          {{- toYaml .Values.injector.affinity | nindent 8 }}
+        {{- end }}
   {{ end }}
 {{- end -}}
 
 {{/*
-Set's the toleration for pod placement when running in standalone and HA modes.
+Sets the topologySpreadConstraints when running in standalone and HA modes.
+*/}}
+{{- define "vault.topologySpreadConstraints" -}}
+  {{- if and (ne .mode "dev") .Values.server.topologySpreadConstraints }}
+      topologySpreadConstraints:
+        {{ $tp := typeOf .Values.server.topologySpreadConstraints }}
+        {{- if eq $tp "string" }}
+          {{- tpl .Values.server.topologySpreadConstraints . | nindent 8 | trim }}
+        {{- else }}
+          {{- toYaml .Values.server.topologySpreadConstraints | nindent 8 }}
+        {{- end }}
+  {{ end }}
+{{- end -}}
+
+
+{{/*
+Sets the injector topologySpreadConstraints for pod placement
+*/}}
+{{- define "injector.topologySpreadConstraints" -}}
+  {{- if .Values.injector.topologySpreadConstraints }}
+      topologySpreadConstraints:
+        {{ $tp := typeOf .Values.injector.topologySpreadConstraints }}
+        {{- if eq $tp "string" }}
+          {{- tpl .Values.injector.topologySpreadConstraints . | nindent 8 | trim }}
+        {{- else }}
+          {{- toYaml .Values.injector.topologySpreadConstraints | nindent 8 }}
+        {{- end }}
+  {{ end }}
+{{- end -}}
+
+{{/*
+Sets the toleration for pod placement when running in standalone and HA modes.
 */}}
 {{- define "vault.tolerations" -}}
   {{- if and (ne .mode "dev") .Values.server.tolerations }}
       tolerations:
+      {{- $tp := typeOf .Values.server.tolerations }}
+      {{- if eq $tp "string" }}
         {{ tpl .Values.server.tolerations . | nindent 8 | trim }}
+      {{- else }}
+        {{- toYaml .Values.server.tolerations | nindent 8 }}
+      {{- end }}
   {{- end }}
 {{- end -}}
 
@@ -243,7 +371,12 @@ Sets the injector toleration for pod placement
 {{- define "injector.tolerations" -}}
   {{- if .Values.injector.tolerations }}
       tolerations:
+      {{- $tp := typeOf .Values.injector.tolerations }}
+      {{- if eq $tp "string" }}
         {{ tpl .Values.injector.tolerations . | nindent 8 | trim }}
+      {{- else }}
+        {{- toYaml .Values.injector.tolerations | nindent 8 }}
+      {{- end }}
   {{- end }}
 {{- end -}}
 
@@ -253,7 +386,12 @@ Set's the node selector for pod placement when running in standalone and HA mode
 {{- define "vault.nodeselector" -}}
   {{- if and (ne .mode "dev") .Values.server.nodeSelector }}
       nodeSelector:
-        {{ tpl .Values.server.nodeSelector . | indent 8 | trim }}
+      {{- $tp := typeOf .Values.server.nodeSelector }}
+      {{- if eq $tp "string" }}
+        {{ tpl .Values.server.nodeSelector . | nindent 8 | trim }}
+      {{- else }}
+        {{- toYaml .Values.server.nodeSelector | nindent 8 }}
+      {{- end }}
   {{- end }}
 {{- end -}}
 
@@ -263,7 +401,27 @@ Sets the injector node selector for pod placement
 {{- define "injector.nodeselector" -}}
   {{- if .Values.injector.nodeSelector }}
       nodeSelector:
-        {{ tpl .Values.injector.nodeSelector . | indent 8 | trim }}
+      {{- $tp := typeOf .Values.injector.nodeSelector }}
+      {{- if eq $tp "string" }}
+        {{ tpl .Values.injector.nodeSelector . | nindent 8 | trim }}
+      {{- else }}
+        {{- toYaml .Values.injector.nodeSelector | nindent 8 }}
+      {{- end }}
+  {{- end }}
+{{- end -}}
+
+{{/*
+Sets the injector deployment update strategy
+*/}}
+{{- define "injector.strategy" -}}
+  {{- if .Values.injector.strategy }}
+  strategy:
+  {{- $tp := typeOf .Values.injector.strategy }}
+  {{- if eq $tp "string" }}
+    {{ tpl .Values.injector.strategy . | nindent 4 | trim }}
+  {{- else }}
+    {{- toYaml .Values.injector.strategy | nindent 4 }}
+  {{- end }}
   {{- end }}
 {{- end -}}
 
@@ -311,6 +469,37 @@ Sets extra injector service annotations
     {{- end }}
   {{- end }}
 {{- end -}}
+
+{{/*
+Sets extra injector webhook annotations
+*/}}
+{{- define "injector.webhookAnnotations" -}}
+  {{- if or (((.Values.injector.webhook)).annotations) (.Values.injector.webhookAnnotations)  }}
+  annotations:
+    {{- $tp := typeOf (or (((.Values.injector.webhook)).annotations) (.Values.injector.webhookAnnotations)) }}
+    {{- if eq $tp "string" }}
+      {{- tpl (((.Values.injector.webhook)).annotations | default .Values.injector.webhookAnnotations) . | nindent 4 }}
+    {{- else }}
+      {{- toYaml (((.Values.injector.webhook)).annotations | default .Values.injector.webhookAnnotations) | nindent 4 }}
+    {{- end }}
+  {{- end }}
+{{- end -}}
+
+{{/*
+Set's the injector webhook objectSelector
+*/}}
+{{- define "injector.objectSelector" -}}
+  {{- $v := or (((.Values.injector.webhook)).objectSelector) (.Values.injector.objectSelector) -}}
+  {{ if $v }}
+    objectSelector:
+    {{- $tp := typeOf $v -}}
+    {{ if eq $tp "string" }}
+      {{ tpl $v . | indent 6 | trim }}
+    {{ else }}
+      {{ toYaml $v | indent 6 | trim }}
+    {{ end }}
+  {{ end }}
+{{ end }}
 
 {{/*
 Sets extra ui service annotations
@@ -503,6 +692,21 @@ Sets extra CSI daemonset annotations
 {{- end -}}
 
 {{/*
+Sets the injector toleration for pod placement
+*/}}
+{{- define "csi.pod.tolerations" -}}
+  {{- if .Values.csi.pod.tolerations }}
+      tolerations:
+      {{- $tp := typeOf .Values.csi.pod.tolerations }}
+      {{- if eq $tp "string" }}
+        {{ tpl .Values.csi.pod.tolerations . | nindent 8 | trim }}
+      {{- else }}
+        {{- toYaml .Values.csi.pod.tolerations | nindent 8 }}
+      {{- end }}
+  {{- end }}
+{{- end -}}
+
+{{/*
 Sets extra CSI provider pod annotations
 */}}
 {{- define "csi.pod.annotations" -}}
@@ -566,4 +770,56 @@ Inject extra environment populated by secrets, if populated
 {{- else -}}
 {{ "https" }}
 {{- end -}}
+{{- end -}}
+
+{{/*
+imagePullSecrets generates pull secrets from either string or map values.
+A map value must be indexable by the key 'name'.
+*/}}
+{{- define "imagePullSecrets" -}}
+{{- with .Values.global.imagePullSecrets -}}
+imagePullSecrets:
+{{- range . -}}
+{{- if typeIs "string" . }}
+  - name: {{ . }}
+{{- else if index . "name" }}
+  - name: {{ .name }}
+{{- end }}
+{{- end -}}
+{{- end -}}
+{{- end -}}
+
+{{/*
+externalTrafficPolicy sets a Service's externalTrafficPolicy if applicable.
+Supported inputs are Values.server.service and Values.ui
+*/}}
+{{- define "service.externalTrafficPolicy" -}}
+{{- $type := "" -}}
+{{- if .serviceType -}}
+{{- $type = .serviceType -}}
+{{- else if .type -}}
+{{- $type = .type -}}
+{{- end -}}
+{{- if and .externalTrafficPolicy (or (eq $type "LoadBalancer") (eq $type "NodePort")) }}
+  externalTrafficPolicy: {{ .externalTrafficPolicy }}
+{{- else }}
+{{- end }}
+{{- end -}}
+
+{{/*
+loadBalancer configuration for the the UI service.
+Supported inputs are Values.ui
+*/}}
+{{- define "service.loadBalancer" -}}
+{{- if  eq (.serviceType | toString) "LoadBalancer" }}
+{{- if .loadBalancerIP }}
+  loadBalancerIP: {{ .loadBalancerIP }}
+{{- end }}
+{{- with .loadBalancerSourceRanges }}
+  loadBalancerSourceRanges:
+{{- range . }}
+  - {{ . }}
+{{- end }}
+{{- end -}}
+{{- end }}
 {{- end -}}

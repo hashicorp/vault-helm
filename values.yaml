@@ -4,14 +4,23 @@ global:
   # enabled is the master enabled switch. Setting this to true or false
   # will enable or disable all the components within this chart by default.
   enabled: true
+
   # Image pull secret to use for registry authentication.
+  # Alternatively, the value may be specified as an array of strings.
   imagePullSecrets: []
   # imagePullSecrets:
   #   - name: image-pull-secret
+
   # TLS for end-to-end encrypted transport
   tlsDisable: true
+
+  # External vault server address for the injector and CSI provider to use.
+  # Setting this will disable deployment of a vault server.
+  externalVaultAddr: ""
+
   # If deploying to OpenShift
   openshift: false
+
   # Create PodSecurityPolicy for pods
   psp:
     enable: false
@@ -25,42 +34,38 @@ global:
 
 injector:
   # True if you want to enable vault agent injection.
-  enabled: true
+  # @default: global.enabled
+  enabled: "-"
 
   replicas: 1
 
   # Configures the port the injector should listen on
   port: 8080
 
-  # If multiple replicas are specified, by default a leader-elector side-car
-  # will be created so that only one injector attempts to create TLS certificates.
+  # If multiple replicas are specified, by default a leader will be determined
+  # so that only one injector attempts to create TLS certificates.
   leaderElector:
     enabled: true
-    image:
-      repository: "gcr.io/google_containers/leader-elector"
-      tag: "0.4"
-    ttl: 60s
 
   # If true, will enable a node exporter metrics endpoint at /metrics.
   metrics:
     enabled: false
 
-  # External vault server address for the injector to use. Setting this will
-  # disable deployment of a vault server along with the injector.
+  # Deprecated: Please use global.externalVaultAddr instead.
   externalVaultAddr: ""
 
   # image sets the repo and tag of the vault-k8s image to use for the injector.
   image:
     repository: "hashicorp/vault-k8s"
-    tag: "0.10.0"
+    tag: "0.16.1"
     pullPolicy: IfNotPresent
 
   # agentImage sets the repo and tag of the Vault image to use for the Vault Agent
   # containers.  This should be set to the official Vault image.  Vault 1.3.1+ is
   # required.
   agentImage:
-    repository: "vault"
-    tag: "1.7.0"
+    repository: "hashicorp/vault"
+    tag: "1.10.3"
 
   # The default values for the injected Vault Agent containers.
   agentDefaults:
@@ -75,6 +80,11 @@ injector:
     # Possible values include: "json" and "map".
     template: "map"
 
+    # Default values within Agent's template_config stanza.
+    templateConfig:
+      exitOnRetryFailure: true
+      staticSecretRenderInterval: ""
+
   # Mount Path of the Vault Kubernetes Auth Method.
   authPath: "auth/kubernetes"
 
@@ -88,6 +98,66 @@ injector:
   # Configures all Vault Agent sidecars to revoke their token when shutting down
   revokeOnShutdown: false
 
+  webhook:
+    # Configures failurePolicy of the webhook. The "unspecified" default behaviour depends on the
+    # API Version of the WebHook.
+    # To block pod creation while webhook is unavailable, set the policy to `Fail` below.
+    # See https://kubernetes.io/docs/reference/access-authn-authz/extensible-admission-controllers/#failure-policy
+    #
+    failurePolicy: Ignore
+
+    # matchPolicy specifies the approach to accepting changes based on the rules of
+    # the MutatingWebhookConfiguration.
+    # See https://kubernetes.io/docs/reference/access-authn-authz/extensible-admission-controllers/#matching-requests-matchpolicy
+    # for more details.
+    #
+    matchPolicy: Exact
+
+    # timeoutSeconds is the amount of seconds before the webhook request will be ignored
+    # or fails.
+    # If it is ignored or fails depends on the failurePolicy
+    # See https://kubernetes.io/docs/reference/access-authn-authz/extensible-admission-controllers/#timeouts
+    # for more details.
+    #
+    timeoutSeconds: 30
+
+    # namespaceSelector is the selector for restricting the webhook to only
+    # specific namespaces.
+    # See https://kubernetes.io/docs/reference/access-authn-authz/extensible-admission-controllers/#matching-requests-namespaceselector
+    # for more details.
+    # Example:
+    # namespaceSelector:
+    #    matchLabels:
+    #      sidecar-injector: enabled
+    namespaceSelector: {}
+
+    # objectSelector is the selector for restricting the webhook to only
+    # specific labels.
+    # See https://kubernetes.io/docs/reference/access-authn-authz/extensible-admission-controllers/#matching-requests-objectselector
+    # for more details.
+    # Example:
+    # objectSelector:
+    #    matchLabels:
+    #      vault-sidecar-injector: enabled
+    objectSelector: |
+      matchExpressions:
+      - key: app.kubernetes.io/name
+        operator: NotIn
+        values:
+        - {{ template "vault.name" . }}-agent-injector
+
+    # Extra annotations to attach to the webhook
+    annotations: {}
+
+  # Deprecated: please use 'webhook.failurePolicy' instead
+  # Configures failurePolicy of the webhook. The "unspecified" default behaviour depends on the
+  # API Version of the WebHook.
+  # To block pod creation while webhook is unavailable, set the policy to `Fail` below.
+  # See https://kubernetes.io/docs/reference/access-authn-authz/extensible-admission-controllers/#failure-policy
+  #
+  failurePolicy: Ignore
+
+  # Deprecated: please use 'webhook.namespaceSelector' instead
   # namespaceSelector is the selector for restricting the webhook to only
   # specific namespaces.
   # See https://kubernetes.io/docs/reference/access-authn-authz/extensible-admission-controllers/#matching-requests-namespaceselector
@@ -97,6 +167,8 @@ injector:
   #    matchLabels:
   #      sidecar-injector: enabled
   namespaceSelector: {}
+
+  # Deprecated: please use 'webhook.objectSelector' instead
   # objectSelector is the selector for restricting the webhook to only
   # specific labels.
   # See https://kubernetes.io/docs/reference/access-authn-authz/extensible-admission-controllers/#matching-requests-objectselector
@@ -107,12 +179,9 @@ injector:
   #      vault-sidecar-injector: enabled
   objectSelector: {}
 
-  # Configures failurePolicy of the webhook. The "unspecified" default behaviour deoends on the
-  # API Version of the WebHook.
-  # To block pod creation while webhook is unavailable, set the policy to `Fail` below.
-  # See https://kubernetes.io/docs/reference/access-authn-authz/extensible-admission-controllers/#failure-policy
-  #
-  failurePolicy: Ignore
+  # Deprecated: please use 'webhook.annotations' instead
+  # Extra annotations to attach to the webhook
+  webhookAnnotations: {}
 
   certs:
     # secretName is the name of the secret that has the TLS certificate and
@@ -121,9 +190,10 @@ injector:
     # a service account to the injector to generate its own certificates.
     secretName: null
 
-    # caBundle is a base64-encoded PEM-encoded certificate bundle for the
-    # CA that signed the TLS certificate that the webhook serves. This must
-    # be set if secretName is non-null.
+    # caBundle is a base64-encoded PEM-encoded certificate bundle for the CA
+    # that signed the TLS certificate that the webhook serves. This must be set
+    # if secretName is non-null, unless an external service like cert-manager is
+    # keeping the caBundle updated.
     caBundle: ""
 
     # certName and keyName are the names of the files within the secret for
@@ -147,8 +217,7 @@ injector:
     # KUBERNETES_SERVICE_HOST: kubernetes.default.svc
 
   # Affinity Settings for injector pods
-  # This should be a multi-line string matching the affinity section of a
-  # PodSpec.
+  # This can either be multi-line string or YAML matching the PodSpec's affinity field.
   # Commenting out or setting as empty the affinity variable, will allow
   # deployment of multiple replicas to single node services such as Minikube.
   affinity: |
@@ -161,17 +230,23 @@ injector:
               component: webhook
           topologyKey: kubernetes.io/hostname
 
-  # Toleration Settings for injector pods
-  # This should be a multi-line string matching the Toleration array
+  # Topology settings for injector pods
+  # ref: https://kubernetes.io/docs/concepts/workloads/pods/pod-topology-spread-constraints/
+  # This should be either a multi-line string or YAML matching the topologySpreadConstraints array
   # in a PodSpec.
-  tolerations: null
+  topologySpreadConstraints: []
 
-  # nodeSelector labels for injector pod assignment, formatted as a muli-line string.
+  # Toleration Settings for injector pods
+  # This should be either a multi-line string or YAML matching the Toleration array
+  # in a PodSpec.
+  tolerations: []
+
+  # nodeSelector labels for server pod assignment, formatted as a multi-line string or YAML map.
   # ref: https://kubernetes.io/docs/concepts/configuration/assign-pod-node/#nodeselector
   # Example:
-  # nodeSelector: |
+  # nodeSelector:
   #   beta.kubernetes.io/arch: amd64
-  nodeSelector: null
+  nodeSelector: {}
 
   # Priority class for injector pods
   priorityClassName: ""
@@ -194,17 +269,45 @@ injector:
     # Extra annotations to attach to the injector service
     annotations: {}
 
+  # A disruption budget limits the number of pods of a replicated application
+  # that are down simultaneously from voluntary disruptions
+  podDisruptionBudget: {}
+  # podDisruptionBudget:
+  #   maxUnavailable: 1
+
+  # strategy for updating the deployment. This can be a multi-line string or a
+  # YAML map.
+  strategy: {}
+  # strategy: |
+  #   rollingUpdate:
+  #     maxSurge: 25%
+  #     maxUnavailable: 25%
+  #   type: RollingUpdate
+
 server:
-  # If not set to true, Vault server will not be installed. See vault.mode in _helpers.tpl for implementation details
-  enabled: true
+  # If true, or "-" with global.enabled true, Vault server will be installed.
+  # See vault.mode in _helpers.tpl for implementation details.
+  enabled: "-"
+
+  # [Enterprise Only] This value refers to a Kubernetes secret that you have
+  # created that contains your enterprise license. If you are not using an
+  # enterprise image or if you plan to introduce the license key via another
+  # route, then leave secretName blank ("") or set it to null.
+  # Requires Vault Enterprise 1.8 or later.
+  enterpriseLicense:
+    # The name of the Kubernetes secret that holds the enterprise license. The
+    # secret must be in the same namespace that Vault is installed into.
+    secretName: ""
+    # The key within the Kubernetes secret that holds the enterprise license.
+    secretKey: "license"
 
   # Resource requests, limits, etc. for the server cluster placement. This
   # should map directly to the value of the resources field for a PodSpec.
   # By default no direct resource request is made.
 
   image:
-    repository: "vault"
-    tag: "1.7.0"
+    repository: "hashicorp/vault"
+    tag: "1.10.3"
     # Overrides the default Image Pull Policy
     pullPolicy: IfNotPresent
 
@@ -244,6 +347,18 @@ server:
       #   or
       # kubernetes.io/ingress.class: nginx
       # kubernetes.io/tls-acme: "true"
+
+    # Optionally use ingressClassName instead of deprecated annotation.
+    # See: https://kubernetes.io/docs/concepts/services-networking/ingress/#deprecated-annotation
+    ingressClassName: ""
+
+    # As of Kubernetes 1.19, all Ingress Paths must have a pathType configured. The default value below should be sufficient in most cases.
+    # See: https://kubernetes.io/docs/concepts/services-networking/ingress/#path-types for other possible values.
+    pathType: Prefix
+
+    # When HA mode is enabled and K8s service registration is being used,
+    # configure the ingress to point to the Vault active service.
+    activeService: true
     hosts:
       - host: chart-example.local
         paths: []
@@ -251,20 +366,32 @@ server:
     extraPaths: []
     # - path: /*
     #   backend:
-    #     serviceName: ssl-redirect
-    #     servicePort: use-annotation
+    #     service:
+    #       name: ssl-redirect
+    #       port:
+    #         number: use-annotation
     tls: []
     #  - secretName: chart-example-tls
     #    hosts:
     #      - chart-example.local
 
   # OpenShift only - create a route to expose the service
-  # The created route will be of type passthrough
+  # By default the created route will be of type passthrough
   route:
     enabled: false
+
+    # When HA mode is enabled and K8s service registration is being used,
+    # configure the route to point to the Vault active service.
+    activeService: true
+
     labels: {}
     annotations: {}
     host: chart-example.local
+    # tls will be passed directly to the route's TLS config, which
+    # can be used to configure other termination methods that terminate
+    # TLS at the router
+    tls:
+      termination: passthrough
 
   # authDelegator enables a cluster role binding to be attached to the service
   # account.  This cluster role binding can be used to setup Kubernetes auth
@@ -332,6 +459,10 @@ server:
     # Number of seconds after which the probe times out.
     timeoutSeconds: 3
 
+  # Optional duration in seconds the pod needs to terminate gracefully.
+  # See: https://kubernetes.io/docs/concepts/containers/container-lifecycle-hooks/
+  terminationGracePeriodSeconds: 10
+
   # Used to set the sleep time during the preStop step
   preStopSleepSeconds: 5
 
@@ -381,10 +512,10 @@ server:
   #     name: plugins
   #     readOnly: true
 
-
   # Affinity Settings
   # Commenting out or setting as empty the affinity variable, will allow
   # deployment to single node services such as Minikube
+  # This should be either a multi-line string or YAML matching the PodSpec's affinity field.
   affinity: |
     podAntiAffinity:
       requiredDuringSchedulingIgnoredDuringExecution:
@@ -395,17 +526,23 @@ server:
               component: server
           topologyKey: kubernetes.io/hostname
 
-  # Toleration Settings for server pods
-  # This should be a multi-line string matching the Toleration array
+  # Topology settings for server pods
+  # ref: https://kubernetes.io/docs/concepts/workloads/pods/pod-topology-spread-constraints/
+  # This should be either a multi-line string or YAML matching the topologySpreadConstraints array
   # in a PodSpec.
-  tolerations: null
+  topologySpreadConstraints: []
 
-  # nodeSelector labels for server pod assignment, formatted as a muli-line string.
+  # Toleration Settings for server pods
+  # This should be either a multi-line string or YAML matching the Toleration array
+  # in a PodSpec.
+  tolerations: []
+
+  # nodeSelector labels for server pod assignment, formatted as a multi-line string or YAML map.
   # ref: https://kubernetes.io/docs/concepts/configuration/assign-pod-node/#nodeselector
   # Example:
-  # nodeSelector: |
+  # nodeSelector:
   #   beta.kubernetes.io/arch: amd64
-  nodeSelector: null
+  nodeSelector: {}
 
   # Enables network policy for server pods
   networkPolicy:
@@ -453,6 +590,15 @@ server:
     # or NodePort.
     #type: ClusterIP
 
+    # Do not wait for pods to be ready
+    publishNotReadyAddresses: true
+
+    # The externalTrafficPolicy can be set to either Cluster or Local
+    # and is only valid for LoadBalancer and NodePort service types.
+    # The default value is Cluster.
+    # ref: https://kubernetes.io/docs/concepts/services-networking/service/#external-traffic-policy
+    externalTrafficPolicy: Cluster
+
     # If type is set to "NodePort", a specific nodePort value can be configured,
     # will be random if left blank.
     #nodePort: 30000
@@ -484,7 +630,7 @@ server:
     annotations: {}
 
   # This configures the Vault Statefulset to create a PVC for audit
-  # logs.  Once Vault is deployed, initialized and unseal, Vault must
+  # logs.  Once Vault is deployed, initialized and unsealed, Vault must
   # be configured to use this for audit logs.  This will be mounted to
   # /vault/audit
   # See https://www.vaultproject.io/docs/audit/index.html to know more
@@ -564,6 +710,11 @@ server:
     # See https://www.vaultproject.io/docs/configuration#api_addr
     # If set to null, this will be set to the Pod IP Address
     apiAddr: null
+
+    # Set the cluster_addr confuguration for Vault HA
+    # See https://www.vaultproject.io/docs/configuration#cluster_addr
+    # If set to null, this will be set to https://$(HOSTNAME).{{ template "vault.fullname" . }}-internal:8201
+    clusterAddr: null
 
     # Enables Vault's integrated Raft storage.  Unlike the typical HA modes where
     # Vault's persistence is external (such as Consul), enabling Raft mode will create
@@ -672,8 +823,15 @@ ui:
   serviceType: "ClusterIP"
   serviceNodePort: null
   externalPort: 8200
+  targetPort: 8200
 
-  # loadBalancerSourceRanges:
+  # The externalTrafficPolicy can be set to either Cluster or Local
+  # and is only valid for LoadBalancer and NodePort service types.
+  # The default value is Cluster.
+  # ref: https://kubernetes.io/docs/concepts/services-networking/service/#external-traffic-policy
+  externalTrafficPolicy: Cluster
+
+  #loadBalancerSourceRanges:
   #   - 10.0.0.0/16
   #   - 1.78.23.3/32
 
@@ -698,7 +856,7 @@ csi:
 
   image:
     repository: "hashicorp/vault-csi-provider"
-    tag: "0.2.0"
+    tag: "1.1.0"
     pullPolicy: IfNotPresent
 
   # volumes is a list of volumes made available to all containers. These are rendered
@@ -735,17 +893,43 @@ csi:
     # YAML-formatted multi-line templated string map of the annotations to apply
     # to the daemonSet.
     annotations: {}
+    # Provider host path (must match the CSI provider's path)
+    providersDir: "/etc/kubernetes/secrets-store-csi-providers"
+    # Kubelet host path
+    kubeletRootDir: "/var/lib/kubelet"
+    # Extra labels to attach to the vault-csi-provider daemonSet
+    # This should be a YAML map of the labels to apply to the csi provider daemonSet
+    extraLabels: {}
+
   pod:
     # Extra annotations for the provider pods. This can either be YAML or a
     # YAML-formatted multi-line templated string map of the annotations to apply
     # to the pod.
     annotations: {}
 
+    # Toleration Settings for provider pods
+    # This should be either a multi-line string or YAML matching the Toleration array
+    # in a PodSpec.
+    tolerations: []
+
+    # Extra labels to attach to the vault-csi-provider pod
+    # This should be a YAML map of the labels to apply to the csi provider pod
+    extraLabels: {}
+
+
+
+  # Priority class for csi pods
+  priorityClassName: ""
+
   serviceAccount:
     # Extra annotations for the serviceAccount definition. This can either be
     # YAML or a YAML-formatted multi-line templated string map of the
     # annotations to apply to the serviceAccount.
     annotations: {}
+
+    # Extra labels to attach to the vault-csi-provider serviceAccount
+    # This should be a YAML map of the labels to apply to the csi provider serviceAccount
+    extraLabels: {}
 
   # Used to configure readinessProbe for the pods.
   readinessProbe:
@@ -774,3 +958,8 @@ csi:
 
   # Enables debug logging.
   debug: false
+
+  # Pass arbitrary additional arguments to vault-csi-provider.
+  # See https://www.vaultproject.io/docs/platform/k8s/csi/configurations#command-line-arguments
+  # for the available command line flags.
+  extraArgs: []

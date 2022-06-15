@@ -8,7 +8,7 @@ resource "random_id" "suffix" {
 
 data "google_container_engine_versions" "main" {
   location = "${var.zone}"
-  version_prefix = "1.17."
+  version_prefix = "1.19."
 }
 
 data "google_service_account" "gcpapi" {
