@@ -909,7 +909,21 @@ csi:
     # This should be a YAML map of the labels to apply to the csi provider pod
     extraLabels: {}
 
+  agent:
+    enabled: true
+    extraArgs: []
 
+    logLevel: info
+    logFormat: normal
+
+    resources: {}
+    # resources:
+    #   requests:
+    #     memory: 256Mi
+    #     cpu: 250m
+    #   limits:
+    #     memory: 256Mi
+    #     cpu: 250m
 
   # Priority class for csi pods
   priorityClassName: ""

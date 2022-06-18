@@ -48,11 +48,14 @@ spec:
             - --endpoint=/provider/vault.sock
             - --debug={{ .Values.csi.debug }}
             {{- if .Values.csi.extraArgs }}
-              {{- toYaml .Values.csi.extraArgs | nindent 12 }}
+            {{- toYaml .Values.csi.extraArgs | nindent 12 }}
             {{- end }}
           env:
             - name: VAULT_ADDR
-            {{- if .Values.global.externalVaultAddr }}
+            {{- if eq (.Values.csi.agent.enabled | toString) "true" }}
+              value: "http://127.0.0.1:8200"
+              # TODO: Add TLS for localhost
+            {{- else if .Values.global.externalVaultAddr }}
               value: "{{ .Values.global.externalVaultAddr }}"
             {{- else }}
               value: {{ include "vault.scheme" . }}://{{ template "vault.fullname" . }}.{{ .Release.Namespace }}.svc:{{ .Values.server.service.port }}
@@ -84,6 +87,41 @@ spec:
             periodSeconds: {{ .Values.csi.readinessProbe.periodSeconds }}
             successThreshold: {{ .Values.csi.readinessProbe.successThreshold }}
             timeoutSeconds: {{ .Values.csi.readinessProbe.timeoutSeconds }}
+        {{- if eq (.Values.csi.agent.enabled | toString) "true" }}
+        - name: vault-agent
+          image: hashicorp/vault:1.10.3
+          imagePullPolicy: IfNotPresent
+          {{ template "csi.agent.resources" . }}
+          command:
+            - vault
+          args:
+            - agent
+            - -config=/etc/vault/config.hcl
+            {{- if .Values.csi.agent.extraArgs }}
+            {{- toYaml .Values.csi.agent.extraArgs | nindent 12 }}
+            {{- end }}
+          ports:
+            - containerPort: 8200
+          env:
+            - name: VAULT_LOG_LEVEL
+              value: "{{ .Values.csi.agent.logLevel }}"
+            - name: VAULT_LOG_FORMAT
+              value: "{{ .Values.csi.agent.logFormat }}"
+          securityContext:
+            runAsNonRoot: true
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            runAsUser: 100
+            runAsGroup: 1000
+          volumeMounts:
+            - name: agent-config
+              mountPath: /etc/vault/config.hcl
+              subPath: config.hcl
+              readOnly: true
+            {{- if .Values.csi.volumeMounts }}
+            {{- toYaml .Values.csi.volumeMounts | nindent 12 }}
+            {{- end }}
+        {{- end }}
       volumes:
         - name: providervol
           hostPath:
@@ -91,8 +129,13 @@ spec:
         - name: mountpoint-dir
           hostPath:
             path: {{ .Values.csi.daemonSet.kubeletRootDir }}/pods
-       {{- if .Values.csi.volumes }}
-         {{- toYaml .Values.csi.volumes | nindent 8}}
-       {{- end }}
+        {{- if eq (.Values.csi.agent.enabled | toString) "true" }}
+        - name: agent-config
+          configMap:
+            name: {{ template "vault.fullname" . }}-csi-agent-config
+        {{- end }}
+        {{- if .Values.csi.volumes }}
+        {{- toYaml .Values.csi.volumes | nindent 8}}
+        {{- end }}
       {{- include "imagePullSecrets" . | nindent 6 }}
 {{- end }}
