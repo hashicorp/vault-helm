@@ -40,13 +40,7 @@ spec:
       serviceAccountName: "{{ template "vault.fullname" . }}-agent-injector"
       {{- if not .Values.global.openshift }}
       hostNetwork: {{ .Values.injector.hostNetwork }}
-      securityContext:
-        runAsNonRoot: true
-        runAsGroup: {{ .Values.injector.gid | default 1000 }}
-        runAsUser: {{ .Values.injector.uid | default 100 }}
-        fsGroup: {{ .Values.injector.uid | default 100 }}
-        supplementalGroups:
-          - {{ .Values.injector.uid | default 100 }}
+      securityContext: {{ .Values.podSecurityContext }}
       {{- end }}
       containers:
         - name: sidecar-injector
@@ -54,11 +48,7 @@ spec:
           image: "{{ .Values.injector.image.repository }}:{{ .Values.injector.image.tag }}"
           imagePullPolicy: "{{ .Values.injector.image.pullPolicy }}"
           {{- if not .Values.global.openshift }}
-          securityContext:
-            allowPrivilegeEscalation: false
-            capabilities:
-              drop:
-                - ALL
+          securityContext: {{ .Values.securityContext }}
           {{- end }}
           env:
             - name: AGENT_INJECT_LISTEN
