@@ -44,6 +44,12 @@ spec:
         runAsNonRoot: true
         runAsGroup: {{ .Values.injector.gid | default 1000 }}
         runAsUser: {{ .Values.injector.uid | default 100 }}
+        {{- if  .Values.injector.fsGroup -}}
+        fsGroup: {{ .Values.injector.fsGroup }}
+        {{- end }}
+        {{- if  .Values.injector.supplementalGroups -}}
+        supplementalGroups: {{ .Values.injector.supplementalGroups }}
+        {{- end }}
       {{- end }}
       containers:
         - name: sidecar-injector
@@ -53,6 +59,15 @@ spec:
           {{- if not .Values.global.openshift }}
           securityContext:
             allowPrivilegeEscalation: false
+            {{- if  .Values.injector.capabilities -}}
+            capabilities: {{ .Values.injector.capabilities }}
+            {{- end }}
+            {{- if  .Values.injector.readOnlyRootFilesystem -}}
+            readOnlyRootFilesystem: {{ .Values.injector.readOnlyRootFilesystem }}
+            {{- end }}
+            {{- if  .Values.injector.privileged -}}
+            privileged: {{ .Values.injector.privileged }}
+            {{- end }}
           {{- end }}
           env:
             - name: AGENT_INJECT_LISTEN
