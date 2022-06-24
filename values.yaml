@@ -202,15 +202,6 @@ injector:
     certName: tls.crt
     keyName: tls.key
 
-  resources: {}
-  # resources:
-  #   requests:
-  #     memory: 256Mi
-  #     cpu: 250m
-  #   limits:
-  #     memory: 256Mi
-  #     cpu: 250m
-
   # Default pod security context for vault-injector
   podSecurityContext:
     runAsNonRoot: true
@@ -226,6 +217,15 @@ injector:
     capabilities:
       drop:
         - ALL
+
+  resources: {}
+  # resources:
+  #   requests:
+  #     memory: 256Mi
+  #     cpu: 250m
+  #   limits:
+  #     memory: 256Mi
+  #     cpu: 250m
 
   # extraEnvironmentVars is a list of extra environment variables to set in the
   # injector deployment.
