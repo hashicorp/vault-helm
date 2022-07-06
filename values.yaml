@@ -85,6 +85,10 @@ injector:
       exitOnRetryFailure: true
       staticSecretRenderInterval: ""
 
+    # Default vault namespace for the injector
+    # default annotation value: vault.hashicorp.com/namespace
+    namespace: ""
+
   # Mount Path of the Vault Kubernetes Auth Method.
   authPath: "auth/kubernetes"
 

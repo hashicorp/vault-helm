@@ -118,6 +118,8 @@ spec:
             - name: AGENT_INJECT_TEMPLATE_STATIC_SECRET_RENDER_INTERVAL
               value: "{{ .Values.injector.agentDefaults.templateConfig.staticSecretRenderInterval }}"
             {{- end }}
+            - name: AGENT_INJECT_VAULT_NAMESPACE
+              value: "{{ .Values.injector.agentDefaults.namespace }}"
             {{- include "vault.extraEnvironmentVars" .Values.injector | nindent 12 }}
             - name: POD_NAME
               valueFrom:
