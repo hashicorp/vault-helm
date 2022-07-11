@@ -471,6 +471,21 @@ Sets extra injector service annotations
 {{- end -}}
 
 {{/*
+Sets extra injector service account annotations
+*/}}
+{{- define "injector.serviceAccount.annotations" -}}
+  {{- if and (ne .mode "dev") .Values.injector.serviceAccount.annotations }}
+  annotations:
+    {{- $tp := typeOf .Values.injector.serviceAccount.annotations }}
+    {{- if eq $tp "string" }}
+      {{- tpl .Values.injector.serviceAccount.annotations . | nindent 4 }}
+    {{- else }}
+      {{- toYaml .Values.injector.serviceAccount.annotations | nindent 4 }}
+    {{- end }}
+  {{- end }}
+{{- end -}}
+
+{{/*
 Sets extra injector webhook annotations
 */}}
 {{- define "injector.webhookAnnotations" -}}

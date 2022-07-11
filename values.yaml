@@ -269,6 +269,11 @@ injector:
     # Extra annotations to attach to the injector service
     annotations: {}
 
+  # Injector serviceAccount specific config
+  serviceAccount:
+    # Extra annotations to attach to the injector serviceAccount
+    annotations: {}
+
   # A disruption budget limits the number of pods of a replicated application
   # that are down simultaneously from voluntary disruptions
   podDisruptionBudget: {}
