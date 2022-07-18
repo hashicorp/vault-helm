@@ -5,6 +5,9 @@ CHANGES:
 * Deprecated `injector.externalVaultAddr`. Added `global.externalVaultAddr`, which applies to both the Injector and the CSI Provider. [GH-745](https://github.com/hashicorp/vault-helm/pull/745)
 * CSI Provider pods now set the `VAULT_ADDR` environment variable to either the internal Vault service or the configured external address. [GH-745](https://github.com/hashicorp/vault-helm/pull/745)
 
+Features:
+* Support for setting annotations on the injector's serviceAccount [GH-753](https://github.com/hashicorp/vault-helm/pull/753)
+
 ## 0.20.1 (May 25th, 2022)
 CHANGES:
 * `vault-k8s` updated to 0.16.1 [GH-739](https://github.com/hashicorp/vault-helm/pull/739)
