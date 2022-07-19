@@ -1145,6 +1145,25 @@ load _helpers
   [ "${actual}" = "2000" ]
 }
 
+@test "server/standalone-StatefulSet: fsGroupChangePolicy omitted by default" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      --show-only templates/server-statefulset.yaml \
+      . | tee /dev/stderr |
+      yq -r '.spec.template.spec.securityContext.fsGroupChangePolicy' | tee /dev/stderr)
+  [ "${actual}" = "null" ]
+}
+
+@test "server/standalone-StatefulSet: fsGroupChangePolicy configurable" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      --show-only templates/server-statefulset.yaml \
+      --set 'server.fsGroupChangePolicy="OnRootMismatch"' \
+      . | tee /dev/stderr |
+      yq -r '.spec.template.spec.securityContext.fsGroupChangePolicy' | tee /dev/stderr)
+  [ "${actual}" = "OnRootMismatch" ]
+}
+
 #--------------------------------------------------------------------
 # health checks
 

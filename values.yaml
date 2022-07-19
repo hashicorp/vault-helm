@@ -430,6 +430,10 @@ server:
   # This is useful if Vault must be signaled, e.g. to send a SIGHUP for log rotation
   shareProcessNamespace: false
 
+  # fsGroupChangePolicy defines the behavior for changing ownership and permission of the volume before being exposed inside the pod
+  # https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#configure-volume-permission-and-ownership-change-policy-for-pods
+  fsGroupChangePolicy: null
+
   # extraArgs is a string containing additional Vault server arguments.
   extraArgs: ""
 

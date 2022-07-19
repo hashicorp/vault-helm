@@ -54,6 +54,9 @@ spec:
         runAsGroup: {{ .Values.server.gid | default 1000 }}
         runAsUser: {{ .Values.server.uid | default 100 }}
         fsGroup: {{ .Values.server.gid | default 1000 }}
+        {{ if  .Values.server.fsGroupChangePolicy }}
+        fsGroupChangePolicy:  {{ .Values.server.fsGroupChangePolicy }}
+        {{ end }}
       {{- end }}
       volumes:
         {{ template "vault.volumes" . }}
