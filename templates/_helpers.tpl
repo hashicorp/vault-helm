@@ -474,29 +474,44 @@ Sets extra injector service annotations
 securityContext for the injector pod level.
 */}}
 {{- define "injector.securityContext.pod" -}}
-{{- if or (.Values.injector.uid) (.Values.injector.gid) }}
-{{- if not .Values.global.openshift }}
+  {{- if not .Values.global.openshift }}
+    {{- if or (.Values.injector.uid) (.Values.injector.gid) }}
       securityContext:
         runAsNonRoot: true
         runAsGroup: {{ .Values.injector.gid | default 1000 }}
         runAsUser: {{ .Values.injector.uid | default 100 }}
-{{- else }}
+    {{- else }}
       securityContext:
         {{- toYaml .Values.injector.securityContext.pod | nindent 8 }}
-{{- end }}
-{{- end }}
+    {{- end }}
+  {{- end }}
 {{- end -}}
 
 {{/*
 securityContext for the injector container level.
 */}}
 {{- define "injector.securityContext.container" -}}
-{{- if .Values.injector.securityContext.container}}
-{{- if not .Values.global.openshift }}
+  {{- if not .Values.global.openshift }}
+    {{- if .Values.injector.securityContext.container}}
           securityContext:
             {{- toYaml .Values.injector.securityContext.container | nindent 12 }}
-{{- end }}
-{{- end }}
+    {{- end }}
+  {{- end }}
+{{- end -}} 
+
+{{/*
+Sets extra injector service account annotations
+*/}}
+{{- define "injector.serviceAccount.annotations" -}}
+  {{- if and (ne .mode "dev") .Values.injector.serviceAccount.annotations }}
+  annotations:
+    {{- $tp := typeOf .Values.injector.serviceAccount.annotations }}
+    {{- if eq $tp "string" }}
+      {{- tpl .Values.injector.serviceAccount.annotations . | nindent 4 }}
+    {{- else }}
+      {{- toYaml .Values.injector.serviceAccount.annotations | nindent 4 }}
+    {{- end }}
+  {{- end }}
 {{- end -}}
 
 {{/*
