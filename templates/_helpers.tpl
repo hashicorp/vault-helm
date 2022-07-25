@@ -471,6 +471,35 @@ Sets extra injector service annotations
 {{- end -}}
 
 {{/*
+securityContext for the injector pod level.
+*/}}
+{{- define "injector.securityContext.pod" -}}
+{{- if or (.Values.injector.uid) (.Values.injector.gid) }}
+{{- if not .Values.global.openshift }}
+      securityContext:
+        runAsNonRoot: true
+        runAsGroup: {{ .Values.injector.gid | default 1000 }}
+        runAsUser: {{ .Values.injector.uid | default 100 }}
+{{- else }}
+      securityContext:
+        {{- toYaml .Values.injector.securityContext.pod | nindent 8 }}
+{{- end }}
+{{- end }}
+{{- end -}}
+
+{{/*
+securityContext for the injector container level.
+*/}}
+{{- define "injector.securityContext.container" -}}
+{{- if .Values.injector.securityContext.container}}
+{{- if not .Values.global.openshift }}
+          securityContext:
+            {{- toYaml .Values.injector.securityContext.container | nindent 10 }}
+{{- end }}
+{{- end }}
+{{- end -}}
+
+{{/*
 Sets extra injector webhook annotations
 */}}
 {{- define "injector.webhookAnnotations" -}}

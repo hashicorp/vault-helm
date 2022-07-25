@@ -1,4 +1,6 @@
 {{- template "vault.injectorEnabled" . -}}
+{{- template "injector.securityContext.pod" . -}}
+{{- template "injector.securityContext.container" . -}}
 {{- if .injectorEnabled -}}
 # Deployment for the injector
 apiVersion: apps/v1
@@ -40,35 +42,12 @@ spec:
       serviceAccountName: "{{ template "vault.fullname" . }}-agent-injector"
       {{- if not .Values.global.openshift }}
       hostNetwork: {{ .Values.injector.hostNetwork }}
-      securityContext:
-        runAsNonRoot: true
-        runAsGroup: {{ .Values.injector.gid | default 1000 }}
-        runAsUser: {{ .Values.injector.uid | default 100 }}
-        {{- if  .Values.injector.fsGroup -}}
-        fsGroup: {{ .Values.injector.fsGroup }}
-        {{- end }}
-        {{- if  .Values.injector.supplementalGroups -}}
-        supplementalGroups: {{ .Values.injector.supplementalGroups }}
-        {{- end }}
       {{- end }}
       containers:
         - name: sidecar-injector
           {{ template "injector.resources" . }}
           image: "{{ .Values.injector.image.repository }}:{{ .Values.injector.image.tag }}"
           imagePullPolicy: "{{ .Values.injector.image.pullPolicy }}"
-          {{- if not .Values.global.openshift }}
-          securityContext:
-            allowPrivilegeEscalation: false
-            {{- if  .Values.injector.capabilities -}}
-            capabilities: {{ .Values.injector.capabilities }}
-            {{- end }}
-            {{- if  .Values.injector.readOnlyRootFilesystem -}}
-            readOnlyRootFilesystem: {{ .Values.injector.readOnlyRootFilesystem }}
-            {{- end }}
-            {{- if  .Values.injector.privileged -}}
-            privileged: {{ .Values.injector.privileged }}
-            {{- end }}
-          {{- end }}
           env:
             - name: AGENT_INJECT_LISTEN
               value: {{ printf ":%v" .Values.injector.port  }}
