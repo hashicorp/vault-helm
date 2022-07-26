@@ -208,9 +208,7 @@ injector:
       runAsNonRoot: true
       runAsGroup: 1000
       runAsUser: 100
-      fsGroup: 100
-      supplementalGroups:
-        - 100
+      fsGroup: 1000
     container:
       allowPrivilegeEscalation: false
       capabilities:
