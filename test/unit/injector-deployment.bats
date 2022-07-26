@@ -380,10 +380,10 @@ load _helpers
   local actual=$(helm template \
       --show-only templates/injector-deployment.yaml  \
       --set 'injector.enabled=true' \
-      --set 'injector.securityContext.runAsNonRoot=true' \
-      --set 'injector.securityContext.runAsGroup=1000' \
-      --set 'injector.securityContext.runAsUser=100' \
-      --set 'injector.securityContext.fsGroup=1000' \
+      --set 'injector.securityContext.pod.runAsNonRoot=true' \
+      --set 'injector.securityContext.pod.runAsGroup=1000' \
+      --set 'injector.securityContext.pod.runAsUser=100' \
+      --set 'injector.securityContext.pod.fsGroup=1000' \
       . | tee /dev/stderr |
       yq -r '.spec.template.spec.securityContext.runAsGroup' | tee /dev/stderr)
   [ "${actual}" = "1000" ]
@@ -391,8 +391,8 @@ load _helpers
   local actual=$(helm template \
       --show-only templates/injector-deployment.yaml  \
       --set 'injector.enabled=true' \
-      --set 'injector.securityContext.runAsNonRoot=true' \
-      --set 'injector.securityContext.runAsGroup=1000' \
+      --set 'injector.securityContext.pod.runAsNonRoot=true' \
+      --set 'injector.securityContext.pod.runAsGroup=1000' \
       . | tee /dev/stderr |
       yq -r '.spec.template.spec.securityContext.runAsNonRoot' | tee /dev/stderr)
   [ "${actual}" = "true" ]
@@ -400,8 +400,8 @@ load _helpers
   local actual=$(helm template \
       --show-only templates/injector-deployment.yaml \
       --set 'injector.enabled=true' \
-      --set 'injector.securityContext.runAsUser=100' \
-      --set 'injector.securityContext.fsGroup=1000' \\
+      --set 'injector.securityContext.pod.runAsUser=100' \
+      --set 'injector.securityContext.pod.fsGroup=1000' \\
       . | tee /dev/stderr |
       yq -r '.spec.template.spec.securityContext.runAsUser' | tee /dev/stderr)
   [ "${actual}" = "100" ]
@@ -409,8 +409,8 @@ load _helpers
   local actual=$(helm template \
       --show-only templates/injector-deployment.yaml \
       --set 'injector.enabled=true' \
-      --set 'injector.securityContext.runAsNonRoot=true' \
-      --set 'injector.securityContext.fsGroup=1000' \
+      --set 'injector.securityContext.pod.runAsNonRoot=true' \
+      --set 'injector.securityContext.pod.fsGroup=1000' \
       . | tee /dev/stderr |
       yq -r '.spec.template.spec.securityContext.fsGroup' | tee /dev/stderr)
   [ "${actual}" = "1000" ]
@@ -430,8 +430,8 @@ load _helpers
   local actual=$(helm template \
       --show-only templates/injector-deployment.yaml  \
       --set 'injector.enabled=true' \
-      --set 'injector.securityContext.containers[0].allowPrivilegeEscalation=false' \
-      --set 'injector.securityContext.containers[0].capabilities.drop=ALL' \
+      --set 'injector.securityContext.container.allowPrivilegeEscalation=false' \
+      --set 'injector.securityContext.container.capabilities.drop=ALL' \
       . | tee /dev/stderr |
       yq -r '.spec.template.spec.containers[0].securityContext.allowPrivilegeEscalation' | tee /dev/stderr)
   [ "${actual}" = "false" ]
@@ -439,7 +439,7 @@ load _helpers
   local actual=$(helm template \
       --show-only templates/injector-deployment.yaml  \
       --set 'injector.enabled=true' \
-      --set 'injector.securityContext.containers[0].capabilities.drop=ALL' \
+      --set 'injector.securityContext.container.capabilities.drop=ALL' \
       . | tee /dev/stderr |
       yq -r '.spec.template.spec.containers[0].securityContext.capabilities.drop' | tee /dev/stderr)
   [ "${actual}" = "ALL" ]
