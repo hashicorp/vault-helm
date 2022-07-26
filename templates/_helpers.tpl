@@ -489,11 +489,9 @@ securityContext for the injector pod level.
 securityContext for the injector container level.
 */}}
 {{- define "injector.securityContext.container" -}}
-  {{- if not .Values.global.openshift }}
-    {{- if .Values.injector.securityContext.container}}
+  {{- if .Values.injector.securityContext.container}}
           securityContext:
             {{- toYaml .Values.injector.securityContext.container | nindent 12 }}
-    {{- end }}
   {{- end }}
 {{- end -}} 
 
