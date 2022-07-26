@@ -1,6 +1,4 @@
 {{- template "vault.injectorEnabled" . -}}
-{{- template "injector.securityContext.pod" . -}}
-{{- template "injector.securityContext.container" . -}}
 {{- if .injectorEnabled -}}
 # Deployment for the injector
 apiVersion: apps/v1
