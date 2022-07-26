@@ -474,16 +474,14 @@ Sets extra injector service annotations
 securityContext for the injector pod level.
 */}}
 {{- define "injector.securityContext.pod" -}}
-  {{- if not .Values.global.openshift }}
-    {{- if or (.Values.injector.uid) (.Values.injector.gid) }}
+  {{- if or (.Values.injector.uid) (.Values.injector.gid) }}
       securityContext:
         runAsNonRoot: true
         runAsGroup: {{ .Values.injector.gid | default 1000 }}
         runAsUser: {{ .Values.injector.uid | default 100 }}
-    {{- else }}
+  {{- else }}
       securityContext:
         {{- toYaml .Values.injector.securityContext.pod | nindent 8 }}
-    {{- end }}
   {{- end }}
 {{- end -}}
 
