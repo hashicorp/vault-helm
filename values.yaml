@@ -215,7 +215,6 @@ injector:
         drop:
           - ALL
 
-
   resources: {}
   # resources:
   #   requests:
