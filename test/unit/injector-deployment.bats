@@ -913,7 +913,6 @@ EOF
       yq -r 'map(select(.name=="AGENT_INJECT_TEMPLATE_CONFIG_EXIT_ON_RETRY_FAILURE")) | .[] .value' | tee /dev/stderr)
   [ "${value}" = "false" ]
 }
-
 @test "injector/deployment: agent default template_config.static_secret_render_interval" {
   cd `chart_dir`
   local object=$(helm template \

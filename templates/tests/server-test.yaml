@@ -1,10 +1,6 @@
-<<<<<<< HEAD
 {{ template "vault.mode" . }}
 {{- if ne .mode "external" }}
 {{- if .serverEnabled -}}
-=======
-{{- if .Values.server.enabled }}
->>>>>>> c4ab664 (feat(DATAGO-27002): Upgrade vault to version 1.7.9 (#12))
 apiVersion: v1
 kind: Pod
 metadata:
@@ -13,10 +9,7 @@ metadata:
   annotations:
     "helm.sh/hook": test
 spec:
-<<<<<<< HEAD
   {{- include "imagePullSecrets" . | nindent 2 }}
-=======
->>>>>>> c4ab664 (feat(DATAGO-27002): Upgrade vault to version 1.7.9 (#12))
   containers:
     - name: {{ .Release.Name }}-server-test
       image: {{ .Values.server.image.repository }}:{{ .Values.server.image.tag | default "latest" }}
@@ -24,10 +17,7 @@ spec:
       env:
         - name: VAULT_ADDR
           value: {{ include "vault.scheme" . }}://{{ template "vault.fullname" . }}.{{ .Release.Namespace }}.svc:{{ .Values.server.service.port }}
-<<<<<<< HEAD
         {{- include "vault.extraEnvironmentVars" .Values.server | nindent 8 }}
-=======
->>>>>>> c4ab664 (feat(DATAGO-27002): Upgrade vault to version 1.7.9 (#12))
       command:
         - /bin/sh
         - -c
@@ -48,7 +38,6 @@ spec:
           fi
 
           exit 0
-<<<<<<< HEAD
       volumeMounts:
         {{- if .Values.server.volumeMounts }}
           {{- toYaml .Values.server.volumeMounts | nindent 8}}
@@ -60,8 +49,3 @@ spec:
   restartPolicy: Never
 {{- end }}
 {{- end }}
-=======
-
-  restartPolicy: Never
-{{- end }}
->>>>>>> c4ab664 (feat(DATAGO-27002): Upgrade vault to version 1.7.9 (#12))
