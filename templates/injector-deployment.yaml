@@ -46,13 +46,6 @@ spec:
       {{ template "injector.securityContext.pod" . -}}
       {{- if not .Values.global.openshift }}
       hostNetwork: {{ .Values.injector.hostNetwork }}
-<<<<<<< HEAD
-=======
-      securityContext:
-        runAsNonRoot: true
-        runAsGroup: {{ .Values.injector.gid | default 1000 }}
-        runAsUser: {{ .Values.injector.uid | default 100 }}
->>>>>>> c4ab664 (feat(DATAGO-27002): Upgrade vault to version 1.7.9 (#12))
       {{- end }}
       containers:
         - name: sidecar-injector
@@ -118,15 +111,12 @@ spec:
               value: "{{ .Values.injector.agentDefaults.memLimit }}"
             - name: AGENT_INJECT_DEFAULT_TEMPLATE
               value: "{{ .Values.injector.agentDefaults.template }}"
-<<<<<<< HEAD
             - name: AGENT_INJECT_TEMPLATE_CONFIG_EXIT_ON_RETRY_FAILURE
               value: "{{ .Values.injector.agentDefaults.templateConfig.exitOnRetryFailure }}"
             {{- if .Values.injector.agentDefaults.templateConfig.staticSecretRenderInterval }}
             - name: AGENT_INJECT_TEMPLATE_STATIC_SECRET_RENDER_INTERVAL
               value: "{{ .Values.injector.agentDefaults.templateConfig.staticSecretRenderInterval }}"
             {{- end }}
-=======
->>>>>>> c4ab664 (feat(DATAGO-27002): Upgrade vault to version 1.7.9 (#12))
             {{- include "vault.extraEnvironmentVars" .Values.injector | nindent 12 }}
             - name: POD_NAME
               valueFrom:
@@ -166,15 +156,12 @@ spec:
             successThreshold: {{ .Values.injector.startupProbe.successThreshold }}
             timeoutSeconds: {{ .Values.injector.startupProbe.timeoutSeconds }}
 {{- if .Values.injector.certs.secretName }}
-<<<<<<< HEAD
           volumeMounts:
             - name: webhook-certs
               mountPath: /etc/webhook/certs
               readOnly: true
 {{- end }}
 {{- if .Values.injector.certs.secretName }}
-=======
->>>>>>> c4ab664 (feat(DATAGO-27002): Upgrade vault to version 1.7.9 (#12))
       volumes:
         - name: webhook-certs
           secret:
