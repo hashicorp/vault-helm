@@ -372,7 +372,19 @@ load _helpers
       --show-only templates/injector-deployment.yaml  \
       . | tee /dev/stderr |
       yq -r '.spec.template.spec.securityContext' | tee /dev/stderr)
-  [ "${actual}" = "null" ]
+  [ "${actual}" != "null" ]
+
+  local value=$(echo $actual | yq -r .fsGroup | tee /dev/stderr)
+  [ "${value}" = "1000" ]
+
+  local value=$(echo $actual | yq -r .runAsGroup | tee /dev/stderr)
+  [ "${value}" = "1000" ]
+
+  local value=$(echo $actual | yq -r .runAsNonRoot | tee /dev/stderr)
+  [ "${value}" = "true" ]
+
+  local value=$(echo $actual | yq -r .runAsUser | tee /dev/stderr)
+  [ "${value}" = "100" ]
 }
 
 @test "injector/deployment: custom pod securityContext" {
