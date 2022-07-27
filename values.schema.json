@@ -53,6 +53,9 @@
                         }
                     }
                 },
+                "priorityClassName": {
+                    "type": "string"
+                },
                 "debug": {
                     "type": "boolean"
                 },
@@ -360,6 +363,9 @@
                         "object",
                         "string"
                     ]
+                },
+                "podDisruptionBudget": {
+                    "type": "object"
                 },
                 "podDisruptionBudget": {
                     "type": "object"
