@@ -455,6 +455,7 @@ load _helpers
       . | tee /dev/stderr |
       yq -r '.spec.template.spec.containers[0].securityContext.capabilities.drop' | tee /dev/stderr)
   [ "${actual}" = "ALL" ]
+}
 
 #--------------------------------------------------------------------
 # extraEnvironmentVars
