@@ -479,7 +479,7 @@ securityContext for the injector pod level.
         runAsNonRoot: true
         runAsGroup: {{ .Values.injector.gid | default 1000 }}
         runAsUser: {{ .Values.injector.uid | default 100 }}
-  {{- else }}
+  {{- else if .Values.injector.securityContext.pod }}
       securityContext:
         {{- toYaml .Values.injector.securityContext.pod | nindent 8 }}
   {{- end }}
