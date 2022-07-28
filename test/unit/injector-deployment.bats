@@ -369,7 +369,7 @@ load _helpers
 # for backward compatibility
 @test "injector/deployment: backward pod securityContext" {
   cd `chart_dir`
-  local object=$(helm template \
+  local actual=$(helm template \
       --show-only templates/injector-deployment.yaml  \
       --set 'injector.uid=200' \
       --set 'injector.gid=4000' \
@@ -411,11 +411,11 @@ load _helpers
       --set 'injector.enabled=true' \
       --set 'injector.securityContext.pod.runAsNonRoot=true' \
       --set 'injector.securityContext.pod.runAsGroup=1001' \
-      --set 'injector.securityContext.pod.runAsUser=100' \
+      --set 'injector.securityContext.pod.runAsUser=1001' \
       --set 'injector.securityContext.pod.fsGroup=1000' \
       . | tee /dev/stderr |
       yq -r '.spec.template.spec.securityContext.runAsGroup' | tee /dev/stderr)
-  [ "${actual}" = "1000" ]
+  [ "${actual}" = "1001" ]
 
   local actual=$(helm template \
       --show-only templates/injector-deployment.yaml  \
@@ -424,16 +424,16 @@ load _helpers
       --set 'injector.securityContext.pod.runAsGroup=1000' \
       . | tee /dev/stderr |
       yq -r '.spec.template.spec.securityContext.runAsNonRoot' | tee /dev/stderr)
-  [ "${actual}" = "true" ]
+  [ "${actual}" = "false" ]
 
   local actual=$(helm template \
       --show-only templates/injector-deployment.yaml \
       --set 'injector.enabled=true' \
       --set 'injector.securityContext.pod.runAsUser=1001' \
-      --set 'injector.securityContext.pod.fsGroup=1000' \\
+      --set 'injector.securityContext.pod.fsGroup=1000' \
       . | tee /dev/stderr |
       yq -r '.spec.template.spec.securityContext.runAsUser' | tee /dev/stderr)
-  [ "${actual}" = "100" ]
+  [ "${actual}" = "1001" ]
 
   local actual=$(helm template \
       --show-only templates/injector-deployment.yaml \
@@ -442,7 +442,7 @@ load _helpers
       --set 'injector.securityContext.pod.fsGroup=1001' \
       . | tee /dev/stderr |
       yq -r '.spec.template.spec.securityContext.fsGroup' | tee /dev/stderr)
-  [ "${actual}" = "1000" ]
+  [ "${actual}" = "1001" ]
 }
 
 @test "injector/deployment: default container securityContext sidecar-injector" {
@@ -456,8 +456,6 @@ load _helpers
   local value=$(echo $actual | yq -r .allowPrivilegeEscalation | tee /dev/stderr)
   [ "${value}" = "false" ]
 
-  local value=$(echo $actual | yq -r .capabilities.drop | tee /dev/stderr)
-  [ "${value}" = "ALL" ]
 }
 
 @test "injector/deployment: custom container securityContext sidecar-injector" {
@@ -465,9 +463,10 @@ load _helpers
   local actual=$(helm template \
       --show-only templates/injector-deployment.yaml  \
       --set 'injector.enabled=true' \
-      --set 'injector.securityContext.container.privileged=false' \
+      --set 'injector.securityContext.container.privileged=true' \
+      . | tee /dev/stderr |
       yq -r '.spec.template.spec.containers[0].securityContext.privileged' | tee /dev/stderr)
-  [ "${actual}" = "false" ]
+  [ "${actual}" = "true" ]
 
   local actual=$(helm template \
       --show-only templates/injector-deployment.yaml  \
