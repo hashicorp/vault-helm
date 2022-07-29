@@ -456,6 +456,8 @@ load _helpers
   local value=$(echo $actual | yq -r .allowPrivilegeEscalation | tee /dev/stderr)
   [ "${value}" = "false" ]
 
+  local value=$(echo $actual | yq -r .capabilities.drop[0] | tee /dev/stderr)
+  [ "${value}" = "ALL" ]
 }
 
 @test "injector/deployment: custom container securityContext sidecar-injector" {
