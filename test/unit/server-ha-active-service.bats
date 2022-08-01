@@ -119,7 +119,7 @@ load _helpers
       --show-only templates/server-ha-active-service.yaml \
       --set 'server.ha.enabled=true' \
       --set 'server.service.type=NodePort' \
-      --set 'server.service.nodePort=30009' \
+      --set 'server.service.activeNodePort=30009' \
       . | tee /dev/stderr |
       yq -r '.spec.ports[0].nodePort' | tee /dev/stderr)
   [ "${actual}" = "30009" ]
@@ -130,7 +130,7 @@ load _helpers
   local actual=$(helm template \
       --show-only templates/server-ha-active-service.yaml \
       --set 'server.ha.enabled=true' \
-      --set 'server.service.nodePort=30009' \
+      --set 'server.service.activeNodePort=30009' \
       . | tee /dev/stderr |
       yq -r '.spec.ports[0].nodePort' | tee /dev/stderr)
   [ "${actual}" = "null" ]
