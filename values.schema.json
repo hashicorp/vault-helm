@@ -828,6 +828,15 @@
                         },
                         "targetPort": {
                             "type": "integer"
+                        },
+                        "nodePort": {
+                            "type": "integer"
+                        },
+                        "activeNodePort": {
+                            "type": "integer"
+                        },
+                        "standbyNodePort": {
+                            "type": "integer"
                         }
                     }
                 },
