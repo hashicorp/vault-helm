@@ -6,6 +6,7 @@ CHANGES:
 * CSI Provider pods now set the `VAULT_ADDR` environment variable to either the internal Vault service or the configured external address. [GH-745](https://github.com/hashicorp/vault-helm/pull/745)
 
 Features:
+* Add `server.service.activeNodePort` and `server.service.standbyNodePort` to specify the `nodePort` for active and standby services. [GH-610](https://github.com/hashicorp/vault-helm/pull/610)
 * Support for setting annotations on the injector's serviceAccount [GH-753](https://github.com/hashicorp/vault-helm/pull/753)
 
 ## 0.20.1 (May 25th, 2022)
