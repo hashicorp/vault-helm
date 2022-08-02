@@ -202,6 +202,19 @@ injector:
     certName: tls.crt
     keyName: tls.key
 
+  # Default pod and container security context for vault-injector
+  securityContext:
+    pod:
+      runAsNonRoot: true
+      runAsGroup: 1000
+      runAsUser: 100
+      fsGroup: 1000
+    container:
+      allowPrivilegeEscalation: false
+      capabilities:
+        drop:
+          - ALL
+
   resources: {}
   # resources:
   #   requests:

@@ -364,6 +364,122 @@ load _helpers
 }
 
 #--------------------------------------------------------------------
+# securityContext or pod and container
+
+# for backward compatibility
+@test "injector/deployment: backward pod securityContext" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      --show-only templates/injector-deployment.yaml  \
+      --set 'injector.uid=200' \
+      --set 'injector.gid=4000' \
+      . | tee /dev/stderr |
+      yq -r '.spec.template.spec.securityContext' | tee /dev/stderr)
+
+  local value=$(echo $actual | yq -r .runAsUser | tee /dev/stderr)
+  [ "${value}" = "200" ]
+
+  local value=$(echo $actual | yq -r .runAsGroup | tee /dev/stderr)
+  [ "${value}" = "4000" ]
+}
+
+@test "injector/deployment: default pod securityContext" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      --show-only templates/injector-deployment.yaml  \
+      . | tee /dev/stderr |
+      yq -r '.spec.template.spec.securityContext' | tee /dev/stderr)
+  [ "${actual}" != "null" ]
+
+  local value=$(echo $actual | yq -r .fsGroup | tee /dev/stderr)
+  [ "${value}" = "1000" ]
+
+  local value=$(echo $actual | yq -r .runAsGroup | tee /dev/stderr)
+  [ "${value}" = "1000" ]
+
+  local value=$(echo $actual | yq -r .runAsNonRoot | tee /dev/stderr)
+  [ "${value}" = "true" ]
+
+  local value=$(echo $actual | yq -r .runAsUser | tee /dev/stderr)
+  [ "${value}" = "100" ]
+}
+
+@test "injector/deployment: custom pod securityContext" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      --show-only templates/injector-deployment.yaml  \
+      --set 'injector.enabled=true' \
+      --set 'injector.securityContext.pod.runAsNonRoot=true' \
+      --set 'injector.securityContext.pod.runAsGroup=1001' \
+      --set 'injector.securityContext.pod.runAsUser=1001' \
+      --set 'injector.securityContext.pod.fsGroup=1000' \
+      . | tee /dev/stderr |
+      yq -r '.spec.template.spec.securityContext.runAsGroup' | tee /dev/stderr)
+  [ "${actual}" = "1001" ]
+
+  local actual=$(helm template \
+      --show-only templates/injector-deployment.yaml  \
+      --set 'injector.enabled=true' \
+      --set 'injector.securityContext.pod.runAsNonRoot=false' \
+      --set 'injector.securityContext.pod.runAsGroup=1000' \
+      . | tee /dev/stderr |
+      yq -r '.spec.template.spec.securityContext.runAsNonRoot' | tee /dev/stderr)
+  [ "${actual}" = "false" ]
+
+  local actual=$(helm template \
+      --show-only templates/injector-deployment.yaml \
+      --set 'injector.enabled=true' \
+      --set 'injector.securityContext.pod.runAsUser=1001' \
+      --set 'injector.securityContext.pod.fsGroup=1000' \
+      . | tee /dev/stderr |
+      yq -r '.spec.template.spec.securityContext.runAsUser' | tee /dev/stderr)
+  [ "${actual}" = "1001" ]
+
+  local actual=$(helm template \
+      --show-only templates/injector-deployment.yaml \
+      --set 'injector.enabled=true' \
+      --set 'injector.securityContext.pod.runAsNonRoot=true' \
+      --set 'injector.securityContext.pod.fsGroup=1001' \
+      . | tee /dev/stderr |
+      yq -r '.spec.template.spec.securityContext.fsGroup' | tee /dev/stderr)
+  [ "${actual}" = "1001" ]
+}
+
+@test "injector/deployment: default container securityContext sidecar-injector" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      --show-only templates/injector-deployment.yaml  \
+      . | tee /dev/stderr |
+      yq -r '.spec.template.spec.containers[0].securityContext' | tee /dev/stderr)
+  [ "${actual}" != "null" ]
+
+  local value=$(echo $actual | yq -r .allowPrivilegeEscalation | tee /dev/stderr)
+  [ "${value}" = "false" ]
+
+  local value=$(echo $actual | yq -r .capabilities.drop[0] | tee /dev/stderr)
+  [ "${value}" = "ALL" ]
+}
+
+@test "injector/deployment: custom container securityContext sidecar-injector" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      --show-only templates/injector-deployment.yaml  \
+      --set 'injector.enabled=true' \
+      --set 'injector.securityContext.container.privileged=true' \
+      . | tee /dev/stderr |
+      yq -r '.spec.template.spec.containers[0].securityContext.privileged' | tee /dev/stderr)
+  [ "${actual}" = "true" ]
+
+  local actual=$(helm template \
+      --show-only templates/injector-deployment.yaml  \
+      --set 'injector.enabled=true' \
+      --set 'injector.securityContext.container.readOnlyRootFilesystem=false' \
+      . | tee /dev/stderr |
+      yq -r '.spec.template.spec.containers[0].securityContext.readOnlyRootFilesystem' | tee /dev/stderr)
+  [ "${actual}" = "false" ]
+}
+
+#--------------------------------------------------------------------
 # extraEnvironmentVars
 
 @test "injector/deployment: set extraEnvironmentVars" {

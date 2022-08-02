@@ -471,6 +471,31 @@ Sets extra injector service annotations
 {{- end -}}
 
 {{/*
+securityContext for the injector pod level.
+*/}}
+{{- define "injector.securityContext.pod" -}}
+  {{- if or (.Values.injector.uid) (.Values.injector.gid) }}
+      securityContext:
+        runAsNonRoot: true
+        runAsGroup: {{ .Values.injector.gid | default 1000 }}
+        runAsUser: {{ .Values.injector.uid | default 100 }}
+  {{- else if .Values.injector.securityContext.pod }}
+      securityContext:
+        {{- toYaml .Values.injector.securityContext.pod | nindent 8 }}
+  {{- end }}
+{{- end -}}
+
+{{/*
+securityContext for the injector container level.
+*/}}
+{{- define "injector.securityContext.container" -}}
+  {{- if .Values.injector.securityContext.container}}
+          securityContext:
+            {{- toYaml .Values.injector.securityContext.container | nindent 12 }}
+  {{- end }}
+{{- end -}} 
+
+{{/*
 Sets extra injector service account annotations
 */}}
 {{- define "injector.serviceAccount.annotations" -}}
