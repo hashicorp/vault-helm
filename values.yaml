@@ -601,6 +601,10 @@ server:
     # or NodePort.
     #type: ClusterIP
 
+    # Configure the loadBalancerClass for the main Vault service.
+    # ref: https://kubernetes.io/docs/concepts/services-networking/service/#load-balancer-class
+    # loadBalancerClass: 
+
     # Do not wait for pods to be ready
     publishNotReadyAddresses: true
 
