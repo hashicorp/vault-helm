@@ -36,9 +36,6 @@
                         }
                     }
                 },
-                "priorityClassName": {
-                    "type": "string"
-                },
                 "debug": {
                     "type": "boolean"
                 },
@@ -106,6 +103,9 @@
                         }
                     }
                 },
+                "priorityClassName": {
+                    "type": "string"
+                },
                 "readinessProbe": {
                     "type": "object",
                     "properties": {
@@ -163,6 +163,9 @@
                 "enabled": {
                     "type": "boolean"
                 },
+                "externalVaultAddr": {
+                    "type": "string"
+                },
                 "imagePullSecrets": {
                     "type": "array"
                 },
@@ -185,9 +188,6 @@
                 },
                 "tlsDisable": {
                     "type": "boolean"
-                },
-                "externalVaultAddr": {
-                    "type": "string"
                 }
             }
         },
@@ -361,6 +361,17 @@
                 },
                 "revokeOnShutdown": {
                     "type": "boolean"
+                },
+                "securityContext": {
+                    "type": "object",
+                    "properties": {
+                        "container": {
+                            "type": "object"
+                        },
+                        "pod": {
+                            "type": "object"
+                        }
+                    }
                 },
                 "service": {
                     "type": "object",
@@ -592,6 +603,12 @@
                                 "string"
                             ]
                         },
+                        "clusterAddr": {
+                            "type": [
+                                "null",
+                                "string"
+                            ]
+                        },
                         "config": {
                             "type": [
                                 "string",
@@ -802,6 +819,9 @@
                         },
                         "labels": {
                             "type": "object"
+                        },
+                        "tls": {
+                            "type": "object"
                         }
                     }
                 },
@@ -817,14 +837,14 @@
                         "enabled": {
                             "type": "boolean"
                         },
-                        "publishNotReadyAddresses": {
-                            "type": "boolean"
-                        },
                         "externalTrafficPolicy": {
                             "type": "string"
                         },
                         "port": {
                             "type": "integer"
+                        },
+                        "publishNotReadyAddresses": {
+                            "type": "boolean"
                         },
                         "targetPort": {
                             "type": "integer"
@@ -892,6 +912,13 @@
                     "type": "integer"
                 },
                 "tolerations": {
+                    "type": [
+                        "null",
+                        "array",
+                        "string"
+                    ]
+                },
+                "topologySpreadConstraints": {
                     "type": [
                         "null",
                         "array",
