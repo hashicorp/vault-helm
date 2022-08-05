@@ -5,8 +5,11 @@ CHANGES:
 * Deprecated `injector.externalVaultAddr`. Added `global.externalVaultAddr`, which applies to both the Injector and the CSI Provider. [GH-745](https://github.com/hashicorp/vault-helm/pull/745)
 * CSI Provider pods now set the `VAULT_ADDR` environment variable to either the internal Vault service or the configured external address. [GH-745](https://github.com/hashicorp/vault-helm/pull/745)
 * Deprecated `injector.uid` and `injector.gid`. Replaced with `injector.securityContext.pod`. [GH-750](https://github.com/hashicorp/vault-helm/pull/750)
+* injector: Allow setting securityContext for pod and container to be objects or YAML strings. [GH-767](https://github.com/hashicorp/vault-helm/pull/767)
 
 Features:
+* server: Add `server.statefulSet.securityContext` to override pod and container `securityContext`. [GH-767](https://github.com/hashicorp/vault-helm/pull/767)
+* csi: Add `csi.daemonSet.securityContext` to override pod and container `securityContext`. [GH-767](https://github.com/hashicorp/vault-helm/pull/767)
 * Add `server.service.activeNodePort` and `server.service.standbyNodePort` to specify the `nodePort` for active and standby services. [GH-610](https://github.com/hashicorp/vault-helm/pull/610)
 * Support for setting annotations on the injector's serviceAccount [GH-753](https://github.com/hashicorp/vault-helm/pull/753)
 * injector: Support setting both pod and container securityContext [GH-750](https://github.com/hashicorp/vault-helm/pull/750)

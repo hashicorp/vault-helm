@@ -48,13 +48,7 @@ spec:
       {{ if  .Values.server.shareProcessNamespace }}
       shareProcessNamespace: true
       {{ end }}
-      {{- if not .Values.global.openshift }}
-      securityContext:
-        runAsNonRoot: true
-        runAsGroup: {{ .Values.server.gid | default 1000 }}
-        runAsUser: {{ .Values.server.uid | default 100 }}
-        fsGroup: {{ .Values.server.gid | default 1000 }}
-      {{- end }}
+      {{- template "server.statefulSet.securityContext.pod" . }}
       volumes:
         {{ template "vault.volumes" . }}
         - name: home
@@ -72,10 +66,7 @@ spec:
           - "/bin/sh"
           - "-ec"
           args: {{ template "vault.args" . }}
-          {{- if not .Values.global.openshift }}
-          securityContext:
-            allowPrivilegeEscalation: false
-          {{- end }}
+          {{- template "server.statefulSet.securityContext.container" . }}
           env:
             - name: HOST_IP
               valueFrom:

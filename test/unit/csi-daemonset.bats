@@ -592,3 +592,59 @@ load _helpers
       yq -r 'map(select(.name=="VAULT_ADDR")) | .[] .value' | tee /dev/stderr)
   [ "${value}" = "http://vault-outside" ]
 }
+
+#--------------------------------------------------------------------
+# securityContext
+
+@test "csi/daemonset: default csi.daemonSet.securityContext.pod" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      --show-only templates/csi-daemonset.yaml \
+      --set 'csi.enabled=true' \
+      . | tee /dev/stderr |
+      yq -r '.spec.template.spec.securityContext' | tee /dev/stderr)
+  [ "${actual}" = "null" ]
+}
+
+@test "csi/daemonset: default csi.daemonSet.securityContext.container" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      --show-only templates/csi-daemonset.yaml \
+      --set 'csi.enabled=true' \
+      . | tee /dev/stderr |
+      yq -r '.spec.template.spec.containers[0].securityContext' | tee /dev/stderr)
+  [ "${actual}" = "null" ]
+}
+
+@test "csi/daemonset: specify csi.daemonSet.securityContext.pod yaml" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      --show-only templates/csi-daemonset.yaml \
+      --set 'csi.enabled=true' \
+      --set 'csi.daemonSet.securityContext.pod.foo=bar' \
+      . | tee /dev/stderr |
+      yq -r '.spec.template.spec.securityContext.foo' | tee /dev/stderr)
+  [ "${actual}" = "bar" ]
+}
+
+@test "csi/daemonset: specify csi.daemonSet.securityContext.container yaml" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      --show-only templates/csi-daemonset.yaml \
+      --set 'csi.enabled=true' \
+      --set 'csi.daemonSet.securityContext.container.foo=bar' \
+      . | tee /dev/stderr |
+      yq -r '.spec.template.spec.containers[0].securityContext.foo' | tee /dev/stderr)
+  [ "${actual}" = "bar" ]
+}
+
+@test "csi/daemonset: specify csi.daemonSet.securityContext.container yaml string" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      --show-only templates/csi-daemonset.yaml \
+      --set 'csi.enabled=true' \
+      --set 'csi.daemonSet.securityContext.container=foo: bar' \
+      . | tee /dev/stderr |
+      yq -r '.spec.template.spec.containers[0].securityContext.foo' | tee /dev/stderr)
+  [ "${actual}" = "bar" ]
+}
