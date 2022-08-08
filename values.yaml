@@ -844,7 +844,6 @@ server:
     # pod: {}
     # container:
     #   allowPrivilegeEscalation: false
-
     securityContext:
       pod: {}
       container: {}
@@ -941,8 +940,10 @@ csi:
     # Extra labels to attach to the vault-csi-provider daemonSet
     # This should be a YAML map of the labels to apply to the csi provider daemonSet
     extraLabels: {}
-    # security context for the pod template in the csi provider daemonSet
-    securityContext: {}
+    # security context for the pod template and container in the csi provider daemonSet
+    securityContext:
+      pod: {}
+      container: {}
 
   pod:
     # Extra annotations for the provider pods. This can either be YAML or a
