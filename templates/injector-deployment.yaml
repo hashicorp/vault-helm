@@ -38,18 +38,16 @@ spec:
       priorityClassName: {{ .Values.injector.priorityClassName }}
       {{- end }}
       serviceAccountName: "{{ template "vault.fullname" . }}-agent-injector"
+      {{ template "injector.securityContext.pod" . -}}
       {{- if not .Values.global.openshift }}
       hostNetwork: {{ .Values.injector.hostNetwork }}
-      {{ template "injector.securityContext.pod" . -}}
       {{- end }}
       containers:
         - name: sidecar-injector
           {{ template "injector.resources" . }}
           image: "{{ .Values.injector.image.repository }}:{{ .Values.injector.image.tag }}"
           imagePullPolicy: "{{ .Values.injector.image.pullPolicy }}"
-          {{- if not .Values.global.openshift }}
-          {{ template "injector.securityContext.container" . -}}
-          {{- end }}
+          {{- template "injector.securityContext.container" . }}
           env:
             - name: AGENT_INJECT_LISTEN
               value: {{ printf ":%v" .Values.injector.port  }}

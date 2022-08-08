@@ -23,6 +23,23 @@
                         "providersDir": {
                             "type": "string"
                         },
+                        "securityContext": {
+                            "type": "object",
+                            "properties": {
+                                "container": {
+                                    "type": [
+                                        "object",
+                                        "string"
+                                    ]
+                                },
+                                "pod": {
+                                    "type": [
+                                        "object",
+                                        "string"
+                                    ]
+                                }
+                            }
+                        },
                         "updateStrategy": {
                             "type": "object",
                             "properties": {
@@ -366,10 +383,16 @@
                     "type": "object",
                     "properties": {
                         "container": {
-                            "type": "object"
+                            "type": [
+                                "object",
+                                "string"
+                            ]
                         },
                         "pod": {
-                            "type": "object"
+                            "type": [
+                                "object",
+                                "string"
+                            ]
                         }
                     }
                 },
@@ -905,6 +928,23 @@
                                 "object",
                                 "string"
                             ]
+                        },
+                        "securityContext": {
+                            "type": "object",
+                            "properties": {
+                                "container": {
+                                    "type": [
+                                        "object",
+                                        "string"
+                                    ]
+                                },
+                                "pod": {
+                                    "type": [
+                                        "object",
+                                        "string"
+                                    ]
+                                }
+                            }
                         }
                     }
                 },

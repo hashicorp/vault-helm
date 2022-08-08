@@ -202,18 +202,20 @@ injector:
     certName: tls.crt
     keyName: tls.key
 
-  # Default pod and container security context for vault-injector
+  # Security context for the pod template and the injector container
+  # The default pod securityContext is:
+  #   runAsNonRoot: true
+  #   runAsGroup: {{ .Values.injector.gid | default 1000 }}
+  #   runAsUser: {{ .Values.injector.uid | default 100 }}
+  #   fsGroup: {{ .Values.injector.gid | default 1000 }}
+  # and for container is
+  #    allowPrivilegeEscalation: false
+  #    capabilities:
+  #      drop:
+  #        - ALL
   securityContext:
-    pod:
-      runAsNonRoot: true
-      runAsGroup: 1000
-      runAsUser: 100
-      fsGroup: 1000
-    container:
-      allowPrivilegeEscalation: false
-      capabilities:
-        drop:
-          - ALL
+    pod: {}
+    container: {}
 
   resources: {}
   # resources:
@@ -830,6 +832,24 @@ server:
     # to the statefulSet.
     annotations: {}
 
+    # Set the pod and container security contexts.
+    # If not set, these will default to, and for *not* OpenShift:
+    # pod:
+    #   runAsNonRoot: true
+    #   runAsGroup: {{ .Values.server.gid | default 1000 }}
+    #   runAsUser: {{ .Values.server.uid | default 100 }}
+    #   fsGroup: {{ .Values.server.gid | default 1000 }}
+    # container: {}
+    #
+    # If not set, these will default to, and for OpenShift:
+    # pod: {}
+    # container:
+    #   allowPrivilegeEscalation: false
+    securityContext:
+      pod: {}
+      container: {}
+
+
 # Vault UI
 ui:
   # True if you want to create a Service entry for the Vault UI.
@@ -921,6 +941,10 @@ csi:
     # Extra labels to attach to the vault-csi-provider daemonSet
     # This should be a YAML map of the labels to apply to the csi provider daemonSet
     extraLabels: {}
+    # security context for the pod template and container in the csi provider daemonSet
+    securityContext:
+      pod: {}
+      container: {}
 
   pod:
     # Extra annotations for the provider pods. This can either be YAML or a
