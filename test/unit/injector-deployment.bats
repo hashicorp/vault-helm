@@ -364,7 +364,7 @@ load _helpers
 }
 
 #--------------------------------------------------------------------
-# securityContext or pod and container
+# securityContext for pod and container
 
 # for backward compatibility
 @test "injector/deployment: backward pod securityContext" {
@@ -443,6 +443,49 @@ load _helpers
       . | tee /dev/stderr |
       yq -r '.spec.template.spec.securityContext.fsGroup' | tee /dev/stderr)
   [ "${actual}" = "1001" ]
+}
+
+@test "injector/deployment: custom pod securityContext from string" {
+  cd `chart_dir`
+  local multi=$(cat <<EOF
+foo: bar
+bar: foo
+EOF
+)
+  local actual=$(helm template \
+      --show-only templates/injector-deployment.yaml  \
+      --set 'injector.enabled=true' \
+      --set "injector.securityContext.pod=$multi" \
+      . | tee /dev/stderr |
+      yq -r '.spec.template.spec.securityContext.bar' | tee /dev/stderr)
+  [ "${actual}" = "foo" ]
+}
+
+@test "injector/deployment: custom container securityContext" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      --show-only templates/injector-deployment.yaml  \
+      --set 'injector.enabled=true' \
+      --set "injector.securityContext.container.bar=foo" \
+      . | tee /dev/stderr |
+      yq -r '.spec.template.spec.containers[0].securityContext.bar' | tee /dev/stderr)
+  [ "${actual}" = "foo" ]
+}
+
+@test "injector/deployment: custom container securityContext from string" {
+  cd `chart_dir`
+  local multi=$(cat <<EOF
+foo: bar
+bar: foo
+EOF
+)
+  local actual=$(helm template \
+      --show-only templates/injector-deployment.yaml  \
+      --set 'injector.enabled=true' \
+      --set "injector.securityContext.container=$multi" \
+      . | tee /dev/stderr |
+      yq -r '.spec.template.spec.containers[0].securityContext.bar' | tee /dev/stderr)
+  [ "${actual}" = "foo" ]
 }
 
 @test "injector/deployment: default container securityContext sidecar-injector" {

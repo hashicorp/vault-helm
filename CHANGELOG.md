@@ -4,7 +4,6 @@ CHANGES:
 * Start testing against Kubernetes 1.24. [GH-744](https://github.com/hashicorp/vault-helm/pull/744)
 * Deprecated `injector.externalVaultAddr`. Added `global.externalVaultAddr`, which applies to both the Injector and the CSI Provider. [GH-745](https://github.com/hashicorp/vault-helm/pull/745)
 * CSI Provider pods now set the `VAULT_ADDR` environment variable to either the internal Vault service or the configured external address. [GH-745](https://github.com/hashicorp/vault-helm/pull/745)
-* Deprecated `injector.uid` and `injector.gid`. Replaced with `injector.securityContext.pod`. [GH-750](https://github.com/hashicorp/vault-helm/pull/750)
 * injector: Allow setting securityContext for pod and container to be objects or YAML strings. [GH-767](https://github.com/hashicorp/vault-helm/pull/767)
 
 Features:

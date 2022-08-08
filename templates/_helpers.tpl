@@ -482,7 +482,7 @@ securityContext for the injector pod level.
         {{- else }}
           {{- toYaml .Values.injector.securityContext.pod | nindent 8 }}
         {{- end }}
-  {{- else }}
+  {{- else if not .Values.global.openshift }}
       securityContext:
         runAsNonRoot: true
         runAsGroup: {{ .Values.injector.gid | default 1000 }}
@@ -503,6 +503,12 @@ securityContext for the injector container level.
             {{- else }}
               {{- toYaml .Values.injector.securityContext.container | nindent 12 }}
             {{- end }}
+  {{- else if not .Values.global.openshift }}
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+                - ALL
   {{- end }}
 {{- end -}}
 

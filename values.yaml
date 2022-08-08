@@ -208,13 +208,14 @@ injector:
   #   runAsGroup: {{ .Values.injector.gid | default 1000 }}
   #   runAsUser: {{ .Values.injector.uid | default 100 }}
   #   fsGroup: {{ .Values.injector.gid | default 1000 }}
+  # and for container is
+  #    allowPrivilegeEscalation: false
+  #    capabilities:
+  #      drop:
+  #        - ALL
   securityContext:
     pod: {}
-    container:
-      allowPrivilegeEscalation: false
-      capabilities:
-        drop:
-          - ALL
+    container: {}
 
   resources: {}
   # resources:
