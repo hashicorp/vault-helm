@@ -130,7 +130,7 @@ load _helpers
       --show-only templates/server-ha-standby-service.yaml \
       --set 'server.ha.enabled=true' \
       --set 'server.service.type=NodePort' \
-      --set 'server.service.nodePort=30009' \
+      --set 'server.service.standbyNodePort=30009' \
       . | tee /dev/stderr |
       yq -r '.spec.ports[0].nodePort' | tee /dev/stderr)
   [ "${actual}" = "30009" ]
@@ -141,7 +141,7 @@ load _helpers
   local actual=$(helm template \
       --show-only templates/server-ha-standby-service.yaml \
       --set 'server.ha.enabled=true' \
-      --set 'server.service.nodePort=30009' \
+      --set 'server.service.standbyNodePort=30009' \
       . | tee /dev/stderr |
       yq -r '.spec.ports[0].nodePort' | tee /dev/stderr)
   [ "${actual}" = "null" ]
@@ -167,4 +167,61 @@ load _helpers
       . | tee /dev/stderr |
       yq -r '.spec.ports | map(select(.port==8200)) | .[] .name' | tee /dev/stderr)
   [ "${actual}" = "https" ]
+}
+
+# duplicated in server-service.bats
+@test "server/ha-standby-Service: NodePort assert externalTrafficPolicy" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      --show-only templates/server-ha-standby-service.yaml \
+      --set 'server.ha.enabled=true' \
+      --set 'server.service.type=NodePort' \
+      --set 'server.service.externalTrafficPolicy=Foo' \
+      . | tee /dev/stderr |
+      yq -r '.spec.externalTrafficPolicy' | tee /dev/stderr)
+  [ "${actual}" = "Foo" ]
+}
+
+# duplicated in server-service.bats
+@test "server/ha-standby-Service: NodePort assert no externalTrafficPolicy" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      --show-only templates/server-ha-standby-service.yaml \
+      --set 'server.ha.enabled=true' \
+      --set 'server.service.type=NodePort' \
+      --set 'server.service.externalTrafficPolicy=' \
+      . | tee /dev/stderr |
+      yq '.spec.externalTrafficPolicy' | tee /dev/stderr)
+  [ "${actual}" = "null" ]
+}
+
+# duplicated in server-service.bats
+@test "server/ha-standby-Service: ClusterIP assert no externalTrafficPolicy" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      --show-only templates/server-ha-standby-service.yaml \
+      --set 'server.ha.enabled=true' \
+      --set 'server.service.type=ClusterIP' \
+      --set 'server.service.externalTrafficPolicy=Foo' \
+      . | tee /dev/stderr |
+      yq '.spec.externalTrafficPolicy' | tee /dev/stderr)
+  [ "${actual}" = "null" ]
+}
+
+@test "server/ha-standby-Service: publishNotReadyAddresses can be changed" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      --show-only templates/server-ha-standby-service.yaml \
+      --set 'server.ha.enabled=true' \
+      . | tee /dev/stderr |
+      yq -r '.spec.publishNotReadyAddresses' | tee /dev/stderr)
+  [ "${actual}" = "true" ]
+
+  local actual=$(helm template \
+      --show-only templates/server-ha-standby-service.yaml \
+      --set 'server.ha.enabled=true' \
+      --set 'server.service.publishNotReadyAddresses=false' \
+      . | tee /dev/stderr |
+      yq -r '.spec.publishNotReadyAddresses' | tee /dev/stderr)
+  [ "${actual}" = "false" ]
 }

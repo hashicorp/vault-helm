@@ -20,3 +20,13 @@ load _helpers
       yq 'length > 0' | tee /dev/stderr)
   [ "${actual}" = "false" ]
 }
+
+@test "injector/ServiceAccount: generic annotations" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      --show-only templates/injector-serviceaccount.yaml \
+      --set 'injector.serviceAccount.annotations=vaultIsAwesome: true' \
+      . | tee /dev/stderr |
+      yq -r '.metadata.annotations["vaultIsAwesome"]' | tee /dev/stderr)
+  [ "${actual}" = "true" ]
+}

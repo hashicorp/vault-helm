@@ -16,7 +16,7 @@ load _helpers
   cd `chart_dir`
   local actual=$( (helm template \
       --show-only templates/server-disruptionbudget.yaml  \
-      --set 'globa.enabled=false' \
+      --set 'global.enabled=false' \
       --set 'server.ha.enabled=false' \
       . || echo "---") | tee /dev/stderr |
       yq 'length > 0' | tee /dev/stderr)
@@ -84,4 +84,40 @@ load _helpers
       . | tee /dev/stderr |
       yq '.spec.maxUnavailable' | tee /dev/stderr)
   [ "${actual}" = "2" ]
+}
+
+@test "server/DisruptionBudget: correct maxUnavailable with custom value" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      --show-only templates/server-disruptionbudget.yaml  \
+      --set 'server.ha.enabled=true' \
+      --set 'server.ha.replicas=3' \
+      --set 'server.ha.disruptionBudget.maxUnavailable=2' \
+      . | tee /dev/stderr |
+      yq '.spec.maxUnavailable' | tee /dev/stderr)
+  [ "${actual}" = "2" ]
+}
+
+@test "server/DisruptionBudget: test is apiVersion is set correctly < version 1.21 of kube" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      --show-only templates/server-disruptionbudget.yaml \
+      --set 'server.ha.enabled=true' \
+      --set 'server.ha.replicas=1' \
+      --kube-version 1.19.5 \
+      . | tee /dev/stderr |
+      yq '.apiVersion == "policy/v1beta1"' | tee /dev/stderr)
+  [ "${actual}" = "true" ]
+}
+
+@test "server/DisruptionBudget: test is apiVersion is set correctly >= version 1.21 of kube" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      --show-only templates/server-disruptionbudget.yaml \
+      --set 'server.ha.enabled=true' \
+      --set 'server.ha.replicas=1' \
+      --kube-version 1.22.5 \
+      . | tee /dev/stderr |
+      yq '.apiVersion == "policy/v1"' | tee /dev/stderr)
+  [ "${actual}" = "true" ]
 }
