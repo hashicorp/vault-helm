@@ -1,6 +1,11 @@
 ## Unreleased
 
+## 0.21.0 (August 10th, 2022)
+
 CHANGES:
+* `vault-k8s` updated to 0.17.0. [GH-???](https://github.com/hashicorp/vault-helm/pull/???)
+* `vault-csi-provider` updated to 1.2.0 [GH-???](https://github.com/hashicorp/vault-helm/pull/???)
+* `vault` updated to 1.11.2 [GH-???](https://github.com/hashicorp/vault-helm/pull/???)
 * Start testing against Kubernetes 1.24. [GH-744](https://github.com/hashicorp/vault-helm/pull/744)
 * Deprecated `injector.externalVaultAddr`. Added `global.externalVaultAddr`, which applies to both the Injector and the CSI Provider. [GH-745](https://github.com/hashicorp/vault-helm/pull/745)
 * CSI Provider pods now set the `VAULT_ADDR` environment variable to either the internal Vault service or the configured external address. [GH-745](https://github.com/hashicorp/vault-helm/pull/745)
