@@ -953,7 +953,7 @@ Supported inputs are Values.ui
 {{- end -}}
 
 {{/*
-prometheusOperator label selectors, assumes has the following attributes:
+prometheusOperator label selectors, assumes the input has the following attributes:
  'defaultSelectors': map
  'overrideSelectors': map
 If `selectors` is empty, then render the default selector labels from `defaultSelectors`
