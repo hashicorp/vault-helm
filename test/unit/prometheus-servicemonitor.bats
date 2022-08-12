@@ -2,7 +2,7 @@
 
 load _helpers
 
-@test "prometheus/ServiceMonitor: disabled by default" {
+@test "prometheus/ServiceMonitor: assertDisabled by default" {
   cd `chart_dir`
   local actual=$( (helm template \
       --show-only templates/prometheus-servicemonitor.yaml  \
@@ -11,65 +11,81 @@ load _helpers
   [ "${actual}" = "false" ]
 }
 
-@test "prometheus/ServiceMonitor: enable with prometheus.operator.enabled true" {
+@test "prometheus/ServiceMonitor: assertEnabled" {
   cd `chart_dir`
   local actual=$( (helm template \
       --show-only templates/prometheus-servicemonitor.yaml  \
-      --set 'prometheus.operator.enabled=true' \
+      --set 'telemetry.prometheusOperator.enabled=true' \
       . || echo "---") | tee /dev/stderr |
       yq 'length > 0' | tee /dev/stderr)
   [ "${actual}" = "true" ]
 }
 
-@test "prometheus/ServiceMonitor: specifying prometheus.operator.serviceMonitor.selector adds additional labels" {
+@test "prometheus/ServiceMonitor: assertScrapeTimeout default" {
   cd `chart_dir`
   local actual=$( (helm template \
       --show-only templates/prometheus-servicemonitor.yaml \
-      --set 'prometheus.operator.enabled=true' \
-      --set 'prometheus.operator.serviceMonitor.selector.newlabel1=foo' \
-      . || echo "---") | tee /dev/stderr |
-      yq -r '.metadata.labels.newlabel1' | tee /dev/stderr)
-  [ "${actual}" = "foo" ]
-}
-
-@test "prometheus/ServiceMonitor: default scrapeTimeout is 10s" {
-  cd `chart_dir`
-  local actual=$( (helm template \
-      --show-only templates/prometheus-servicemonitor.yaml \
-      --set 'prometheus.operator.enabled=true' \
-      . || echo "---") | tee /dev/stderr |
+      --set 'telemetry.prometheusOperator.enabled=true' \
+      . ) | tee /dev/stderr |
       yq -r '.spec.endpoints[0].scrapeTimeout' | tee /dev/stderr)
   [ "${actual}" = "10s" ]
 }
 
-@test "prometheus/ServiceMonitor: specifying prometheus.operator.serviceMonitor.scrapeTimeout changes scrapeTimeout" {
+@test "prometheus/ServiceMonitor: assertScrapeTimeout update" {
   cd `chart_dir`
   local actual=$( (helm template \
       --show-only templates/prometheus-servicemonitor.yaml \
-      --set 'prometheus.operator.enabled=true' \
-      --set 'prometheus.operator.serviceMonitor.scrapeTimeout=60s' \
-      . || echo "---") | tee /dev/stderr |
+      --set 'telemetry.prometheusOperator.enabled=true' \
+      --set 'telemetry.prometheusOperator.serviceMonitor.scrapeTimeout=60s' \
+      . ) | tee /dev/stderr |
       yq -r '.spec.endpoints[0].scrapeTimeout' | tee /dev/stderr)
   [ "${actual}" = "60s" ]
 }
 
-@test "prometheus/ServiceMonitor: default interval is 30s" {
+@test "prometheus/ServiceMonitor: assertInterval default" {
   cd `chart_dir`
   local actual=$( (helm template \
       --show-only templates/prometheus-servicemonitor.yaml \
-      --set 'prometheus.operator.enabled=true' \
-      . || echo "---") | tee /dev/stderr |
+      --set 'telemetry.prometheusOperator.enabled=true' \
+      . ) | tee /dev/stderr |
       yq -r '.spec.endpoints[0].interval' | tee /dev/stderr)
   [ "${actual}" = "30s" ]
 }
 
-@test "prometheus/ServiceMonitor: specifying prometheus.operator.serviceMonitor.interval changes interval" {
+@test "prometheus/ServiceMonitor: assertInterval update" {
   cd `chart_dir`
-  local actual=$( (helm template \
+  local output=$( (helm template \
       --show-only templates/prometheus-servicemonitor.yaml \
-      --set 'prometheus.operator.enabled=true' \
-      --set 'prometheus.operator.serviceMonitor.interval=60s' \
-      . || echo "---") | tee /dev/stderr |
-      yq -r '.spec.endpoints[0].interval' | tee /dev/stderr)
-  [ "${actual}" = "60s" ]
+      --set 'telemetry.prometheusOperator.enabled=true' \
+      --set 'telemetry.prometheusOperator.serviceMonitor.interval=60s' \
+      . )  | tee /dev/stderr)
+
+  [ "$(echo "$output" | yq -r '.spec.endpoints[0].interval')" = "60s" ]
+}
+
+@test "prometheus/ServiceMonitor: assertSelectors default" {
+  cd `chart_dir`
+  local output=$( (helm template \
+      --show-only templates/prometheus-servicemonitor.yaml \
+      --set 'telemetry.prometheusOperator.enabled=true' \
+      . ) | tee /dev/stderr)
+
+  [ "$(echo "$output" | yq -r '.metadata.labels | length')" = "5" ]
+  [ "$(echo "$output" | yq -r '.metadata.labels.release')" = "prometheus" ]
+}
+
+@test "prometheus/ServiceMonitor: assertSelectors overrides" {
+  cd `chart_dir`
+  local output=$( (helm template \
+      --show-only templates/prometheus-servicemonitor.yaml \
+      --set 'telemetry.prometheusOperator.enabled=true' \
+      --set 'telemetry.prometheusOperator.enabled=true' \
+      --set 'telemetry.prometheusOperator.serviceMonitor.overrideSelectors.baz=qux' \
+      --set 'telemetry.prometheusOperator.serviceMonitor.overrideSelectors.bar=foo' \
+      . ) | tee /dev/stderr)
+
+  [ "$(echo "$output" | yq -r '.metadata.labels | length')" = "6" ]
+  [ "$(echo "$output" | yq -r '.metadata.labels | has("app")')" = "false" ]
+  [ "$(echo "$output" | yq -r '.metadata.labels.baz')" = "qux" ]
+  [ "$(echo "$output" | yq -r '.metadata.labels.bar')" = "foo" ]
 }

@@ -1033,35 +1033,54 @@ csi:
   # for the available command line flags.
   extraArgs: []
 
-## Prometheus Operator Resources
-prometheus:
-  operator:
-    ## Are you using Prometheus Operator?
+telemetry:
+  # Enable support for the Prometheus Operator.
+  #
+  # The Prometheus operator *must* be installed before enabling this feature,
+  # if not the chart will fail to install due to missing CustomResourceDefinitions
+  # provided by the operator.
+  #
+  # Instructions on how to install the Helm chart can be found here:
+  #  https://github.com/prometheus-community/helm-charts/tree/main/charts/kube-prometheus-stack
+  # More information can be found here:
+  #  https://github.com/prometheus-operator/prometheus-operator
+  #  https://github.com/prometheus-operator/kube-prometheus
+  prometheusOperator:
+    # Enable to deploy Prometheus Operator CustomResources
     enabled: false
 
     serviceMonitor:
-      ## Additional labels to add to the ServiceMonitor so it is picked up by the operator.
-      ## If using the [Helm Chart](https://github.com/prometheus-community/helm-charts/tree/main/charts/kube-prometheus-stack) this is the name of the Helm release.
-      selector:
+      defaultSelectors:
+        # Name to set for the 'release' selector label.
+        # Assumes that the operator has been installed by Helm with a release name of 'prometheus'
+        # Set this to the release name for the installed operator Helm chart.
         release: prometheus
 
-      ## Interval at which Prometheus scrapes metrics
+      # Override the default ServiceMonitor.
+      overrideSelectors: {}
+
+      # Interval at which Prometheus scrapes metrics
       interval: 30s
 
-      ## Timeout at which Prometheus timeouts scrape run
+      # Timeout at which Prometheus timeouts scrape run
       scrapeTimeout: 10s
 
     prometheusRules:
-      ## Enable PrometheusRules resource
+      # Deploy the PrometheusRule custom resource for AlertManager based alerts.
+      # Requires that AlertManager is properly deployed.
       enabled: false
 
-      ## Additional labels to add to the PrometheusRule so it is picked up by the operator.
-      ## If using the [Helm Chart](https://github.com/prometheus-community/helm-charts/tree/main/charts/kube-prometheus-stack) this is the name of the Helm release and 'app: kube-prometheus-stack'
-      selector:
-        release: prometheus
-        app: kube-prometheus-stack
+      defaultSelectors:
+         release: prometheus
+         app: kube-prometheus-stack
 
-      ## Some example rules.
+      # Override the default labels to add to the PrometheusRule, so that it is picked up by the operator.
+      # Default labels are:
+      #   release: prometheus
+      #   app: kube-prometheus-stack
+      overrideSelectors: {}
+
+      # Some example rules.
       rules: {}
       #  - alert: vault-HighResponseTime
       #    annotations:

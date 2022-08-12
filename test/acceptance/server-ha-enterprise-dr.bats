@@ -25,6 +25,7 @@ load _helpers
   local init=$(kubectl exec -ti "$(name_prefix)-east-0" -- \
     vault operator init -format=json -n 1 -t 1)
 
+  echo $init | jq >&2
   local primary_token=$(echo ${init} | jq -r '.unseal_keys_b64[0]')
   [ "${primary_token}" != "" ]
 

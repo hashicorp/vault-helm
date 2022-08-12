@@ -1,5 +1,5 @@
 {{ template "vault.mode" . }}
-{{ if .Values.prometheus.operator.enabled }}
+{{ if .Values.telemetry.prometheusOperator.enabled }}
 apiVersion: monitoring.coreos.com/v1
 kind: ServiceMonitor
 metadata:
@@ -9,7 +9,7 @@ metadata:
     app.kubernetes.io/name: {{ include "vault.name" . }}
     app.kubernetes.io/instance: {{ .Release.Name }}
     app.kubernetes.io/managed-by: {{ .Release.Service }}
-    {{- toYaml .Values.prometheus.operator.serviceMonitor.selector | nindent 4 }}
+    {{- include "prometheusOperator.selectors" .Values.telemetry.prometheusOperator.serviceMonitor | nindent 4 }}
 spec:
   selector:
     matchLabels:
@@ -22,8 +22,8 @@ spec:
       {{- end }}
   endpoints:
   - port: http
-    interval: {{ .Values.prometheus.operator.serviceMonitor.interval }}
-    scrapeTimeout: {{ .Values.prometheus.operator.serviceMonitor.scrapeTimeout }}
+    interval: {{ .Values.telemetry.prometheusOperator.serviceMonitor.interval }}
+    scrapeTimeout: {{ .Values.telemetry.prometheusOperator.serviceMonitor.scrapeTimeout }}
     scheme: {{ include "vault.scheme" . | lower }}
     path: /v1/sys/metrics
     params:
