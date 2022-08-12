@@ -62,11 +62,3 @@ teardown() {
       kubectl delete namespace acceptance --ignore-not-found=true
   fi
 }
-#
-helm install --namespace vault --create-namespace vault \
-    --set="server.dev.enabled=true" \
-    --set="server.image.repository=hashicorp/vault-enterprise" \
-    --set="server.image.tag=1.11-ent" \
-    --set-file="server.extraEnvironmentVars.VAULT_LICENSE=${VAULT_LICENSE_PATH}" \
-    --set="telemetry.prometheusOperator.enabled=true" \
-    .
