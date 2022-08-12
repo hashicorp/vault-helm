@@ -71,7 +71,7 @@ acceptance:
 ifneq ($(LOCAL_ACCEPTANCE_TESTS),true)
 	gcloud auth activate-service-account --key-file=${GOOGLE_CREDENTIALS}
 endif
-	bats test/${ACCEPTANCE_TESTS}
+	bats --tap --timing test/${ACCEPTANCE_TESTS}
 
 # this target is for provisioning the GKE cluster
 # it is run in the docker container above when the test-provision target is invoked
