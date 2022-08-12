@@ -1034,7 +1034,30 @@ csi:
   extraArgs: []
 
 telemetry:
-  # Enable support for the Prometheus Operator.
+  # Vault is able to collect and publish various runtime metrics.
+  # Enabling this feature requires setting adding `telemetry{}` stanza to
+  # the Vault configuration. There are a few examples included in the `config` sections above.
+  #
+  # For more information see:
+  # https://www.vaultproject.io/docs/configuration/telemetry
+  # https://www.vaultproject.io/docs/internals/telemetry
+
+  # Enable support for the Prometheus Operator. Currently, this chart does not support
+  # authenticating to Vault's metrics endpoint, so the following `telemetry{}` must be included
+  # in the `listener "tcp"{}` stanza
+  #  telemetry {
+  #    unauthenticated_metrics_access = "true"
+  #  }
+  #
+  # See the `standalone.config` for a more complete example of this.
+  #
+  # In addition, a top level `telemetry{}` stanza must also be included in the Vault configuration:
+  #
+  # example:
+  #  telemetry {
+  #    prometheus_retention_time = "30s",
+  #    disable_hostname = true
+  #  }
   #
   # The Prometheus operator *must* be installed before enabling this feature,
   # if not the chart will fail to install due to missing CustomResourceDefinitions
