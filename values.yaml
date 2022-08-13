@@ -721,13 +721,31 @@ server:
       #}
 
   # Run Vault in "HA" mode. There are no storage requirements unless audit log
-  # persistence is required.  In HA mode Vault will configure itself to use Consul
-  # for its storage backend.  The default configuration provided will work the Consul
-  # Helm project by default.  It is possible to manually configure Vault to use a
+  # persistence is required. In HA mode Vault will configure itself to use Consul
+  # for its storage backend. The default configuration provided will work with the Consul
+  # Helm project by default. It is possible to manually configure Vault to use a
   # different HA backend.
   ha:
     enabled: false
     replicas: 3
+
+    # Create a LoadBalancer service type. This is the recommended ingress for
+    # cross-cluster replication, but it may be useful for other cases too.
+    lb:
+      enabled: false
+      
+      # Local preserves the client source IP and avoids a second hop for
+      # LoadBalancer services, but risks potentially imbalanced traffic spreading.
+      externalTrafficPolicy: Local
+
+      # publishNotReadyAddresses indicates that any agent which deals with endpoints
+      # for this Service should disregard any indications of ready/not-ready.
+      publishNotReadyAddresses: false
+
+      # Extra annotations for the service definition. This can either be YAML or a
+      # YAML-formatted multi-line templated string map of the annotations to apply
+      # to the service.
+      annotations: {}
 
     # Set the api_addr configuration for Vault HA
     # See https://www.vaultproject.io/docs/configuration#api_addr
