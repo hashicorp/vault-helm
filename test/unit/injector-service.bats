@@ -52,7 +52,7 @@ load _helpers
       --set 'injector.enabled=true' \
       . || echo "---") | tee /dev/stderr |
       yq 'length > 0' | tee /dev/stderr)
-  [ "${actual}" = "false" ]
+  [ "${actual}" = "true" ]
 }
 
 @test "injector/Service: generic annotations" {

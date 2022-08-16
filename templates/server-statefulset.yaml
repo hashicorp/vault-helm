@@ -1,6 +1,7 @@
 {{ template "vault.mode" . }}
 {{- if ne .mode "external" }}
-{{- if and (ne .mode "") (eq (.Values.global.enabled | toString) "true") }}
+{{- if ne .mode "" }}
+{{- if .serverEnabled -}}
 # StatefulSet to run the actual vault server cluster.
 apiVersion: apps/v1
 kind: StatefulSet
@@ -36,6 +37,7 @@ spec:
       {{ template "vault.annotations" . }}
     spec:
       {{ template "vault.affinity" . }}
+      {{ template "vault.topologySpreadConstraints" . }}
       {{ template "vault.tolerations" . }}
       {{ template "vault.nodeselector" . }}
       {{- if .Values.server.priorityClassName }}
@@ -46,13 +48,7 @@ spec:
       {{ if  .Values.server.shareProcessNamespace }}
       shareProcessNamespace: true
       {{ end }}
-      {{- if not .Values.global.openshift }}
-      securityContext:
-        runAsNonRoot: true
-        runAsGroup: {{ .Values.server.gid | default 1000 }}
-        runAsUser: {{ .Values.server.uid | default 100 }}
-        fsGroup: {{ .Values.server.gid | default 1000 }}
-      {{- end }}
+      {{- template "server.statefulSet.securityContext.pod" . }}
       volumes:
         {{ template "vault.volumes" . }}
         - name: home
@@ -70,10 +66,7 @@ spec:
           - "/bin/sh"
           - "-ec"
           args: {{ template "vault.args" . }}
-          {{- if not .Values.global.openshift }}
-          securityContext:
-            allowPrivilegeEscalation: false
-          {{- end }}
+          {{- template "server.statefulSet.securityContext.container" . }}
           env:
             - name: HOST_IP
               valueFrom:
@@ -108,7 +101,11 @@ spec:
                 fieldRef:
                   fieldPath: metadata.name
             - name: VAULT_CLUSTER_ADDR
+              {{- if .Values.server.ha.clusterAddr }}
+              value: {{ .Values.server.ha.clusterAddr }}
+              {{- else }}
               value: "https://$(HOSTNAME).{{ template "vault.fullname" . }}-internal:8201"
+              {{- end }}
             {{- if and (eq (.Values.server.ha.raft.enabled | toString) "true") (eq (.Values.server.ha.raft.setNodeId | toString) "true") }}
             - name: VAULT_RAFT_NODE_ID
               valueFrom:
@@ -204,5 +201,6 @@ spec:
         {{- end }}
       {{- include "imagePullSecrets" . | nindent 6 }}
   {{ template "vault.volumeclaims" . }}
+{{ end }}
 {{ end }}
 {{ end }}

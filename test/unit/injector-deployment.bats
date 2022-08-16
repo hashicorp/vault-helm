@@ -26,10 +26,20 @@ load _helpers
   local actual=$( (helm template \
       --show-only templates/injector-deployment.yaml  \
       --set 'global.enabled=false' \
-      --set 'injector.enabled=true' \
       . || echo "---") | tee /dev/stderr |
       yq 'length > 0' | tee /dev/stderr)
   [ "${actual}" = "false" ]
+}
+
+@test "injector/deployment: enable with injector.enabled true and global.enabled false" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      --show-only templates/injector-deployment.yaml  \
+      --set 'injector.enabled=true' \
+      --set 'global.enabled=false' \
+      . | tee /dev/stderr |
+      yq 'length > 0' | tee /dev/stderr)
+  [ "${actual}" = "true" ]
 }
 
 @test "injector/deployment: image defaults to injector.image" {
@@ -157,7 +167,7 @@ load _helpers
 
   local value=$(echo $object |
       yq -r 'map(select(.name=="AGENT_INJECT_TLS_AUTO")) | .[] .value' | tee /dev/stderr)
-  [ "${value}" = "RELEASE-NAME-vault-agent-injector-cfg" ]
+  [ "${value}" = "release-name-vault-agent-injector-cfg" ]
 
   # helm template does uses current context namespace and ignores namespace flags, so
   # discover the targeted namespace so we can check the rendered value correctly.
@@ -165,7 +175,7 @@ load _helpers
 
   local value=$(echo $object |
       yq -r 'map(select(.name=="AGENT_INJECT_TLS_AUTO_HOSTS")) | .[] .value' | tee /dev/stderr)
-  [ "${value}" = "RELEASE-NAME-vault-agent-injector-svc,RELEASE-NAME-vault-agent-injector-svc.${namespace:-default},RELEASE-NAME-vault-agent-injector-svc.${namespace:-default}.svc" ]
+  [ "${value}" = "release-name-vault-agent-injector-svc,release-name-vault-agent-injector-svc.${namespace:-default},release-name-vault-agent-injector-svc.${namespace:-default}.svc" ]
 }
 
 @test "injector/deployment: manual TLS adds volume mount" {
@@ -197,6 +207,33 @@ load _helpers
   local value=$(echo $object |
       yq -r 'map(select(.name=="AGENT_INJECT_VAULT_ADDR")) | .[] .value' | tee /dev/stderr)
   [ "${value}" = "http://vault-outside" ]
+}
+
+@test "injector/deployment: with global.externalVaultAddr" {
+  cd `chart_dir`
+  local object=$(helm template \
+      --show-only templates/injector-deployment.yaml  \
+      --set 'global.externalVaultAddr=http://vault-outside' \
+      . | tee /dev/stderr |
+      yq -r '.spec.template.spec.containers[0].env' | tee /dev/stderr)
+
+  local value=$(echo $object |
+      yq -r 'map(select(.name=="AGENT_INJECT_VAULT_ADDR")) | .[] .value' | tee /dev/stderr)
+  [ "${value}" = "http://vault-outside" ]
+}
+
+@test "injector/deployment: global.externalVaultAddr takes precendence over injector.externalVaultAddr" {
+  cd `chart_dir`
+  local object=$(helm template \
+      --show-only templates/injector-deployment.yaml  \
+      --set 'global.externalVaultAddr=http://global-vault-outside' \
+      --set 'injector.externalVaultAddr=http://injector-vault-outside' \
+      . | tee /dev/stderr |
+      yq -r '.spec.template.spec.containers[0].env' | tee /dev/stderr)
+
+  local value=$(echo $object |
+      yq -r 'map(select(.name=="AGENT_INJECT_VAULT_ADDR")) | .[] .value' | tee /dev/stderr)
+  [ "${value}" = "http://global-vault-outside" ]
 }
 
 @test "injector/deployment: without externalVaultAddr" {
@@ -327,6 +364,165 @@ load _helpers
 }
 
 #--------------------------------------------------------------------
+# securityContext for pod and container
+
+# for backward compatibility
+@test "injector/deployment: backward pod securityContext" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      --show-only templates/injector-deployment.yaml  \
+      --set 'injector.uid=200' \
+      --set 'injector.gid=4000' \
+      . | tee /dev/stderr |
+      yq -r '.spec.template.spec.securityContext' | tee /dev/stderr)
+
+  local value=$(echo $actual | yq -r .runAsUser | tee /dev/stderr)
+  [ "${value}" = "200" ]
+
+  local value=$(echo $actual | yq -r .runAsGroup | tee /dev/stderr)
+  [ "${value}" = "4000" ]
+}
+
+@test "injector/deployment: default pod securityContext" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      --show-only templates/injector-deployment.yaml  \
+      . | tee /dev/stderr |
+      yq -r '.spec.template.spec.securityContext' | tee /dev/stderr)
+  [ "${actual}" != "null" ]
+
+  local value=$(echo $actual | yq -r .fsGroup | tee /dev/stderr)
+  [ "${value}" = "1000" ]
+
+  local value=$(echo $actual | yq -r .runAsGroup | tee /dev/stderr)
+  [ "${value}" = "1000" ]
+
+  local value=$(echo $actual | yq -r .runAsNonRoot | tee /dev/stderr)
+  [ "${value}" = "true" ]
+
+  local value=$(echo $actual | yq -r .runAsUser | tee /dev/stderr)
+  [ "${value}" = "100" ]
+}
+
+@test "injector/deployment: custom pod securityContext" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      --show-only templates/injector-deployment.yaml  \
+      --set 'injector.enabled=true' \
+      --set 'injector.securityContext.pod.runAsNonRoot=true' \
+      --set 'injector.securityContext.pod.runAsGroup=1001' \
+      --set 'injector.securityContext.pod.runAsUser=1001' \
+      --set 'injector.securityContext.pod.fsGroup=1000' \
+      . | tee /dev/stderr |
+      yq -r '.spec.template.spec.securityContext.runAsGroup' | tee /dev/stderr)
+  [ "${actual}" = "1001" ]
+
+  local actual=$(helm template \
+      --show-only templates/injector-deployment.yaml  \
+      --set 'injector.enabled=true' \
+      --set 'injector.securityContext.pod.runAsNonRoot=false' \
+      --set 'injector.securityContext.pod.runAsGroup=1000' \
+      . | tee /dev/stderr |
+      yq -r '.spec.template.spec.securityContext.runAsNonRoot' | tee /dev/stderr)
+  [ "${actual}" = "false" ]
+
+  local actual=$(helm template \
+      --show-only templates/injector-deployment.yaml \
+      --set 'injector.enabled=true' \
+      --set 'injector.securityContext.pod.runAsUser=1001' \
+      --set 'injector.securityContext.pod.fsGroup=1000' \
+      . | tee /dev/stderr |
+      yq -r '.spec.template.spec.securityContext.runAsUser' | tee /dev/stderr)
+  [ "${actual}" = "1001" ]
+
+  local actual=$(helm template \
+      --show-only templates/injector-deployment.yaml \
+      --set 'injector.enabled=true' \
+      --set 'injector.securityContext.pod.runAsNonRoot=true' \
+      --set 'injector.securityContext.pod.fsGroup=1001' \
+      . | tee /dev/stderr |
+      yq -r '.spec.template.spec.securityContext.fsGroup' | tee /dev/stderr)
+  [ "${actual}" = "1001" ]
+}
+
+@test "injector/deployment: custom pod securityContext from string" {
+  cd `chart_dir`
+  local multi=$(cat <<EOF
+foo: bar
+bar: foo
+EOF
+)
+  local actual=$(helm template \
+      --show-only templates/injector-deployment.yaml  \
+      --set 'injector.enabled=true' \
+      --set "injector.securityContext.pod=$multi" \
+      . | tee /dev/stderr |
+      yq -r '.spec.template.spec.securityContext.bar' | tee /dev/stderr)
+  [ "${actual}" = "foo" ]
+}
+
+@test "injector/deployment: custom container securityContext" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      --show-only templates/injector-deployment.yaml  \
+      --set 'injector.enabled=true' \
+      --set "injector.securityContext.container.bar=foo" \
+      . | tee /dev/stderr |
+      yq -r '.spec.template.spec.containers[0].securityContext.bar' | tee /dev/stderr)
+  [ "${actual}" = "foo" ]
+}
+
+@test "injector/deployment: custom container securityContext from string" {
+  cd `chart_dir`
+  local multi=$(cat <<EOF
+foo: bar
+bar: foo
+EOF
+)
+  local actual=$(helm template \
+      --show-only templates/injector-deployment.yaml  \
+      --set 'injector.enabled=true' \
+      --set "injector.securityContext.container=$multi" \
+      . | tee /dev/stderr |
+      yq -r '.spec.template.spec.containers[0].securityContext.bar' | tee /dev/stderr)
+  [ "${actual}" = "foo" ]
+}
+
+@test "injector/deployment: default container securityContext sidecar-injector" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      --show-only templates/injector-deployment.yaml  \
+      . | tee /dev/stderr |
+      yq -r '.spec.template.spec.containers[0].securityContext' | tee /dev/stderr)
+  [ "${actual}" != "null" ]
+
+  local value=$(echo $actual | yq -r .allowPrivilegeEscalation | tee /dev/stderr)
+  [ "${value}" = "false" ]
+
+  local value=$(echo $actual | yq -r .capabilities.drop[0] | tee /dev/stderr)
+  [ "${value}" = "ALL" ]
+}
+
+@test "injector/deployment: custom container securityContext sidecar-injector" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      --show-only templates/injector-deployment.yaml  \
+      --set 'injector.enabled=true' \
+      --set 'injector.securityContext.container.privileged=true' \
+      . | tee /dev/stderr |
+      yq -r '.spec.template.spec.containers[0].securityContext.privileged' | tee /dev/stderr)
+  [ "${actual}" = "true" ]
+
+  local actual=$(helm template \
+      --show-only templates/injector-deployment.yaml  \
+      --set 'injector.enabled=true' \
+      --set 'injector.securityContext.container.readOnlyRootFilesystem=false' \
+      . | tee /dev/stderr |
+      yq -r '.spec.template.spec.containers[0].securityContext.readOnlyRootFilesystem' | tee /dev/stderr)
+  [ "${actual}" = "false" ]
+}
+
+#--------------------------------------------------------------------
 # extraEnvironmentVars
 
 @test "injector/deployment: set extraEnvironmentVars" {
@@ -449,6 +645,27 @@ load _helpers
       --set 'injector.affinity.podAntiAffinity=foobar' \
       . | tee /dev/stderr |
       yq '.spec.template.spec.affinity.podAntiAffinity == "foobar"' | tee /dev/stderr)
+  [ "${actual}" = "true" ]
+}
+
+#--------------------------------------------------------------------
+# topologySpreadConstraints
+
+@test "injector/deployment: topologySpreadConstraints is null by default" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      --show-only templates/injector-deployment.yaml \
+      . | tee /dev/stderr |
+      yq '.spec.template.spec | .topologySpreadConstraints? == null' | tee /dev/stderr)
+}
+
+@test "injector/deployment: topologySpreadConstraints can be set as YAML" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      --show-only templates/injector-deployment.yaml \
+      --set "injector.topologySpreadConstraints[0].foo=bar,injector.topologySpreadConstraints[1].baz=qux" \
+      . | tee /dev/stderr |
+      yq '.spec.template.spec.topologySpreadConstraints == [{"foo": "bar"}, {"baz": "qux"}]' | tee /dev/stderr)
   [ "${actual}" = "true" ]
 }
 

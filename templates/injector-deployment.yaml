@@ -1,4 +1,5 @@
-{{- if and (eq (.Values.injector.enabled | toString) "true" ) (eq (.Values.global.enabled | toString) "true") }}
+{{- template "vault.injectorEnabled" . -}}
+{{- if .injectorEnabled -}}
 # Deployment for the injector
 apiVersion: apps/v1
 kind: Deployment
@@ -30,35 +31,32 @@ spec:
       {{ template "injector.annotations" . }}
     spec:
       {{ template "injector.affinity" . }}
+      {{ template "injector.topologySpreadConstraints" . }}
       {{ template "injector.tolerations" . }}
       {{ template "injector.nodeselector" . }}
       {{- if .Values.injector.priorityClassName }}
       priorityClassName: {{ .Values.injector.priorityClassName }}
       {{- end }}
       serviceAccountName: "{{ template "vault.fullname" . }}-agent-injector"
+      {{ template "injector.securityContext.pod" . -}}
       {{- if not .Values.global.openshift }}
       hostNetwork: {{ .Values.injector.hostNetwork }}
-      securityContext:
-        runAsNonRoot: true
-        runAsGroup: {{ .Values.injector.gid | default 1000 }}
-        runAsUser: {{ .Values.injector.uid | default 100 }}
       {{- end }}
       containers:
         - name: sidecar-injector
           {{ template "injector.resources" . }}
           image: "{{ .Values.injector.image.repository }}:{{ .Values.injector.image.tag }}"
           imagePullPolicy: "{{ .Values.injector.image.pullPolicy }}"
-          {{- if not .Values.global.openshift }}
-          securityContext:
-            allowPrivilegeEscalation: false
-          {{- end }}
+          {{- template "injector.securityContext.container" . }}
           env:
             - name: AGENT_INJECT_LISTEN
               value: {{ printf ":%v" .Values.injector.port  }}
             - name: AGENT_INJECT_LOG_LEVEL
               value: {{ .Values.injector.logLevel | default "info" }}
             - name: AGENT_INJECT_VAULT_ADDR
-            {{- if .Values.injector.externalVaultAddr }}
+            {{- if .Values.global.externalVaultAddr }}
+              value: "{{ .Values.global.externalVaultAddr }}"
+            {{- else if .Values.injector.externalVaultAddr }}
               value: "{{ .Values.injector.externalVaultAddr }}"
             {{- else }}
               value: {{ include "vault.scheme" . }}://{{ template "vault.fullname" . }}.{{ .Release.Namespace }}.svc:{{ .Values.server.service.port }}

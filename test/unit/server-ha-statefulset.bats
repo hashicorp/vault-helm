@@ -417,7 +417,7 @@ load _helpers
 #--------------------------------------------------------------------
 # VAULT_CLUSTER_ADDR renders
 
-@test "server/ha-StatefulSet: cluster addr renders" {
+@test "server/ha-StatefulSet: clusterAddr not set" {
   cd `chart_dir`
   local object=$(helm template \
       --show-only templates/server-statefulset.yaml  \
@@ -428,7 +428,52 @@ load _helpers
 
   local value=$(echo $object |
       yq -r 'map(select(.name=="VAULT_CLUSTER_ADDR")) | .[] .value' | tee /dev/stderr)
-  [ "${value}" = 'https://$(HOSTNAME).RELEASE-NAME-vault-internal:8201' ]
+  [ "${value}" = 'https://$(HOSTNAME).release-name-vault-internal:8201' ]
+}
+
+@test "server/ha-StatefulSet: clusterAddr set to null" {
+  cd `chart_dir`
+  local object=$(helm template \
+      --show-only templates/server-statefulset.yaml  \
+      --set 'server.ha.enabled=true' \
+      --set 'server.ha.raft.enabled=true' \
+       --set 'server.ha.clusterAddr=null' \
+      . | tee /dev/stderr |
+      yq -r '.spec.template.spec.containers[0].env' | tee /dev/stderr)
+
+  local value=$(echo $object |
+      yq -r 'map(select(.name=="VAULT_CLUSTER_ADDR")) | .[] .value' | tee /dev/stderr)
+  [ "${value}" = 'https://$(HOSTNAME).release-name-vault-internal:8201' ]
+}
+
+@test "server/ha-StatefulSet: clusterAddr set to custom url" {
+  cd `chart_dir`
+  local object=$(helm template \
+      --show-only templates/server-statefulset.yaml  \
+      --set 'server.ha.enabled=true' \
+      --set 'server.ha.raft.enabled=true' \
+       --set 'server.ha.clusterAddr=https://test.example.com:8201' \
+      . | tee /dev/stderr |
+      yq -r '.spec.template.spec.containers[0].env' | tee /dev/stderr)
+
+  local value=$(echo $object |
+      yq -r 'map(select(.name=="VAULT_CLUSTER_ADDR")) | .[] .value' | tee /dev/stderr)
+  [ "${value}" = 'https://test.example.com:8201' ]
+}
+
+@test "server/ha-StatefulSet: clusterAddr set to custom url with environment variable" {
+  cd `chart_dir`
+  local object=$(helm template \
+      --show-only templates/server-statefulset.yaml  \
+      --set 'server.ha.enabled=true' \
+      --set 'server.ha.raft.enabled=true' \
+       --set 'server.ha.clusterAddr=http://$(HOSTNAME).release-name-vault-internal:8201' \
+      . | tee /dev/stderr |
+      yq -r '.spec.template.spec.containers[0].env' | tee /dev/stderr)
+
+  local value=$(echo $object |
+      yq -r 'map(select(.name=="VAULT_CLUSTER_ADDR")) | .[] .value' | tee /dev/stderr)
+  [ "${value}" = 'http://$(HOSTNAME).release-name-vault-internal:8201' ]
 }
 
 #--------------------------------------------------------------------
@@ -539,6 +584,32 @@ load _helpers
       yq -r '.spec.volumeClaimTemplates | length' | tee /dev/stderr)
   [ "${actual}" = "1" ]
 }
+
+#--------------------------------------------------------------------
+# topologySpreadConstraints
+
+@test "server/ha-StatefulSet: topologySpreadConstraints is null by default" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      --show-only templates/server-statefulset.yaml \
+      --set 'server.ha.enabled=true' \
+      . | tee /dev/stderr |
+      yq '.spec.template.spec | .topologySpreadConstraints? == null' | tee /dev/stderr)
+}
+
+@test "server/ha-StatefulSet: topologySpreadConstraints can be set as YAML" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      --show-only templates/server-statefulset.yaml \
+      --set 'server.ha.enabled=true' \
+      --set "server.topologySpreadConstraints[0].foo=bar,server.topologySpreadConstraints[1].baz=qux" \
+      . | tee /dev/stderr |
+      yq '.spec.template.spec.topologySpreadConstraints == [{"foo": "bar"}, {"baz": "qux"}]' | tee /dev/stderr)
+  [ "${actual}" = "true" ]
+}
+
+#--------------------------------------------------------------------
+# tolerations
 
 @test "server/ha-StatefulSet: tolerations not set by default" {
   cd `chart_dir`

@@ -537,7 +537,7 @@ load _helpers
   cd `chart_dir`
   local object=$(helm template \
       --show-only templates/server-statefulset.yaml  \
-      --set 'server.stanadlone.enabled=true' \
+      --set 'server.standalone.enabled=true' \
       --set 'server.extraEnvironmentVars.FOO=bar' \
       --set 'server.extraEnvironmentVars.FOOBAR=foobar' \
       . | tee /dev/stderr |
@@ -784,6 +784,29 @@ load _helpers
   [ "${actual}" = "true" ]
 }
 
+#--------------------------------------------------------------------
+# topologySpreadConstraints
+
+@test "server/standalone-StatefulSet: topologySpreadConstraints is null by default" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      --show-only templates/server-statefulset.yaml \
+      . | tee /dev/stderr |
+      yq '.spec.template.spec | .topologySpreadConstraints? == null' | tee /dev/stderr)
+}
+
+@test "server/standalone-StatefulSet: topologySpreadConstraints can be set as YAML" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      --show-only templates/server-statefulset.yaml \
+      --set "server.topologySpreadConstraints[0].foo=bar,server.topologySpreadConstraints[1].baz=qux" \
+      . | tee /dev/stderr |
+      yq '.spec.template.spec.topologySpreadConstraints == [{"foo": "bar"}, {"baz": "qux"}]' | tee /dev/stderr)
+  [ "${actual}" = "true" ]
+}
+
+#--------------------------------------------------------------------
+# tolerations
 
 @test "server/standalone-StatefulSet: tolerations not set by default" {
   cd `chart_dir`
@@ -1640,7 +1663,7 @@ load _helpers
       --set 'server.serviceAccount.create=true' \
       . | tee /dev/stderr |
       yq -r '.spec.template.spec.serviceAccountName' | tee /dev/stderr)
-  [ "${actual}" = "RELEASE-NAME-vault" ]
+  [ "${actual}" = "release-name-vault" ]
 
 
 }
@@ -1699,4 +1722,65 @@ load _helpers
       . | tee /dev/stderr |
       yq -r -c '.spec.template.spec.containers[0].env[] | select(.name == "VAULT_LICENSE_PATH")' | tee /dev/stderr)
       [ "${actual}" = '' ]
+}
+
+#--------------------------------------------------------------------
+# securityContext
+
+@test "server/standalone-StatefulSet: default statefulSet.securityContext.pod" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      --show-only templates/server-statefulset.yaml \
+      . | tee /dev/stderr |
+      yq -r '.spec.template.spec.securityContext' | tee /dev/stderr)
+  [ ! "${actual}" = "null" ]
+}
+
+@test "server/standalone-StatefulSet: default statefulSet.securityContext.container" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      --show-only templates/server-statefulset.yaml \
+      . | tee /dev/stderr |
+      yq -r '.spec.template.spec.containers[0].securityContext' | tee /dev/stderr)
+  [ ! "${actual}" = "null" ]
+}
+
+@test "server/standalone-StatefulSet: specify statefulSet.securityContext.pod yaml" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      --show-only templates/server-statefulset.yaml \
+      --set 'server.statefulSet.securityContext.pod.foo=bar' \
+      . | tee /dev/stderr |
+      yq -r '.spec.template.spec.securityContext.foo' | tee /dev/stderr)
+  [ "${actual}" = "bar" ]
+}
+
+@test "server/standalone-StatefulSet: specify statefulSet.securityContext.container yaml" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      --show-only templates/server-statefulset.yaml \
+      --set 'server.statefulSet.securityContext.container.foo=bar' \
+      . | tee /dev/stderr |
+      yq -r '.spec.template.spec.containers[0].securityContext.foo' | tee /dev/stderr)
+  [ "${actual}" = "bar" ]
+}
+
+@test "server/standalone-StatefulSet: specify statefulSet.securityContext.pod yaml string" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      --show-only templates/server-statefulset.yaml \
+      --set 'server.statefulSet.securityContext.pod=foo: bar' \
+      . | tee /dev/stderr |
+      yq -r '.spec.template.spec.securityContext.foo' | tee /dev/stderr)
+  [ "${actual}" = "bar" ]
+}
+
+@test "server/standalone-StatefulSet: specify statefulSet.securityContext.container yaml string" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      --show-only templates/server-statefulset.yaml \
+      --set 'server.statefulSet.securityContext.container=foo: bar' \
+      . | tee /dev/stderr |
+      yq -r '.spec.template.spec.containers[0].securityContext.foo' | tee /dev/stderr)
+  [ "${actual}" = "bar" ]
 }

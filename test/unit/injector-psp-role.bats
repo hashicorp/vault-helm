@@ -22,7 +22,7 @@ load _helpers
   [ "${actual}" = "true" ]
 }
 
-@test "injector/PodSecurityPolicy-Role: disable with global.enabled" {
+@test "injector/PodSecurityPolicy-Role: ignore global.enabled" {
   cd `chart_dir`
   local actual=$( (helm template \
       --show-only templates/injector-psp-role.yaml  \
@@ -31,5 +31,5 @@ load _helpers
       --set 'global.psp.enable=true' \
       . || echo "---") | tee /dev/stderr |
       yq 'length > 0' | tee /dev/stderr)
-  [ "${actual}" = "false" ]
+  [ "${actual}" = "true" ]
 }

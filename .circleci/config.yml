@@ -77,7 +77,7 @@ jobs:
                 -X POST \
                 -H 'Content-Type: application/json' \
                 -H 'Accept: application/json' \
-                -d "{\"branch\": \"master\",\"parameters\":{\"SOURCE_REPO\": \"${CIRCLE_PROJECT_USERNAME}/${CIRCLE_PROJECT_REPONAME}\",\"SOURCE_TAG\": \"${CIRCLE_TAG}\"}}" \
+                -d "{\"branch\": \"main\",\"parameters\":{\"SOURCE_REPO\": \"${CIRCLE_PROJECT_USERNAME}/${CIRCLE_PROJECT_REPONAME}\",\"SOURCE_TAG\": \"${CIRCLE_TAG}\"}}" \
                 "${CIRCLE_ENDPOINT}/${CIRCLE_PROJECT}/pipeline"
       - slack/status:
           fail_only: true
