@@ -22,7 +22,7 @@ apiVersion: extensions/v1beta1
 kind: Ingress
 metadata:
   name: {{ template "vault.fullname" . }}
-  namespace: {{ .Release.Namespace }}
+  namespace: {{ template "vault.namespace" . }}
   labels:
     helm.sh/chart: {{ include "vault.chart" . }}
     app.kubernetes.io/name: {{ include "vault.name" . }}

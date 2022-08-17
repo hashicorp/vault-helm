@@ -7,8 +7,8 @@ Vault with Kubernetes available here:
 https://www.vaultproject.io/docs/
 
 
-Your release is named {{ .Release.Name }}. To learn more about the release, try:
+Your release is named {{ template "vault.namespace" . }}. To learn more about the release, try:
 
-  $ helm status {{ .Release.Name }}
-  $ helm get manifest {{ .Release.Name }}
+  $ helm status {{ template "vault.namespace" . }}
+  $ helm get manifest {{ template "vault.namespace" . }}
 

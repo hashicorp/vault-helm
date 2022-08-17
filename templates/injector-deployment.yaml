@@ -5,7 +5,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: {{ template "vault.fullname" . }}-agent-injector
-  namespace: {{ .Release.Namespace }}
+  namespace: {{ template "vault.namespace" . }}
   labels:
     app.kubernetes.io/name: {{ include "vault.name" . }}-agent-injector
     app.kubernetes.io/instance: {{ .Release.Name }}
@@ -59,7 +59,7 @@ spec:
             {{- else if .Values.injector.externalVaultAddr }}
               value: "{{ .Values.injector.externalVaultAddr }}"
             {{- else }}
-              value: {{ include "vault.scheme" . }}://{{ template "vault.fullname" . }}.{{ .Release.Namespace }}.svc:{{ .Values.server.service.port }}
+              value: {{ include "vault.scheme" . }}://{{ template "vault.fullname" . }}.{{ template "vault.namespace" . }}.svc:{{ .Values.server.service.port }}
             {{- end }}
             - name: AGENT_INJECT_VAULT_AUTH_PATH
               value: {{ .Values.injector.authPath }}
@@ -74,7 +74,7 @@ spec:
             - name: AGENT_INJECT_TLS_AUTO
               value: {{ template "vault.fullname" . }}-agent-injector-cfg
             - name: AGENT_INJECT_TLS_AUTO_HOSTS
-              value: {{ template "vault.fullname" . }}-agent-injector-svc,{{ template "vault.fullname" . }}-agent-injector-svc.{{ .Release.Namespace }},{{ template "vault.fullname" . }}-agent-injector-svc.{{ .Release.Namespace }}.svc
+              value: {{ template "vault.fullname" . }}-agent-injector-svc,{{ template "vault.fullname" . }}-agent-injector-svc.{{ template "vault.namespace" . }},{{ template "vault.fullname" . }}-agent-injector-svc.{{ template "vault.namespace" . }}.svc
             {{- end }}
             - name: AGENT_INJECT_LOG_FORMAT
               value: {{ .Values.injector.logFormat | default "standard" }}

@@ -7,7 +7,7 @@ apiVersion: apps/v1
 kind: StatefulSet
 metadata:
   name: {{ template "vault.fullname" . }}
-  namespace: {{ .Release.Namespace }}
+  namespace: {{ template "vault.namespace" . }}
   labels:
     app.kubernetes.io/name: {{ include "vault.name" . }}
     app.kubernetes.io/instance: {{ .Release.Name }}
