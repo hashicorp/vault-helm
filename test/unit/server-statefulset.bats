@@ -1784,3 +1784,25 @@ load _helpers
       yq -r '.spec.template.spec.containers[0].securityContext.foo' | tee /dev/stderr)
   [ "${actual}" = "bar" ]
 }
+
+#--------------------------------------------------------------------
+# hostNetwork
+
+@test "server/StatefulSet: server.hostNetwork not set" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      --show-only templates/server-statefulset.yaml \
+      . | tee /dev/stderr |
+      yq -r '.spec.template.spec.hostNetwork' | tee /dev/stderr)
+  [ "${actual}" = "false" ]
+}
+
+@test "server/StatefulSet: server.hostNetwork is set" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      --show-only templates/server-statefulset.yaml \
+      --set 'server.hostNetwork=true' \
+      . | tee /dev/stderr |
+      yq -r '.spec.template.spec.hostNetwork' | tee /dev/stderr)
+  [ "${actual}" = "true" ]
+}

@@ -49,6 +49,10 @@ spec:
       shareProcessNamespace: true
       {{ end }}
       {{- template "server.statefulSet.securityContext.pod" . }}
+      {{- if not .Values.global.openshift }}
+      hostNetwork: {{ .Values.server.hostNetwork }}
+      {{- end }}
+
       volumes:
         {{ template "vault.volumes" . }}
         - name: home

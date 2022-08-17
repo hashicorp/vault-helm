@@ -849,6 +849,8 @@ server:
       pod: {}
       container: {}
 
+  # Should the server pods run on the host network
+  hostNetwork: false
 
 # Vault UI
 ui:
