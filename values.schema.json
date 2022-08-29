@@ -840,6 +840,12 @@
                         "host": {
                             "type": "string"
                         },
+                        "subdomain": {
+                            "type": [
+                                "null",
+                                "string"
+                            ]
+                        },
                         "labels": {
                             "type": "object"
                         },

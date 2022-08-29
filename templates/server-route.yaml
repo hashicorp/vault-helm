@@ -20,7 +20,11 @@ metadata:
     {{- end }}
   {{- template "vault.route.annotations" . }}
 spec:
+  {{- if .Values.server.route.subdomain }}
+  subdomain: {{ .Values.server.route.subdomain }}
+  {{- else if .Values.server.route.host }}
   host: {{ .Values.server.route.host }}
+  {{- end }}
   to:
     kind: Service
     name: {{ $serviceName }}

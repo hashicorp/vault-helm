@@ -36,6 +36,52 @@ load _helpers
   [ "${actual}" = 'test.com' ]
 }
 
+@test "server/route: OpenShift - checking subdomain entry takes precedence over any host entry" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      --show-only templates/server-route.yaml \
+      --set 'global.openshift=true' \
+      --set 'server.route.enabled=true' \
+      --set 'server.route.host=test.com' \
+      --set 'server.route.subdomain=vault' \
+      . | tee /dev/stderr |
+      yq  -r '.spec.host' | tee /dev/stderr)
+  [ "${actual}" = "null" ]
+
+  local actual=$(helm template \
+      --show-only templates/server-route.yaml \
+      --set 'global.openshift=true' \
+      --set 'server.route.enabled=true' \
+      --set 'server.route.host=test.com' \
+      --set 'server.route.subdomain=vault' \
+      . | tee /dev/stderr |
+      yq  -r '.spec.subdomain' | tee /dev/stderr)
+  [ "${actual}" = "vault" ]
+}
+
+@test "server/route: OpenShift - checking when subdomain and host are both null" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      --show-only templates/server-route.yaml \
+      --set 'global.openshift=true' \
+      --set 'server.route.enabled=true' \
+      --set 'server.route.host=null' \
+      --set 'server.route.subdomain=null' \
+      . | tee /dev/stderr |
+      yq  -r '.spec.subdomain' | tee /dev/stderr)
+        [ "${actual}" = 'null' ]
+
+  local actual=$(helm template \
+      --show-only templates/server-route.yaml \
+      --set 'global.openshift=true' \
+      --set 'server.route.enabled=true' \
+      --set 'server.route.host=null' \
+      --set 'server.route.subdomain=null' \
+      . | tee /dev/stderr |
+      yq  -r '.spec.host' | tee /dev/stderr)
+        [ "${actual}" = 'null' ]
+}
+
 @test "server/route: OpenShift - vault backend should be added when I specify a path" {
   cd `chart_dir`
 

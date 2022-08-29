@@ -407,6 +407,13 @@ server:
     labels: {}
     annotations: {}
     host: chart-example.local
+
+    # subdomain is unset by default. if set it will take precedence over whatever host:
+    # subdomains are DNS subdomains that are then requested within the ingress
+    # controller's domain. So setting:
+    # "subdomain: foo" will create "foo.apps.mycluster.com" as the final host route
+    subdomain: null
+
     # tls will be passed directly to the route's TLS config, which
     # can be used to configure other termination methods that terminate
     # TLS at the router
