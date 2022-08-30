@@ -17,7 +17,6 @@ metadata:
     update the selectors docs in values.yaml whenever these defaults change.
     */}}
     release: prometheus
-    app: kube-prometheus-stack
     {{- end }}
 spec:
   selector:
