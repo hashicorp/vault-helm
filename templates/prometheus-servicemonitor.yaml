@@ -21,7 +21,7 @@ spec:
       vault-internal: "true"
       {{- end }}
   endpoints:
-  - port: http
+  - port: {{ include "vault.scheme" . }}
     interval: {{ .Values.telemetry.prometheusOperator.serviceMonitor.interval }}
     scrapeTimeout: {{ .Values.telemetry.prometheusOperator.serviceMonitor.scrapeTimeout }}
     scheme: {{ include "vault.scheme" . | lower }}

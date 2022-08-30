@@ -89,3 +89,28 @@ load _helpers
   [ "$(echo "$output" | yq -r '.metadata.labels.baz')" = "qux" ]
   [ "$(echo "$output" | yq -r '.metadata.labels.bar')" = "foo" ]
 }
+
+@test "prometheus/ServiceMonitor: assertEndpoints noTLS" {
+  cd `chart_dir`
+  local output=$( (helm template \
+      --show-only templates/prometheus-servicemonitor.yaml \
+      --set 'global.tlsDisable=true' \
+      --set 'telemetry.prometheusOperator.enabled=true' \
+      . ) | tee /dev/stderr)
+
+      #yq -r '.spec.endpoints[0].scrapeTimeout' | tee /dev/stderr)
+  [ "$(echo "$output" | yq -r '.spec.endpoints | length')" = "1" ]
+  [ "$(echo "$output" | yq -r '.spec.endpoints[0].port')" = "http" ]
+}
+
+@test "prometheus/ServiceMonitor: assertEndpoints TLS" {
+  cd `chart_dir`
+  local output=$( (helm template \
+      --show-only templates/prometheus-servicemonitor.yaml \
+      --set 'global.tlsDisable=false' \
+      --set 'telemetry.prometheusOperator.enabled=true' \
+      . ) | tee /dev/stderr)
+
+  [ "$(echo "$output" | yq -r '.spec.endpoints | length')" = "1" ]
+  [ "$(echo "$output" | yq -r '.spec.endpoints[0].port')" = "https" ]
+}
