@@ -74,8 +74,8 @@ load _helpers
       --set 'telemetry.prometheusOperator.enabled=true' \
       --set 'telemetry.prometheusOperator.prometheusRules.enabled=true' \
       --set 'telemetry.prometheusOperator.prometheusRules.rules.foo=bar' \
-      --set 'telemetry.prometheusOperator.prometheusRules.overrideSelectors.baz=qux' \
-      --set 'telemetry.prometheusOperator.prometheusRules.overrideSelectors.bar=foo' \
+      --set 'telemetry.prometheusOperator.prometheusRules.selectors.baz=qux' \
+      --set 'telemetry.prometheusOperator.prometheusRules.selectors.bar=foo' \
       . ) | tee /dev/stderr)
 
   [ "$(echo "$output" | yq -r '.metadata.labels | length')" = "6" ]

@@ -74,14 +74,14 @@ load _helpers
   [ "$(echo "$output" | yq -r '.metadata.labels.release')" = "prometheus" ]
 }
 
-@test "prometheus/ServiceMonitor: assertSelectors overrides" {
+@test "prometheus/ServiceMonitor: assertSelectors override" {
   cd `chart_dir`
   local output=$( (helm template \
       --show-only templates/prometheus-servicemonitor.yaml \
       --set 'telemetry.prometheusOperator.enabled=true' \
       --set 'telemetry.prometheusOperator.enabled=true' \
-      --set 'telemetry.prometheusOperator.serviceMonitor.overrideSelectors.baz=qux' \
-      --set 'telemetry.prometheusOperator.serviceMonitor.overrideSelectors.bar=foo' \
+      --set 'telemetry.prometheusOperator.serviceMonitor.selectors.baz=qux' \
+      --set 'telemetry.prometheusOperator.serviceMonitor.selectors.bar=foo' \
       . ) | tee /dev/stderr)
 
   [ "$(echo "$output" | yq -r '.metadata.labels | length')" = "6" ]

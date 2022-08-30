@@ -1071,15 +1071,10 @@ telemetry:
     enabled: false
 
     serviceMonitor:
-      # Default selector labels to add to the ServiceMonitor.
-      defaultSelectors:
-        # Name to set for the 'release' selector label.
-        # Assumes that the operator has been installed by Helm with a release name of 'prometheus'
-        # Set this to the release name for the installed operator Helm chart.
-        release: prometheus
-
-      # Default selector overrides.
-      overrideSelectors: {}
+      # Selector labels to add to the ServiceMonitor.
+      # When empty, defaults to:
+      #  release: prometheus
+      selectors: {}
 
       # Interval at which Prometheus scrapes metrics
       interval: 30s
@@ -1092,14 +1087,11 @@ telemetry:
       # Requires that AlertManager is properly deployed.
       enabled: false
 
-      # Default selector labels to add to the PrometheusRule.
-      # Assumes that the operator has been installed by Helm with a release name of 'prometheus'
-      defaultSelectors:
-         release: prometheus
-         app: kube-prometheus-stack
-
-      # Default selector overrides.
-      overrideSelectors: {}
+      # Selector labels to add to the ServiceMonitor.
+      # When empty, defaults to:
+      #  release: prometheus
+      #  app: kube-prometheus-stack
+      selectors: {}
 
       # Some example rules.
       rules: {}

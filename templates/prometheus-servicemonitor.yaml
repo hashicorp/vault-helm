@@ -9,7 +9,16 @@ metadata:
     app.kubernetes.io/name: {{ include "vault.name" . }}
     app.kubernetes.io/instance: {{ .Release.Name }}
     app.kubernetes.io/managed-by: {{ .Release.Service }}
-    {{- include "prometheusOperator.selectors" .Values.telemetry.prometheusOperator.serviceMonitor | nindent 4 }}
+    {{- $selectors := .Values.telemetry.prometheusOperator.serviceMonitor.selectors }}
+    {{- if $selectors }}
+    {{- toYaml $selectors | nindent 4 }}
+    {{- else }}
+    {{/*
+    update the selectors docs in values.yaml whenever these defaults change.
+    */}}
+    release: prometheus
+    app: kube-prometheus-stack
+    {{- end }}
 spec:
   selector:
     matchLabels:

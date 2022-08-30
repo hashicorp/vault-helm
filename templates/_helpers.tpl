@@ -951,21 +951,3 @@ Supported inputs are Values.ui
 {{- end -}}
 {{- end }}
 {{- end -}}
-
-{{/*
-prometheusOperator label selectors, assumes the input has the following attributes:
- 'defaultSelectors': map
- 'overrideSelectors': map
-If `overrideSelectors` is empty, then render the default selector labels from `defaultSelectors`
-*/}}
-{{- define "prometheusOperator.selectors" -}}
-{{- $selectors := .overrideSelectors -}}
-{{- if not $selectors -}}
-    {{ $selectors = .defaultSelectors }}
-{{- end -}}
-{{- with $selectors -}}
-{{- range $key, $value := . -}}
-{{ printf "%s: %s" $key $value }}
-{{ end -}}
-{{- end -}}
-{{- end -}}
