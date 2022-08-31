@@ -98,7 +98,6 @@ load _helpers
       --set 'telemetry.prometheusOperator.enabled=true' \
       . ) | tee /dev/stderr)
 
-      #yq -r '.spec.endpoints[0].scrapeTimeout' | tee /dev/stderr)
   [ "$(echo "$output" | yq -r '.spec.endpoints | length')" = "1" ]
   [ "$(echo "$output" | yq -r '.spec.endpoints[0].port')" = "http" ]
 }
