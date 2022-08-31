@@ -1,4 +1,5 @@
-{{ if and (.Values.telemetry.prometheusOperator.enabled) (.Values.telemetry.prometheusOperator.prometheusRules.enabled) (.Values.telemetry.prometheusOperator.prometheusRules.rules) }}
+{{ if and (.Values.telemetry.prometheusOperator.server.prometheusRules.enabled) (.Values.telemetry.prometheusOperator.server.prometheusRules.rules) }}
+---
 apiVersion: monitoring.coreos.com/v1
 kind: PrometheusRule
 metadata:
@@ -8,19 +9,18 @@ metadata:
     app.kubernetes.io/name: {{ include "vault.name" . }}
     app.kubernetes.io/instance: {{ .Release.Name }}
     app.kubernetes.io/managed-by: {{ .Release.Service }}
-    {{- $selectors := .Values.telemetry.prometheusOperator.prometheusRules.selectors }}
+    {{- $selectors := .Values.telemetry.prometheusOperator.server.prometheusRules.selectors }}
     {{- if $selectors }}
     {{- toYaml $selectors | nindent 4 }}
     {{- else }}
     {{/*
     update the selectors docs in values.yaml whenever these defaults change.
     */}}
-    app: kube-prometheus-stack
     release: prometheus
     {{- end }}
 spec:
   groups:
   - name: {{ include "vault.fullname" . }}
     rules:
-      {{- toYaml .Values.telemetry.prometheusOperator.prometheusRules.rules | nindent 6 }}
+      {{- toYaml .Values.telemetry.prometheusOperator.server.prometheusRules.rules | nindent 6 }}
 {{- end }}

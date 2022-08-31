@@ -2,47 +2,32 @@
 
 load _helpers
 
-@test "prometheus/PrometheusRules: assertDisabled by default" {
+@test "prometheus/PrometheusRules-server: assertDisabled by default" {
   cd `chart_dir`
   local actual=$( (helm template \
       --show-only templates/prometheus-prometheusrules.yaml  \
-      --set 'telemetry.prometheusOperator.enabled=true' \
-      --set 'telemetry.prometheusOperator.prometheusRules.rules.foo=bar' \
+      --set 'telemetry.prometheusOperator.server.prometheusRules.rules.foo=bar' \
       . || echo "---") | tee /dev/stderr |
       yq 'length > 0' | tee /dev/stderr)
   [ "${actual}" = "false" ]
 }
 
-@test "prometheus/PrometheusRules: assertDisabled with operator-enabled=false" {
+@test "prometheus/PrometheusRules-server: assertDisabled with rules-defined=false" {
   cd `chart_dir`
   local actual=$( (helm template \
       --show-only templates/prometheus-prometheusrules.yaml  \
-      --set 'telemetry.prometheusOperator.enabled=false' \
-      --set 'telemetry.prometheusOperator.prometheusRules.enabled=true' \
-      --set 'telemetry.prometheusOperator.prometheusRules.rules.foo=bar' \
-      . || echo "---") | tee /dev/stderr |
-      yq 'length > 0' | tee /dev/stderr)
-  [ "${actual}" = "false" ]
-}
-
-@test "prometheus/PrometheusRules: assertDisabled with rules-defined=false" {
-  cd `chart_dir`
-  local actual=$( (helm template \
-      --show-only templates/prometheus-prometheusrules.yaml  \
-      --set 'telemetry.prometheusOperator.enabled=true' \
-      --set 'telemetry.prometheusOperator.prometheusRules.enabled=true' \
+      --set 'telemetry.prometheusOperator.server.prometheusRules.enabled=true' \
       . || echo "---") | tee /dev/stderr | yq 'length > 0' | tee /dev/stderr)
   [ "${actual}" = "false" ]
 }
 
-@test "prometheus/PrometheusRules: assertEnabled  with rules-defined=true" {
+@test "prometheus/PrometheusRules-server: assertEnabled with rules-defined=true" {
   cd `chart_dir`
   local output=$( (helm template \
       --show-only templates/prometheus-prometheusrules.yaml \
-      --set 'telemetry.prometheusOperator.enabled=true' \
-      --set 'telemetry.prometheusOperator.prometheusRules.enabled=true' \
-      --set 'telemetry.prometheusOperator.prometheusRules.rules.foo=bar' \
-      --set 'telemetry.prometheusOperator.prometheusRules.rules.baz=qux' \
+      --set 'telemetry.prometheusOperator.server.prometheusRules.enabled=true' \
+      --set 'telemetry.prometheusOperator.server.prometheusRules.rules.foo=bar' \
+      --set 'telemetry.prometheusOperator.server.prometheusRules.rules.baz=qux' \
       .) | tee  /dev/stderr )
 
   [ "$(echo "$output" | yq -r '.spec.groups | length')" = "1" ]
@@ -53,29 +38,26 @@ load _helpers
   [ "$(echo "$output" | yq -r '.spec.groups[0].rules.baz')" = "qux" ]
 }
 
-@test "prometheus/PrometheusRules: assertSelectors default" {
+@test "prometheus/PrometheusRules-server: assertSelectors default" {
   cd `chart_dir`
   local output=$( (helm template \
       --show-only templates/prometheus-prometheusrules.yaml \
-      --set 'telemetry.prometheusOperator.enabled=true' \
-      --set 'telemetry.prometheusOperator.prometheusRules.enabled=true' \
-      --set 'telemetry.prometheusOperator.prometheusRules.rules.foo=bar' \
+      --set 'telemetry.prometheusOperator.server.prometheusRules.enabled=true' \
+      --set 'telemetry.prometheusOperator.server.prometheusRules.rules.foo=bar' \
       . ) | tee /dev/stderr)
 
-  [ "$(echo "$output" | yq -r '.metadata.labels | length')" = "6" ]
-  [ "$(echo "$output" | yq -r '.metadata.labels.app')" = "kube-prometheus-stack" ]
+  [ "$(echo "$output" | yq -r '.metadata.labels | length')" = "5" ]
   [ "$(echo "$output" | yq -r '.metadata.labels.release')" = "prometheus" ]
 }
 
-@test "prometheus/PrometheusRules: assertSelectors overrides" {
+@test "prometheus/PrometheusRules-server: assertSelectors overrides" {
   cd `chart_dir`
   local output=$( (helm template \
       --show-only templates/prometheus-prometheusrules.yaml \
-      --set 'telemetry.prometheusOperator.enabled=true' \
-      --set 'telemetry.prometheusOperator.prometheusRules.enabled=true' \
-      --set 'telemetry.prometheusOperator.prometheusRules.rules.foo=bar' \
-      --set 'telemetry.prometheusOperator.prometheusRules.selectors.baz=qux' \
-      --set 'telemetry.prometheusOperator.prometheusRules.selectors.bar=foo' \
+      --set 'telemetry.prometheusOperator.server.prometheusRules.enabled=true' \
+      --set 'telemetry.prometheusOperator.server.prometheusRules.rules.foo=bar' \
+      --set 'telemetry.prometheusOperator.server.prometheusRules.selectors.baz=qux' \
+      --set 'telemetry.prometheusOperator.server.prometheusRules.selectors.bar=foo' \
       . ) | tee /dev/stderr)
 
   [ "$(echo "$output" | yq -r '.metadata.labels | length')" = "6" ]
