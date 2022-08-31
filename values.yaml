@@ -1079,7 +1079,7 @@ telemetry:
       # Interval at which Prometheus scrapes metrics
       interval: 30s
 
-      # Timeout at which Prometheus timeouts scrape run
+      # Timeout for Prometheus scrapes
       scrapeTimeout: 10s
 
     prometheusRules:
