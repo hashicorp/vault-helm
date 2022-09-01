@@ -32,6 +32,11 @@ global:
       seccomp.security.alpha.kubernetes.io/defaultProfileName:  runtime/default
       apparmor.security.beta.kubernetes.io/defaultProfileName:  runtime/default
 
+  serverTelemetry:
+    # Enable integration with the Prometheus Operator
+    # See the top level serverTelemetry section below before enabling this feature.
+    prometheusOperator: false
+
 injector:
   # True if you want to enable vault agent injection.
   # @default: global.enabled
@@ -1031,15 +1036,14 @@ csi:
   # for the available command line flags.
   extraArgs: []
 
-telemetry:
-  # Vault is able to collect and publish various runtime metrics.
-  # Enabling this feature requires setting adding `telemetry{}` stanza to
-  # the Vault configuration. There are a few examples included in the `config` sections above.
-  #
-  # For more information see:
-  # https://www.vaultproject.io/docs/configuration/telemetry
-  # https://www.vaultproject.io/docs/internals/telemetry
-
+# Vault is able to collect and publish various runtime metrics.
+# Enabling this feature requires setting adding `telemetry{}` stanza to
+# the Vault configuration. There are a few examples included in the `config` sections above.
+#
+# For more information see:
+# https://www.vaultproject.io/docs/configuration/telemetry
+# https://www.vaultproject.io/docs/internals/telemetry
+serverTelemetry:
   # Enable support for the Prometheus Operator. Currently, this chart does not support
   # authenticating to Vault's metrics endpoint, so the following `telemetry{}` must be included
   # in the `listener "tcp"{}` stanza
@@ -1057,59 +1061,59 @@ telemetry:
   #    disable_hostname = true
   #  }
   #
-  # The Prometheus operator *must* be installed before enabling this feature,
-  # if not the chart will fail to install due to missing CustomResourceDefinitions
-  # provided by the operator.
-  #
-  # Instructions on how to install the Helm chart can be found here:
-  #  https://github.com/prometheus-community/helm-charts/tree/main/charts/kube-prometheus-stack
-  # More information can be found here:
-  #  https://github.com/prometheus-operator/prometheus-operator
-  #  https://github.com/prometheus-operator/kube-prometheus
-  prometheusOperator:
-    # Enable all supported ServiceMonitors
-    enableAllServiceMonitors: false
+  # Configuration for monitoring the Vault server.
+  serviceMonitor:
+    # The Prometheus operator *must* be installed before enabling this feature,
+    # if not the chart will fail to install due to missing CustomResourceDefinitions
+    # provided by the operator.
+    #
+    # Instructions on how to install the Helm chart can be found here:
+    #  https://github.com/prometheus-community/helm-charts/tree/main/charts/kube-prometheus-stack
+    # More information can be found here:
+    #  https://github.com/prometheus-operator/prometheus-operator
+    #  https://github.com/prometheus-operator/kube-prometheus
 
-    # Configuration for monitoring the Vault server.
-    server:
-      serviceMonitor:
-          # Enable deployment of the Vault Server ServiceMonitor CustomResource.
-          enabled: false
+    # Enable deployment of the Vault Server ServiceMonitor CustomResource.
+    enabled: false
 
-          # Selector labels to add to the ServiceMonitor.
-          # When empty, defaults to:
-          #  release: prometheus
-          selectors: {}
+    # Selector labels to add to the ServiceMonitor.
+    # When empty, defaults to:
+    #  release: prometheus
+    selectors: {}
 
-          # Interval at which Prometheus scrapes metrics
-          interval: 30s
+    # Interval at which Prometheus scrapes metrics
+    interval: 30s
 
-          # Timeout for Prometheus scrapes
-          scrapeTimeout: 10s
+    # Timeout for Prometheus scrapes
+    scrapeTimeout: 10s
 
-      prometheusRules:
-          # Deploy the PrometheusRule custom resource for AlertManager based alerts.
-          # Requires that AlertManager is properly deployed.
-          enabled: false
+  prometheusRules:
+      # The Prometheus operator *must* be installed before enabling this feature,
+      # if not the chart will fail to install due to missing CustomResourceDefinitions
+      # provided by the operator.
 
-          # Selector labels to add to the PrometheusRules.
-          # When empty, defaults to:
-          #  release: prometheus
-          selectors: {}
+      # Deploy the PrometheusRule custom resource for AlertManager based alerts.
+      # Requires that AlertManager is properly deployed.
+      enabled: false
 
-          # Some example rules.
-          rules: {}
-          #  - alert: vault-HighResponseTime
-          #    annotations:
-          #      message: The response time of Vault is over 500ms on average over the last 5 minutes.
-          #    expr: vault_core_handle_request{quantile="0.5", namespace="mynamespace"} > 500
-          #    for: 5m
-          #    labels:
-          #      severity: warning
-          #  - alert: vault-HighResponseTime
-          #    annotations:
-          #      message: The response time of Vault is over 1s on average over the last 5 minutes.
-          #    expr: vault_core_handle_request{quantile="0.5", namespace="mynamespace"} > 1000
-          #    for: 5m
-          #    labels:
-          #      severity: critical
+      # Selector labels to add to the PrometheusRules.
+      # When empty, defaults to:
+      #  release: prometheus
+      selectors: {}
+
+      # Some example rules.
+      rules: {}
+      #  - alert: vault-HighResponseTime
+      #    annotations:
+      #      message: The response time of Vault is over 500ms on average over the last 5 minutes.
+      #    expr: vault_core_handle_request{quantile="0.5", namespace="mynamespace"} > 500
+      #    for: 5m
+      #    labels:
+      #      severity: warning
+      #  - alert: vault-HighResponseTime
+      #    annotations:
+      #      message: The response time of Vault is over 1s on average over the last 5 minutes.
+      #    expr: vault_core_handle_request{quantile="0.5", namespace="mynamespace"} > 1000
+      #    for: 5m
+      #    labels:
+      #      severity: critical

@@ -22,8 +22,7 @@ server:
         disable_hostname = true
       }
 
-telemetry:
-  prometheusOperator:
+serverTelemetry:
+  serviceMonitor:
     enabled: true
-    serviceMonitor:
-      interval: 15s
+    interval: 15s

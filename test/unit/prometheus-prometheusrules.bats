@@ -6,7 +6,7 @@ load _helpers
   cd `chart_dir`
   local actual=$( (helm template \
       --show-only templates/prometheus-prometheusrules.yaml  \
-      --set 'telemetry.prometheusOperator.server.prometheusRules.rules.foo=bar' \
+      --set 'serverTelemetry.prometheusRules.rules.foo=bar' \
       . || echo "---") | tee /dev/stderr |
       yq 'length > 0' | tee /dev/stderr)
   [ "${actual}" = "false" ]
@@ -16,7 +16,7 @@ load _helpers
   cd `chart_dir`
   local actual=$( (helm template \
       --show-only templates/prometheus-prometheusrules.yaml  \
-      --set 'telemetry.prometheusOperator.server.prometheusRules.enabled=true' \
+      --set 'serverTelemetry.prometheusRules.enabled=true' \
       . || echo "---") | tee /dev/stderr | yq 'length > 0' | tee /dev/stderr)
   [ "${actual}" = "false" ]
 }
@@ -25,9 +25,9 @@ load _helpers
   cd `chart_dir`
   local output=$( (helm template \
       --show-only templates/prometheus-prometheusrules.yaml \
-      --set 'telemetry.prometheusOperator.server.prometheusRules.enabled=true' \
-      --set 'telemetry.prometheusOperator.server.prometheusRules.rules.foo=bar' \
-      --set 'telemetry.prometheusOperator.server.prometheusRules.rules.baz=qux' \
+      --set 'serverTelemetry.prometheusRules.enabled=true' \
+      --set 'serverTelemetry.prometheusRules.rules.foo=bar' \
+      --set 'serverTelemetry.prometheusRules.rules.baz=qux' \
       .) | tee  /dev/stderr )
 
   [ "$(echo "$output" | yq -r '.spec.groups | length')" = "1" ]
@@ -42,8 +42,8 @@ load _helpers
   cd `chart_dir`
   local output=$( (helm template \
       --show-only templates/prometheus-prometheusrules.yaml \
-      --set 'telemetry.prometheusOperator.server.prometheusRules.enabled=true' \
-      --set 'telemetry.prometheusOperator.server.prometheusRules.rules.foo=bar' \
+      --set 'serverTelemetry.prometheusRules.enabled=true' \
+      --set 'serverTelemetry.prometheusRules.rules.foo=bar' \
       . ) | tee /dev/stderr)
 
   [ "$(echo "$output" | yq -r '.metadata.labels | length')" = "5" ]
@@ -54,10 +54,10 @@ load _helpers
   cd `chart_dir`
   local output=$( (helm template \
       --show-only templates/prometheus-prometheusrules.yaml \
-      --set 'telemetry.prometheusOperator.server.prometheusRules.enabled=true' \
-      --set 'telemetry.prometheusOperator.server.prometheusRules.rules.foo=bar' \
-      --set 'telemetry.prometheusOperator.server.prometheusRules.selectors.baz=qux' \
-      --set 'telemetry.prometheusOperator.server.prometheusRules.selectors.bar=foo' \
+      --set 'serverTelemetry.prometheusRules.enabled=true' \
+      --set 'serverTelemetry.prometheusRules.rules.foo=bar' \
+      --set 'serverTelemetry.prometheusRules.selectors.baz=qux' \
+      --set 'serverTelemetry.prometheusRules.selectors.bar=foo' \
       . ) | tee /dev/stderr)
 
   [ "$(echo "$output" | yq -r '.metadata.labels | length')" = "6" ]
