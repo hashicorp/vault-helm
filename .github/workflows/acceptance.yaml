@@ -21,6 +21,6 @@ jobs:
           node_image: kindest/node:v${{ matrix.kind-k8s-version }}
           version: v0.14.0
 
-      - run: bats ./test/acceptance -t
+      - run: bats --tap --timing ./test/acceptance
         env:
           VAULT_LICENSE_CI: ${{ secrets.VAULT_LICENSE_CI }}
