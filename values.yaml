@@ -839,12 +839,12 @@ server:
     #   runAsGroup: {{ .Values.server.gid | default 1000 }}
     #   runAsUser: {{ .Values.server.uid | default 100 }}
     #   fsGroup: {{ .Values.server.gid | default 1000 }}
-    # container: {}
+    # container:
+    #   allowPrivilegeEscalation: false
     #
     # If not set, these will default to, and for OpenShift:
     # pod: {}
-    # container:
-    #   allowPrivilegeEscalation: false
+    # container: {}
     securityContext:
       pod: {}
       container: {}
