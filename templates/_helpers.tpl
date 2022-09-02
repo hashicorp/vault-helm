@@ -271,6 +271,11 @@ storage might be desired by the user.
           {{- if .Values.server.dataStorage.storageClass }}
         storageClassName: {{ .Values.server.dataStorage.storageClass }}
           {{- end }}
+          {{- with .Values.server.dataStorage.selectorLabels }}
+        selector:
+          matchLabels:
+{{ toYaml . | indent 12 }}
+          {{- end }}
       {{ end }}
       {{- if eq (.Values.server.auditStorage.enabled | toString) "true" }}
     - metadata:
@@ -284,6 +289,11 @@ storage might be desired by the user.
             storage: {{ .Values.server.auditStorage.size }}
           {{- if .Values.server.auditStorage.storageClass }}
         storageClassName: {{ .Values.server.auditStorage.storageClass }}
+          {{- end }}
+          {{- with .Values.server.auditStorage.selectorLabels }}
+        selector:
+          matchLabels:
+{{ toYaml . | indent 12 }}
           {{- end }}
       {{ end }}
   {{ end }}

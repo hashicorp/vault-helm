@@ -652,6 +652,8 @@ server:
     # Name of the storage class to use.  If null it will use the
     # configured default Storage Class.
     storageClass: null
+    # Labels for PV selector
+    selectorLabels: {}
     # Access Mode of the storage device being used for the PVC
     accessMode: ReadWriteOnce
     # Annotations to apply to the PVC
@@ -671,6 +673,8 @@ server:
     # Name of the storage class to use.  If null it will use the
     # configured default Storage Class.
     storageClass: null
+    # Labels for PV selector
+    selectorLabels: {}
     # Access Mode of the storage device being used for the PVC
     accessMode: ReadWriteOnce
     # Annotations to apply to the PVC
