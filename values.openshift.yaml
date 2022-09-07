@@ -6,7 +6,7 @@ global:
 injector:
   image:
     repository: "registry.connect.redhat.com/hashicorp/vault-k8s"
-    tag: "0.17.0-ubi"
+    tag: "1.0.0-ubi"
 
   agentImage:
     repository: "registry.connect.redhat.com/hashicorp/vault"

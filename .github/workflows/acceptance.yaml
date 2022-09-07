@@ -7,7 +7,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        kind-k8s-version: [1.16.15, 1.20.15, 1.21.12, 1.22.9, 1.23.6, 1.24.1]
+        kind-k8s-version: [1.16.15, 1.20.15, 1.21.14, 1.22.13, 1.23.10, 1.24.4, 1.25.0]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
