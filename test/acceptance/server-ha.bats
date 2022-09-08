@@ -87,8 +87,18 @@ setup() {
   kubectl create namespace acceptance
   kubectl config set-context --current --namespace=acceptance
 
-  helm install consul \
-    https://github.com/hashicorp/consul-helm/archive/v0.28.0.tar.gz \
+  helm repo add hashicorp https://helm.releases.hashicorp.com
+  helm repo update
+
+  CONSUL_HELM_VERSION=v0.48.0
+
+  K8S_MAJOR=$(kubectl version --output=json | jq -r .serverVersion.major)
+  K8S_MINOR=$(kubectl version --output=json | jq -r .serverVersion.minor)
+  if [ \( $K8S_MAJOR -eq 1 \) -a \( $K8S_MINOR -le 20 \) ]; then
+    CONSUL_HELM_VERSION=v0.32.1
+  fi
+  helm install consul hashicorp/consul \
+    --version $CONSUL_HELM_VERSION \
     --set 'ui.enabled=false'
 
   wait_for_running_consul
