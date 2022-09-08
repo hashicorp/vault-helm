@@ -1,5 +1,7 @@
 ## Unreleased
 
+## 0.21.1 (September 8th, 2022)
+
 Features:
 * Add PrometheusOperator support for collecting Vault server metrics. [GH-772](https://github.com/hashicorp/vault-helm/pull/772)
 
