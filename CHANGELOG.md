@@ -1,11 +1,14 @@
 ## Unreleased
 
+## 0.22.0 (September 8th, 2022)
+
 Features:
 * Add PrometheusOperator support for collecting Vault server metrics. [GH-772](https://github.com/hashicorp/vault-helm/pull/772)
 
 Changes:
 * `vault-k8s` to 1.0.0 [GH-784](https://github.com/hashicorp/vault-helm/pull/784)
 * Test against Kubernetes 1.25 [GH-784](https://github.com/hashicorp/vault-helm/pull/784)
+* `vault` updated to 1.11.3 [GH-785](https://github.com/hashicorp/vault-helm/pull/785)
 
 ## 0.21.0 (August 10th, 2022)
 
