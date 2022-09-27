@@ -56,6 +56,8 @@ spec:
             - name: VAULT_ADDR
             {{- if .Values.global.externalVaultAddr }}
               value: "{{ .Values.global.externalVaultAddr }}"
+            {{- else if .Values.server.ha.apiAddr }}
+              value: "{{ .Values.server.ha.apiAddr }}"
             {{- else }}
               value: {{ include "vault.scheme" . }}://{{ template "vault.fullname" . }}.{{ .Release.Namespace }}.svc:{{ .Values.server.service.port }}
             {{- end }}
