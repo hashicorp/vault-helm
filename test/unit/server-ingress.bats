@@ -236,7 +236,7 @@ load _helpers
       --set server.ingress.pathType=ImplementationSpecific \
       --kube-version 1.19.0 \
       . | tee /dev/stderr |
-      yq -r '.spec.rules[0].http.paths[0].pathType' | tee /dev/stderr)
+      yq -r '.spec.rules[0].http.pathType' | tee /dev/stderr)
   [ "${actual}" = "ImplementationSpecific" ]
 }
 
@@ -249,7 +249,7 @@ load _helpers
       --set server.ingress.pathType=ImplementationSpecific \
       --kube-version 1.18.3 \
       . | tee /dev/stderr |
-      yq -r '.spec.rules[0].http.paths[0].pathType' | tee /dev/stderr)
+      yq -r '.spec.rules[0].http.pathType' | tee /dev/stderr)
   [ "${actual}" = "null" ]
 }
 
@@ -262,6 +262,6 @@ load _helpers
       --set server.ingress.pathType=Prefix \
       --kube-version 1.20.0 \
       . | tee /dev/stderr |
-      yq -r '.spec.rules[0].http.paths[0].pathType' | tee /dev/stderr)
+      yq -r '.spec.rules[0].http.pathType' | tee /dev/stderr)
   [ "${actual}" = "Prefix" ]
 }
