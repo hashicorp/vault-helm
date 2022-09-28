@@ -51,14 +51,14 @@ spec:
     - host: {{ .host | quote }}
       http:
         paths:
+          {{ if semverCompare ">= 1.19.0-0" $kubeVersion }}
+          pathType: {{ $pathType }}
+          {{ end }}
 {{ if $extraPaths }}
 {{ toYaml $extraPaths | indent 10 }}
 {{- end }}
         {{- range (.paths | default (list "/")) }}
           - path: {{ . }}
-            {{ if semverCompare ">= 1.19.0-0" $kubeVersion }}
-            pathType: {{ $pathType }}
-            {{ end }}
             backend:
               {{ if semverCompare ">= 1.19.0-0" $kubeVersion }}
               service:
