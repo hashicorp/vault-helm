@@ -834,6 +834,14 @@ EOF
   local value=$(echo $object |
       yq -r 'map(select(.name=="AGENT_INJECT_MEM_REQUEST")) | .[] .value' | tee /dev/stderr)
   [ "${value}" = "64Mi" ]
+
+  local value=$(echo $object |
+      yq -r 'map(select(.name=="AGENT_INJECT_EPHEMERAL_REQUEST")) | .[] .value' | tee /dev/stderr)
+  [ "${value}" = "64Mi" ]
+
+  local value=$(echo $object |
+      yq -r 'map(select(.name=="AGENT_INJECT_EPHEMERAL_LIMIT")) | .[] .value' | tee /dev/stderr)
+  [ "${value}" = "128Mi" ]
 }
 
 @test "injector/deployment: can set agent default resources" {
@@ -844,6 +852,8 @@ EOF
       --set 'injector.agentDefaults.cpuRequest=cpuRequest' \
       --set 'injector.agentDefaults.memLimit=memLimit' \
       --set 'injector.agentDefaults.memRequest=memRequest' \
+      --set 'injector.agentDefaults.ephemeralLimit=ephemeralLimit' \
+      --set 'injector.agentDefaults.ephemeralRequest=ephemeralRequest' \
       . | tee /dev/stderr |
       yq -r '.spec.template.spec.containers[0].env' | tee /dev/stderr)
 
@@ -862,6 +872,14 @@ EOF
   local value=$(echo $object |
       yq -r 'map(select(.name=="AGENT_INJECT_MEM_REQUEST")) | .[] .value' | tee /dev/stderr)
   [ "${value}" = "memRequest" ]
+
+  local value=$(echo $object |
+      yq -r 'map(select(.name=="AGENT_INJECT_EPHEMERAL_LIMIT")) | .[] .value' | tee /dev/stderr)
+  [ "${value}" = "ephemeralLimit" ]
+
+  local value=$(echo $object |
+      yq -r 'map(select(.name=="AGENT_INJECT_EPHEMERAL_REQUEST")) | .[] .value' | tee /dev/stderr)
+  [ "${value}" = "ephemeralRequest" ]
 }
 
 @test "injector/deployment: agent default template" {

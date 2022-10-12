@@ -232,6 +232,12 @@
                         "memRequest": {
                             "type": "string"
                         },
+                        "ephemeralLimit": {
+                            "type": "string"
+                        },
+                        "ephemeralRequest": {
+                            "type": "string"
+                        },
                         "template": {
                             "type": "string"
                         },
