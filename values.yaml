@@ -80,8 +80,8 @@ injector:
     cpuRequest: "250m"
     memLimit: "128Mi"
     memRequest: "64Mi"
-    ephemeralLimit: "128Mi"
-    ephemeralRequest: "64Mi"
+    # ephemeralLimit: "128Mi"
+    # ephemeralRequest: "64Mi"
 
     # Default template type for secrets when no custom template is specified.
     # Possible values include: "json" and "map".
