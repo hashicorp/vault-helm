@@ -5,13 +5,13 @@ orbs:
 jobs:
   update-helm-charts-index:
     docker:
-      - image: docker.mirror.hashicorp.services/circleci/golang:1.19.2
+      - image: docker.mirror.hashicorp.services/golang:1.19.2
     steps:
       - checkout
       - run:
           name: verify Chart version matches tag version
           command: |
-            GO111MODULE=on go get github.com/mikefarah/yq/v2
+            go install github.com/mikefarah/yq/v2@latest
             git_tag=$(echo "${CIRCLE_TAG#v}")
             chart_tag=$(yq r Chart.yaml version)
             if [ "${git_tag}" != "${chart_tag}" ]; then
