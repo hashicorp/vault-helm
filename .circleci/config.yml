@@ -5,7 +5,7 @@ orbs:
 jobs:
   update-helm-charts-index:
     docker:
-      - image: docker.mirror.hashicorp.services/golang:1.19.2
+      - image: docker.mirror.hashicorp.services/cimg/go:1.19.2
     steps:
       - checkout
       - run:
@@ -14,8 +14,8 @@ jobs:
             RELEASE_TAG: << pipeline.parameters.release-tag >>
           command: |
             go install github.com/mikefarah/yq/v2@latest
-            export RELEASE_TAG=${RELEASE_TAG:-$CIRCLE_TAG}
-            git_tag=$(echo "${RELEASE_TAG#v}")
+            export TAG=${RELEASE_TAG:-$CIRCLE_TAG}
+            git_tag=$(echo "${TAG#v}")
             chart_tag=$(yq r Chart.yaml version)
             if [ "${git_tag}" != "${chart_tag}" ]; then
               echo "chart version (${chart_tag}) did not match git version (${git_tag})"
@@ -23,6 +23,8 @@ jobs:
             fi
       - run:
           name: update helm-charts index
+          environment:
+            RELEASE_TAG: << pipeline.parameters.release-tag >>
           command: |
             # curl --show-error --silent --fail --user "${CIRCLE_TOKEN}:" \
             #     -X POST \
