@@ -3,58 +3,6 @@ orbs:
   slack: circleci/slack@3.4.2
 
 jobs:
-  bats-unit-test:
-    docker:
-      # This image is built from test/docker/Test.dockerfile
-      - image: docker.mirror.hashicorp.services/hashicorpdev/vault-helm-test:0.2.0
-    steps:
-      - checkout
-      - run: bats ./test/unit -t
-
-  chart-verifier:
-    docker:
-      - image: docker.mirror.hashicorp.services/cimg/go:1.19.2
-    environment:
-      BATS_VERSION: "1.8.2"
-      CHART_VERIFIER_VERSION: "1.2.1"
-    steps:
-      - checkout
-      - run:
-          name: install chart-verifier
-          command: go get github.com/redhat-certification/chart-verifier@${CHART_VERIFIER_VERSION}
-      - run:
-          name: install bats
-          command: |
-            curl -sSL https://github.com/bats-core/bats-core/archive/v${BATS_VERSION}.tar.gz -o /tmp/bats.tgz
-            tar -zxf /tmp/bats.tgz -C /tmp
-            sudo /bin/bash /tmp/bats-core-${BATS_VERSION}/install.sh /usr/local
-      - run:
-          name: run chart-verifier tests
-          command: bats ./test/chart -t
-
-  acceptance:
-    docker:
-      # This image is build from test/docker/Test.dockerfile
-      - image: docker.mirror.hashicorp.services/hashicorpdev/vault-helm-test:0.2.0
-
-    steps:
-      - checkout
-      - run:
-          name: terraform init & apply
-          command: |
-            echo -e "${GOOGLE_APP_CREDS}" | base64 -d > vault-helm-test.json
-            export GOOGLE_CREDENTIALS=vault-helm-test.json
-            make provision-cluster
-      - run:
-          name: Run acceptance tests
-          command: bats ./test/acceptance -t
-
-      - run:
-          name: terraform destroy
-          command: |
-            export GOOGLE_CREDENTIALS=vault-helm-test.json
-            make destroy-cluster
-          when: always
   update-helm-charts-index:
     docker:
       - image: docker.mirror.hashicorp.services/circleci/golang:1.19.2
