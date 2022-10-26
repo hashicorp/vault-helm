@@ -13,10 +13,10 @@ jobs:
 
   chart-verifier:
     docker:
-      - image: docker.mirror.hashicorp.services/cimg/go:1.16
+      - image: docker.mirror.hashicorp.services/cimg/go:1.19.2
     environment:
-      BATS_VERSION: "1.3.0"
-      CHART_VERIFIER_VERSION: "1.2.1"
+      BATS_VERSION: "1.8.2"
+      CHART_VERIFIER_VERSION: "1.8.0"
     steps:
       - checkout
       - run:
@@ -57,7 +57,7 @@ jobs:
           when: always
   update-helm-charts-index:
     docker:
-      - image: docker.mirror.hashicorp.services/circleci/golang:1.15.3
+      - image: docker.mirror.hashicorp.services/circleci/golang:1.19.2
     steps:
       - checkout
       - run:

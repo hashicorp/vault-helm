@@ -6,13 +6,15 @@ runs:
   steps:
     - uses: actions/setup-node@v2
       with:
-        node-version: '14'
+        node-version: '16'
     - run: npm install -g bats@${BATS_VERSION}
       shell: bash
       env:
-        BATS_VERSION: '1.5.0'
+        BATS_VERSION: '1.8.2'
     - run: bats -v
       shell: bash
-    - uses: actions/setup-python@v2
+    - uses: actions/setup-python@v4
+      with:
+        python-version: '3.10'
     - run: pip install yq
       shell: bash
