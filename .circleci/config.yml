@@ -26,13 +26,12 @@ jobs:
           environment:
             RELEASE_TAG: << pipeline.parameters.release-tag >>
           command: |
-            # curl --show-error --silent --fail --user "${CIRCLE_TOKEN}:" \
-            #     -X POST \
-            #     -H 'Content-Type: application/json' \
-            #     -H 'Accept: application/json' \
-            #     -d "{\"branch\": \"main\",\"parameters\":{\"SOURCE_REPO\": \"${CIRCLE_PROJECT_USERNAME}/${CIRCLE_PROJECT_REPONAME}\",\"SOURCE_TAG\": \"${RELEASE_TAG}\"}}" \
-            #     "${CIRCLE_ENDPOINT}/${CIRCLE_PROJECT}/pipeline"
-            echo $RELEASE_TAG
+            curl --show-error --silent --fail --user "${CIRCLE_TOKEN}:" \
+                -X POST \
+                -H 'Content-Type: application/json' \
+                -H 'Accept: application/json' \
+                -d "{\"branch\": \"main\",\"parameters\":{\"SOURCE_REPO\": \"${CIRCLE_PROJECT_USERNAME}/${CIRCLE_PROJECT_REPONAME}\",\"SOURCE_TAG\": \"${RELEASE_TAG}\"}}" \
+                "${CIRCLE_ENDPOINT}/${CIRCLE_PROJECT}/pipeline"
       - slack/status:
           fail_only: true
           failure_message: "Failed to trigger an update to the helm charts index. Check the logs at: ${CIRCLE_BUILD_URL}"
