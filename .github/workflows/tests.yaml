@@ -13,7 +13,7 @@ jobs:
   chart-verifier:
     runs-on: ubuntu-latest
     env:
-      CHART_VERIFIER_VERSION: '1.8.0'
+      CHART_VERIFIER_VERSION: '1.2.1'
     steps:
       - uses: actions/checkout@v3
       - name: Setup test tools
