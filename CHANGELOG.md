@@ -1,5 +1,11 @@
 ## Unreleased
 
+## 0.22.1 (October 26th, 2022)
+
+Changes:
+* `vault` updated to 1.12.0 [GH-803](https://github.com/hashicorp/vault-helm/pull/803)
+* `vault-k8s` updated to 1.0.1 [GH-803](https://github.com/hashicorp/vault-helm/pull/803)
+
 ## 0.22.0 (September 8th, 2022)
 
 Features:
