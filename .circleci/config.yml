@@ -10,9 +10,12 @@ jobs:
       - checkout
       - run:
           name: verify Chart version matches tag version
+          environment:
+            RELEASE_TAG: << pipeline.parameters.release-tag >>
           command: |
             go install github.com/mikefarah/yq/v2@latest
-            git_tag=$(echo "${CIRCLE_TAG#v}")
+            export RELEASE_TAG=${RELEASE_TAG:-$CIRCLE_TAG}
+            git_tag=$(echo "${RELEASE_TAG#v}")
             chart_tag=$(yq r Chart.yaml version)
             if [ "${git_tag}" != "${chart_tag}" ]; then
               echo "chart version (${chart_tag}) did not match git version (${git_tag})"
@@ -21,15 +24,22 @@ jobs:
       - run:
           name: update helm-charts index
           command: |
-            curl --show-error --silent --fail --user "${CIRCLE_TOKEN}:" \
-                -X POST \
-                -H 'Content-Type: application/json' \
-                -H 'Accept: application/json' \
-                -d "{\"branch\": \"main\",\"parameters\":{\"SOURCE_REPO\": \"${CIRCLE_PROJECT_USERNAME}/${CIRCLE_PROJECT_REPONAME}\",\"SOURCE_TAG\": \"${CIRCLE_TAG}\"}}" \
-                "${CIRCLE_ENDPOINT}/${CIRCLE_PROJECT}/pipeline"
+            # curl --show-error --silent --fail --user "${CIRCLE_TOKEN}:" \
+            #     -X POST \
+            #     -H 'Content-Type: application/json' \
+            #     -H 'Accept: application/json' \
+            #     -d "{\"branch\": \"main\",\"parameters\":{\"SOURCE_REPO\": \"${CIRCLE_PROJECT_USERNAME}/${CIRCLE_PROJECT_REPONAME}\",\"SOURCE_TAG\": \"${RELEASE_TAG}\"}}" \
+            #     "${CIRCLE_ENDPOINT}/${CIRCLE_PROJECT}/pipeline"
+            echo $RELEASE_TAG
       - slack/status:
           fail_only: true
           failure_message: "Failed to trigger an update to the helm charts index. Check the logs at: ${CIRCLE_BUILD_URL}"
+
+parameters:
+  release-tag:
+    type: string
+    default: ""
+    description: "The tag to release, including v, e.g. v0.22.1"
 
 workflows:
   version: 2
@@ -43,3 +53,7 @@ workflows:
               only: /^v.*/
             branches:
               ignore: /.*/
+  manual-trigger-update-helm-charts-index:
+    jobs:
+      - update-helm-charts-index:
+          context: helm-charts-trigger-vault
