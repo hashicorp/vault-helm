@@ -54,11 +54,7 @@ workflows:
             branches:
               ignore: /.*/
   manual-trigger-update-helm-charts-index:
+    when: << pipeline.parameters.release-tag >>
     jobs:
       - update-helm-charts-index:
           context: helm-charts-trigger-vault
-          filters:
-            tags:
-              ignore: /.*/
-            branches:
-              ignore: /.*/
