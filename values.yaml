@@ -851,6 +851,9 @@ server:
     # YAML or a YAML-formatted multi-line templated string map of the
     # annotations to apply to the serviceAccount.
     annotations: {}
+    # Extra labels to attach to the serviceAccount
+    # This should be a YAML map of the labels to apply to the serviceAccount
+    extraLabels: {}
 
   # Settings for the statefulSet used to run Vault.
   statefulSet:
