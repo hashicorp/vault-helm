@@ -1,5 +1,8 @@
 ## Unreleased
 
+Features:
+* server: Add `extraLabels` for Vault server serviceAccount [GH-806](https://github.com/hashicorp/vault-helm/pull/806)
+
 ## 0.22.1 (October 26th, 2022)
 
 Changes:
