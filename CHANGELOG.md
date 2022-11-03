@@ -1,5 +1,24 @@
 ## Unreleased
 
+Features:
+* server: Add `extraLabels` for Vault server serviceAccount [GH-806](https://github.com/hashicorp/vault-helm/pull/806)
+
+## 0.22.1 (October 26th, 2022)
+
+Changes:
+* `vault` updated to 1.12.0 [GH-803](https://github.com/hashicorp/vault-helm/pull/803)
+* `vault-k8s` updated to 1.0.1 [GH-803](https://github.com/hashicorp/vault-helm/pull/803)
+
+## 0.22.0 (September 8th, 2022)
+
+Features:
+* Add PrometheusOperator support for collecting Vault server metrics. [GH-772](https://github.com/hashicorp/vault-helm/pull/772)
+
+Changes:
+* `vault-k8s` to 1.0.0 [GH-784](https://github.com/hashicorp/vault-helm/pull/784)
+* Test against Kubernetes 1.25 [GH-784](https://github.com/hashicorp/vault-helm/pull/784)
+* `vault` updated to 1.11.3 [GH-785](https://github.com/hashicorp/vault-helm/pull/785)
+
 ## 0.21.0 (August 10th, 2022)
 
 CHANGES:

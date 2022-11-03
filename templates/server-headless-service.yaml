@@ -13,6 +13,7 @@ metadata:
     app.kubernetes.io/name: {{ include "vault.name" . }}
     app.kubernetes.io/instance: {{ .Release.Name }}
     app.kubernetes.io/managed-by: {{ .Release.Service }}
+    vault-internal: "true"
   annotations:
 {{ template "vault.service.annotations" .}}
 spec:

@@ -979,6 +979,9 @@
                         "null",
                         "array"
                     ]
+                },
+                "hostNetwork": {
+                    "type": "boolean"
                 }
             }
         },
