@@ -835,13 +835,6 @@ EOF
       yq -r 'map(select(.name=="AGENT_INJECT_MEM_REQUEST")) | .[] .value' | tee /dev/stderr)
   [ "${value}" = "64Mi" ]
 
-  local value=$(echo $object |
-      yq -r 'map(select(.name=="AGENT_INJECT_EPHEMERAL_REQUEST")) | .[] .value' | tee /dev/stderr)
-  [ "${value}" = "64Mi" ]
-
-  local value=$(echo $object |
-      yq -r 'map(select(.name=="AGENT_INJECT_EPHEMERAL_LIMIT")) | .[] .value' | tee /dev/stderr)
-  [ "${value}" = "128Mi" ]
 }
 
 @test "injector/deployment: can set agent default resources" {
