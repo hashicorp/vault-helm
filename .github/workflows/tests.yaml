@@ -6,7 +6,7 @@ jobs:
   bats-unit-tests:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - uses: ./.github/workflows/setup-test-tools
       - run: bats --tap --timing ./test/unit
 
@@ -15,11 +15,11 @@ jobs:
     env:
       CHART_VERIFIER_VERSION: '1.2.1'
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - name: Setup test tools
         uses: ./.github/workflows/setup-test-tools
-      - uses: actions/setup-go@v2
+      - uses: actions/setup-go@v3
         with:
-          go-version: '1.17.4'
+          go-version: '1.19.2'
       - run: go install github.com/redhat-certification/chart-verifier@${CHART_VERIFIER_VERSION}
       - run: bats --tap --timing ./test/chart

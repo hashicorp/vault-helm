@@ -62,7 +62,7 @@ injector:
   # image sets the repo and tag of the vault-k8s image to use for the injector.
   image:
     repository: "hashicorp/vault-k8s"
-    tag: "1.0.0"
+    tag: "1.0.1"
     pullPolicy: IfNotPresent
 
   # agentImage sets the repo and tag of the Vault image to use for the Vault Agent
@@ -70,7 +70,7 @@ injector:
   # required.
   agentImage:
     repository: "hashicorp/vault"
-    tag: "1.11.3"
+    tag: "1.12.0"
 
   # The default values for the injected Vault Agent containers.
   agentDefaults:
@@ -334,7 +334,7 @@ server:
 
   image:
     repository: "hashicorp/vault"
-    tag: "1.11.3"
+    tag: "1.12.0"
     # Overrides the default Image Pull Policy
     pullPolicy: IfNotPresent
 
@@ -853,6 +853,9 @@ server:
     # YAML or a YAML-formatted multi-line templated string map of the
     # annotations to apply to the serviceAccount.
     annotations: {}
+    # Extra labels to attach to the serviceAccount
+    # This should be a YAML map of the labels to apply to the serviceAccount
+    extraLabels: {}
 
   # Settings for the statefulSet used to run Vault.
   statefulSet:
