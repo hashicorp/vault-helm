@@ -476,6 +476,22 @@ load _helpers
   [ "${value}" = 'http://$(HOSTNAME).release-name-vault-internal:8201' ]
 }
 
+@test "server/ha-StatefulSet: clusterAddr gets quoted" {
+  cd `chart_dir`
+  local customUrl='http://$(HOSTNAME).release-name-vault-internal:8201'
+  local rendered=$(helm template \
+      --show-only templates/server-statefulset.yaml  \
+      --set 'server.ha.enabled=true' \
+      --set 'server.ha.raft.enabled=true' \
+      --set "server.ha.clusterAddr=${customUrl}" \
+      . | tee /dev/stderr | \
+      grep -F "${customUrl}" | tee /dev/stderr)
+
+local value=$(echo $rendered |
+      yq -Y '.' | tee /dev/stderr)
+  [ "${value}" = 'value: "http://$(HOSTNAME).release-name-vault-internal:8201"' ]
+}
+
 #--------------------------------------------------------------------
 # VAULT_RAFT_NODE_ID renders
 
