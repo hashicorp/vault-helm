@@ -106,7 +106,7 @@ spec:
                   fieldPath: metadata.name
             - name: VAULT_CLUSTER_ADDR
               {{- if .Values.server.ha.clusterAddr }}
-              value: {{ .Values.server.ha.clusterAddr }}
+              value: {{ .Values.server.ha.clusterAddr | quote }}
               {{- else }}
               value: "https://$(HOSTNAME).{{ template "vault.fullname" . }}-internal:8201"
               {{- end }}
