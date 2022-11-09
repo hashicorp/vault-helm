@@ -3,6 +3,9 @@
 Features:
 * server: Add `extraLabels` for Vault server serviceAccount [GH-806](https://github.com/hashicorp/vault-helm/pull/806)
 
+Bugs:
+* server: Quote `.server.ha.clusterAddr` value [GH-810](https://github.com/hashicorp/vault-helm/pull/810)
+
 ## 0.22.1 (October 26th, 2022)
 
 Changes:
