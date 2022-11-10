@@ -52,7 +52,6 @@ spec:
       {{- if not .Values.global.openshift }}
       hostNetwork: {{ .Values.server.hostNetwork }}
       {{- end }}
-
       volumes:
         {{ template "vault.volumes" . }}
         - name: home

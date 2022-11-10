@@ -35,6 +35,18 @@ load _helpers
   [ "${actual}" = "false" ]
 }
 
+@test "server/ha-active-Service: disable with server.service.active.enabled false" {
+  cd `chart_dir`
+  local actual=$( (helm template \
+      --show-only templates/server-ha-active-service.yaml  \
+      --set 'server.ha.enabled=true' \
+      --set 'server.service.enabled=true' \
+      --set 'server.service.active.enabled=false' \
+      . || echo "---") | tee /dev/stderr |
+      yq 'length > 0' | tee /dev/stderr)
+  [ "${actual}" = "false" ]
+}
+
 @test "server/ha-active-Service: type empty by default" {
   cd `chart_dir`
   local actual=$(helm template \

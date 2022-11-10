@@ -596,6 +596,10 @@ server:
   # Enables a headless service to be used by the Vault Statefulset
   service:
     enabled: true
+    active:
+      enabled: true
+    standby:
+      enabled: true
     # clusterIP controls whether a Cluster IP address is attached to the
     # Vault service within Kubernetes.  By default, the Vault service will
     # be given a Cluster IP address, set to None to disable.  When disabled

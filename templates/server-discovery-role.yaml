@@ -1,7 +1,8 @@
 {{ template "vault.mode" . }}
-{{- if ne .mode "external" }}
-{{- if .serverEnabled -}}
+{{ template "vault.serverServiceAccountEnabled" . }}
 {{- if eq .mode "ha" }}
+{{- if .serverEnabled -}}
+{{- if .serverServiceAccountEnabled -}}
 apiVersion: rbac.authorization.k8s.io/v1
 kind: Role
 metadata:
