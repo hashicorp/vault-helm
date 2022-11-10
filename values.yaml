@@ -604,6 +604,11 @@ server:
     # have labelled themselves as a cluster follower with `vault-active: "false"`
     standby:
       enabled: true
+    # If enabled, the service selectors will include `app.kubernetes.io/instance: {{ .Release.Name }}`
+    # When disabled, services may select Vault pods not deployed from the chart.
+    # Does not affect the headless vault-internal service with `ClusterIP: None`
+    instanceSelector:
+      enabled: true
     # clusterIP controls whether a Cluster IP address is attached to the
     # Vault service within Kubernetes.  By default, the Vault service will
     # be given a Cluster IP address, set to None to disable.  When disabled
