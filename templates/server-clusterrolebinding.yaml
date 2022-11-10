@@ -20,5 +20,5 @@ roleRef:
 subjects:
 - kind: ServiceAccount
   name: {{ template "vault.serviceAccount.name" . }}
-  namespace: {{ .Release.Namespace }}
+  namespace: {{ template "vault.namespace" . }}
 {{ end }}

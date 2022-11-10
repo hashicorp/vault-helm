@@ -15,5 +15,5 @@ roleRef:
 subjects:
 - kind: ServiceAccount
   name: {{ template "vault.fullname" . }}-csi-provider
-  namespace: {{ .Release.Namespace }}
+  namespace: {{ template "vault.namespace" . }}
 {{- end }}
