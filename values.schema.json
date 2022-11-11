@@ -911,8 +911,19 @@
                         "create": {
                             "type": "boolean"
                         },
+                        "extraLabels": {
+                            "type": "object"
+                        },
                         "name": {
                             "type": "string"
+                        },
+                        "serviceDiscovery": {
+                            "type": "object",
+                            "properties": {
+                                "enabled": {
+                                    "type": "boolean"
+                                }
+                            }
                         }
                     }
                 },

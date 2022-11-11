@@ -1,8 +1,7 @@
 {{ template "vault.mode" . }}
-{{ template "vault.serverServiceAccountEnabled" . }}
-{{- if eq .mode "ha" }}
 {{- if .serverEnabled -}}
-{{- if .serverServiceAccountEnabled -}}
+{{- if eq .mode "ha" }}
+{{- if eq (.Values.server.serviceAccount.serviceDiscovery.enabled | toString) "true" }}
 {{- if .Capabilities.APIVersions.Has "rbac.authorization.k8s.io/v1" -}}
 apiVersion: rbac.authorization.k8s.io/v1
 {{- else }}
