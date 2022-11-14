@@ -851,6 +851,14 @@
                 "service": {
                     "type": "object",
                     "properties": {
+                        "active": {
+                            "type": "object",
+                            "properties": {
+                                "enabled": {
+                                    "type": "boolean"
+                                }
+                            }
+                        },
                         "annotations": {
                             "type": [
                                 "object",
@@ -868,6 +876,14 @@
                         },
                         "publishNotReadyAddresses": {
                             "type": "boolean"
+                        },
+                        "standby": {
+                            "type": "object",
+                            "properties": {
+                                "enabled": {
+                                    "type": "boolean"
+                                }
+                            }
                         },
                         "targetPort": {
                             "type": "integer"
@@ -895,8 +911,19 @@
                         "create": {
                             "type": "boolean"
                         },
+                        "extraLabels": {
+                            "type": "object"
+                        },
                         "name": {
                             "type": "string"
+                        },
+                        "serviceDiscovery": {
+                            "type": "object",
+                            "properties": {
+                                "enabled": {
+                                    "type": "boolean"
+                                }
+                            }
                         }
                     }
                 },

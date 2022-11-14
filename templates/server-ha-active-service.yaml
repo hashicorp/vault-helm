@@ -3,6 +3,7 @@
 {{- template "vault.serverServiceEnabled" . -}}
 {{- if .serverServiceEnabled -}}
 {{- if eq .mode "ha" }}
+{{- if eq (.Values.server.service.active.enabled | toString) "true" }}
 # Service for active Vault pod
 apiVersion: v1
 kind: Service
@@ -41,6 +42,7 @@ spec:
     app.kubernetes.io/instance: {{ .Release.Name }}
     component: server
     vault-active: "true"
+{{- end }}
 {{- end }}
 {{- end }}
 {{- end }}

@@ -596,6 +596,14 @@ server:
   # Enables a headless service to be used by the Vault Statefulset
   service:
     enabled: true
+    # Enable or disable the vault-active service, which selects Vault pods that
+    # have labelled themselves as the cluster leader with `vault-active: "true"`
+    active:
+      enabled: true
+    # Enable or disable the vault-standby service, which selects Vault pods that
+    # have labelled themselves as a cluster follower with `vault-active: "false"`
+    standby:
+      enabled: true
     # clusterIP controls whether a Cluster IP address is attached to the
     # Vault service within Kubernetes.  By default, the Vault service will
     # be given a Cluster IP address, set to None to disable.  When disabled
@@ -854,6 +862,11 @@ server:
     # Extra labels to attach to the serviceAccount
     # This should be a YAML map of the labels to apply to the serviceAccount
     extraLabels: {}
+    # Enable or disable a service account role binding with the permissions required for
+    # Vault's Kubernetes service_registration config option.
+    # See https://developer.hashicorp.com/vault/docs/configuration/service-registration/kubernetes
+    serviceDiscovery:
+      enabled: true
 
   # Settings for the statefulSet used to run Vault.
   statefulSet:

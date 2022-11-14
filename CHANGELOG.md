@@ -2,6 +2,8 @@
 
 Features:
 * server: Add `extraLabels` for Vault server serviceAccount [GH-806](https://github.com/hashicorp/vault-helm/pull/806)
+* server: Add `server.service.active.enabled` and `server.service.standby.enabled` options to selectively disable additional services [GH-811](https://github.com/hashicorp/vault-helm/pull/811)
+* server: Add `server.serviceAccount.serviceDiscovery.enabled` option to selectively disable a Vault service discovery role and role binding [GH-811](https://github.com/hashicorp/vault-helm/pull/811)
 
 Bugs:
 * server: Quote `.server.ha.clusterAddr` value [GH-810](https://github.com/hashicorp/vault-helm/pull/810)

@@ -3,6 +3,7 @@
 {{- template "vault.serverServiceEnabled" . -}}
 {{- if .serverServiceEnabled -}}
 {{- if eq .mode "ha" }}
+{{- if eq (.Values.server.service.standby.enabled | toString) "true" }}
 # Service for standby Vault pod
 apiVersion: v1
 kind: Service
@@ -40,6 +41,7 @@ spec:
     app.kubernetes.io/instance: {{ .Release.Name }}
     component: server
     vault-active: "false"
+{{- end }}
 {{- end }}
 {{- end }}
 {{- end }}
