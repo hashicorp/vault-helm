@@ -226,3 +226,21 @@ load _helpers
       yq -r '.spec.publishNotReadyAddresses' | tee /dev/stderr)
   [ "${actual}" = "false" ]
 }
+
+@test "server/ha-active-Service: instance selector can be disabled" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      --show-only templates/server-ha-active-service.yaml \
+      --set 'server.ha.enabled=true' \
+      . | tee /dev/stderr |
+      yq -r '.spec.selector["app.kubernetes.io/instance"]' | tee /dev/stderr)
+  [ "${actual}" = "release-name" ]
+
+  local actual=$(helm template \
+      --show-only templates/server-ha-active-service.yaml \
+      --set 'server.ha.enabled=true' \
+      --set 'server.service.instanceSelector.enabled=false' \
+      . | tee /dev/stderr |
+      yq -r '.spec.selector["app.kubernetes.io/instance"]' | tee /dev/stderr)
+  [ "${actual}" = "null" ]
+}

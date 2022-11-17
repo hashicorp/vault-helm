@@ -38,7 +38,9 @@ spec:
       targetPort: 8201
   selector:
     app.kubernetes.io/name: {{ include "vault.name" . }}
+    {{- if eq (.Values.server.service.instanceSelector.enabled | toString) "true" }}
     app.kubernetes.io/instance: {{ .Release.Name }}
+    {{- end }}
     component: server
     vault-active: "false"
 {{- end }}
