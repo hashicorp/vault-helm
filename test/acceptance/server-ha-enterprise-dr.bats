@@ -7,7 +7,7 @@ load _helpers
 
   helm install "$(name_prefix)-east" \
     --set='server.image.repository=hashicorp/vault-enterprise' \
-    --set='server.image.tag=1.12.0-ent' \
+    --set='server.image.tag=1.12.1-ent' \
     --set='injector.enabled=false' \
     --set='server.ha.enabled=true' \
     --set='server.ha.raft.enabled=true' \
@@ -75,7 +75,7 @@ load _helpers
   helm install "$(name_prefix)-west" \
     --set='injector.enabled=false' \
     --set='server.image.repository=hashicorp/vault-enterprise' \
-    --set='server.image.tag=1.12.0-ent' \
+    --set='server.image.tag=1.12.1-ent' \
     --set='server.ha.enabled=true' \
     --set='server.ha.raft.enabled=true' \
     --set='server.enterpriseLicense.secretName=vault-license' .

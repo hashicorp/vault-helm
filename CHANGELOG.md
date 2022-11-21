@@ -1,5 +1,12 @@
 ## Unreleased
 
+## 0.23.0 (November 22nd, 2022)
+
+Changes:
+* `vault` updated to 1.12.1 [GH-814](https://github.com/hashicorp/vault-helm/pull/814)
+* `vault-k8s` updated to 1.1.0 [GH-814](https://github.com/hashicorp/vault-helm/pull/814)
+* `vault-csi-provider` updated to 1.2.1 [GH-814](https://github.com/hashicorp/vault-helm/pull/814)
+
 Features:
 * server: Add `extraLabels` for Vault server serviceAccount [GH-806](https://github.com/hashicorp/vault-helm/pull/806)
 * server: Add `server.service.active.enabled` and `server.service.standby.enabled` options to selectively disable additional services [GH-811](https://github.com/hashicorp/vault-helm/pull/811)
