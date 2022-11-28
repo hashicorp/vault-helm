@@ -1,6 +1,6 @@
 ## Unreleased
 
-## 0.23.0 (November 22nd, 2022)
+## 0.23.0 (November 28th, 2022)
 
 Changes:
 * `vault` updated to 1.12.1 [GH-814](https://github.com/hashicorp/vault-helm/pull/814)
