@@ -14,5 +14,5 @@ roleRef:
 subjects:
 - kind: ServiceAccount
   name: {{ template "vault.fullname" . }}-agent-injector
-  namespace: {{ .Release.Namespace }}
+  namespace: {{ .Values.namespace | default .Release.Namespace }}
 {{ end }}
