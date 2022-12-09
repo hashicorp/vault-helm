@@ -26,12 +26,12 @@ jobs:
         persist-credentials: false # otherwise, the token used is the GITHUB_TOKEN, instead of your personal token
         fetch-depth: 0 # otherwise, you will fail to push refs to dest repo
 
-    - name: Install kubectl
-      run: |
-        curl -LO "https://storage.googleapis.com/kubernetes-release/release/v${KUBERNETES_VERSION}/bin/linux/amd64/kubectl"
-        sudo install ./kubectl /usr/local/bin/ && rm kubectl
-        kubectl version --short --client
-        kubectl version --short --client | grep -q ${KUBERNETES_VERSION}
+ #   - name: Install kubectl
+  #    run: |
+ #       curl -LO "https://storage.googleapis.com/kubernetes-release/release/v${KUBERNETES_VERSION}/bin/linux/amd64/kubectl"
+ #       sudo install ./kubectl /usr/local/bin/ && rm kubectl
+ #       kubectl version --short --client
+ #       kubectl version --short --client | grep -q ${KUBERNETES_VERSION}
 #    - name: Install Kind
 #      run: |
 #        curl -L -o kind https://github.com/kubernetes-sigs/kind/releases/download/v${KIND_VERSION}/kind-linux-amd64
@@ -64,9 +64,9 @@ jobs:
         version: v3.4.0
 
     # Lint
-    - name: Helm Lint
-      run: |
-        helm lint .
+#    - name: Helm Lint
+#      run: |
+#        helm lint .
     # Dry run to ensure that manifests are generated successfully 
 #    - name: Dry Run Chart
 #      run: |
