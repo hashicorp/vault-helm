@@ -32,15 +32,15 @@ jobs:
         sudo install ./kubectl /usr/local/bin/ && rm kubectl
         kubectl version --short --client
         kubectl version --short --client | grep -q ${KUBERNETES_VERSION}
-    - name: Install Kind
-      run: |
-        curl -L -o kind https://github.com/kubernetes-sigs/kind/releases/download/v${KIND_VERSION}/kind-linux-amd64
-        sudo install ./kind /usr/local/bin && rm kind
-        kind version
-        kind version | grep -q ${KIND_VERSION}
-    - name: Create Kind Cluster
-      run: |
-        kind create cluster
+#    - name: Install Kind
+#      run: |
+#        curl -L -o kind https://github.com/kubernetes-sigs/kind/releases/download/v${KIND_VERSION}/kind-linux-amd64
+#        sudo install ./kind /usr/local/bin && rm kind
+#        kind version
+#        kind version | grep -q ${KIND_VERSION}
+#    - name: Create Kind Cluster
+#      run: |
+#        kind create cluster
     # Generate tag for chart without "v" prefix
     - name: Generate Tag
       id: generate_tag
@@ -68,9 +68,9 @@ jobs:
       run: |
         helm lint .
     # Dry run to ensure that manifests are generated successfully 
-    - name: Dry Run Chart
-      run: |
-        helm install ${CHART_NAME} . --dry-run --debug
+#    - name: Dry Run Chart
+#      run: |
+#        helm install ${CHART_NAME} . --dry-run --debug
     # Publish helm chart
     - name: Publish Helm chart
       uses: stefanprodan/helm-gh-pages@master
