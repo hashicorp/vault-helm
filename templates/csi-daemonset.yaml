@@ -3,7 +3,7 @@ apiVersion: apps/v1
 kind: DaemonSet
 metadata:
   name: {{ template "vault.fullname" . }}-csi-provider
-  namespace: {{ .Release.Namespace }}
+  namespace: {{ .Values.namespace | default .Release.Namespace }}
   labels:
     app.kubernetes.io/name: {{ include "vault.name" . }}-csi-provider
     app.kubernetes.io/instance: {{ .Release.Name }}
@@ -70,7 +70,7 @@ spec:
           {{- if .Values.global.openshift }}
           securityContext:
             privileged: true
-          {{- end }}  
+          {{- end }}
       volumes:
         - name: providervol
           hostPath:
