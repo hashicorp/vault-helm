@@ -1125,7 +1125,7 @@ serverTelemetry:
       selectors: {}
 
       # Some example rules.
-      rules: {}
+      rules: []
       #  - alert: vault-HighResponseTime
       #    annotations:
       #      message: The response time of Vault is over 500ms on average over the last 5 minutes.
