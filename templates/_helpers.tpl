@@ -59,7 +59,7 @@ Compute if the server is enabled.
 {{- end -}}
 
 {{/*
-Compute if the server auth delegator serviceaccount is enabled.
+Compute if the server serviceaccount is enabled.
 */}}
 {{- define "vault.serverServiceAccountEnabled" -}}
 {{- $_ := set . "serverServiceAccountEnabled"
