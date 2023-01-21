@@ -459,6 +459,8 @@ server:
     # If you need to use a http path instead of the default exec
     # path: /v1/sys/health?standbyok=true
 
+    # Port number on which readinessProbe will be checked.
+    port: 8200
     # When a probe fails, Kubernetes will try failureThreshold times before giving up
     failureThreshold: 2
     # Number of seconds after the container has started before probe initiates
@@ -473,6 +475,8 @@ server:
   livenessProbe:
     enabled: false
     path: "/v1/sys/health?standbyok=true"
+    # Port nuumber on which livenessProbe will be checked.
+    port: 8200
     # When a probe fails, Kubernetes will try failureThreshold times before giving up
     failureThreshold: 2
     # Number of seconds after the container has started before probe initiates
