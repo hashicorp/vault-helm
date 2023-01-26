@@ -1110,6 +1110,24 @@ serverTelemetry:
     # Timeout for Prometheus scrapes
     scrapeTimeout: 10s
 
+    # MetricRelabelConfigs to apply to samples before ingestion.
+    metricRelabelings: []
+    # Some example metricRelabelings.
+    #- action: "replace"
+    #  regex: "(.*)"
+    #  sourceLabels:
+    #    - "cluster"
+    #  targetLabel: "vault_cluster"
+
+    # RelabelConfigs to apply to samples before scraping.
+    relabelings: []
+    # Some example relabelings.
+    #- action: "replace"
+    #  regex: "(.*)"
+    #  sourceLabels:
+    #    - "cluster"
+    #  targetLabel: "vault_cluster"
+
   prometheusRules:
       # The Prometheus operator *must* be installed before enabling this feature,
       # if not the chart will fail to install due to missing CustomResourceDefinitions
