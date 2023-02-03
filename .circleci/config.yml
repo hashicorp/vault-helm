@@ -32,11 +32,11 @@ jobs:
 
       - run:
           name: update helm-charts index
-          environment:
-            RELEASE_TAG: << pipeline.parameters.release-tag >>
+          # environment:
+          #   RELEASE_TAG: << pipeline.parameters.release-tag >>
           command: |
             export GITHUB_TOKEN="${HELM_CHARTS_GITHUB_TOKEN}"
-            gh workflow run .github/workflows/publish-charts.yml \
+            ./bin/gh workflow run .github/workflows/publish-charts.yml \
               --repo hashicorp/helm-charts \
               --ref templates_default_test \
               -f SOURCE_TAG="${CIRCLE_TAG}" \
@@ -45,11 +45,11 @@ jobs:
       #     fail_only: true
       #     failure_message: "Failed to trigger an update to the helm charts index. Check the logs at: ${CIRCLE_BUILD_URL}"
 
-parameters:
-  release-tag:
-    type: string
-    default: ""
-    description: "The tag to release, including v, e.g. v0.22.1"
+# parameters:
+#   release-tag:
+#     type: string
+#     default: ""
+#     description: "The tag to release, including v, e.g. v0.22.1"
 
 workflows:
   version: 2
