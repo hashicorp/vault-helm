@@ -45,11 +45,11 @@ jobs:
       #     fail_only: true
       #     failure_message: "Failed to trigger an update to the helm charts index. Check the logs at: ${CIRCLE_BUILD_URL}"
 
-# parameters:
-#   release-tag:
-#     type: string
-#     default: ""
-#     description: "The tag to release, including v, e.g. v0.22.1"
+parameters:
+  release-tag:
+    type: string
+    default: ""
+    description: "The tag to release, including v, e.g. v0.22.1"
 
 workflows:
   version: 2
