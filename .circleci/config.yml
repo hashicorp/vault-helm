@@ -1,11 +1,13 @@
 version: 2.1
-orbs:
-  slack: circleci/slack@3.4.2
+# orbs:
+#   slack: circleci/slack@3.4.2
 
 jobs:
   update-helm-charts-index:
     docker:
       - image: docker.mirror.hashicorp.services/cimg/go:1.19.2
+    environment:
+      CIRCLE_TAG: v0.23.0
     steps:
       - checkout
       - run:
@@ -36,18 +38,18 @@ jobs:
             export GITHUB_TOKEN="${HELM_CHARTS_GITHUB_TOKEN}"
             gh workflow run .github/workflows/publish-charts.yml \
               --repo hashicorp/helm-charts \
-              --ref main \
+              --ref templates_default_test \
               -f SOURCE_TAG="${CIRCLE_TAG}" \
               -f SOURCE_REPO="${CIRCLE_PROJECT_USERNAME}/${CIRCLE_PROJECT_REPONAME}"
-      - slack/status:
-          fail_only: true
-          failure_message: "Failed to trigger an update to the helm charts index. Check the logs at: ${CIRCLE_BUILD_URL}"
+      # - slack/status:
+      #     fail_only: true
+      #     failure_message: "Failed to trigger an update to the helm charts index. Check the logs at: ${CIRCLE_BUILD_URL}"
 
-parameters:
-  release-tag:
-    type: string
-    default: ""
-    description: "The tag to release, including v, e.g. v0.22.1"
+# parameters:
+#   release-tag:
+#     type: string
+#     default: ""
+#     description: "The tag to release, including v, e.g. v0.22.1"
 
 workflows:
   version: 2
@@ -56,13 +58,13 @@ workflows:
     jobs:
       - update-helm-charts-index:
           context: helm-charts-trigger-vault
-          filters:
-            tags:
-              only: /^v.*/
-            branches:
-              ignore: /.*/
-  manual-trigger-update-helm-charts-index:
-    when: << pipeline.parameters.release-tag >>
-    jobs:
-      - update-helm-charts-index:
-          context: helm-charts-trigger-vault
+  #         filters:
+  #           tags:
+  #             only: /^v.*/
+  #           branches:
+  #             ignore: /.*/
+  # manual-trigger-update-helm-charts-index:
+  #   when: << pipeline.parameters.release-tag >>
+  #   jobs:
+  #     - update-helm-charts-index:
+  #         context: helm-charts-trigger-vault
