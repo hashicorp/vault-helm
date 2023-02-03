@@ -12,8 +12,8 @@ jobs:
       - checkout
       - run:
           name: verify Chart version matches tag version
-          environment:
-            RELEASE_TAG: << pipeline.parameters.release-tag >>
+          # environment:
+          #   RELEASE_TAG: << pipeline.parameters.release-tag >>
           command: |
             go install github.com/mikefarah/yq/v2@latest
             export TAG=${RELEASE_TAG:-$CIRCLE_TAG}
