@@ -359,8 +359,7 @@ server:
 
   # Ingress allows ingress services to be created to allow external access
   # from Kubernetes to access Vault pods.
-  # If deployment is on OpenShift, the following block is ignored.
-  # In order to expose the service, use the route section below
+  # If deployment is on OpenShift and route is enabled, the following block is ignored.
   ingress:
     enabled: false
     labels: {}

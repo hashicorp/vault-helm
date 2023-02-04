@@ -1,4 +1,4 @@
-{{- if not .Values.global.openshift }}
+{{- if or (not .Values.global.openshift) (not .Values.server.route.enabled) }}
 {{ template "vault.mode" . }}
 {{- if ne .mode "external" }}
 {{- if .Values.server.ingress.enabled -}}
