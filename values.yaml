@@ -453,6 +453,12 @@ server:
   # extraArgs is a string containing additional Vault server arguments.
   extraArgs: ""
 
+  # extraPorts is a list of extra ports. Specified as a YAML list.
+  # This is useful if you need to add additional ports to the statefulset in dynamic way.
+  extraPorts: null
+    # - containerPort: 8300
+    #   name: http-monitoring
+
   # Used to define custom readinessProbe settings
   readinessProbe:
     enabled: true

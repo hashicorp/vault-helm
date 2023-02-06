@@ -143,6 +143,9 @@ spec:
               name: https-internal
             - containerPort: 8202
               name: {{ include "vault.scheme" . }}-rep
+          {{- if .Values.server.extraPorts -}}
+          {{ toYaml .Values.server.extraPorts | nindent 12}}
+          {{- end }}
           {{- if .Values.server.readinessProbe.enabled }}
           readinessProbe:
             {{- if .Values.server.readinessProbe.path }}
