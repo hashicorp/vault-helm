@@ -34,7 +34,7 @@ jobs:
             RELEASE_TAG: << pipeline.parameters.release-tag >>
           command: |
             export GITHUB_TOKEN="${HELM_CHARTS_GITHUB_TOKEN}"
-            ./bin/gh workflow run .github/workflows/publish-charts.yml \
+            ./bin/gh workflow run publish-charts.yml \
               --repo hashicorp/helm-charts \
               --ref main \
               -f SOURCE_TAG="${CIRCLE_TAG}" \
