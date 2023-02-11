@@ -1,3 +1,8 @@
+{{/*
+Copyright (c) HashiCorp, Inc.
+SPDX-License-Identifier: MPL-2.0
+*/}}
+
 {{- if .Values.global.openshift }}
 {{- if ne .mode "external" }}
 {{- if .Values.server.route.enabled -}}

@@ -1,3 +1,8 @@
+{{/*
+Copyright (c) HashiCorp, Inc.
+SPDX-License-Identifier: MPL-2.0
+*/}}
+
 {{ template "vault.mode" . }}
 {{- if .serverEnabled -}}
 {{- if and (ne .mode "") (eq (.Values.global.psp.enable | toString) "true") }}
