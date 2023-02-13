@@ -1,3 +1,8 @@
+{{/*
+Copyright (c) HashiCorp, Inc.
+SPDX-License-Identifier: MPL-2.0
+*/}}
+
 {{- template "vault.injectorEnabled" . -}}
 {{- if .injectorEnabled -}}
 apiVersion: rbac.authorization.k8s.io/v1
