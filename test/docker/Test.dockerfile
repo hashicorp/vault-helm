@@ -1,3 +1,6 @@
+# Copyright (c) HashiCorp, Inc.
+# SPDX-License-Identifier: MPL-2.0
+
 # This Dockerfile installs all the dependencies necessary to run the unit and
 # acceptance tests. This image also contains gcloud so you can run tests
 # against a GKE cluster easily.

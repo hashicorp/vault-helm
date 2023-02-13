@@ -1,3 +1,6 @@
+# Copyright (c) HashiCorp, Inc.
+# SPDX-License-Identifier: MPL-2.0
+
 {{- if .Values.injector.podDisruptionBudget }}
 apiVersion: {{ ge .Capabilities.KubeVersion.Minor "21" | ternary "policy/v1" "policy/v1beta1" }}
 kind: PodDisruptionBudget

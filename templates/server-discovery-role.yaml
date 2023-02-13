@@ -1,3 +1,6 @@
+# Copyright (c) HashiCorp, Inc.
+# SPDX-License-Identifier: MPL-2.0
+
 {{ template "vault.mode" . }}
 {{- if .serverEnabled -}}
 {{- if eq .mode "ha" }}
