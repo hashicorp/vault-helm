@@ -1828,3 +1828,4 @@ load _helpers
   local actual=$(echo $object |
       yq -r '.name' | tee /dev/stderr)
   [ "${actual}" = "foo" ]
+}
