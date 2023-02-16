@@ -1819,7 +1819,7 @@ load _helpers
       --set 'server.extraPorts[0].containerPort=1111' \
       --set 'server.extraPorts[0].name=foo' \
       . | tee /dev/stderr |
-      yq -r '.spec.template.spec.ports[] | select(.name == "foo")' | tee /dev/stderr)
+      yq -r '.spec.template.spec.containers[0].ports[] | select(.name == "foo")' | tee /dev/stderr)
 
   local actual=$(echo $object |
       yq -r '.containerPort' | tee /dev/stderr)
