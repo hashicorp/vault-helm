@@ -1,5 +1,8 @@
 ## Unreleased
 
+Features:
+* server: New `extraPorts` option for adding ports to the Vault server statefulset [GH-841](https://github.com/hashicorp/vault-helm/pull/841)
+
 ## 0.23.0 (November 28th, 2022)
 
 Changes:
