@@ -61,19 +61,12 @@ spec:
 {{- end }}
         {{- range (.paths | default (list "/")) }}
           - path: {{ . }}
-            {{ if semverCompare ">= 1.19.0-0" $kubeVersion }}
             pathType: {{ $pathType }}
-            {{ end }}
             backend:
-              {{ if semverCompare ">= 1.19.0-0" $kubeVersion }}
               service:
                 name: {{ $serviceName }}
                 port:
                   number: {{ $servicePort }}
-              {{ else }}
-              serviceName: {{ $serviceName }}
-              servicePort: {{ $servicePort }}
-              {{ end }}
         {{- end }}
   {{- end }}
 {{- end }}
