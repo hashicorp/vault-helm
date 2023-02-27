@@ -1,5 +1,8 @@
 ## Unreleased
 
+Changes:
+* Earliest Kubernetes version tested is now 1.20
+
 Features:
 * server: New `extraPorts` option for adding ports to the Vault server statefulset [GH-841](https://github.com/hashicorp/vault-helm/pull/841)
 
