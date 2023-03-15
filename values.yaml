@@ -129,6 +129,7 @@ injector:
     successThreshold: 1
     # Number of seconds after which the probe times out.
     timeoutSeconds: 5
+    
   # Mount Path of the Vault Kubernetes Auth Method.
   authPath: "auth/kubernetes"
 
