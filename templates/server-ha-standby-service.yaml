@@ -5,14 +5,10 @@ SPDX-License-Identifier: MPL-2.0
 
 {{ template "vault.mode" . }}
 {{- if ne .mode "external" }}
-<<<<<<< HEAD
 {{- template "vault.serverServiceEnabled" . -}}
 {{- if .serverServiceEnabled -}}
 {{- if eq .mode "ha" }}
 {{- if eq (.Values.server.service.standby.enabled | toString) "true" }}
-=======
-{{- if and (eq .mode "ha" ) (eq (.Values.server.service.enabled | toString) "true" ) (eq (.Values.global.enabled | toString) "true") }}
->>>>>>> c4ab664 (feat(DATAGO-27002): Upgrade vault to version 1.7.9 (#12))
 # Service for standby Vault pod
 apiVersion: v1
 kind: Service

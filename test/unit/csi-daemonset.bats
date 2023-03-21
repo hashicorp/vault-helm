@@ -327,11 +327,7 @@ load _helpers
   [ "${actual}" = "true" ]
 }
 
-<<<<<<< HEAD
 @test "csi/daemonset: tolerations can be set as string" {
-=======
-@test "csi/daemonset: tolerations can be set" {
->>>>>>> c4ab664 (feat(DATAGO-27002): Upgrade vault to version 1.7.9 (#12))
   cd `chart_dir`
   local actual=$(helm template \
       --show-only templates/csi-daemonset.yaml  \
@@ -342,7 +338,6 @@ load _helpers
   [ "${actual}" = "true" ]
 }
 
-<<<<<<< HEAD
 @test "csi/daemonset: tolerations can be set as YAML" {
   cd `chart_dir`
   local actual=$(helm template \
@@ -380,8 +375,6 @@ load _helpers
 }
 
 
-=======
->>>>>>> c4ab664 (feat(DATAGO-27002): Upgrade vault to version 1.7.9 (#12))
 #--------------------------------------------------------------------
 # volumes
 
@@ -402,7 +395,6 @@ load _helpers
   [ "${actual}" = "{}" ]
 }
 
-<<<<<<< HEAD
 @test "csi/daemonset: csi providersDir default" {
   cd `chart_dir`
 
@@ -434,8 +426,6 @@ load _helpers
   [ "${actual}" = "/alt/csi-prov-dir" ]
 }
 
-=======
->>>>>>> c4ab664 (feat(DATAGO-27002): Upgrade vault to version 1.7.9 (#12))
 #--------------------------------------------------------------------
 # volumeMounts
 
@@ -573,7 +563,6 @@ load _helpers
       yq -r '.timeoutSeconds' | tee /dev/stderr)
   [ "${actual}" = "14" ]
 }
-<<<<<<< HEAD
 
 @test "csi/daemonset: VAULT_ADDR defaults to Agent unix socket" {
   cd `chart_dir`
@@ -778,5 +767,3 @@ load _helpers
       yq -r '.limits.cpu' | tee /dev/stderr)
   [ "${value}" = "500m" ]
 }
-=======
->>>>>>> c4ab664 (feat(DATAGO-27002): Upgrade vault to version 1.7.9 (#12))

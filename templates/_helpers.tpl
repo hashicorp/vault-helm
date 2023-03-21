@@ -131,7 +131,7 @@ template logic.
     {{- $_ := set . "mode" "external" -}}
   {{- else if not .serverEnabled -}}
     {{- $_ := set . "mode" "external" -}}
-  {{- else if ne (.Values.server.enabled | toString) "true" -}}
+  {{- else if not .serverEnabled -}}
     {{- $_ := set . "mode" "external" -}}
   {{- else if eq (.Values.server.dev.enabled | toString) "true" -}}
     {{- $_ := set . "mode" "dev" -}}

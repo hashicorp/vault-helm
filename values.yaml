@@ -165,7 +165,6 @@ injector:
     # for more details.
     #
     timeoutSeconds: 30
-
     # namespaceSelector is the selector for restricting the webhook to only
     # specific namespaces.
     # See https://kubernetes.io/docs/reference/access-authn-authz/extensible-admission-controllers/#matching-requests-namespaceselector
@@ -212,6 +211,8 @@ injector:
   #    matchLabels:
   #      sidecar-injector: enabled
   namespaceSelector: {}
+
+  # Deprecated: please use 'webhook.objectSelector' instead
   # objectSelector is the selector for restricting the webhook to only
   # specific labels.
   # See https://kubernetes.io/docs/reference/access-authn-authz/extensible-admission-controllers/#matching-requests-objectselector

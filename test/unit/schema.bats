@@ -7,15 +7,9 @@ load _helpers
 # schema, setting it as a string fails 'helm template'.
 @test "schema: csi enabled datatype" {
   cd `chart_dir`
-<<<<<<< HEAD
   run helm template . --set csi.enabled="123"
   [ "$status" -eq 1 ]
   [ "${lines[2]}" = "- csi.enabled: Invalid type. Expected: [boolean,string], given: integer" ]
-=======
-  run helm template . --set csi.enabled="nope"
-  [ "$status" -eq 1 ]
-  [ "${lines[2]}" = "- csi.enabled: Invalid type. Expected: boolean, given: string" ]
->>>>>>> c4ab664 (feat(DATAGO-27002): Upgrade vault to version 1.7.9 (#12))
 
   run helm template . --set csi.enabled=true
   [ "$status" -eq 0 ]
