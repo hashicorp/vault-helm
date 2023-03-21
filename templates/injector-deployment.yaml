@@ -141,41 +141,6 @@ spec:
             successThreshold: 1
             timeoutSeconds: 5
 {{- if .Values.injector.certs.secretName }}
-          volumeMounts:
-            - name: webhook-certs
-              mountPath: /etc/webhook/certs
-              readOnly: true
-{{- end }}
-        {{- if and (eq (.Values.injector.leaderElector.enabled | toString) "true") (gt (.Values.injector.replicas | int) 1) }}
-        - name: leader-elector
-          image: {{ .Values.injector.leaderElector.image.repository }}:{{ .Values.injector.leaderElector.image.tag }}
-          args:
-            - --election={{ template "vault.fullname" . }}-agent-injector-leader
-            - --election-namespace={{ .Release.Namespace }}
-            - --http=0.0.0.0:4040
-            - --ttl={{ .Values.injector.leaderElector.ttl }}
-          livenessProbe:
-            httpGet:
-              path: /
-              port: 4040
-              scheme: HTTP
-            failureThreshold: 2
-            initialDelaySeconds: 5
-            periodSeconds: 2
-            successThreshold: 1
-            timeoutSeconds: 5
-          readinessProbe:
-            httpGet:
-              path: /
-              port: 4040
-              scheme: HTTP
-            failureThreshold: 2
-            initialDelaySeconds: 5
-            periodSeconds: 2
-            successThreshold: 1
-            timeoutSeconds: 5
-        {{- end }}
-{{- if .Values.injector.certs.secretName }}
       volumes:
         - name: webhook-certs
           secret:

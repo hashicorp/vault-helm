@@ -75,7 +75,11 @@ load _helpers
   helm install "$(name_prefix)-west" \
     --set='injector.enabled=false' \
     --set='server.image.repository=hashicorp/vault-enterprise' \
+<<<<<<< HEAD
     --set='server.image.tag=1.11.3-ent' \
+=======
+    --set='server.image.tag=1.10.3-ent' \
+>>>>>>> c575574 (feat(DATAGO-30305): Upgrade vault server to 1.10.x (#16))
     --set='server.ha.enabled=true' \
     --set='server.ha.raft.enabled=true' \
     --set='server.enterpriseLicense.secretName=vault-license' .
