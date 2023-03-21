@@ -46,10 +46,14 @@ spec:
       volumeMounts:
         {{- if .Values.server.volumeMounts }}
           {{- toYaml .Values.server.volumeMounts | nindent 8}}
+        {{ else }}
+          []
         {{- end }}
   volumes:
     {{- if .Values.server.volumes }}
       {{- toYaml .Values.server.volumes | nindent 4}}
+    {{ else }}
+      []
     {{- end }}
   restartPolicy: Never
 {{- end }}
