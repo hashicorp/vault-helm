@@ -7,6 +7,11 @@ Features:
 * server: New `extraPorts` option for adding ports to the Vault server statefulset [GH-841](https://github.com/hashicorp/vault-helm/pull/841)
 * injector: Make livenessProbe and readinessProbe configurable and add configurable startupProbe [GH-852](https://github.com/hashicorp/vault-helm/pull/852)
 
+## 0.23.0 (March 22nd, 2023)
+
+Changes:
+* `vault` updated to 1.12.4 [GH-814](https://github.com/hashicorp/vault-helm/pull/857)
+
 ## 0.23.0 (November 28th, 2022)
 
 Changes:
