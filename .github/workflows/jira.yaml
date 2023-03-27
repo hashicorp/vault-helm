@@ -22,9 +22,9 @@ jobs:
         id: preprocess
         run: |
           if [[ "${{ github.event_name }}" == "pull_request_target" ]]; then
-            echo "::set-output name=type::PR"
+            echo "type=PR" >> "$GITHUB_OUTPUT"
           else
-            echo "::set-output name=type::ISS"
+            echo "type=ISS" >> "$GITHUB_OUTPUT"
           fi
       - name: Create ticket
         if: github.event.action == 'opened'
