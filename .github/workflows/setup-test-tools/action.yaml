@@ -1,6 +1,5 @@
 name: Setup common testing tools
 description: Install bats and python-yq
-
 runs:
   using: "composite"
   steps:
@@ -18,3 +17,5 @@ runs:
         python-version: '3.10'
     - run: pip install yq
       shell: bash
+permissions:
+  contents: read

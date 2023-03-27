@@ -12,33 +12,36 @@ jobs:
     container:
       image: docker.mirror.hashicorp.services/cimg/go:1.19.2
     steps:
-    - uses: actions/checkout@ac593985615ec2ede58e132d2e21d2b1cbd6127c # v3.3.0
-    - name: verify Chart version matches tag version
-      run: |-
-        go install github.com/mikefarah/yq/v2@latest
-        export TAG=${RELEASE_TAG:-${{ github.ref }}}
-        git_tag=$(echo "${TAG#v}")
-        chart_tag=$(yq r Chart.yaml version)
-        if [ "${git_tag}" != "${chart_tag}" ]; then
-          echo "chart version (${chart_tag}) did not match git version (${git_tag})"
-          exit 1
-        fi
-      env:
-        RELEASE_TAG: "${{ inputs.release-tag }}"
-    - name: install gh tool
-      run: |-
-        version="2.22.1"
-        curl --show-error --silent --location --output "gh.tar.gz" "https://github.com/cli/cli/releases/download/v${version}/gh_${version}_linux_amd64.tar.gz"
-        tar -xvzf gh.tar.gz && mkdir -p bin && mv "gh_${version}_linux_amd64/bin/gh" bin/
-    - name: update helm-charts index
-      run: |-
-        export GITHUB_TOKEN="${HELM_CHARTS_GITHUB_TOKEN}"
-        ./bin/gh workflow run publish-charts.yml \
-          --repo hashicorp/helm-charts \
-          --ref main \
-          -f SOURCE_TAG="${{ github.ref }}" \
-          -f SOURCE_REPO="${CIRCLE_PROJECT_USERNAME}/${{ github.repository }}"
-      env:
-        RELEASE_TAG: "${{ inputs.release-tag }}"
+      - uses: actions/checkout@ac593985615ec2ede58e132d2e21d2b1cbd6127c # v3.3.0
+      - name: verify Chart version matches tag version
+        run: |-
+          go install github.com/mikefarah/yq/v2@latest
+          export TAG=${RELEASE_TAG:-${{ github.ref }}}
+          git_tag=$(echo "${TAG#v}")
+          chart_tag=$(yq r Chart.yaml version)
+          if [ "${git_tag}" != "${chart_tag}" ]; then
+            echo "chart version (${chart_tag}) did not match git version (${git_tag})"
+            exit 1
+          fi
+        env:
+          RELEASE_TAG: "${{ inputs.release-tag }}"
+      - name: install gh tool
+        run: |-
+          version="2.22.1"
+          curl --show-error --silent --location --output "gh.tar.gz" "https://github.com/cli/cli/releases/download/v${version}/gh_${version}_linux_amd64.tar.gz"
+          tar -xvzf gh.tar.gz && mkdir -p bin && mv "gh_${version}_linux_amd64/bin/gh" bin/
+      - name: update helm-charts index
+        run: |-
+          export GITHUB_TOKEN="${HELM_CHARTS_GITHUB_TOKEN}"
+          ./bin/gh workflow run publish-charts.yml \
+            --repo hashicorp/helm-charts \
+            --ref main \
+            -f SOURCE_TAG="${{ github.ref }}" \
+            -f SOURCE_REPO="${CIRCLE_PROJECT_USERNAME}/${{ github.repository }}"
+        env:
+          RELEASE_TAG: "${{ inputs.release-tag }}"
 #     # This item has no matching transformer
 #     - circleci_slack_status:
+
+permissions:
+  contents: read
