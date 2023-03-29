@@ -12,24 +12,8 @@ on:
 jobs:
   update-helm-charts-index:
     if: startsWith(github.ref, 'refs/tags/v')
-    runs-on: self-hosted
-    permissions:
-      id-token: write
-      contents: read
+    runs-on: ubuntu-latest
     steps:
-      - name: Authenticate to Vault
-        id: vault-auth
-        run: vault-auth
-      - name: Retrieve Vault-hosted Secrets
-        id: secrets
-        uses: hashicorp/vault-action@v2.4.3
-        with:
-          url: ${{ steps.vault-auth.outputs.addr }}
-          caCertificate: ${{ steps.vault-auth.outputs.ca_certificate }}
-          token: ${{ steps.vault-auth.outputs.token }}
-          secrets: |
-            kv/data/github/${{ github.repository }}/helm-charts-github-token;
-            kv/data/github/${{ github.repository }}/slack-webhook-url;
       - uses: actions/checkout@ac593985615ec2ede58e132d2e21d2b1cbd6127c # v3.3.0
       - name: verify Chart version matches tag version
         run: |-
@@ -43,8 +27,9 @@ jobs:
         env:
           RELEASE_TAG: "${{ inputs.release-tag }}"
       - name: update helm-charts index
+        id: update
         run: |-
-          export GITHUB_TOKEN="${{steps.secrets.outputs.helm_charts_github_token}}"
+          export GITHUB_TOKEN="${{secrets.helm_charts_github_token }}"
           gh workflow run publish-charts.yml \
             --repo hashicorp/helm-charts \
             --ref main \
@@ -53,7 +38,7 @@ jobs:
       - name: Prepare Slack Notification
         if: always()
         run: |
-          case "${{ steps.merge.outcome }}" in
+          case "${{ steps.update.conclusion }}" in
             failure)
               echo "SLACK_MESSAGE=:red_circle: The vault-helm charts index update failed." >> "$GITHUB_ENV"
               echo "SLACK_BLOCK_COLOR=ed5c5c" >> "$GITHUB_ENV"
@@ -71,4 +56,4 @@ jobs:
           block-color: ${{ env.SLACK_BLOCK_COLOR }}
           message: ${{ env.SLACK_MESSAGE }}
           run-url: ${{ env.RUN_URL }}
-          slack-webhook-url: ${{ steps.secrets.outputs.slack_webhook_url }}
+          slack-webhook-url: ${{ secrets.slack_webhook_url }}
