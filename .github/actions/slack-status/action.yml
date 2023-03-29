@@ -1,0 +1,37 @@
+name: "Send Slack Status Notification"
+description: Slack Status Notification (replacement for circleci_slack_status orb).
+
+inputs:
+  message:
+    description: The Markdown message contents
+    required: true
+  slack-webhook-url:
+    description: Slack channel webhook URL to post the message
+    required: true
+  run-url:
+    description: Self-referencing RUN
+    required: true
+  block-color:
+    description: HEX color code, use `ed5c5c` for failure and `1cbf43` for success status
+    required: false
+    default: 1cbf43
+
+runs:
+  using: "composite"
+  steps:
+    - name: Send Slack Notification
+      uses: slackapi/slack-github-action@v1.23.0
+      env:
+        SLACK_WEBHOOK_URL: ${{ inputs.slack-webhook-url }}
+        SLACK_WEBHOOK_TYPE: INCOMING_WEBHOOK
+      with:
+        payload: '
+          {
+            "attachments": [
+              {
+                "mrkdwn_in": ["text"],
+                "color": "#${{ inputs.block-color }}",
+                "text": "${{ inputs.message }}\n<${{ input.run-url }}|View Workflow>"
+              }
+            ]
+          }'

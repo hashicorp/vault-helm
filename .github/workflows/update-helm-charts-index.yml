@@ -1,23 +1,36 @@
 name: hashicorp/vault-helm/update-helm-charts-index
 on:
+  # FIXME: Does this mean the same thing in GHA?
+  push:
+    tags:
+      - 'v[0-9]+\.[0-9]+\.[0-9]+\.*'
   workflow_dispatch:
     inputs:
       release-tag:
         required: true
-        description: The tag to release, including v, e.g. v0.22.1
+        description: The tag to release, including v, e.g. `v0.22.1`
 jobs:
   update-helm-charts-index:
-    if: # GitHub does not currently support regular expressions inside if conditions
-    #         (github.ref == 'refs/tags//^v.*/') && (github.ref != 'refs/heads//.*/')
+    if: startsWith(github.ref, 'refs/tags/v')
     runs-on: ubuntu-latest
-    container:
-      image: docker.mirror.hashicorp.services/cimg/go:1.19.2
     steps:
+      - name: Authenticate to Vault
+        id: vault-auth
+        run: vault-auth
+      - name: Retrieve Vault-hosted Secrets
+        id: secrets
+        uses: hashicorp/vault-action@v2.4.3
+        with:
+          url: ${{ steps.vault-auth.outputs.addr }}
+          caCertificate: ${{ steps.vault-auth.outputs.ca_certificate }}
+          token: ${{ steps.vault-auth.outputs.token }}
+          secrets: |
+            kv/data/github/${{ github.repository }}/helm-charts-github-token;
+            kv/data/github/${{ github.repository }}/slack-webhook-url;
       - uses: actions/checkout@ac593985615ec2ede58e132d2e21d2b1cbd6127c # v3.3.0
       - name: verify Chart version matches tag version
         run: |-
-          go install github.com/mikefarah/yq/v2@latest
-          export TAG=${RELEASE_TAG:-${{ github.ref }}}
+          export TAG=${RELEASE_TAG:-${{ github.ref_name }}}
           git_tag=$(echo "${TAG#v}")
           chart_tag=$(yq r Chart.yaml version)
           if [ "${git_tag}" != "${chart_tag}" ]; then
@@ -26,23 +39,36 @@ jobs:
           fi
         env:
           RELEASE_TAG: "${{ inputs.release-tag }}"
-      - name: install gh tool
-        run: |-
-          version="2.22.1"
-          curl --show-error --silent --location --output "gh.tar.gz" "https://github.com/cli/cli/releases/download/v${version}/gh_${version}_linux_amd64.tar.gz"
-          tar -xvzf gh.tar.gz && mkdir -p bin && mv "gh_${version}_linux_amd64/bin/gh" bin/
       - name: update helm-charts index
         run: |-
           export GITHUB_TOKEN="${HELM_CHARTS_GITHUB_TOKEN}"
-          ./bin/gh workflow run publish-charts.yml \
+          gh workflow run publish-charts.yml \
             --repo hashicorp/helm-charts \
             --ref main \
-            -f SOURCE_TAG="${{ github.ref }}" \
-            -f SOURCE_REPO="${CIRCLE_PROJECT_USERNAME}/${{ github.repository }}"
-        env:
-          RELEASE_TAG: "${{ inputs.release-tag }}"
-#     # This item has no matching transformer
-#     - circleci_slack_status:
+            -f SOURCE_TAG="${{ github.ref_name }}" \
+            -f SOURCE_REPO="${{ github.repository }}"
+      - name: Prepare Slack Notification
+        if: always()
+        run: |
+          case "${{ steps.merge.outcome }}" in
+            failure)
+              echo "SLACK_MESSAGE=:red_circle: The vault-helm charts index update failed." >> "$GITHUB_ENV"
+              echo "SLACK_BLOCK_COLOR=ed5c5c" >> "$GITHUB_ENV"
+              ;;
+            success)
+              echo "SLACK_MESSAGE=:tada: The vault-helm charts index update succeeded." >> "$GITHUB_ENV"
+              echo "SLACK_BLOCK_COLOR=1cbf43" >> "$GITHUB_ENV"
+              ;;
+          esac
+      - name: Send Slack Notification
+        # note: this will skip Slack notification if the job is skipped or cancelled.
+        if: ${{ (success() || failure()) && env.SLACK_MESSAGE != '' }}
+        uses: ./.github/actions/slack-status
+        with:
+          block-color: ${{ env.SLACK_BLOCK_COLOR }}
+          message: ${{ env.SLACK_MESSAGE }}
+          run-url: ${{ env.RUN_URL }}
+          slack-webhook-url: ${{ steps.secrets.outputs.slack_webhook_url }}
 
 permissions:
   contents: read
