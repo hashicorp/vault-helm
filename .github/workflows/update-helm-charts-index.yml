@@ -12,7 +12,10 @@ on:
 jobs:
   update-helm-charts-index:
     if: startsWith(github.ref, 'refs/tags/v')
-    runs-on: ubuntu-latest
+    runs-on: self-hosted
+    permissions:
+      id-token: write
+      contents: read
     steps:
       - name: Authenticate to Vault
         id: vault-auth
@@ -41,7 +44,7 @@ jobs:
           RELEASE_TAG: "${{ inputs.release-tag }}"
       - name: update helm-charts index
         run: |-
-          export GITHUB_TOKEN="${HELM_CHARTS_GITHUB_TOKEN}"
+          export GITHUB_TOKEN="${{steps.secrets.outputs.helm_charts_github_token}}"
           gh workflow run publish-charts.yml \
             --repo hashicorp/helm-charts \
             --ref main \
@@ -69,6 +72,3 @@ jobs:
           message: ${{ env.SLACK_MESSAGE }}
           run-url: ${{ env.RUN_URL }}
           slack-webhook-url: ${{ steps.secrets.outputs.slack_webhook_url }}
-
-permissions:
-  contents: read
