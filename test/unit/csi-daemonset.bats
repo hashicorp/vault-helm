@@ -319,6 +319,74 @@ load _helpers
 }
 
 #--------------------------------------------------------------------
+# nodeSelector
+@test "csi/daemonset: nodeSelector not set by default" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      --show-only templates/csi-daemonset.yaml  \
+      --set 'csi.enabled=true' \
+      . | tee /dev/stderr |
+      yq '.spec.template.spec | .nodeSelector? == null' | tee /dev/stderr)
+  [ "${actual}" = "true" ]
+}
+
+@test "csi/daemonset: nodeSelector can be set as string" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      --show-only templates/csi-daemonset.yaml  \
+      --set 'csi.enabled=true' \
+      --set 'csi.pod.nodeSelector=foobar' \
+      . | tee /dev/stderr |
+      yq '.spec.template.spec.nodeSelector == "foobar"' | tee /dev/stderr)
+  [ "${actual}" = "true" ]
+}
+
+@test "csi/daemonset: nodeSelector can be set as YAML" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      --show-only templates/csi-daemonset.yaml  \
+      --set 'csi.enabled=true' \
+      --set "csi.pod.nodeSelector[0].foo=bar,csi.pod.nodeSelector[1].baz=qux" \
+      . | tee /dev/stderr |
+      yq '.spec.template.spec.nodeSelector[0].foo == "bar" and .spec.template.spec.nodeSelector[1].baz == "qux"' | tee /dev/stderr)
+  [ "${actual}" = "true" ]
+}
+
+#--------------------------------------------------------------------
+# affinity
+@test "csi/daemonset: affinity not set by default" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      --show-only templates/csi-daemonset.yaml  \
+      --set 'csi.enabled=true' \
+      . | tee /dev/stderr |
+      yq '.spec.template.spec | .affinity? == null' | tee /dev/stderr)
+  [ "${actual}" = "true" ]
+}
+
+@test "csi/daemonset: affinity can be set as string" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      --show-only templates/csi-daemonset.yaml  \
+      --set 'csi.enabled=true' \
+      --set 'csi.pod.affinity=foobar' \
+      . | tee /dev/stderr |
+      yq '.spec.template.spec.affinity == "foobar"' | tee /dev/stderr)
+  [ "${actual}" = "true" ]
+}
+
+@test "csi/daemonset: affinity can be set as YAML" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      --show-only templates/csi-daemonset.yaml  \
+      --set 'csi.enabled=true' \
+      --set "csi.pod.affinity.podAntiAffinity=foobar" \
+      . | tee /dev/stderr |
+      yq '.spec.template.spec.affinity.podAntiAffinity == "foobar"' | tee /dev/stderr)
+  [ "${actual}" = "true" ]
+}
+
+#--------------------------------------------------------------------
 # Extra Labels
 
 @test "csi/daemonset: specify csi.daemonSet.extraLabels" {

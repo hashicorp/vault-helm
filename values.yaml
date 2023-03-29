@@ -1053,6 +1053,19 @@ csi:
     # in a PodSpec.
     tolerations: []
 
+    # nodeSelector labels for csi pod assignment, formatted as a multi-line string or YAML map.
+    # ref: https://kubernetes.io/docs/concepts/configuration/assign-pod-node/#nodeselector
+    # Example:
+    # nodeSelector:
+    #   beta.kubernetes.io/arch: amd64
+    nodeSelector: []
+
+    # Affinity Settings
+    # Commenting out or setting as empty the affinity variable, will allow
+    # deployment to single node services such as Minikube
+    # This should be either a multi-line string or YAML matching the PodSpec's affinity field.
+    affinity: {}
+
     # Extra labels to attach to the vault-csi-provider pod
     # This should be a YAML map of the labels to apply to the csi provider pod
     extraLabels: {}

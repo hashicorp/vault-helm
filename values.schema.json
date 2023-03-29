@@ -102,6 +102,13 @@
                 "pod": {
                     "type": "object",
                     "properties": {
+                        "affinity": {
+                            "type": [
+                              "null",
+                              "array",
+                              "string"
+                            ]
+                        },
                         "annotations": {
                             "type": [
                                 "object",
@@ -110,6 +117,13 @@
                         },
                         "extraLabels": {
                             "type": "object"
+                        },
+                        "nodeSelector": {
+                            "type": [
+                              "null",
+                              "array",
+                              "string"
+                            ]
                         },
                         "tolerations": {
                             "type": [
