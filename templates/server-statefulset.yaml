@@ -169,7 +169,7 @@ spec:
           livenessProbe:
             httpGet:
               path: {{ .Values.server.livenessProbe.path | quote }}
-              port: .Values.server.livenessProbe.port
+              port: {{ .Values.server.livenessProbe.port }}
               scheme: {{ include "vault.scheme" . | upper }}
             failureThreshold: {{ .Values.server.livenessProbe.failureThreshold }}
             initialDelaySeconds: {{ .Values.server.livenessProbe.initialDelaySeconds }}
