@@ -98,19 +98,7 @@ load _helpers
   [ "${actual}" = "2" ]
 }
 
-@test "server/DisruptionBudget: test is apiVersion is set correctly < version 1.21 of kube" {
-  cd `chart_dir`
-  local actual=$(helm template \
-      --show-only templates/server-disruptionbudget.yaml \
-      --set 'server.ha.enabled=true' \
-      --set 'server.ha.replicas=1' \
-      --kube-version 1.20.15 \
-      . | tee /dev/stderr |
-      yq '.apiVersion == "policy/v1beta1"' | tee /dev/stderr)
-  [ "${actual}" = "true" ]
-}
-
-@test "server/DisruptionBudget: test is apiVersion is set correctly >= version 1.21 of kube" {
+@test "server/DisruptionBudget: apiVersion is set correctly >= version 1.21 of kube" {
   cd `chart_dir`
   local actual=$(helm template \
       --show-only templates/server-disruptionbudget.yaml \
