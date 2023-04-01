@@ -6,9 +6,9 @@ setup_file() {
     cd `chart_dir`
     export VERIFY_OUTPUT="/$BATS_RUN_TMPDIR/verify.json"
     export CHART_VOLUME=vault-helm-chart-src
-    local IMAGE="quay.io/redhat-certification/chart-verifier:1.2.1"
+    local IMAGE="quay.io/redhat-certification/chart-verifier:1.10.1"
     # chart-verifier requires an openshift version if a cluster isn't available
-    local OPENSHIFT_VERSION="4.8"
+    local OPENSHIFT_VERSION="4.12"
     local DISABLED_TESTS="chart-testing"
 
     local run_cmd="chart-verifier"
@@ -40,7 +40,7 @@ teardown_file() {
 }
 
 @test "has-kubeversion" {
-    check_result v1.0/has-kubeversion
+    check_result v1.1/has-kubeversion
 }
 
 @test "is-helm-v3" {
@@ -76,10 +76,19 @@ teardown_file() {
 }
 
 @test "images-are-certified" {
-    check_result v1.0/images-are-certified
+    check_result v1.1/images-are-certified
+}
+
+@test "required-annotations-present" {
+    check_result v1.0/required-annotations-present
 }
 
 @test "chart-testing" {
     skip "Skipping since this test requires a kubernetes/openshift cluster"
     check_result v1.0/chart-testing
+}
+
+@test "signature-is-valid" {
+    skip "Chart is not signed : Signature verification not required"
+    check_result v1.0/signature-is-valid
 }
