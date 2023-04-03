@@ -1,3 +1,6 @@
+# Copyright (c) HashiCorp, Inc.
+# SPDX-License-Identifier: MPL-2.0
+
 version: 2.1
 orbs:
   slack: circleci/slack@3.4.2
@@ -22,16 +25,23 @@ jobs:
               exit 1
             fi
       - run:
+          name: install gh tool
+          command: |
+            version="2.22.1"
+            curl --show-error --silent --location --output "gh.tar.gz" "https://github.com/cli/cli/releases/download/v${version}/gh_${version}_linux_amd64.tar.gz"
+            tar -xvzf gh.tar.gz && mkdir -p bin && mv "gh_${version}_linux_amd64/bin/gh" bin/
+
+      - run:
           name: update helm-charts index
           environment:
             RELEASE_TAG: << pipeline.parameters.release-tag >>
           command: |
-            curl --show-error --silent --fail --user "${CIRCLE_TOKEN}:" \
-                -X POST \
-                -H 'Content-Type: application/json' \
-                -H 'Accept: application/json' \
-                -d "{\"branch\": \"main\",\"parameters\":{\"SOURCE_REPO\": \"${CIRCLE_PROJECT_USERNAME}/${CIRCLE_PROJECT_REPONAME}\",\"SOURCE_TAG\": \"${RELEASE_TAG:-$CIRCLE_TAG}\"}}" \
-                "${CIRCLE_ENDPOINT}/${CIRCLE_PROJECT}/pipeline"
+            export GITHUB_TOKEN="${HELM_CHARTS_GITHUB_TOKEN}"
+            ./bin/gh workflow run publish-charts.yml \
+              --repo hashicorp/helm-charts \
+              --ref main \
+              -f SOURCE_TAG="${CIRCLE_TAG}" \
+              -f SOURCE_REPO="${CIRCLE_PROJECT_USERNAME}/${CIRCLE_PROJECT_REPONAME}"
       - slack/status:
           fail_only: true
           failure_message: "Failed to trigger an update to the helm charts index. Check the logs at: ${CIRCLE_BUILD_URL}"

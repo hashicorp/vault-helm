@@ -593,6 +593,12 @@
                 "extraArgs": {
                     "type": "string"
                 },
+                "extraPorts": {
+                    "type": [
+                        "null",
+                        "array"
+                    ]
+                },
                 "extraContainers": {
                     "type": [
                         "null",

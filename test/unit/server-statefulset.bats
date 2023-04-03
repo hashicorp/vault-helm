@@ -1806,3 +1806,26 @@ load _helpers
       yq -r '.spec.template.spec.hostNetwork' | tee /dev/stderr)
   [ "${actual}" = "true" ]
 }
+
+#--------------------------------------------------------------------
+# extraPorts
+
+@test "server/standalone-StatefulSet: adds extra ports" {
+  cd `chart_dir`
+
+  # Test that it defines it
+  local object=$(helm template \
+      --show-only templates/server-statefulset.yaml  \
+      --set 'server.extraPorts[0].containerPort=1111' \
+      --set 'server.extraPorts[0].name=foo' \
+      . | tee /dev/stderr |
+      yq -r '.spec.template.spec.containers[0].ports[] | select(.name == "foo")' | tee /dev/stderr)
+
+  local actual=$(echo $object |
+      yq -r '.containerPort' | tee /dev/stderr)
+  [ "${actual}" = "1111" ]
+
+  local actual=$(echo $object |
+      yq -r '.name' | tee /dev/stderr)
+  [ "${actual}" = "foo" ]
+}

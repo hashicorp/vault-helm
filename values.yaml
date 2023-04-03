@@ -1,3 +1,6 @@
+# Copyright (c) HashiCorp, Inc.
+# SPDX-License-Identifier: MPL-2.0
+
 # Available parameters and their default values for the Vault chart.
 
 global:
@@ -89,6 +92,43 @@ injector:
     templateConfig:
       exitOnRetryFailure: true
       staticSecretRenderInterval: ""
+
+  # Used to define custom livenessProbe settings
+  livenessProbe:
+    # When a probe fails, Kubernetes will try failureThreshold times before giving up
+    failureThreshold: 2
+    # Number of seconds after the container has started before probe initiates
+    initialDelaySeconds: 5
+    # How often (in seconds) to perform the probe
+    periodSeconds: 2
+    # Minimum consecutive successes for the probe to be considered successful after having failed
+    successThreshold: 1
+    # Number of seconds after which the probe times out.
+    timeoutSeconds: 5
+  # Used to define custom readinessProbe settings
+  readinessProbe:
+    # When a probe fails, Kubernetes will try failureThreshold times before giving up
+    failureThreshold: 2
+    # Number of seconds after the container has started before probe initiates
+    initialDelaySeconds: 5
+    # How often (in seconds) to perform the probe
+    periodSeconds: 2
+    # Minimum consecutive successes for the probe to be considered successful after having failed
+    successThreshold: 1
+    # Number of seconds after which the probe times out.
+    timeoutSeconds: 5
+  # Used to define custom startupProbe settings
+  startupProbe:
+    # When a probe fails, Kubernetes will try failureThreshold times before giving up
+    failureThreshold: 12
+    # Number of seconds after the container has started before probe initiates
+    initialDelaySeconds: 5
+    # How often (in seconds) to perform the probe
+    periodSeconds: 5
+    # Minimum consecutive successes for the probe to be considered successful after having failed
+    successThreshold: 1
+    # Number of seconds after which the probe times out.
+    timeoutSeconds: 5
 
   # Mount Path of the Vault Kubernetes Auth Method.
   authPath: "auth/kubernetes"
@@ -453,6 +493,12 @@ server:
   # extraArgs is a string containing additional Vault server arguments.
   extraArgs: ""
 
+  # extraPorts is a list of extra ports. Specified as a YAML list.
+  # This is useful if you need to add additional ports to the statefulset in dynamic way.
+  extraPorts: null
+    # - containerPort: 8300
+    #   name: http-monitoring
+
   # Used to define custom readinessProbe settings
   readinessProbe:
     enabled: true
@@ -748,7 +794,7 @@ server:
 
       # Example configuration for enabling Prometheus metrics in your config.
       #telemetry {
-      #  prometheus_retention_time = "30s",
+      #  prometheus_retention_time = "30s"
       #  disable_hostname = true
       #}
 
@@ -842,7 +888,7 @@ server:
       # If you are using Prometheus Operator you can enable a ServiceMonitor resource below.
       # You may wish to enable unauthenticated metrics in the listener block above.
       #telemetry {
-      #  prometheus_retention_time = "30s",
+      #  prometheus_retention_time = "30s"
       #  disable_hostname = true
       #}
 
@@ -1084,7 +1130,7 @@ serverTelemetry:
   #
   # example:
   #  telemetry {
-  #    prometheus_retention_time = "30s",
+  #    prometheus_retention_time = "30s"
   #    disable_hostname = true
   #  }
   #
