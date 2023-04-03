@@ -35,6 +35,18 @@ load _helpers
   [ "${actual}" = "false" ]
 }
 
+@test "server/ha-active-Service: disable with server.service.active.enabled false" {
+  cd `chart_dir`
+  local actual=$( (helm template \
+      --show-only templates/server-ha-active-service.yaml  \
+      --set 'server.ha.enabled=true' \
+      --set 'server.service.enabled=true' \
+      --set 'server.service.active.enabled=false' \
+      . || echo "---") | tee /dev/stderr |
+      yq 'length > 0' | tee /dev/stderr)
+  [ "${actual}" = "false" ]
+}
+
 @test "server/ha-active-Service: type empty by default" {
   cd `chart_dir`
   local actual=$(helm template \
@@ -119,7 +131,7 @@ load _helpers
       --show-only templates/server-ha-active-service.yaml \
       --set 'server.ha.enabled=true' \
       --set 'server.service.type=NodePort' \
-      --set 'server.service.nodePort=30009' \
+      --set 'server.service.activeNodePort=30009' \
       . | tee /dev/stderr |
       yq -r '.spec.ports[0].nodePort' | tee /dev/stderr)
   [ "${actual}" = "30009" ]
@@ -130,7 +142,7 @@ load _helpers
   local actual=$(helm template \
       --show-only templates/server-ha-active-service.yaml \
       --set 'server.ha.enabled=true' \
-      --set 'server.service.nodePort=30009' \
+      --set 'server.service.activeNodePort=30009' \
       . | tee /dev/stderr |
       yq -r '.spec.ports[0].nodePort' | tee /dev/stderr)
   [ "${actual}" = "null" ]
@@ -213,4 +225,22 @@ load _helpers
       . | tee /dev/stderr |
       yq -r '.spec.publishNotReadyAddresses' | tee /dev/stderr)
   [ "${actual}" = "false" ]
+}
+
+@test "server/ha-active-Service: instance selector can be disabled" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      --show-only templates/server-ha-active-service.yaml \
+      --set 'server.ha.enabled=true' \
+      . | tee /dev/stderr |
+      yq -r '.spec.selector["app.kubernetes.io/instance"]' | tee /dev/stderr)
+  [ "${actual}" = "release-name" ]
+
+  local actual=$(helm template \
+      --show-only templates/server-ha-active-service.yaml \
+      --set 'server.ha.enabled=true' \
+      --set 'server.service.instanceSelector.enabled=false' \
+      . | tee /dev/stderr |
+      yq -r '.spec.selector["app.kubernetes.io/instance"]' | tee /dev/stderr)
+  [ "${actual}" = "null" ]
 }

@@ -23,6 +23,23 @@
                         "providersDir": {
                             "type": "string"
                         },
+                        "securityContext": {
+                            "type": "object",
+                            "properties": {
+                                "container": {
+                                    "type": [
+                                        "object",
+                                        "string"
+                                    ]
+                                },
+                                "pod": {
+                                    "type": [
+                                        "object",
+                                        "string"
+                                    ]
+                                }
+                            }
+                        },
                         "updateStrategy": {
                             "type": "object",
                             "properties": {
@@ -35,9 +52,6 @@
                             }
                         }
                     }
-                },
-                "priorityClassName": {
-                    "type": "string"
                 },
                 "debug": {
                     "type": "boolean"
@@ -106,6 +120,9 @@
                         }
                     }
                 },
+                "priorityClassName": {
+                    "type": "string"
+                },
                 "readinessProbe": {
                     "type": "object",
                     "properties": {
@@ -163,6 +180,9 @@
                 "enabled": {
                     "type": "boolean"
                 },
+                "externalVaultAddr": {
+                    "type": "string"
+                },
                 "imagePullSecrets": {
                     "type": "array"
                 },
@@ -185,9 +205,6 @@
                 },
                 "tlsDisable": {
                     "type": "boolean"
-                },
-                "externalVaultAddr": {
-                    "type": "string"
                 }
             }
         },
@@ -362,7 +379,35 @@
                 "revokeOnShutdown": {
                     "type": "boolean"
                 },
+                "securityContext": {
+                    "type": "object",
+                    "properties": {
+                        "container": {
+                            "type": [
+                                "object",
+                                "string"
+                            ]
+                        },
+                        "pod": {
+                            "type": [
+                                "object",
+                                "string"
+                            ]
+                        }
+                    }
+                },
                 "service": {
+                    "type": "object",
+                    "properties": {
+                        "annotations": {
+                            "type": [
+                                "object",
+                                "string"
+                            ]
+                        }
+                    }
+                },
+                "serviceAccount": {
                     "type": "object",
                     "properties": {
                         "annotations": {
@@ -548,6 +593,12 @@
                 "extraArgs": {
                     "type": "string"
                 },
+                "extraPorts": {
+                    "type": [
+                        "null",
+                        "array"
+                    ]
+                },
                 "extraContainers": {
                     "type": [
                         "null",
@@ -576,6 +627,12 @@
                     "type": "object",
                     "properties": {
                         "apiAddr": {
+                            "type": [
+                                "null",
+                                "string"
+                            ]
+                        },
+                        "clusterAddr": {
                             "type": [
                                 "null",
                                 "string"
@@ -791,12 +848,23 @@
                         },
                         "labels": {
                             "type": "object"
+                        },
+                        "tls": {
+                            "type": "object"
                         }
                     }
                 },
                 "service": {
                     "type": "object",
                     "properties": {
+                        "active": {
+                            "type": "object",
+                            "properties": {
+                                "enabled": {
+                                    "type": "boolean"
+                                }
+                            }
+                        },
                         "annotations": {
                             "type": [
                                 "object",
@@ -806,16 +874,41 @@
                         "enabled": {
                             "type": "boolean"
                         },
-                        "publishNotReadyAddresses": {
-                            "type": "boolean"
-                        },
                         "externalTrafficPolicy": {
                             "type": "string"
+                        },
+                        "instanceSelector": {
+                            "type": "object",
+                            "properties": {
+                                "enabled": {
+                                    "type": "boolean"
+                                }
+                            }
                         },
                         "port": {
                             "type": "integer"
                         },
+                        "publishNotReadyAddresses": {
+                            "type": "boolean"
+                        },
+                        "standby": {
+                            "type": "object",
+                            "properties": {
+                                "enabled": {
+                                    "type": "boolean"
+                                }
+                            }
+                        },
                         "targetPort": {
+                            "type": "integer"
+                        },
+                        "nodePort": {
+                            "type": "integer"
+                        },
+                        "activeNodePort": {
+                            "type": "integer"
+                        },
+                        "standbyNodePort": {
                             "type": "integer"
                         }
                     }
@@ -832,8 +925,19 @@
                         "create": {
                             "type": "boolean"
                         },
+                        "extraLabels": {
+                            "type": "object"
+                        },
                         "name": {
                             "type": "string"
+                        },
+                        "serviceDiscovery": {
+                            "type": "object",
+                            "properties": {
+                                "enabled": {
+                                    "type": "boolean"
+                                }
+                            }
                         }
                     }
                 },
@@ -865,6 +969,23 @@
                                 "object",
                                 "string"
                             ]
+                        },
+                        "securityContext": {
+                            "type": "object",
+                            "properties": {
+                                "container": {
+                                    "type": [
+                                        "object",
+                                        "string"
+                                    ]
+                                },
+                                "pod": {
+                                    "type": [
+                                        "object",
+                                        "string"
+                                    ]
+                                }
+                            }
                         }
                     }
                 },
@@ -872,6 +993,13 @@
                     "type": "integer"
                 },
                 "tolerations": {
+                    "type": [
+                        "null",
+                        "array",
+                        "string"
+                    ]
+                },
+                "topologySpreadConstraints": {
                     "type": [
                         "null",
                         "array",
@@ -892,6 +1020,9 @@
                         "null",
                         "array"
                     ]
+                },
+                "hostNetwork": {
+                    "type": "boolean"
                 }
             }
         },

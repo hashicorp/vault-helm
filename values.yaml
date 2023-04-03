@@ -1,3 +1,6 @@
+# Copyright (c) HashiCorp, Inc.
+# SPDX-License-Identifier: MPL-2.0
+
 # Available parameters and their default values for the Vault chart.
 
 global:
@@ -32,6 +35,11 @@ global:
       seccomp.security.alpha.kubernetes.io/defaultProfileName:  runtime/default
       apparmor.security.beta.kubernetes.io/defaultProfileName:  runtime/default
 
+  serverTelemetry:
+    # Enable integration with the Prometheus Operator
+    # See the top level serverTelemetry section below before enabling this feature.
+    prometheusOperator: false
+
 injector:
   # True if you want to enable vault agent injection.
   # @default: global.enabled
@@ -57,7 +65,7 @@ injector:
   # image sets the repo and tag of the vault-k8s image to use for the injector.
   image:
     repository: "hashicorp/vault-k8s"
-    tag: "0.16.1"
+    tag: "1.1.0"
     pullPolicy: IfNotPresent
 
   # agentImage sets the repo and tag of the Vault image to use for the Vault Agent
@@ -65,7 +73,7 @@ injector:
   # required.
   agentImage:
     repository: "hashicorp/vault"
-    tag: "1.10.3"
+    tag: "1.12.1"
 
   # The default values for the injected Vault Agent containers.
   agentDefaults:
@@ -85,6 +93,43 @@ injector:
       exitOnRetryFailure: true
       staticSecretRenderInterval: ""
 
+  # Used to define custom livenessProbe settings
+  livenessProbe:
+    # When a probe fails, Kubernetes will try failureThreshold times before giving up
+    failureThreshold: 2
+    # Number of seconds after the container has started before probe initiates
+    initialDelaySeconds: 5
+    # How often (in seconds) to perform the probe
+    periodSeconds: 2
+    # Minimum consecutive successes for the probe to be considered successful after having failed
+    successThreshold: 1
+    # Number of seconds after which the probe times out.
+    timeoutSeconds: 5
+  # Used to define custom readinessProbe settings
+  readinessProbe:
+    # When a probe fails, Kubernetes will try failureThreshold times before giving up
+    failureThreshold: 2
+    # Number of seconds after the container has started before probe initiates
+    initialDelaySeconds: 5
+    # How often (in seconds) to perform the probe
+    periodSeconds: 2
+    # Minimum consecutive successes for the probe to be considered successful after having failed
+    successThreshold: 1
+    # Number of seconds after which the probe times out.
+    timeoutSeconds: 5
+  # Used to define custom startupProbe settings
+  startupProbe:
+    # When a probe fails, Kubernetes will try failureThreshold times before giving up
+    failureThreshold: 12
+    # Number of seconds after the container has started before probe initiates
+    initialDelaySeconds: 5
+    # How often (in seconds) to perform the probe
+    periodSeconds: 5
+    # Minimum consecutive successes for the probe to be considered successful after having failed
+    successThreshold: 1
+    # Number of seconds after which the probe times out.
+    timeoutSeconds: 5
+
   # Mount Path of the Vault Kubernetes Auth Method.
   authPath: "auth/kubernetes"
 
@@ -101,7 +146,7 @@ injector:
   webhook:
     # Configures failurePolicy of the webhook. The "unspecified" default behaviour depends on the
     # API Version of the WebHook.
-    # To block pod creation while webhook is unavailable, set the policy to `Fail` below.
+    # To block pod creation while the webhook is unavailable, set the policy to `Fail` below.
     # See https://kubernetes.io/docs/reference/access-authn-authz/extensible-admission-controllers/#failure-policy
     #
     failurePolicy: Ignore
@@ -192,7 +237,7 @@ injector:
 
     # caBundle is a base64-encoded PEM-encoded certificate bundle for the CA
     # that signed the TLS certificate that the webhook serves. This must be set
-    # if secretName is non-null, unless an external service like cert-manager is
+    # if secretName is non-null unless an external service like cert-manager is
     # keeping the caBundle updated.
     caBundle: ""
 
@@ -201,6 +246,21 @@ injector:
     # defaults but can be customized if necessary.
     certName: tls.crt
     keyName: tls.key
+
+  # Security context for the pod template and the injector container
+  # The default pod securityContext is:
+  #   runAsNonRoot: true
+  #   runAsGroup: {{ .Values.injector.gid | default 1000 }}
+  #   runAsUser: {{ .Values.injector.uid | default 100 }}
+  #   fsGroup: {{ .Values.injector.gid | default 1000 }}
+  # and for container is
+  #    allowPrivilegeEscalation: false
+  #    capabilities:
+  #      drop:
+  #        - ALL
+  securityContext:
+    pod: {}
+    container: {}
 
   resources: {}
   # resources:
@@ -217,7 +277,7 @@ injector:
     # KUBERNETES_SERVICE_HOST: kubernetes.default.svc
 
   # Affinity Settings for injector pods
-  # This can either be multi-line string or YAML matching the PodSpec's affinity field.
+  # This can either be a multi-line string or YAML matching the PodSpec's affinity field.
   # Commenting out or setting as empty the affinity variable, will allow
   # deployment of multiple replicas to single node services such as Minikube.
   affinity: |
@@ -269,6 +329,11 @@ injector:
     # Extra annotations to attach to the injector service
     annotations: {}
 
+  # Injector serviceAccount specific config
+  serviceAccount:
+    # Extra annotations to attach to the injector serviceAccount
+    annotations: {}
+
   # A disruption budget limits the number of pods of a replicated application
   # that are down simultaneously from voluntary disruptions
   podDisruptionBudget: {}
@@ -307,7 +372,7 @@ server:
 
   image:
     repository: "hashicorp/vault"
-    tag: "1.10.3"
+    tag: "1.12.1"
     # Overrides the default Image Pull Policy
     pullPolicy: IfNotPresent
 
@@ -422,11 +487,17 @@ server:
   extraContainers: null
 
   # shareProcessNamespace enables process namespace sharing between Vault and the extraContainers
-  # This is useful if Vault must be signaled, e.g. to send a SIGHUP for log rotation
+  # This is useful if Vault must be signaled, e.g. to send a SIGHUP for a log rotation
   shareProcessNamespace: false
 
   # extraArgs is a string containing additional Vault server arguments.
   extraArgs: ""
+
+  # extraPorts is a list of extra ports. Specified as a YAML list.
+  # This is useful if you need to add additional ports to the statefulset in dynamic way.
+  extraPorts: null
+    # - containerPort: 8300
+    #   name: http-monitoring
 
   # Used to define custom readinessProbe settings
   readinessProbe:
@@ -571,11 +642,24 @@ server:
   # Enables a headless service to be used by the Vault Statefulset
   service:
     enabled: true
+    # Enable or disable the vault-active service, which selects Vault pods that
+    # have labelled themselves as the cluster leader with `vault-active: "true"`
+    active:
+      enabled: true
+    # Enable or disable the vault-standby service, which selects Vault pods that
+    # have labelled themselves as a cluster follower with `vault-active: "false"`
+    standby:
+      enabled: true
+    # If enabled, the service selectors will include `app.kubernetes.io/instance: {{ .Release.Name }}`
+    # When disabled, services may select Vault pods not deployed from the chart.
+    # Does not affect the headless vault-internal service with `ClusterIP: None`
+    instanceSelector:
+      enabled: true
     # clusterIP controls whether a Cluster IP address is attached to the
-    # Vault service within Kubernetes.  By default the Vault service will
+    # Vault service within Kubernetes.  By default, the Vault service will
     # be given a Cluster IP address, set to None to disable.  When disabled
     # Kubernetes will create a "headless" service.  Headless services can be
-    # used to communicate with pods directly through DNS instead of a round robin
+    # used to communicate with pods directly through DNS instead of a round-robin
     # load balancer.
     # clusterIP: None
 
@@ -595,6 +679,16 @@ server:
     # If type is set to "NodePort", a specific nodePort value can be configured,
     # will be random if left blank.
     #nodePort: 30000
+
+    # When HA mode is enabled
+    # If type is set to "NodePort", a specific nodePort value can be configured,
+    # will be random if left blank.
+    #activeNodePort: 30001
+
+    # When HA mode is enabled
+    # If type is set to "NodePort", a specific nodePort value can be configured,
+    # will be random if left blank.
+    #standbyNodePort: 30002
 
     # Port on which Vault server is listening
     port: 8200
@@ -623,7 +717,7 @@ server:
     annotations: {}
 
   # This configures the Vault Statefulset to create a PVC for audit
-  # logs.  Once Vault is deployed, initialized and unsealed, Vault must
+  # logs.  Once Vault is deployed, initialized, and unsealed, Vault must
   # be configured to use this for audit logs.  This will be mounted to
   # /vault/audit
   # See https://www.vaultproject.io/docs/audit/index.html to know more
@@ -675,6 +769,10 @@ server:
         tls_disable = 1
         address = "[::]:8200"
         cluster_address = "[::]:8201"
+        # Enable unauthenticated metrics access (necessary for Prometheus Operator)
+        #telemetry {
+        #  unauthenticated_metrics_access = "true"
+        #}
       }
       storage "file" {
         path = "/vault/data"
@@ -690,7 +788,13 @@ server:
       #   crypto_key  = "vault-helm-unseal-key"
       #}
 
-  # Run Vault in "HA" mode. There are no storage requirements unless audit log
+      # Example configuration for enabling Prometheus metrics in your config.
+      #telemetry {
+      #  prometheus_retention_time = "30s"
+      #  disable_hostname = true
+      #}
+
+  # Run Vault in "HA" mode. There are no storage requirements unless the audit log
   # persistence is required.  In HA mode Vault will configure itself to use Consul
   # for its storage backend.  The default configuration provided will work the Consul
   # Helm project by default.  It is possible to manually configure Vault to use a
@@ -731,6 +835,10 @@ server:
           tls_disable = 1
           address = "[::]:8200"
           cluster_address = "[::]:8201"
+          # Enable unauthenticated metrics access (necessary for Prometheus Operator)
+          #telemetry {
+          #  unauthenticated_metrics_access = "true"
+          #}
         }
 
         storage "raft" {
@@ -772,6 +880,14 @@ server:
       #   crypto_key  = "vault-helm-unseal-key"
       #}
 
+      # Example configuration for enabling Prometheus metrics.
+      # If you are using Prometheus Operator you can enable a ServiceMonitor resource below.
+      # You may wish to enable unauthenticated metrics in the listener block above.
+      #telemetry {
+      #  prometheus_retention_time = "30s"
+      #  disable_hostname = true
+      #}
+
     # A disruption budget limits the number of pods of a replicated application
     # that are down simultaneously from voluntary disruptions
     disruptionBudget:
@@ -794,6 +910,14 @@ server:
     # YAML or a YAML-formatted multi-line templated string map of the
     # annotations to apply to the serviceAccount.
     annotations: {}
+    # Extra labels to attach to the serviceAccount
+    # This should be a YAML map of the labels to apply to the serviceAccount
+    extraLabels: {}
+    # Enable or disable a service account role binding with the permissions required for
+    # Vault's Kubernetes service_registration config option.
+    # See https://developer.hashicorp.com/vault/docs/configuration/service-registration/kubernetes
+    serviceDiscovery:
+      enabled: true
 
   # Settings for the statefulSet used to run Vault.
   statefulSet:
@@ -801,6 +925,26 @@ server:
     # YAML-formatted multi-line templated string map of the annotations to apply
     # to the statefulSet.
     annotations: {}
+
+    # Set the pod and container security contexts.
+    # If not set, these will default to, and for *not* OpenShift:
+    # pod:
+    #   runAsNonRoot: true
+    #   runAsGroup: {{ .Values.server.gid | default 1000 }}
+    #   runAsUser: {{ .Values.server.uid | default 100 }}
+    #   fsGroup: {{ .Values.server.gid | default 1000 }}
+    # container:
+    #   allowPrivilegeEscalation: false
+    #
+    # If not set, these will default to, and for OpenShift:
+    # pod: {}
+    # container: {}
+    securityContext:
+      pod: {}
+      container: {}
+
+  # Should the server pods run on the host network
+  hostNetwork: false
 
 # Vault UI
 ui:
@@ -849,7 +993,7 @@ csi:
 
   image:
     repository: "hashicorp/vault-csi-provider"
-    tag: "1.1.0"
+    tag: "1.2.1"
     pullPolicy: IfNotPresent
 
   # volumes is a list of volumes made available to all containers. These are rendered
@@ -893,6 +1037,10 @@ csi:
     # Extra labels to attach to the vault-csi-provider daemonSet
     # This should be a YAML map of the labels to apply to the csi provider daemonSet
     extraLabels: {}
+    # security context for the pod template and container in the csi provider daemonSet
+    securityContext:
+      pod: {}
+      container: {}
 
   pod:
     # Extra annotations for the provider pods. This can either be YAML or a
@@ -970,3 +1118,85 @@ csi:
   # See https://www.vaultproject.io/docs/platform/k8s/csi/configurations#command-line-arguments
   # for the available command line flags.
   extraArgs: []
+
+# Vault is able to collect and publish various runtime metrics.
+# Enabling this feature requires setting adding `telemetry{}` stanza to
+# the Vault configuration. There are a few examples included in the `config` sections above.
+#
+# For more information see:
+# https://www.vaultproject.io/docs/configuration/telemetry
+# https://www.vaultproject.io/docs/internals/telemetry
+serverTelemetry:
+  # Enable support for the Prometheus Operator. Currently, this chart does not support
+  # authenticating to Vault's metrics endpoint, so the following `telemetry{}` must be included
+  # in the `listener "tcp"{}` stanza
+  #  telemetry {
+  #    unauthenticated_metrics_access = "true"
+  #  }
+  #
+  # See the `standalone.config` for a more complete example of this.
+  #
+  # In addition, a top level `telemetry{}` stanza must also be included in the Vault configuration:
+  #
+  # example:
+  #  telemetry {
+  #    prometheus_retention_time = "30s"
+  #    disable_hostname = true
+  #  }
+  #
+  # Configuration for monitoring the Vault server.
+  serviceMonitor:
+    # The Prometheus operator *must* be installed before enabling this feature,
+    # if not the chart will fail to install due to missing CustomResourceDefinitions
+    # provided by the operator.
+    #
+    # Instructions on how to install the Helm chart can be found here:
+    #  https://github.com/prometheus-community/helm-charts/tree/main/charts/kube-prometheus-stack
+    # More information can be found here:
+    #  https://github.com/prometheus-operator/prometheus-operator
+    #  https://github.com/prometheus-operator/kube-prometheus
+
+    # Enable deployment of the Vault Server ServiceMonitor CustomResource.
+    enabled: false
+
+    # Selector labels to add to the ServiceMonitor.
+    # When empty, defaults to:
+    #  release: prometheus
+    selectors: {}
+
+    # Interval at which Prometheus scrapes metrics
+    interval: 30s
+
+    # Timeout for Prometheus scrapes
+    scrapeTimeout: 10s
+
+  prometheusRules:
+      # The Prometheus operator *must* be installed before enabling this feature,
+      # if not the chart will fail to install due to missing CustomResourceDefinitions
+      # provided by the operator.
+
+      # Deploy the PrometheusRule custom resource for AlertManager based alerts.
+      # Requires that AlertManager is properly deployed.
+      enabled: false
+
+      # Selector labels to add to the PrometheusRules.
+      # When empty, defaults to:
+      #  release: prometheus
+      selectors: {}
+
+      # Some example rules.
+      rules: {}
+      #  - alert: vault-HighResponseTime
+      #    annotations:
+      #      message: The response time of Vault is over 500ms on average over the last 5 minutes.
+      #    expr: vault_core_handle_request{quantile="0.5", namespace="mynamespace"} > 500
+      #    for: 5m
+      #    labels:
+      #      severity: warning
+      #  - alert: vault-HighResponseTime
+      #    annotations:
+      #      message: The response time of Vault is over 1s on average over the last 5 minutes.
+      #    expr: vault_core_handle_request{quantile="0.5", namespace="mynamespace"} > 1000
+      #    for: 5m
+      #    labels:
+      #      severity: critical

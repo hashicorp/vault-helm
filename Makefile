@@ -14,7 +14,7 @@ LOCAL_ACCEPTANCE_TESTS?=false
 KIND_CLUSTER_NAME?=vault-helm
 
 # kind k8s version
-KIND_K8S_VERSION?=v1.24.1
+KIND_K8S_VERSION?=v1.25.0
 
 # Generate json schema for chart values. See test/README.md for more details.
 values-schema:
@@ -71,7 +71,7 @@ acceptance:
 ifneq ($(LOCAL_ACCEPTANCE_TESTS),true)
 	gcloud auth activate-service-account --key-file=${GOOGLE_CREDENTIALS}
 endif
-	bats test/${ACCEPTANCE_TESTS}
+	bats --tap --timing test/${ACCEPTANCE_TESTS}
 
 # this target is for provisioning the GKE cluster
 # it is run in the docker container above when the test-provision target is invoked

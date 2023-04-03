@@ -275,6 +275,135 @@ load _helpers
   [ "${value}" = "auth/k8s" ]
 }
 
+@test "injector/deployment: default livenessProbe settings" {
+  cd `chart_dir`
+  local object=$(helm template \
+      --show-only templates/injector-deployment.yaml  \
+      . | tee /dev/stderr |
+      yq -r '.spec.template.spec.containers[0].livenessProbe' | tee /dev/stderr)
+
+  local actual=$(echo "$object" | yq '.failureThreshold' | tee /dev/stderr)
+    [ "${actual}" = "2" ]
+  local actual=$(echo "$object" | yq '.initialDelaySeconds' | tee /dev/stderr)
+    [ "${actual}" = "5" ]
+  local actual=$(echo "$object" | yq '.periodSeconds' | tee /dev/stderr)
+    [ "${actual}" = "2" ]
+  local actual=$(echo "$object" | yq '.successThreshold' | tee /dev/stderr)
+    [ "${actual}" = "1" ]
+  local actual=$(echo "$object" | yq '.timeoutSeconds' | tee /dev/stderr)
+    [ "${actual}" = "5" ]
+}
+
+@test "injector/deployment: can set livenessProbe settings" {
+  cd `chart_dir`
+  local object=$(helm template \
+      --show-only templates/injector-deployment.yaml  \
+      --set 'injector.livenessProbe.failureThreshold=100' \
+      --set 'injector.livenessProbe.initialDelaySeconds=100' \
+      --set 'injector.livenessProbe.periodSeconds=100' \
+      --set 'injector.livenessProbe.successThreshold=100' \
+      --set 'injector.livenessProbe.timeoutSeconds=100' \
+      . | tee /dev/stderr |
+      yq -r '.spec.template.spec.containers[0].livenessProbe' | tee /dev/stderr)
+
+  local actual=$(echo "$object" | yq '.failureThreshold' | tee /dev/stderr)
+    [ "${actual}" = "100" ]
+  local actual=$(echo "$object" | yq '.initialDelaySeconds' | tee /dev/stderr)
+    [ "${actual}" = "100" ]
+  local actual=$(echo "$object" | yq '.periodSeconds' | tee /dev/stderr)
+    [ "${actual}" = "100" ]
+  local actual=$(echo "$object" | yq '.successThreshold' | tee /dev/stderr)
+    [ "${actual}" = "100" ]
+  local actual=$(echo "$object" | yq '.timeoutSeconds' | tee /dev/stderr)
+    [ "${actual}" = "100" ]
+}
+
+@test "injector/deployment: default readinessProbe settings" {
+  cd `chart_dir`
+  local object=$(helm template \
+      --show-only templates/injector-deployment.yaml  \
+      . | tee /dev/stderr |
+      yq -r '.spec.template.spec.containers[0].readinessProbe' | tee /dev/stderr)
+
+  local actual=$(echo "$object" | yq '.failureThreshold' | tee /dev/stderr)
+    [ "${actual}" = "2" ]
+  local actual=$(echo "$object" | yq '.initialDelaySeconds' | tee /dev/stderr)
+    [ "${actual}" = "5" ]
+  local actual=$(echo "$object" | yq '.periodSeconds' | tee /dev/stderr)
+    [ "${actual}" = "2" ]
+  local actual=$(echo "$object" | yq '.successThreshold' | tee /dev/stderr)
+    [ "${actual}" = "1" ]
+  local actual=$(echo "$object" | yq '.timeoutSeconds' | tee /dev/stderr)
+    [ "${actual}" = "5" ]
+}
+
+@test "injector/deployment: can set readinessProbe settings" {
+  cd `chart_dir`
+  local object=$(helm template \
+      --show-only templates/injector-deployment.yaml  \
+      --set 'injector.readinessProbe.failureThreshold=100' \
+      --set 'injector.readinessProbe.initialDelaySeconds=100' \
+      --set 'injector.readinessProbe.periodSeconds=100' \
+      --set 'injector.readinessProbe.successThreshold=100' \
+      --set 'injector.readinessProbe.timeoutSeconds=100' \
+      . | tee /dev/stderr |
+      yq -r '.spec.template.spec.containers[0].readinessProbe' | tee /dev/stderr)
+
+  local actual=$(echo "$object" | yq '.failureThreshold' | tee /dev/stderr)
+    [ "${actual}" = "100" ]
+  local actual=$(echo "$object" | yq '.initialDelaySeconds' | tee /dev/stderr)
+    [ "${actual}" = "100" ]
+  local actual=$(echo "$object" | yq '.periodSeconds' | tee /dev/stderr)
+    [ "${actual}" = "100" ]
+  local actual=$(echo "$object" | yq '.successThreshold' | tee /dev/stderr)
+    [ "${actual}" = "100" ]
+  local actual=$(echo "$object" | yq '.timeoutSeconds' | tee /dev/stderr)
+    [ "${actual}" = "100" ]
+}
+
+@test "injector/deployment: default startupProbe settings" {
+  cd `chart_dir`
+  local object=$(helm template \
+      --show-only templates/injector-deployment.yaml  \
+      . | tee /dev/stderr |
+      yq -r '.spec.template.spec.containers[0].startupProbe' | tee /dev/stderr)
+
+  local actual=$(echo "$object" | yq '.failureThreshold' | tee /dev/stderr)
+    [ "${actual}" = "12" ]
+  local actual=$(echo "$object" | yq '.initialDelaySeconds' | tee /dev/stderr)
+    [ "${actual}" = "5" ]
+  local actual=$(echo "$object" | yq '.periodSeconds' | tee /dev/stderr)
+    [ "${actual}" = "5" ]
+  local actual=$(echo "$object" | yq '.successThreshold' | tee /dev/stderr)
+    [ "${actual}" = "1" ]
+  local actual=$(echo "$object" | yq '.timeoutSeconds' | tee /dev/stderr)
+    [ "${actual}" = "5" ]
+}
+
+@test "injector/deployment: can set startupProbe settings" {
+  cd `chart_dir`
+  local object=$(helm template \
+      --show-only templates/injector-deployment.yaml  \
+      --set 'injector.startupProbe.failureThreshold=100' \
+      --set 'injector.startupProbe.initialDelaySeconds=100' \
+      --set 'injector.startupProbe.periodSeconds=100' \
+      --set 'injector.startupProbe.successThreshold=100' \
+      --set 'injector.startupProbe.timeoutSeconds=100' \
+      . | tee /dev/stderr |
+      yq -r '.spec.template.spec.containers[0].startupProbe' | tee /dev/stderr)
+
+  local actual=$(echo "$object" | yq '.failureThreshold' | tee /dev/stderr)
+    [ "${actual}" = "100" ]
+  local actual=$(echo "$object" | yq '.initialDelaySeconds' | tee /dev/stderr)
+    [ "${actual}" = "100" ]
+  local actual=$(echo "$object" | yq '.periodSeconds' | tee /dev/stderr)
+    [ "${actual}" = "100" ]
+  local actual=$(echo "$object" | yq '.successThreshold' | tee /dev/stderr)
+    [ "${actual}" = "100" ]
+  local actual=$(echo "$object" | yq '.timeoutSeconds' | tee /dev/stderr)
+    [ "${actual}" = "100" ]
+}
+
 @test "injector/deployment: default logLevel" {
   cd `chart_dir`
   local object=$(helm template \
@@ -361,6 +490,165 @@ load _helpers
   local value=$(echo $object |
       yq -r 'map(select(.name=="AGENT_INJECT_SET_SECURITY_CONTEXT")) | .[] .value' | tee /dev/stderr)
   [ "${value}" = "false" ]
+}
+
+#--------------------------------------------------------------------
+# securityContext for pod and container
+
+# for backward compatibility
+@test "injector/deployment: backward pod securityContext" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      --show-only templates/injector-deployment.yaml  \
+      --set 'injector.uid=200' \
+      --set 'injector.gid=4000' \
+      . | tee /dev/stderr |
+      yq -r '.spec.template.spec.securityContext' | tee /dev/stderr)
+
+  local value=$(echo $actual | yq -r .runAsUser | tee /dev/stderr)
+  [ "${value}" = "200" ]
+
+  local value=$(echo $actual | yq -r .runAsGroup | tee /dev/stderr)
+  [ "${value}" = "4000" ]
+}
+
+@test "injector/deployment: default pod securityContext" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      --show-only templates/injector-deployment.yaml  \
+      . | tee /dev/stderr |
+      yq -r '.spec.template.spec.securityContext' | tee /dev/stderr)
+  [ "${actual}" != "null" ]
+
+  local value=$(echo $actual | yq -r .fsGroup | tee /dev/stderr)
+  [ "${value}" = "1000" ]
+
+  local value=$(echo $actual | yq -r .runAsGroup | tee /dev/stderr)
+  [ "${value}" = "1000" ]
+
+  local value=$(echo $actual | yq -r .runAsNonRoot | tee /dev/stderr)
+  [ "${value}" = "true" ]
+
+  local value=$(echo $actual | yq -r .runAsUser | tee /dev/stderr)
+  [ "${value}" = "100" ]
+}
+
+@test "injector/deployment: custom pod securityContext" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      --show-only templates/injector-deployment.yaml  \
+      --set 'injector.enabled=true' \
+      --set 'injector.securityContext.pod.runAsNonRoot=true' \
+      --set 'injector.securityContext.pod.runAsGroup=1001' \
+      --set 'injector.securityContext.pod.runAsUser=1001' \
+      --set 'injector.securityContext.pod.fsGroup=1000' \
+      . | tee /dev/stderr |
+      yq -r '.spec.template.spec.securityContext.runAsGroup' | tee /dev/stderr)
+  [ "${actual}" = "1001" ]
+
+  local actual=$(helm template \
+      --show-only templates/injector-deployment.yaml  \
+      --set 'injector.enabled=true' \
+      --set 'injector.securityContext.pod.runAsNonRoot=false' \
+      --set 'injector.securityContext.pod.runAsGroup=1000' \
+      . | tee /dev/stderr |
+      yq -r '.spec.template.spec.securityContext.runAsNonRoot' | tee /dev/stderr)
+  [ "${actual}" = "false" ]
+
+  local actual=$(helm template \
+      --show-only templates/injector-deployment.yaml \
+      --set 'injector.enabled=true' \
+      --set 'injector.securityContext.pod.runAsUser=1001' \
+      --set 'injector.securityContext.pod.fsGroup=1000' \
+      . | tee /dev/stderr |
+      yq -r '.spec.template.spec.securityContext.runAsUser' | tee /dev/stderr)
+  [ "${actual}" = "1001" ]
+
+  local actual=$(helm template \
+      --show-only templates/injector-deployment.yaml \
+      --set 'injector.enabled=true' \
+      --set 'injector.securityContext.pod.runAsNonRoot=true' \
+      --set 'injector.securityContext.pod.fsGroup=1001' \
+      . | tee /dev/stderr |
+      yq -r '.spec.template.spec.securityContext.fsGroup' | tee /dev/stderr)
+  [ "${actual}" = "1001" ]
+}
+
+@test "injector/deployment: custom pod securityContext from string" {
+  cd `chart_dir`
+  local multi=$(cat <<EOF
+foo: bar
+bar: foo
+EOF
+)
+  local actual=$(helm template \
+      --show-only templates/injector-deployment.yaml  \
+      --set 'injector.enabled=true' \
+      --set "injector.securityContext.pod=$multi" \
+      . | tee /dev/stderr |
+      yq -r '.spec.template.spec.securityContext.bar' | tee /dev/stderr)
+  [ "${actual}" = "foo" ]
+}
+
+@test "injector/deployment: custom container securityContext" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      --show-only templates/injector-deployment.yaml  \
+      --set 'injector.enabled=true' \
+      --set "injector.securityContext.container.bar=foo" \
+      . | tee /dev/stderr |
+      yq -r '.spec.template.spec.containers[0].securityContext.bar' | tee /dev/stderr)
+  [ "${actual}" = "foo" ]
+}
+
+@test "injector/deployment: custom container securityContext from string" {
+  cd `chart_dir`
+  local multi=$(cat <<EOF
+foo: bar
+bar: foo
+EOF
+)
+  local actual=$(helm template \
+      --show-only templates/injector-deployment.yaml  \
+      --set 'injector.enabled=true' \
+      --set "injector.securityContext.container=$multi" \
+      . | tee /dev/stderr |
+      yq -r '.spec.template.spec.containers[0].securityContext.bar' | tee /dev/stderr)
+  [ "${actual}" = "foo" ]
+}
+
+@test "injector/deployment: default container securityContext sidecar-injector" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      --show-only templates/injector-deployment.yaml  \
+      . | tee /dev/stderr |
+      yq -r '.spec.template.spec.containers[0].securityContext' | tee /dev/stderr)
+  [ "${actual}" != "null" ]
+
+  local value=$(echo $actual | yq -r .allowPrivilegeEscalation | tee /dev/stderr)
+  [ "${value}" = "false" ]
+
+  local value=$(echo $actual | yq -r .capabilities.drop[0] | tee /dev/stderr)
+  [ "${value}" = "ALL" ]
+}
+
+@test "injector/deployment: custom container securityContext sidecar-injector" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      --show-only templates/injector-deployment.yaml  \
+      --set 'injector.enabled=true' \
+      --set 'injector.securityContext.container.privileged=true' \
+      . | tee /dev/stderr |
+      yq -r '.spec.template.spec.containers[0].securityContext.privileged' | tee /dev/stderr)
+  [ "${actual}" = "true" ]
+
+  local actual=$(helm template \
+      --show-only templates/injector-deployment.yaml  \
+      --set 'injector.enabled=true' \
+      --set 'injector.securityContext.container.readOnlyRootFilesystem=false' \
+      . | tee /dev/stderr |
+      yq -r '.spec.template.spec.containers[0].securityContext.readOnlyRootFilesystem' | tee /dev/stderr)
+  [ "${actual}" = "false" ]
 }
 
 #--------------------------------------------------------------------

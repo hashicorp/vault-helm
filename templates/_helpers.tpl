@@ -1,4 +1,9 @@
 {{/*
+Copyright (c) HashiCorp, Inc.
+SPDX-License-Identifier: MPL-2.0
+*/}}
+
+{{/*
 Create a default fully qualified app name.
 We truncate at 63 chars because some Kubernetes name fields are limited to
 this (by the DNS naming spec). If release name contains chart name it will
@@ -59,7 +64,7 @@ Compute if the server is enabled.
 {{- end -}}
 
 {{/*
-Compute if the server auth delegator serviceaccount is enabled.
+Compute if the server serviceaccount is enabled.
 */}}
 {{- define "vault.serverServiceAccountEnabled" -}}
 {{- $_ := set . "serverServiceAccountEnabled"
@@ -471,6 +476,103 @@ Sets extra injector service annotations
 {{- end -}}
 
 {{/*
+securityContext for the injector pod level.
+*/}}
+{{- define "injector.securityContext.pod" -}}
+  {{- if .Values.injector.securityContext.pod }}
+      securityContext:
+        {{- $tp := typeOf .Values.injector.securityContext.pod }}
+        {{- if eq $tp "string" }}
+          {{- tpl .Values.injector.securityContext.pod . | nindent 8 }}
+        {{- else }}
+          {{- toYaml .Values.injector.securityContext.pod | nindent 8 }}
+        {{- end }}
+  {{- else if not .Values.global.openshift }}
+      securityContext:
+        runAsNonRoot: true
+        runAsGroup: {{ .Values.injector.gid | default 1000 }}
+        runAsUser: {{ .Values.injector.uid | default 100 }}
+        fsGroup: {{ .Values.injector.gid | default 1000 }}
+  {{- end }}
+{{- end -}}
+
+{{/*
+securityContext for the injector container level.
+*/}}
+{{- define "injector.securityContext.container" -}}
+  {{- if .Values.injector.securityContext.container}}
+          securityContext:
+            {{- $tp := typeOf .Values.injector.securityContext.container }}
+            {{- if eq $tp "string" }}
+              {{- tpl .Values.injector.securityContext.container . | nindent 12 }}
+            {{- else }}
+              {{- toYaml .Values.injector.securityContext.container | nindent 12 }}
+            {{- end }}
+  {{- else if not .Values.global.openshift }}
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+                - ALL
+  {{- end }}
+{{- end -}}
+
+{{/*
+securityContext for the statefulset pod template.
+*/}}
+{{- define "server.statefulSet.securityContext.pod" -}}
+  {{- if .Values.server.statefulSet.securityContext.pod }}
+      securityContext:
+        {{- $tp := typeOf .Values.server.statefulSet.securityContext.pod }}
+        {{- if eq $tp "string" }}
+          {{- tpl .Values.server.statefulSet.securityContext.pod . | nindent 8 }}
+        {{- else }}
+          {{- toYaml .Values.server.statefulSet.securityContext.pod | nindent 8 }}
+        {{- end }}
+  {{- else if not .Values.global.openshift }}
+      securityContext:
+        runAsNonRoot: true
+        runAsGroup: {{ .Values.server.gid | default 1000 }}
+        runAsUser: {{ .Values.server.uid | default 100 }}
+        fsGroup: {{ .Values.server.gid | default 1000 }}
+  {{- end }}
+{{- end -}}
+
+{{/*
+securityContext for the statefulset vault container
+*/}}
+{{- define "server.statefulSet.securityContext.container" -}}
+  {{- if .Values.server.statefulSet.securityContext.container }}
+          securityContext:
+            {{- $tp := typeOf .Values.server.statefulSet.securityContext.container }}
+            {{- if eq $tp "string" }}
+              {{- tpl .Values.server.statefulSet.securityContext.container . | nindent 12 }}
+            {{- else }}
+              {{- toYaml .Values.server.statefulSet.securityContext.container | nindent 12 }}
+            {{- end }}
+  {{- else if not .Values.global.openshift }}
+          securityContext:
+            allowPrivilegeEscalation: false
+  {{- end }}
+{{- end -}}
+
+
+{{/*
+Sets extra injector service account annotations
+*/}}
+{{- define "injector.serviceAccount.annotations" -}}
+  {{- if and (ne .mode "dev") .Values.injector.serviceAccount.annotations }}
+  annotations:
+    {{- $tp := typeOf .Values.injector.serviceAccount.annotations }}
+    {{- if eq $tp "string" }}
+      {{- tpl .Values.injector.serviceAccount.annotations . | nindent 4 }}
+    {{- else }}
+      {{- toYaml .Values.injector.serviceAccount.annotations | nindent 4 }}
+    {{- end }}
+  {{- end }}
+{{- end -}}
+
+{{/*
 Sets extra injector webhook annotations
 */}}
 {{- define "injector.webhookAnnotations" -}}
@@ -700,6 +802,37 @@ Sets extra CSI daemonset annotations
     {{- end }}
   {{- end }}
 {{- end -}}
+
+{{/*
+Sets CSI daemonset securityContext for pod template
+*/}}
+{{- define "csi.daemonSet.securityContext.pod" -}}
+  {{- if .Values.csi.daemonSet.securityContext.pod }}
+      securityContext:
+    {{- $tp := typeOf .Values.csi.daemonSet.securityContext.pod }}
+    {{- if eq $tp "string" }}
+      {{- tpl .Values.csi.daemonSet.securityContext.pod . | nindent 8 }}
+    {{- else }}
+      {{- toYaml .Values.csi.daemonSet.securityContext.pod | nindent 8 }}
+    {{- end }}
+  {{- end }}
+{{- end -}}
+
+{{/*
+Sets CSI daemonset securityContext for container
+*/}}
+{{- define "csi.daemonSet.securityContext.container" -}}
+  {{- if .Values.csi.daemonSet.securityContext.container }}
+          securityContext:
+    {{- $tp := typeOf .Values.csi.daemonSet.securityContext.container }}
+    {{- if eq $tp "string" }}
+      {{- tpl .Values.csi.daemonSet.securityContext.container . | nindent 12 }}
+    {{- else }}
+      {{- toYaml .Values.csi.daemonSet.securityContext.container | nindent 12 }}
+    {{- end }}
+  {{- end }}
+{{- end -}}
+
 
 {{/*
 Sets the injector toleration for pod placement

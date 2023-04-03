@@ -1,3 +1,6 @@
+# Copyright (c) HashiCorp, Inc.
+# SPDX-License-Identifier: MPL-2.0
+
 # These overrides are appropriate defaults for deploying this chart on OpenShift
 
 global:
@@ -6,13 +9,13 @@ global:
 injector:
   image:
     repository: "registry.connect.redhat.com/hashicorp/vault-k8s"
-    tag: "0.16.1-ubi"
+    tag: "1.1.0-ubi"
 
   agentImage:
     repository: "registry.connect.redhat.com/hashicorp/vault"
-    tag: "1.10.3-ubi"
+    tag: "1.12.1-ubi"
 
 server:
   image:
     repository: "registry.connect.redhat.com/hashicorp/vault"
-    tag: "1.10.3-ubi"
+    tag: "1.12.1-ubi"

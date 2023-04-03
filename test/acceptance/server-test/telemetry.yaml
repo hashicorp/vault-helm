@@ -1,0 +1,31 @@
+# Copyright (c) HashiCorp, Inc.
+# SPDX-License-Identifier: MPL-2.0
+
+server:
+  standalone:
+    config: |
+      ui = true
+
+      listener "tcp" {
+        tls_disable = 1
+        address = "[::]:8200"
+        cluster_address = "[::]:8201"
+        # Enable unauthenticated metrics access (necessary for Prometheus Operator)
+        telemetry {
+          unauthenticated_metrics_access = "true"
+        }
+      }
+
+      storage "file" {
+        path = "/vault/data"
+      }
+
+      telemetry {
+        prometheus_retention_time = "30s"
+        disable_hostname = true
+      }
+
+serverTelemetry:
+  serviceMonitor:
+    enabled: true
+    interval: 15s

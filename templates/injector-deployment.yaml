@@ -1,3 +1,8 @@
+{{/*
+Copyright (c) HashiCorp, Inc.
+SPDX-License-Identifier: MPL-2.0
+*/}}
+
 {{- template "vault.injectorEnabled" . -}}
 {{- if .injectorEnabled -}}
 # Deployment for the injector
@@ -38,22 +43,16 @@ spec:
       priorityClassName: {{ .Values.injector.priorityClassName }}
       {{- end }}
       serviceAccountName: "{{ template "vault.fullname" . }}-agent-injector"
+      {{ template "injector.securityContext.pod" . -}}
       {{- if not .Values.global.openshift }}
       hostNetwork: {{ .Values.injector.hostNetwork }}
-      securityContext:
-        runAsNonRoot: true
-        runAsGroup: {{ .Values.injector.gid | default 1000 }}
-        runAsUser: {{ .Values.injector.uid | default 100 }}
       {{- end }}
       containers:
         - name: sidecar-injector
           {{ template "injector.resources" . }}
           image: "{{ .Values.injector.image.repository }}:{{ .Values.injector.image.tag }}"
           imagePullPolicy: "{{ .Values.injector.image.pullPolicy }}"
-          {{- if not .Values.global.openshift }}
-          securityContext:
-            allowPrivilegeEscalation: false
-          {{- end }}
+          {{- template "injector.securityContext.container" . }}
           env:
             - name: AGENT_INJECT_LISTEN
               value: {{ printf ":%v" .Values.injector.port  }}
@@ -131,21 +130,31 @@ spec:
               path: /health/ready
               port: {{ .Values.injector.port }}
               scheme: HTTPS
-            failureThreshold: 2
-            initialDelaySeconds: 5
-            periodSeconds: 2
-            successThreshold: 1
-            timeoutSeconds: 5
+            failureThreshold: {{ .Values.injector.livenessProbe.failureThreshold }}
+            initialDelaySeconds: {{ .Values.injector.livenessProbe.initialDelaySeconds }}
+            periodSeconds: {{ .Values.injector.livenessProbe.periodSeconds }}
+            successThreshold: {{ .Values.injector.livenessProbe.successThreshold }}
+            timeoutSeconds: {{ .Values.injector.livenessProbe.timeoutSeconds }}
           readinessProbe:
             httpGet:
               path: /health/ready
               port: {{ .Values.injector.port }}
               scheme: HTTPS
-            failureThreshold: 2
-            initialDelaySeconds: 5
-            periodSeconds: 2
-            successThreshold: 1
-            timeoutSeconds: 5
+            failureThreshold: {{ .Values.injector.readinessProbe.failureThreshold }}
+            initialDelaySeconds: {{ .Values.injector.readinessProbe.initialDelaySeconds }}
+            periodSeconds: {{ .Values.injector.readinessProbe.periodSeconds }}
+            successThreshold: {{ .Values.injector.readinessProbe.successThreshold }}
+            timeoutSeconds: {{ .Values.injector.readinessProbe.timeoutSeconds }}
+          startupProbe:
+            httpGet:
+              path: /health/ready
+              port: {{ .Values.injector.port }}
+              scheme: HTTPS
+            failureThreshold: {{ .Values.injector.startupProbe.failureThreshold }}
+            initialDelaySeconds: {{ .Values.injector.startupProbe.initialDelaySeconds }}
+            periodSeconds: {{ .Values.injector.startupProbe.periodSeconds }}
+            successThreshold: {{ .Values.injector.startupProbe.successThreshold }}
+            timeoutSeconds: {{ .Values.injector.startupProbe.timeoutSeconds }}
 {{- if .Values.injector.certs.secretName }}
           volumeMounts:
             - name: webhook-certs

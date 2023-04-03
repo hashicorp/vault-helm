@@ -1,3 +1,8 @@
+{{/*
+Copyright (c) HashiCorp, Inc.
+SPDX-License-Identifier: MPL-2.0
+*/}}
+
 {{- template "vault.csiEnabled" . -}}
 {{- if .csiEnabled -}}
 apiVersion: apps/v1
@@ -34,6 +39,7 @@ spec:
         {{- end -}}
       {{ template "csi.pod.annotations" . }}
     spec:
+      {{ template "csi.daemonSet.securityContext.pod" . }}
       {{- if .Values.csi.priorityClassName }}
       priorityClassName: {{ .Values.csi.priorityClassName }}
       {{- end }}
@@ -42,6 +48,7 @@ spec:
       containers:
         - name: {{ include "vault.name" . }}-csi-provider
           {{ template "csi.resources" . }}
+          {{ template "csi.daemonSet.securityContext.container" . }}
           image: "{{ .Values.csi.image.repository }}:{{ .Values.csi.image.tag }}"
           imagePullPolicy: {{ .Values.csi.image.pullPolicy }}
           args:
