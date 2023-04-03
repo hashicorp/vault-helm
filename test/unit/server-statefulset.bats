@@ -1837,7 +1837,7 @@ load _helpers
   cd `chart_dir`
   local actual=$(helm template \
       --show-only templates/server-statefulset.yaml \
-      --set '--set server.readinessProbe.enabled=true' \
+      --set 'server.readinessProbe.enabled=true' \
       . | tee /dev/stderr |
       yq -r '.spec.template.spec.containers[0].readinessProbe.httpGet.port' | tee /dev/stderr)
   [ "${actual}" = "8200" ]
@@ -1851,7 +1851,7 @@ load _helpers
   cd `chart_dir`
   local actual=$(helm template \
       --show-only templates/server-statefulset.yaml \
-      --set '--set server.livenessProbe.enabled=true' \
+      --set 'server.livenessProbe.enabled=true' \
       . | tee /dev/stderr |
       yq -r '.spec.template.spec.containers[0].livenessProbe.httpGet.port' | tee /dev/stderr)
   [ "${actual}" = "8200" ]
