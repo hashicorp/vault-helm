@@ -1829,3 +1829,30 @@ load _helpers
       yq -r '.name' | tee /dev/stderr)
   [ "${actual}" = "foo" ]
 }
+
+#--------------------------------------------------------------------
+# readinessProbe
+
+@test "server/StatefulSet: server.readinessProbe.port is set" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      --show-only templates/server-statefulset.yaml \
+      --set '--set server.readinessProbe.enabled=true' \
+      . | tee /dev/stderr |
+      yq -r '.spec.template.spec.containers[0].readinessProbe.httpGet.port' | tee /dev/stderr)
+  [ "${actual}" = "8200" ]
+}
+
+
+#--------------------------------------------------------------------
+# livenessProbe
+
+@test "server/StatefulSet: server.livenessProbe.port is set" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      --show-only templates/server-statefulset.yaml \
+      --set '--set server.livenessProbe.enabled=true' \
+      . | tee /dev/stderr |
+      yq -r '.spec.template.spec.containers[0].livenessProbe.httpGet.port' | tee /dev/stderr)
+  [ "${actual}" = "8200" ]
+}
