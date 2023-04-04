@@ -620,6 +620,9 @@
                 "extraSecretEnvironmentVars": {
                     "type": "array"
                 },
+                "extraEnvironmentVarsFromConfigMap": {
+                    "type": "array"
+                },
                 "extraVolumes": {
                     "type": "array"
                 },

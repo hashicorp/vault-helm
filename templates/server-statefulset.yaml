@@ -137,6 +137,7 @@ spec:
             {{ template "vault.envs" . }}
             {{- include "vault.extraEnvironmentVars" .Values.server | nindent 12 }}
             {{- include "vault.extraSecretEnvironmentVars" .Values.server | nindent 12 }}
+            {{- include "vault.extraEnvironmentVarsFromConfigMap" .Values.server | nindent 10 }}
           volumeMounts:
           {{ template "vault.mounts" . }}
             - name: home
