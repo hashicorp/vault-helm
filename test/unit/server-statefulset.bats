@@ -1838,6 +1838,7 @@ load _helpers
   local actual=$(helm template \
       --show-only templates/server-statefulset.yaml \
       --set 'server.readinessProbe.enabled=true' \
+      --set 'server.readinessProbe.path=foo' \
       . | tee /dev/stderr |
       yq -r '.spec.template.spec.containers[0].readinessProbe.httpGet.port' | tee /dev/stderr)
   [ "${actual}" = "8200" ]
