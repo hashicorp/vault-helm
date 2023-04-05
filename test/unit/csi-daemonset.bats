@@ -533,6 +533,33 @@ load _helpers
   [ "${actual}" = "14" ]
 }
 
+@test "csi/daemonset: VAULT_ADDR defaults to Agent unix socket" {
+  cd `chart_dir`
+  local object=$(helm template \
+      --show-only templates/csi-daemonset.yaml \
+      --set 'csi.enabled=true' \
+      . | tee /dev/stderr |
+      yq -r '.spec.template.spec.containers[0].env' | tee /dev/stderr)
+
+  local value=$(echo $object |
+      yq -r 'map(select(.name=="VAULT_ADDR")) | .[] .value' | tee /dev/stderr)
+  [ "${value}" = "unix:///var/run/vault/agent.sock" ]
+}
+
+@test "csi/daemonset: VAULT_ADDR remains pointed to Agent unix socket if external Vault" {
+  cd `chart_dir`
+  local object=$(helm template \
+      --show-only templates/csi-daemonset.yaml \
+      --set 'csi.enabled=true' \
+      --set 'global.externalVaultAddr=http://vault-outside' \
+      . | tee /dev/stderr |
+      yq -r '.spec.template.spec.containers[0].env' | tee /dev/stderr)
+
+  local value=$(echo $object |
+      yq -r 'map(select(.name=="VAULT_ADDR")) | .[] .value' | tee /dev/stderr)
+  [ "${value}" = "unix:///var/run/vault/agent.sock" ]
+}
+
 @test "csi/daemonset: with only injector.externalVaultAddr" {
   cd `chart_dir`
   local object=$(helm template \
@@ -618,4 +645,94 @@ load _helpers
       . | tee /dev/stderr |
       yq -r '.spec.template.spec.containers[0].securityContext.foo' | tee /dev/stderr)
   [ "${actual}" = "bar" ]
+}
+
+#--------------------------------------------------------------------
+# Agent sidecar configurables
+
+@test "csi/daemonset: Agent sidecar enabled by default" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      --show-only templates/csi-daemonset.yaml \
+      --set 'csi.enabled=true' \
+      . | tee /dev/stderr |
+      yq -r '.spec.template.spec.containers | length' | tee /dev/stderr)
+  [ "${actual}" = "2" ]
+}
+
+@test "csi/daemonset: Agent sidecar can pass extra args" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      --show-only templates/csi-daemonset.yaml \
+      --set 'csi.enabled=true' \
+      --set 'csi.agent.extraArgs[0]=-config=extra-config.hcl' \
+      . | tee /dev/stderr |
+      yq -r '.spec.template.spec.containers[1].args[2]' | tee /dev/stderr)
+  [ "${actual}" = "-config=extra-config.hcl" ]
+}
+
+@test "csi/daemonset: Agent log level settable" {
+  cd `chart_dir`
+  local object=$(helm template \
+      --show-only templates/csi-daemonset.yaml \
+      --set 'csi.enabled=true' \
+      --set 'csi.agent.logLevel=error' \
+      . | tee /dev/stderr |
+      yq -r '.spec.template.spec.containers[1].env' | tee /dev/stderr)
+
+  local value=$(echo $object |
+      yq -r 'map(select(.name=="VAULT_LOG_LEVEL")) | .[] .value' | tee /dev/stderr)
+  [ "${value}" = "error" ]
+}
+
+@test "csi/daemonset: Agent log format settable" {
+  cd `chart_dir`
+  local object=$(helm template \
+      --show-only templates/csi-daemonset.yaml \
+      --set 'csi.enabled=true' \
+      --set 'csi.agent.logFormat=json' \
+      . | tee /dev/stderr |
+      yq -r '.spec.template.spec.containers[1].env' | tee /dev/stderr)
+
+  local value=$(echo $object |
+      yq -r 'map(select(.name=="VAULT_LOG_FORMAT")) | .[] .value' | tee /dev/stderr)
+  [ "${value}" = "json" ]
+}
+
+@test "csi/daemonset: Agent default resources" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      --show-only templates/csi-daemonset.yaml  \
+      --set 'csi.enabled=true' \
+      . | tee /dev/stderr |
+      yq -r '.spec.template.spec.containers[1].resources' | tee /dev/stderr)
+  [ "${actual}" = "null" ]
+}
+
+@test "csi/daemonset: Agent custom resources" {
+  cd `chart_dir`
+  local object=$(helm template \
+      --show-only templates/csi-daemonset.yaml  \
+      --set 'csi.enabled=true' \
+      --set 'csi.agent.resources.requests.memory=256Mi' \
+      --set 'csi.agent.resources.requests.cpu=250m' \
+      --set 'csi.agent.resources.limits.memory=512Mi' \
+      --set 'csi.agent.resources.limits.cpu=500m' \
+      . | tee /dev/stderr |
+      yq -r '.spec.template.spec.containers[1].resources' | tee /dev/stderr)
+  local value=$(echo $object |
+      yq -r '.requests.memory' | tee /dev/stderr)
+  [ "${value}" = "256Mi" ]
+
+  local value=$(echo $object |
+      yq -r '.requests.cpu' | tee /dev/stderr)
+  [ "${value}" = "250m" ]
+
+  local value=$(echo $object |
+      yq -r '.limits.memory' | tee /dev/stderr)
+  [ "${value}" = "512Mi" ]
+
+  local value=$(echo $object |
+      yq -r '.limits.cpu' | tee /dev/stderr)
+  [ "${value}" = "500m" ]
 }
