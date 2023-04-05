@@ -4,6 +4,9 @@ on:
     tags:
       - 'v[0-9]+\.[0-9]+\.[0-9]+\.*'
 
+permissions:
+  contents: read
+
 jobs:
   update-helm-charts-index:
     runs-on: ubuntu-latest
@@ -23,7 +26,7 @@ jobs:
       - name: update helm-charts index
         id: update
         run: |-
-          export GITHUB_TOKEN="${{secrets.helm_charts_github_token }}"
+          export GITHUB_TOKEN="${{secrets.HELM_CHARTS_GITHUB_TOKEN }}"
           gh workflow run publish-charts.yml \
             --repo hashicorp/helm-charts \
             --ref main \
@@ -50,4 +53,4 @@ jobs:
           block-color: ${{ env.SLACK_BLOCK_COLOR }}
           message: ${{ env.SLACK_MESSAGE }}
           run-url: ${{ env.RUN_URL }}
-          slack-webhook-url: ${{ secrets.slack_webhook_url }}
+          slack-webhook-url: ${{ secrets.SLACK_WEBHOOK_URL }}
