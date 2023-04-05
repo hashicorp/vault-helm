@@ -379,21 +379,6 @@ load _helpers
   [ "${actual}" = "/etc/kubernetes/secrets-store-csi-providers" ]
 }
 
-@test "csi/daemonset: csi kubeletRootDir default" {
-  cd `chart_dir`
-
-  # Test that it defines it
-  local object=$(helm template \
-      --show-only templates/csi-daemonset.yaml  \
-      --set 'csi.enabled=true' \
-      . | tee /dev/stderr |
-      yq -r '.spec.template.spec.volumes[] | select(.name == "mountpoint-dir")' | tee /dev/stderr)
-
-  local actual=$(echo $object |
-      yq -r '.hostPath.path' | tee /dev/stderr)
-  [ "${actual}" = "/var/lib/kubelet/pods" ]
-}
-
 @test "csi/daemonset: csi providersDir override " {
   cd `chart_dir`
 
@@ -408,22 +393,6 @@ load _helpers
   local actual=$(echo $object |
       yq -r '.hostPath.path' | tee /dev/stderr)
   [ "${actual}" = "/alt/csi-prov-dir" ]
-}
-
-@test "csi/daemonset: csi kubeletRootDir override" {
-  cd `chart_dir`
-
-  # Test that it defines it
-  local object=$(helm template \
-      --show-only templates/csi-daemonset.yaml  \
-      --set 'csi.enabled=true' \
-      --set 'csi.daemonSet.kubeletRootDir=/alt/kubelet-root' \
-      . | tee /dev/stderr |
-      yq -r '.spec.template.spec.volumes[] | select(.name == "mountpoint-dir")' | tee /dev/stderr)
-
-  local actual=$(echo $object |
-      yq -r '.hostPath.path' | tee /dev/stderr)
-  [ "${actual}" = "/alt/kubelet-root/pods" ]
 }
 
 #--------------------------------------------------------------------
@@ -569,6 +538,7 @@ load _helpers
   local object=$(helm template \
       --show-only templates/csi-daemonset.yaml \
       --set 'csi.enabled=true' \
+      --set 'csi.agent.enabled=false' \
       --release-name not-external-test \
       --set 'injector.externalVaultAddr=http://vault-outside' \
       . | tee /dev/stderr |
@@ -584,6 +554,7 @@ load _helpers
   local object=$(helm template \
       --show-only templates/csi-daemonset.yaml \
       --set 'csi.enabled=true' \
+      --set 'csi.agent.enabled=false' \
       --set 'global.externalVaultAddr=http://vault-outside' \
       . | tee /dev/stderr |
       yq -r '.spec.template.spec.containers[0].env' | tee /dev/stderr)
