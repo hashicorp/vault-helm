@@ -9,6 +9,4 @@ jobs:
   actionlint:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@ac593985615ec2ede58e132d2e21d2b1cbd6127c # v3.3.0
-      - name: "Check workflow files"
-        uses: docker://docker.mirror.hashicorp.services/rhysd/actionlint:latest
+      - uses: hashicorp/vault-workflows-common/.github/workflows/actionlint.yaml@main
