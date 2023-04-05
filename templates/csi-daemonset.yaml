@@ -136,7 +136,7 @@ spec:
         {{- if eq (.Values.csi.agent.enabled | toString) "true" }}
         - name: agent-config
           configMap:
-            name: {{ template "vault.fullname" . }}-csi-agent-config
+            name: {{ template "vault.fullname" . }}-csi-provider-agent-config
         - name: agent-unix-socket
           emptyDir:
             medium: Memory
