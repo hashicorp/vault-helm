@@ -1061,8 +1061,8 @@ csi:
     enabled: true
     extraArgs: []
 
-    logLevel: info
     logFormat: standard
+    logLevel: info
 
     resources: {}
     # resources:

@@ -5,6 +5,26 @@
         "csi": {
             "type": "object",
             "properties": {
+                "agent": {
+                    "type": "object",
+                    "properties": {
+                        "enabled": {
+                            "type": "boolean"
+                        },
+                        "extraArgs": {
+                            "type": "array"
+                        },
+                        "logFormat": {
+                            "type": "string"
+                        },
+                        "logLevel": {
+                            "type": "string"
+                        },
+                        "resources": {
+                            "type": "object"
+                        }
+                    }
+                },
                 "daemonSet": {
                     "type": "object",
                     "properties": {
