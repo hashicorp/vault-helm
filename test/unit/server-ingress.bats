@@ -197,7 +197,7 @@ load _helpers
   [ "${actual}" = "release-name-vault" ]
 }
 
-@test "server/ingress: k8s 1.20.15 uses correct service format when not ha - yaml" {
+@test "server/ingress: k8s 1.26.3 uses correct service format when not ha - yaml" {
   cd `chart_dir`
 
   local actual=$(helm template \
@@ -206,7 +206,7 @@ load _helpers
       --set 'server.dev.enabled=false' \
       --set 'server.ha.enabled=false' \
       --set 'server.service.enabled=true' \
-      --kube-version 1.20.15 \
+      --kube-version 1.26.3 \
       . | tee /dev/stderr |
       yq -r '.spec.rules[0].http.paths[0].backend.service.name' | tee /dev/stderr)
   [ "${actual}" = "release-name-vault" ]
@@ -227,14 +227,14 @@ load _helpers
   [ "${actual}" = "release-name-vault" ]
 }
 
-@test "server/ingress: pathType is added to Kubernetes version == 1.20.15" {
+@test "server/ingress: pathType is added to Kubernetes version == 1.26.3" {
   cd `chart_dir`
 
   local actual=$(helm template \
       --show-only templates/server-ingress.yaml \
       --set 'server.ingress.enabled=true' \
       --set server.ingress.pathType=ImplementationSpecific \
-      --kube-version 1.20.15 \
+      --kube-version 1.26.3 \
       . | tee /dev/stderr |
       yq -r '.spec.rules[0].http.paths[0].pathType' | tee /dev/stderr)
   [ "${actual}" = "ImplementationSpecific" ]
@@ -247,7 +247,7 @@ load _helpers
       --show-only templates/server-ingress.yaml \
       --set 'server.ingress.enabled=true' \
       --set server.ingress.pathType=Prefix \
-      --kube-version 1.20.0 \
+      --kube-version 1.26.3 \
       . | tee /dev/stderr |
       yq -r '.spec.rules[0].http.paths[0].pathType' | tee /dev/stderr)
   [ "${actual}" = "Prefix" ]

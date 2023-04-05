@@ -1,10 +1,12 @@
 ## Unreleased
 
 Changes:
-* Earliest Kubernetes version tested is now 1.20
+* Earliest Kubernetes version tested is now 1.22
+* `vault` updated to 1.13.1
 
 Features:
 * server: New `extraPorts` option for adding ports to the Vault server statefulset [GH-841](https://github.com/hashicorp/vault-helm/pull/841)
+* server: Add configurable Port Number in readinessProbe and livenessProbe for the server-statefulset [GH-831](https://github.com/hashicorp/vault-helm/pull/831)
 * injector: Make livenessProbe and readinessProbe configurable and add configurable startupProbe [GH-852](https://github.com/hashicorp/vault-helm/pull/852)
 
 ## 0.23.0 (November 28th, 2022)

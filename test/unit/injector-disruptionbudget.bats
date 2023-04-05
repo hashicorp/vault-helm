@@ -31,18 +31,7 @@ load _helpers
   [ "${actual}" = "true" ]
 }
 
-@test "injector/DisruptionBudget: test is apiVersion is set correctly < version 1.21 of kube" {
-  cd `chart_dir`
-  local actual=$(helm template \
-      --show-only templates/injector-disruptionbudget.yaml \
-      --set 'injector.podDisruptionBudget.minAvailable=2' \
-      --kube-version 1.20.15 \
-      . | tee /dev/stderr |
-      yq '.apiVersion == "policy/v1beta1"' | tee /dev/stderr)
-  [ "${actual}" = "true" ]
-}
-
-@test "injector/DisruptionBudget: test is apiVersion is set correctly >= version 1.21 of kube" {
+@test "injector/DisruptionBudget: apiVersion is set correctly >= version 1.21 of kube" {
   cd `chart_dir`
   local actual=$(helm template \
       --show-only templates/injector-disruptionbudget.yaml \
