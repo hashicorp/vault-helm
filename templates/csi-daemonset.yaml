@@ -60,8 +60,7 @@ spec:
           env:
             - name: VAULT_ADDR
             {{- if eq (.Values.csi.agent.enabled | toString) "true" }}
-              value: "http://127.0.0.1:8200"
-              # TODO: Add TLS for localhost
+              value: "unix:///var/run/vault/agent.sock"
             {{- else if .Values.global.externalVaultAddr }}
               value: "{{ .Values.global.externalVaultAddr }}"
             {{- else }}
@@ -70,9 +69,8 @@ spec:
           volumeMounts:
             - name: providervol
               mountPath: "/provider"
-            - name: mountpoint-dir
-              mountPath: {{ .Values.csi.daemonSet.kubeletRootDir }}/pods
-              mountPropagation: HostToContainer
+            - name: agent-unix-socket
+              mountPath: /var/run/vault
             {{- if .Values.csi.volumeMounts }}
               {{- toYaml .Values.csi.volumeMounts | nindent 12}}
             {{- end }}
@@ -95,8 +93,8 @@ spec:
             successThreshold: {{ .Values.csi.readinessProbe.successThreshold }}
             timeoutSeconds: {{ .Values.csi.readinessProbe.timeoutSeconds }}
         {{- if eq (.Values.csi.agent.enabled | toString) "true" }}
-        - name: vault-agent
-          image: hashicorp/vault:1.10.3
+        - name: {{ include "vault.name" . }}-agent
+          image: hashicorp/vault:1.13.1
           imagePullPolicy: IfNotPresent
           {{ template "csi.agent.resources" . }}
           command:
@@ -125,6 +123,8 @@ spec:
               mountPath: /etc/vault/config.hcl
               subPath: config.hcl
               readOnly: true
+            - name: agent-unix-socket
+              mountPath: /var/run/vault
             {{- if .Values.csi.volumeMounts }}
             {{- toYaml .Values.csi.volumeMounts | nindent 12 }}
             {{- end }}
@@ -133,13 +133,13 @@ spec:
         - name: providervol
           hostPath:
             path: {{ .Values.csi.daemonSet.providersDir }}
-        - name: mountpoint-dir
-          hostPath:
-            path: {{ .Values.csi.daemonSet.kubeletRootDir }}/pods
         {{- if eq (.Values.csi.agent.enabled | toString) "true" }}
         - name: agent-config
           configMap:
             name: {{ template "vault.fullname" . }}-csi-agent-config
+        - name: agent-unix-socket
+          emptyDir:
+            medium: Memory
         {{- end }}
         {{- if .Values.csi.volumes }}
         {{- toYaml .Values.csi.volumes | nindent 8}}

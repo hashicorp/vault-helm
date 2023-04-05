@@ -22,9 +22,8 @@ data:
 
     cache {}
 
-    listener "tcp" {
-        address = "127.0.0.1:8200"
+    listener "unix" {
+        address = "/var/run/vault/agent.sock"
         tls_disable = true
-        # TODO: Add TLS for localhost communication
     }
 {{- end }}
