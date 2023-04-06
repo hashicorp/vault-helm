@@ -65,24 +65,32 @@ load _helpers
 }
 
 # Image
-@test "csi/daemonset: image is configurable" {
+@test "csi/daemonset: images are configurable" {
   cd `chart_dir`
-  local actual=$(helm template \
+  local object=$(helm template \
       --show-only templates/csi-daemonset.yaml \
       --set "csi.enabled=true" \
-      --set "csi.image.repository=SomeOtherImage" \
+      --set "csi.image.repository=Image1" \
       --set "csi.image.tag=0.0.1" \
+      --set "csi.image.pullPolicy=PullPolicy1" \
+      --set "csi.agent.image.repository=Image2" \
+      --set "csi.agent.image.tag=0.0.2" \
+      --set "csi.agent.image.pullPolicy=PullPolicy2" \
       . | tee /dev/stderr |
-      yq -r '.spec.template.spec.containers[0].image' | tee /dev/stderr)
-  [ "${actual}" = "SomeOtherImage:0.0.1" ]
+      yq -r '.spec.template.spec.containers' | tee /dev/stderr)
 
-  local actual=$(helm template \
-      --show-only templates/csi-daemonset.yaml \
-      --set "csi.enabled=true" \
-      --set "csi.image.pullPolicy=SomePullPolicy" \
-      . | tee /dev/stderr |
-      yq -r '.spec.template.spec.containers[0].imagePullPolicy' | tee /dev/stderr)
-  [ "${actual}" = "SomePullPolicy" ]
+  local actual=$(echo $object |
+      yq -r '.[0].image' | tee /dev/stderr)
+  [ "${actual}" = "Image1:0.0.1" ]
+  local actual=$(echo $object |
+      yq -r '.[0].imagePullPolicy' | tee /dev/stderr)
+  [ "${actual}" = "PullPolicy1" ]
+  local actual=$(echo $object |
+      yq -r '.[1].image' | tee /dev/stderr)
+  [ "${actual}" = "Image2:0.0.2" ]
+  local actual=$(echo $object |
+      yq -r '.[1].imagePullPolicy' | tee /dev/stderr)
+  [ "${actual}" = "PullPolicy2" ]
 }
 
 @test "csi/daemonset: Custom imagePullSecrets" {

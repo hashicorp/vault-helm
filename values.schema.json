@@ -14,6 +14,20 @@
                         "extraArgs": {
                             "type": "array"
                         },
+                        "image": {
+                            "type": "object",
+                            "properties": {
+                                "pullPolicy": {
+                                    "type": "string"
+                                },
+                                "repository": {
+                                    "type": "string"
+                                },
+                                "tag": {
+                                    "type": "string"
+                                }
+                            }
+                        },
                         "logFormat": {
                             "type": "string"
                         },

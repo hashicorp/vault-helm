@@ -1065,6 +1065,11 @@ csi:
     enabled: true
     extraArgs: []
 
+    image:
+      repository: "hashicorp/vault"
+      tag: "1.13.1"
+      pullPolicy: IfNotPresent
+
     logFormat: standard
     logLevel: info
 

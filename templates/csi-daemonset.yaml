@@ -69,8 +69,10 @@ spec:
           volumeMounts:
             - name: providervol
               mountPath: "/provider"
+            {{- if eq (.Values.csi.agent.enabled | toString) "true" }}
             - name: agent-unix-socket
               mountPath: /var/run/vault
+            {{- end }}
             {{- if .Values.csi.volumeMounts }}
               {{- toYaml .Values.csi.volumeMounts | nindent 12}}
             {{- end }}
@@ -94,8 +96,8 @@ spec:
             timeoutSeconds: {{ .Values.csi.readinessProbe.timeoutSeconds }}
         {{- if eq (.Values.csi.agent.enabled | toString) "true" }}
         - name: {{ include "vault.name" . }}-agent
-          image: hashicorp/vault:1.13.1
-          imagePullPolicy: IfNotPresent
+          image: "{{ .Values.csi.agent.image.repository }}:{{ .Values.csi.agent.image.tag }}"
+          imagePullPolicy: {{ .Values.csi.agent.image.pullPolicy }}
           {{ template "csi.agent.resources" . }}
           command:
             - vault

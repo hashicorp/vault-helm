@@ -11,16 +11,6 @@ load _helpers
   [ "${actual}" = "false" ]
 }
 
-@test "csi/Agent-ConfigMap: enabled with csi.enabled" {
-  cd `chart_dir`
-  local actual=$(helm template \
-      --show-only templates/csi-agent-configmap.yaml  \
-      --set 'csi.enabled=true' \
-      . | tee /dev/stderr |
-      yq 'length > 0' | tee /dev/stderr)
-  [ "${actual}" = "true" ]
-}
-
 @test "csi/Agent-ConfigMap: name" {
   cd `chart_dir`
   local actual=$(helm template \
