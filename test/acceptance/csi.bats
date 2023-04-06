@@ -14,7 +14,7 @@ load _helpers
   CSI_DRIVER_VERSION=1.3.2
   helm install secrets-store-csi-driver secrets-store-csi-driver \
     --repo https://kubernetes-sigs.github.io/secrets-store-csi-driver/charts \
-    --version=$(CSI_DRIVER_VERSION) \
+    --version=$CSI_DRIVER_VERSION \
     --wait --timeout=5m \
     --namespace=acceptance \
     --set linux.image.pullPolicy="IfNotPresent" \
