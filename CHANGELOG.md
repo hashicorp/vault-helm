@@ -1,5 +1,7 @@
 ## Unreleased
 
+## 0.24.0 (April 6, 2023)
+
 Changes:
 * Earliest Kubernetes version tested is now 1.22
 * `vault` updated to 1.13.1
