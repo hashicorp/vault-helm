@@ -1,8 +1,8 @@
-name: hashicorp/vault-helm/update-helm-charts-index
+name: update-helm-charts-index
 on:
   push:
     tags:
-      - 'v[0-9]+\.[0-9]+\.[0-9]+\.*'
+      - 'v[0-9]+\.[0-9]+\.[0-9]+*'
 
 permissions:
   contents: read
