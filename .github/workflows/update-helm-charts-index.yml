@@ -2,7 +2,7 @@ name: update-helm-charts-index
 on:
   push:
     tags:
-      - 'v[0-9]+\.[0-9]+\.[0-9]+*'
+      - 'v[0-9]+.[0-9]+.[0-9]+*'
 
 permissions:
   contents: read
@@ -14,15 +14,13 @@ jobs:
       - uses: actions/checkout@ac593985615ec2ede58e132d2e21d2b1cbd6127c # v3.3.0
       - name: verify Chart version matches tag version
         run: |-
-          export TAG=${RELEASE_TAG:-${{ github.ref_name }}}
+          export TAG=${{ github.ref_name }}
           git_tag=$(echo "${TAG#v}")
           chart_tag=$(yq r Chart.yaml version)
           if [ "${git_tag}" != "${chart_tag}" ]; then
             echo "chart version (${chart_tag}) did not match git version (${git_tag})"
             exit 1
           fi
-        env:
-          RELEASE_TAG: "${{ inputs.release-tag }}"
       - name: update helm-charts index
         id: update
         run: |-
@@ -32,25 +30,10 @@ jobs:
             --ref main \
             -f SOURCE_TAG="${{ github.ref_name }}" \
             -f SOURCE_REPO="${{ github.repository }}"
-      - name: Prepare Slack Notification
-        if: always()
-        run: |
-          case "${{ steps.update.conclusion }}" in
-            failure)
-              echo "SLACK_MESSAGE=:red_circle: The vault-helm charts index update failed." >> "$GITHUB_ENV"
-              echo "SLACK_BLOCK_COLOR=ed5c5c" >> "$GITHUB_ENV"
-              ;;
-            success)
-              echo "SLACK_MESSAGE=:tada: The vault-helm charts index update succeeded." >> "$GITHUB_ENV"
-              echo "SLACK_BLOCK_COLOR=1cbf43" >> "$GITHUB_ENV"
-              ;;
-          esac
-      - name: Send Slack Notification
-        # note: this will skip Slack notification if the job is skipped or cancelled.
-        if: ${{ (success() || failure()) && env.SLACK_MESSAGE != '' }}
-        uses: ./.github/actions/slack-status
+      - uses: hashicorp/actions-slack-status@v1
+        if: ${{always()}}
         with:
-          block-color: ${{ env.SLACK_BLOCK_COLOR }}
-          message: ${{ env.SLACK_MESSAGE }}
-          run-url: ${{ env.RUN_URL }}
-          slack-webhook-url: ${{ secrets.SLACK_WEBHOOK_URL }}
+          success-message: "vault-helm charts index update triggered successfully. View the run <https://github.com/hashicorp/helm-charts/actions/workflows/publish-charts.yml|here>."
+          failure-message: "vault-helm charts index update failed."
+          status: ${{job.status}
+          slack-webhook-url: ${{secrets.SLACK_WEBHOOK_URL}}
