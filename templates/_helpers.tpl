@@ -779,6 +779,16 @@ Sets the container resources if the user has set any.
 {{- end -}}
 
 {{/*
+Sets the container resources for CSI's Agent sidecar if the user has set any.
+*/}}
+{{- define "csi.agent.resources" -}}
+  {{- if .Values.csi.agent.resources -}}
+          resources:
+{{ toYaml .Values.csi.agent.resources | indent 12}}
+  {{ end }}
+{{- end -}}
+
+{{/*
 Sets extra CSI daemonset annotations
 */}}
 {{- define "csi.daemonSet.annotations" -}}

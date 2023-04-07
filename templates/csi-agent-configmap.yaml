@@ -1,0 +1,29 @@
+{{- template "vault.csiEnabled" . -}}
+{{- if and (.csiEnabled) (eq (.Values.csi.agent.enabled | toString) "true") -}}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ template "vault.fullname" . }}-csi-provider-agent-config
+  namespace: {{ .Release.Namespace }}
+  labels:
+    helm.sh/chart: {{ include "vault.chart" . }}
+    app.kubernetes.io/name: {{ include "vault.name" . }}-csi-provider
+    app.kubernetes.io/instance: {{ .Release.Name }}
+    app.kubernetes.io/managed-by: {{ .Release.Service }}
+data:
+  config.hcl: |
+    vault {
+        {{- if .Values.global.externalVaultAddr }}
+        "address" = "{{ .Values.global.externalVaultAddr }}"
+        {{- else }}
+        "address" = "{{ include "vault.scheme" . }}://{{ template "vault.fullname" . }}.{{ .Release.Namespace }}.svc:{{ .Values.server.service.port }}"
+        {{- end }}
+    }
+
+    cache {}
+
+    listener "unix" {
+        address = "/var/run/vault/agent.sock"
+        tls_disable = true
+    }
+{{- end }}
