@@ -2,7 +2,11 @@
 name: Lint GitHub Actions Workflows
 on:
   push:
+    paths:
+      - .github/workflows/**.yml
   pull_request:
+    paths:
+      - .github/workflows/**.yml
 permissions:
   contents: read
 jobs:
