@@ -34,6 +34,6 @@ jobs:
         if: ${{always()}}
         with:
           success-message: "vault-helm charts index update triggered successfully. View the run <https://github.com/hashicorp/helm-charts/actions/workflows/publish-charts.yml|here>."
-          failure-message: "vault-helm charts index update failed."
-          status: ${{job.status}
+          failure-message: "vault-helm charts index update trigger failed."
+          status: ${{job.status}}
           slack-webhook-url: ${{secrets.SLACK_WEBHOOK_URL}}
