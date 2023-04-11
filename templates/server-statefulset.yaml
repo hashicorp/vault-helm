@@ -159,13 +159,8 @@ spec:
               port: {{ .Values.server.readinessProbe.port }}
               scheme: {{ include "vault.scheme" . | upper }}
             {{- else }}
-            # Check status; unsealed vault servers return 0
-            # The exit code reflects the seal status:
-            #   0 - unsealed
-            #   1 - error
-            #   2 - sealed
             exec:
-              command: ["/bin/sh", "-ec", "vault status -tls-skip-verify"]
+              command: {{- toYaml .Values.server.readinessProbe.exec.command | nindent 14 }}
             {{- end }}
             failureThreshold: {{ .Values.server.readinessProbe.failureThreshold }}
             initialDelaySeconds: {{ .Values.server.readinessProbe.initialDelaySeconds }}

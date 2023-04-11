@@ -502,6 +502,15 @@ server:
   # Used to define custom readinessProbe settings
   readinessProbe:
     enabled: true
+
+    # Check status; unsealed vault servers return 0
+    # The exit code reflects the seal status:
+    #   0 - unsealed
+    #   1 - error
+    #   2 - sealed
+    exec:
+      command: ["/bin/sh", "-ec", "vault status -tls-skip-verify"]
+
     # If you need to use a http path instead of the default exec
     # path: /v1/sys/health?standbyok=true
 
