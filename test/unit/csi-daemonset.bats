@@ -168,6 +168,25 @@ load _helpers
   [ "${actual}" = "--debug=true" ]
 }
 
+# HMAC secret arg
+@test "csi/daemonset: HMAC secret arg is configurable" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      --show-only templates/csi-daemonset.yaml \
+      --set "csi.enabled=true" \
+      . | tee /dev/stderr |
+      yq -r '.spec.template.spec.containers[0].args[2]' | tee /dev/stderr)
+  [ "${actual}" = "--hmac-secret-name=vault-csi-provider-hmac-key" ]
+
+  local actual=$(helm template \
+      --show-only templates/csi-daemonset.yaml \
+      --set "csi.enabled=true" \
+      --set "csi.hmacSecretName=foo" \
+      . | tee /dev/stderr |
+      yq -r '.spec.template.spec.containers[0].args[2]' | tee /dev/stderr)
+  [ "${actual}" = "--hmac-secret-name=foo" ]
+}
+
 # Extra args
 @test "csi/daemonset: extra args can be passed" {
   cd `chart_dir`

@@ -54,6 +54,11 @@ spec:
           args:
             - --endpoint=/provider/vault.sock
             - --debug={{ .Values.csi.debug }}
+            {{- if (eq .Values.csi.hmacSecretName "") }}
+            - --hmac-secret-name={{- include "vault.name" . }}-csi-provider-hmac-key
+            {{- else }}
+            - --hmac-secret-name={{ .Values.csi.hmacSecretName }}
+            {{- end }}
             {{- if .Values.csi.extraArgs }}
             {{- toYaml .Values.csi.extraArgs | nindent 12 }}
             {{- end }}
