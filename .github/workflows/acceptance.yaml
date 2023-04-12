@@ -1,7 +1,5 @@
 name: Acceptance Tests
-
 on: [push, workflow_dispatch]
-
 jobs:
   kind:
     strategy:
@@ -13,14 +11,14 @@ jobs:
       - uses: actions/checkout@ac593985615ec2ede58e132d2e21d2b1cbd6127c # v3.3.0
       - name: Setup test tools
         uses: ./.github/workflows/setup-test-tools
-
       - name: Create K8s Kind Cluster
         uses: helm/kind-action@d8ccf8fb623ce1bb360ae2f45f323d9d5c5e9f00 # v1.5.0
         with:
           config: test/kind/config.yaml
           node_image: kindest/node:v${{ matrix.kind-k8s-version }}
           version: v0.17.0
-
       - run: bats --tap --timing ./test/acceptance
         env:
           VAULT_LICENSE_CI: ${{ secrets.VAULT_LICENSE_CI }}
+permissions:
+  contents: read
