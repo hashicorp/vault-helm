@@ -1025,6 +1025,10 @@ csi:
   #     cpu: 50m
   #     memory: 128Mi
 
+  # Override the default secret name for the CSI Provider's HMAC key used for
+  # generating secret versions.
+  hmacSecretName: ""
+
   # Settings for the daemonSet used to run the provider.
   daemonSet:
     updateStrategy:
