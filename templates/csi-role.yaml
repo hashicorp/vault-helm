@@ -18,10 +18,10 @@ rules:
   resources: ["secrets"]
   verbs: ["get"]
   resourceNames:
-    {{- if (eq .Values.csi.hmacSecretName "") }}
-    - {{ include "vault.name" . }}-csi-provider-hmac-key
-    {{- else }}
+    {{- if .Values.csi.hmacSecretName }}
     - {{ .Values.csi.hmacSecretName }}
+    {{- else }}
+    - {{ include "vault.name" . }}-csi-provider-hmac-key
     {{- end }}
 # 'create' permissions cannot be restricted by resource name:
 # https://kubernetes.io/docs/reference/access-authn-authz/rbac/#referring-to-resources

@@ -5,7 +5,7 @@ load _helpers
 @test "csi/RoleBinding: disabled by default" {
   cd `chart_dir`
   local actual=$( (helm template \
-      --show-only templates/csi-role.yaml  \
+      --show-only templates/csi-rolebinding.yaml  \
       . || echo "---") | tee /dev/stderr |
       yq 'length > 0' | tee /dev/stderr)
   [ "${actual}" = "false" ]
