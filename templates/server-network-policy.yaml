@@ -19,6 +19,10 @@ spec:
   ingress:
     - from:
         - namespaceSelector: {}
+          {{- if .Values.server.networkPolicy.podSelector }}
+          podSelector:
+            {{- toYaml .Values.server.networkPolicy.podSelector | nindent 14 }}
+          {{- end }}
       ports:
       - port: 8200
         protocol: TCP
