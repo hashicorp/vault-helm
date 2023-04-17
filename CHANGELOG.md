@@ -1,10 +1,17 @@
 ## Unreleased
 
+## 0.24.1 (April 17, 2023)
+
+Bugs:
+* csi: Add RBAC required by v1.3.0 to create secret for HMAC key used to generate secret versions [GH-872](https://github.com/hashicorp/vault-helm/pull/872)
+
 ## 0.24.0 (April 6, 2023)
 
 Changes:
 * Earliest Kubernetes version tested is now 1.22
-* `vault` updated to 1.13.1
+* `vault` updated to 1.13.1 [GH-863](https://github.com/hashicorp/vault-helm/pull/863)
+* `vault-k8s` updated to 1.2.1 [GH-868](https://github.com/hashicorp/vault-helm/pull/868)
+* `vault-csi-provider` updated to 1.3.0 [GH-749](https://github.com/hashicorp/vault-helm/pull/749)
 
 Features:
 * server: New `extraPorts` option for adding ports to the Vault server statefulset [GH-841](https://github.com/hashicorp/vault-helm/pull/841)
