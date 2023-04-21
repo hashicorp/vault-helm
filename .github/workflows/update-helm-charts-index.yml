@@ -11,7 +11,7 @@ jobs:
   update-helm-charts-index:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@ac593985615ec2ede58e132d2e21d2b1cbd6127c # v3.3.0
+      - uses: actions/checkout@8e5e7e5ab8b370d6c329ec480221332ada57f0ab # v3.5.2
       - name: verify Chart version matches tag version
         run: |-
           export TAG=${{ github.ref_name }}
