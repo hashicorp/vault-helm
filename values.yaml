@@ -521,7 +521,7 @@ server:
   livenessProbe:
     enabled: false
     path: "/v1/sys/health?standbyok=true"
-    # Port nuumber on which livenessProbe will be checked.
+    # Port number on which livenessProbe will be checked.
     port: 8200
     # When a probe fails, Kubernetes will try failureThreshold times before giving up
     failureThreshold: 2
