@@ -35,6 +35,9 @@ Features:
 Bugs:
 * server: Quote `.server.ha.clusterAddr` value [GH-810](https://github.com/hashicorp/vault-helm/pull/810)
 
+Improvements:
+* injector: Add `ephemeralLimit` and `ephemeralRequest` as options for configuring Agent's ephemeral storage resources [GH-798](https://github.com/hashicorp/vault-helm/pull/798)
+
 ## 0.22.1 (October 26th, 2022)
 
 Changes:
