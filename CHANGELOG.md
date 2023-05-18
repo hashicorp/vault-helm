@@ -1,5 +1,8 @@
 ## Unreleased
 
+Bugs:
+* server: Set the default for `prometheusRules.rules` to an empty list [GH-886](https://github.com/hashicorp/vault-helm/pull/886)
+
 ## 0.24.1 (April 17, 2023)
 
 Bugs:
