@@ -13,6 +13,17 @@ load _helpers
   [ "${actual}" = "true" ]
 }
 
+@test "server/ha-active-Service: with active annotations" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      --show-only templates/server-ha-active-service.yaml \
+      --set 'server.ha.enabled=true' \
+      --set 'server.service.active.annotations=vaultIsAwesome: true' \
+      . | tee /dev/stderr |
+      yq -r '.metadata.annotations["vaultIsAwesome"]' | tee /dev/stderr)
+  [ "${actual}" = "true" ]
+}
+
 @test "server/ha-active-Service: disable with ha.enabled false" {
   cd `chart_dir`
   local actual=$( (helm template \

@@ -22,6 +22,7 @@ metadata:
     app.kubernetes.io/managed-by: {{ .Release.Service }}
     vault-active: "true"
   annotations:
+{{ template "vault.service.active.annotations" .}}
 {{ template "vault.service.annotations" .}}
 spec:
   {{- if .Values.server.service.type}}

@@ -922,6 +922,12 @@
                             "properties": {
                                 "enabled": {
                                     "type": "boolean"
+                                },
+                                "annotations": {
+                                    "type": [
+                                        "object",
+                                        "string"
+                                    ]
                                 }
                             }
                         },
@@ -956,6 +962,12 @@
                             "properties": {
                                 "enabled": {
                                     "type": "boolean"
+                                },
+                                "annotations": {
+                                    "type": [
+                                        "object",
+                                        "string"
+                                    ]
                                 }
                             }
                         },
