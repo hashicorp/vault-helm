@@ -723,6 +723,12 @@
                         }
                     }
                 },
+		"hostAliases": {
+                    "type": [
+			"null",
+	                "array"
+		    ]
+	        },
                 "image": {
                     "type": "object",
                     "properties": {
