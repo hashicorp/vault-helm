@@ -1,5 +1,8 @@
 ## Unreleased
 
+Changes:
+* Latest Kubernetes version tested is now 1.27
+
 Bugs:
 * server: Set the default for `prometheusRules.rules` to an empty list [GH-886](https://github.com/hashicorp/vault-helm/pull/886)
 
