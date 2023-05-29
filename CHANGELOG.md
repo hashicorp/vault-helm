@@ -3,6 +3,9 @@
 Changes:
 * Latest Kubernetes version tested is now 1.27
 
+Features:
+* CSI: Make `nodeSelector` and `affinity` configurable for CSI daemonset's pods [GH-862](https://github.com/hashicorp/vault-helm/pull/862)
+
 Bugs:
 * server: Set the default for `prometheusRules.rules` to an empty list [GH-886](https://github.com/hashicorp/vault-helm/pull/886)
 
@@ -23,7 +26,6 @@ Features:
 * server: New `extraPorts` option for adding ports to the Vault server statefulset [GH-841](https://github.com/hashicorp/vault-helm/pull/841)
 * server: Add configurable Port Number in readinessProbe and livenessProbe for the server-statefulset [GH-831](https://github.com/hashicorp/vault-helm/pull/831)
 * injector: Make livenessProbe and readinessProbe configurable and add configurable startupProbe [GH-852](https://github.com/hashicorp/vault-helm/pull/852)
-* CSI: Make `nodeSelector` and `affinity` configurable for CSI daemonset's pods [GH-862](https://github.com/hashicorp/vault-helm/pull/862)
 * csi: Add an Agent sidecar to Vault CSI Provider pods to provide lease caching and renewals [GH-749](https://github.com/hashicorp/vault-helm/pull/749)
 
 ## 0.23.0 (November 28th, 2022)
