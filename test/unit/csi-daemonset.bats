@@ -168,6 +168,25 @@ load _helpers
   [ "${actual}" = "--debug=true" ]
 }
 
+# HMAC secret arg
+@test "csi/daemonset: HMAC secret arg is configurable" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      --show-only templates/csi-daemonset.yaml \
+      --set "csi.enabled=true" \
+      . | tee /dev/stderr |
+      yq -r '.spec.template.spec.containers[0].args[2]' | tee /dev/stderr)
+  [ "${actual}" = "--hmac-secret-name=vault-csi-provider-hmac-key" ]
+
+  local actual=$(helm template \
+      --show-only templates/csi-daemonset.yaml \
+      --set "csi.enabled=true" \
+      --set "csi.hmacSecretName=foo" \
+      . | tee /dev/stderr |
+      yq -r '.spec.template.spec.containers[0].args[2]' | tee /dev/stderr)
+  [ "${actual}" = "--hmac-secret-name=foo" ]
+}
+
 # Extra args
 @test "csi/daemonset: extra args can be passed" {
   cd `chart_dir`
@@ -176,7 +195,7 @@ load _helpers
       --set "csi.enabled=true" \
       . | tee /dev/stderr |
       yq -r '.spec.template.spec.containers[0].args | length' | tee /dev/stderr)
-  [ "${actual}" = "2" ]
+  [ "${actual}" = "3" ]
 
   local object=$(helm template \
       --show-only templates/csi-daemonset.yaml \
@@ -186,15 +205,15 @@ load _helpers
       yq -r '.spec.template.spec.containers[0]')
   local actual=$(echo $object |
       yq -r '.args | length' | tee /dev/stderr)
-  [ "${actual}" = "5" ]
-  local actual=$(echo $object |
-      yq -r '.args[2]' | tee /dev/stderr)
-  [ "${actual}" = "--foo=bar" ]
+  [ "${actual}" = "6" ]
   local actual=$(echo $object |
       yq -r '.args[3]' | tee /dev/stderr)
-  [ "${actual}" = "--bar baz" ]
+  [ "${actual}" = "--foo=bar" ]
   local actual=$(echo $object |
       yq -r '.args[4]' | tee /dev/stderr)
+  [ "${actual}" = "--bar baz" ]
+  local actual=$(echo $object |
+      yq -r '.args[5]' | tee /dev/stderr)
   [ "${actual}" = "first" ]
 }
 

@@ -83,6 +83,8 @@ injector:
     cpuRequest: "250m"
     memLimit: "128Mi"
     memRequest: "64Mi"
+    # ephemeralLimit: "128Mi"
+    # ephemeralRequest: "64Mi"
 
     # Default template type for secrets when no custom template is specified.
     # Possible values include: "json" and "map".
@@ -521,7 +523,7 @@ server:
   livenessProbe:
     enabled: false
     path: "/v1/sys/health?standbyok=true"
-    # Port nuumber on which livenessProbe will be checked.
+    # Port number on which livenessProbe will be checked.
     port: 8200
     # When a probe fails, Kubernetes will try failureThreshold times before giving up
     failureThreshold: 2
@@ -1025,6 +1027,10 @@ csi:
   #     cpu: 50m
   #     memory: 128Mi
 
+  # Override the default secret name for the CSI Provider's HMAC key used for
+  # generating secret versions.
+  hmacSecretName: ""
+
   # Settings for the daemonSet used to run the provider.
   daemonSet:
     updateStrategy:
@@ -1207,7 +1213,7 @@ serverTelemetry:
       selectors: {}
 
       # Some example rules.
-      rules: {}
+      rules: []
       #  - alert: vault-HighResponseTime
       #    annotations:
       #      message: The response time of Vault is over 500ms on average over the last 5 minutes.
