@@ -2,7 +2,7 @@
 
 load _helpers
 
-@test "server/headless-Service: publishNotReadyAddresses can be changed" {
+@test "server/headless-Service: publishNotReadyAddresses cannot be changed" {
   cd `chart_dir`
   local actual=$(helm template \
       --show-only templates/server-headless-service.yaml \
@@ -15,7 +15,7 @@ load _helpers
       --set 'server.service.publishNotReadyAddresses=false' \
       . | tee /dev/stderr |
       yq -r '.spec.publishNotReadyAddresses' | tee /dev/stderr)
-  [ "${actual}" = "false" ]
+  [ "${actual}" = "true" ]
 }
 
 @test "server/headless-Service: instance selector cannot be disabled" {
