@@ -11,6 +11,4 @@ permissions:
   contents: read
 jobs:
   actionlint:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: hashicorp/vault-workflows-common/.github/workflows/actionlint.yaml@main
+    uses: hashicorp/vault-workflows-common/.github/workflows/actionlint.yaml@main
