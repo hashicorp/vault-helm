@@ -673,7 +673,9 @@ server:
     # or NodePort.
     #type: ClusterIP
 
-    # Do not wait for pods to be ready
+    # Do not wait for pods to be ready before including them in the services'
+    # targets. Does not apply to the headless service, which is used for
+    # cluster-internal communication.
     publishNotReadyAddresses: true
 
     # The externalTrafficPolicy can be set to either Cluster or Local
