@@ -10,7 +10,7 @@ jobs:
     steps:
       - uses: actions/checkout@8e5e7e5ab8b370d6c329ec480221332ada57f0ab # v3.5.2
       - name: Setup test tools
-        uses: ./.github/workflows/setup-test-tools
+        uses: ./.github/actions/setup-test-tools
       - name: Create K8s Kind Cluster
         uses: helm/kind-action@fa81e57adff234b2908110485695db0f181f3c67 # v1.7.0
         with:
