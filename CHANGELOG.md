@@ -4,6 +4,9 @@ Changes:
 * Latest Kubernetes version tested is now 1.27
 * server: Headless service ignores `server.service.publishNotReadyAddresses` setting and always sets it as `true` [GH-902](https://github.com/hashicorp/vault-helm/pull/902)
 
+Features:
+* CSI: Make `nodeSelector` and `affinity` configurable for CSI daemonset's pods [GH-862](https://github.com/hashicorp/vault-helm/pull/862)
+
 Bugs:
 * server: Set the default for `prometheusRules.rules` to an empty list [GH-886](https://github.com/hashicorp/vault-helm/pull/886)
 
