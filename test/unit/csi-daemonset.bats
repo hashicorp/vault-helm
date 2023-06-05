@@ -373,9 +373,9 @@ load _helpers
   local actual=$(helm template \
       --show-only templates/csi-daemonset.yaml  \
       --set 'csi.enabled=true' \
-      --set "csi.pod.nodeSelector[0].foo=bar,csi.pod.nodeSelector[1].baz=qux" \
+      --set "csi.pod.nodeSelector.foo=bar,csi.pod.nodeSelector.baz=qux" \
       . | tee /dev/stderr |
-      yq '.spec.template.spec.nodeSelector[0].foo == "bar" and .spec.template.spec.nodeSelector[1].baz == "qux"' | tee /dev/stderr)
+      yq '.spec.template.spec.nodeSelector.foo == "bar" and .spec.template.spec.nodeSelector.baz == "qux"' | tee /dev/stderr)
   [ "${actual}" = "true" ]
 }
 
