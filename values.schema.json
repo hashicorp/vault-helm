@@ -139,7 +139,7 @@
                         "affinity": {
                             "type": [
                               "null",
-                              "array",
+                              "object",
                               "string"
                             ]
                         },
@@ -155,7 +155,7 @@
                         "nodeSelector": {
                             "type": [
                               "null",
-                              "array",
+                              "object",
                               "string"
                             ]
                         },

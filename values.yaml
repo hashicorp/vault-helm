@@ -1070,7 +1070,7 @@ csi:
     # Example:
     # nodeSelector:
     #   beta.kubernetes.io/arch: amd64
-    nodeSelector: []
+    nodeSelector: {}
 
     # Affinity Settings
     # This should be either a multi-line string or YAML matching the PodSpec's affinity field.
