@@ -9,7 +9,7 @@ apiVersion: apps/v1
 kind: DaemonSet
 metadata:
   name: {{ template "vault.fullname" . }}-csi-provider
-  namespace: {{ .Release.Namespace }}
+  namespace: {{ include "vault.namespace" . }}
   labels:
     app.kubernetes.io/name: {{ include "vault.name" . }}-csi-provider
     app.kubernetes.io/instance: {{ .Release.Name }}

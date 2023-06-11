@@ -10,7 +10,7 @@ apiVersion: v1
 kind: Pod
 metadata:
   name: "{{ .Release.Name }}-server-test"
-  namespace: {{ .Release.Namespace }}
+  namespace: {{ include "vault.namespace" . }}
   annotations:
     "helm.sh/hook": test
 spec:
