@@ -109,6 +109,14 @@ spec:
               value: "{{ .Values.injector.agentDefaults.memRequest }}"
             - name: AGENT_INJECT_MEM_LIMIT
               value: "{{ .Values.injector.agentDefaults.memLimit }}"
+            {{- if .Values.injector.agentDefaults.ephemeralRequest }}
+            - name: AGENT_INJECT_EPHEMERAL_REQUEST
+              value: "{{ .Values.injector.agentDefaults.ephemeralRequest }}"
+            {{- end }}
+            {{- if .Values.injector.agentDefaults.ephemeralLimit }}
+            - name: AGENT_INJECT_EPHEMERAL_LIMIT
+              value: "{{ .Values.injector.agentDefaults.ephemeralLimit }}"
+            {{- end }}
             - name: AGENT_INJECT_DEFAULT_TEMPLATE
               value: "{{ .Values.injector.agentDefaults.template }}"
             - name: AGENT_INJECT_TEMPLATE_CONFIG_EXIT_ON_RETRY_FAILURE

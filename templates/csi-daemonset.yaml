@@ -45,6 +45,8 @@ spec:
       {{- end }}
       serviceAccountName: {{ template "vault.fullname" . }}-csi-provider
       {{- template "csi.pod.tolerations" . }}
+      {{- template "csi.pod.nodeselector" . }}
+      {{- template "csi.pod.affinity" . }}
       containers:
         - name: {{ include "vault.name" . }}-csi-provider
           {{ template "csi.resources" . }}

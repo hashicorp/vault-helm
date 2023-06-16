@@ -850,6 +850,34 @@ Sets the injector toleration for pod placement
 {{- end -}}
 
 {{/*
+Sets the CSI provider nodeSelector for pod placement
+*/}}
+{{- define "csi.pod.nodeselector" -}}
+  {{- if .Values.csi.pod.nodeSelector }}
+      nodeSelector:
+      {{- $tp := typeOf .Values.csi.pod.nodeSelector }}
+      {{- if eq $tp "string" }}
+        {{ tpl .Values.csi.pod.nodeSelector . | nindent 8 | trim }}
+      {{- else }}
+        {{- toYaml .Values.csi.pod.nodeSelector | nindent 8 }}
+      {{- end }}
+  {{- end }}
+{{- end -}}
+{{/*
+Sets the CSI provider affinity for pod placement.
+*/}}
+{{- define "csi.pod.affinity" -}}
+  {{- if .Values.csi.pod.affinity }}
+      affinity:
+        {{ $tp := typeOf .Values.csi.pod.affinity }}
+        {{- if eq $tp "string" }}
+          {{- tpl .Values.csi.pod.affinity . | nindent 8 | trim }}
+        {{- else }}
+          {{- toYaml .Values.csi.pod.affinity | nindent 8 }}
+        {{- end }}
+  {{ end }}
+{{- end -}}
+{{/*
 Sets extra CSI provider pod annotations
 */}}
 {{- define "csi.pod.annotations" -}}
