@@ -16,7 +16,7 @@ jobs:
         run: |-
           export TAG=${{ github.ref_name }}
           git_tag="${TAG#v}"
-          chart_tag=$(yq r Chart.yaml version)
+          chart_tag=$(yq -r '.version' Chart.yaml)
           if [ "${git_tag}" != "${chart_tag}" ]; then
             echo "chart version (${chart_tag}) did not match git version (${git_tag})"
             exit 1
