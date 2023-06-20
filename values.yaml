@@ -3,6 +3,10 @@
 
 # Available parameters and their default values for the Vault chart.
 
+# Allows to specify namespace other than Release.Namespace
+# If empty, default namespace would be Release.Namespace
+namespaceOverride: ""
+
 global:
   # enabled is the master enabled switch. Setting this to true or false
   # will enable or disable all the components within this chart by default.

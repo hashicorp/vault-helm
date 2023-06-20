@@ -32,6 +32,26 @@ load _helpers
   [ "${actual}" = "release-name-vault-csi-provider" ]
 }
 
+# serviceAccountNamespace namespace
+@test "csi/daemonset: serviceAccountNamespace namespace" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      --show-only templates/csi-serviceaccount.yaml \
+      --set "csi.enabled=true" \
+      --namespace foo \
+      . | tee /dev/stderr |
+      yq -r '.metadata.namespace' | tee /dev/stderr)
+  [ "${actual}" = "foo" ]
+  local actual=$(helm template \
+      --show-only templates/csi-serviceaccount.yaml \
+      --set "csi.enabled=true" \
+      --set 'namespaceOverride=bar' \
+      --namespace foo \
+      . | tee /dev/stderr |
+      yq -r '.metadata.namespace' | tee /dev/stderr)
+  [ "${actual}" = "bar" ]
+}
+
 @test "csi/serviceAccount: specify annotations" {
   cd `chart_dir`
   local actual=$(helm template \

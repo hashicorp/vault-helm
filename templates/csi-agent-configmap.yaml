@@ -21,7 +21,7 @@ data:
         {{- if .Values.global.externalVaultAddr }}
         "address" = "{{ .Values.global.externalVaultAddr }}"
         {{- else }}
-        "address" = "{{ include "vault.scheme" . }}://{{ template "vault.fullname" . }}.{{ .Release.Namespace }}.svc:{{ .Values.server.service.port }}"
+        "address" = "{{ include "vault.scheme" . }}://{{ template "vault.fullname" . }}.{{ include "vault.namespace" . }}.svc:{{ .Values.server.service.port }}"
         {{- end }}
     }
 

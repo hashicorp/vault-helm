@@ -53,6 +53,25 @@ load _helpers
   [ "${actual}" = "false" ]
 }
 
+@test "server/DisruptionBudget: namespace" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      --show-only templates/server-disruptionbudget.yaml  \
+      --set 'server.ha.enabled=true' \
+      --namespace foo \
+      . | tee /dev/stderr |
+      yq -r '.metadata.namespace' | tee /dev/stderr)
+  [ "${actual}" = "foo" ]
+  local actual=$(helm template \
+      --show-only templates/server-disruptionbudget.yaml  \
+      --set 'server.ha.enabled=true' \
+      --set 'namespaceOverride=bar' \
+      --namespace foo \
+      . | tee /dev/stderr |
+      yq -r '.metadata.namespace' | tee /dev/stderr)
+  [ "${actual}" = "bar" ]
+}
+
 @test "server/DisruptionBudget: correct maxUnavailable with n=1" {
   cd `chart_dir`
   local actual=$(helm template \

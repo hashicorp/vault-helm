@@ -27,6 +27,25 @@ load _helpers
   [ "${actual}" = "vault-csi-provider-hmac-key" ]
 }
 
+@test "csi/Role: namespace" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      --show-only templates/csi-role.yaml \
+      --set "csi.enabled=true" \
+      --namespace foo \
+      . | tee /dev/stderr |
+      yq -r '.metadata.namespace' | tee /dev/stderr)
+  [ "${actual}" = "foo" ]
+  local actual=$(helm template \
+      --show-only templates/csi-role.yaml \
+      --set "csi.enabled=true" \
+      --set 'namespaceOverride=bar' \
+      --namespace foo \
+      . | tee /dev/stderr |
+      yq -r '.metadata.namespace' | tee /dev/stderr)
+  [ "${actual}" = "bar" ]
+}
+
 @test "csi/Role: HMAC secret name configurable" {
   cd `chart_dir`
   local actual=$(helm template \

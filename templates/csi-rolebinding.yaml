@@ -9,6 +9,7 @@ apiVersion: rbac.authorization.k8s.io/v1
 kind: RoleBinding
 metadata:
   name: {{ template "vault.fullname" . }}-csi-provider-rolebinding
+  namespace: {{ include "vault.namespace" . }}
   labels:
     app.kubernetes.io/name: {{ include "vault.name" . }}-csi-provider
     app.kubernetes.io/instance: {{ .Release.Name }}

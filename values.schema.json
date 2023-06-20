@@ -2,6 +2,9 @@
     "$schema": "http://json-schema.org/schema#",
     "type": "object",
     "properties": {
+        "namespaceOverride": {
+            "type": "string"
+        },
         "csi": {
             "type": "object",
             "properties": {

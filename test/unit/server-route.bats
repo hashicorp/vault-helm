@@ -24,6 +24,27 @@ load _helpers
   [ "${actual}" = "false" ]
 }
 
+@test "server/route: namespace" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      --show-only templates/server-route.yaml  \
+      --set 'global.openshift=true' \
+      --set 'server.route.enabled=true' \
+      --namespace foo \
+      . | tee /dev/stderr |
+      yq -r '.metadata.namespace' | tee /dev/stderr)
+  [ "${actual}" = "foo" ]
+  local actual=$(helm template \
+      --show-only templates/server-route.yaml  \
+      --set 'global.openshift=true' \
+      --set 'server.route.enabled=true' \
+      --set 'namespaceOverride=bar' \
+      --namespace foo \
+      . | tee /dev/stderr |
+      yq -r '.metadata.namespace' | tee /dev/stderr)
+  [ "${actual}" = "bar" ]
+}
+
 @test "server/route: OpenShift - checking host entry gets added and path is /" {
   cd `chart_dir`
   local actual=$(helm template \

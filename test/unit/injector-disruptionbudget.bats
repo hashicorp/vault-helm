@@ -11,6 +11,25 @@ load _helpers
   [ "${actual}" = "false" ]
 }
 
+@test "injector/DisruptionBudget: namespace" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      --show-only templates/injector-disruptionbudget.yaml \
+      --set 'injector.podDisruptionBudget.minAvailable=2' \
+      --namespace foo \
+      . | tee /dev/stderr |
+      yq -r '.metadata.namespace' | tee /dev/stderr)
+  [ "${actual}" = "foo" ]
+  local actual=$(helm template \
+      --show-only templates/injector-disruptionbudget.yaml \
+      --set 'injector.podDisruptionBudget.minAvailable=2' \
+      --set 'namespaceOverride=bar' \
+      --namespace foo \
+      . | tee /dev/stderr |
+      yq -r '.metadata.namespace' | tee /dev/stderr)
+  [ "${actual}" = "bar" ]
+}
+
 @test "injector/DisruptionBudget: configure with injector.podDisruptionBudget minAvailable" {
   cd `chart_dir`
   local actual=$(helm template \

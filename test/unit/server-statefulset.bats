@@ -78,6 +78,25 @@ load _helpers
   [ "${actual}" = "false" ]
 }
 
+@test "server/standalone-StatefulSet: namespace" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      --show-only templates/server-statefulset.yaml  \
+      --set 'server.standalone.enabled=true' \
+      --namespace foo \
+      . | tee /dev/stderr |
+      yq -r '.metadata.namespace' | tee /dev/stderr)
+  [ "${actual}" = "foo" ]
+  local actual=$(helm template \
+      --show-only templates/server-statefulset.yaml  \
+      --set 'server.standalone.enabled=true' \
+      --set 'namespaceOverride=bar' \
+      --namespace foo \
+      . | tee /dev/stderr |
+      yq -r '.metadata.namespace' | tee /dev/stderr)
+  [ "${actual}" = "bar" ]
+}
+
 @test "server/standalone-StatefulSet: image defaults to server.image.repository:tag" {
   cd `chart_dir`
   local actual=$(helm template \

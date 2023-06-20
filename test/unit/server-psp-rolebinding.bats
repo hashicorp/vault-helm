@@ -109,3 +109,22 @@ load _helpers
       yq 'length > 0' | tee /dev/stderr)
   [ "${actual}" = "false" ]
 }
+
+@test "server/PSP-RoleBinding: namespace" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      --show-only templates/server-psp-rolebinding.yaml \
+      --set 'global.psp.enable=true' \
+      --namespace foo \
+      . | tee /dev/stderr |
+      yq -r '.metadata.namespace' | tee /dev/stderr)
+  [ "${actual}" = "foo" ]
+  local actual=$(helm template \
+      --show-only templates/server-psp-rolebinding.yaml \
+      --set 'global.psp.enable=true' \
+      --set 'namespaceOverride=bar' \
+      --namespace foo \
+      . | tee /dev/stderr |
+      yq -r '.metadata.namespace' | tee /dev/stderr)
+  [ "${actual}" = "bar" ]
+}

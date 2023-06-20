@@ -18,6 +18,23 @@ load _helpers
   [ "${actual}" = "true" ]
 }
 
+@test "injector/Service: namespace" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      --show-only templates/injector-service.yaml \
+      --namespace foo \
+      . | tee /dev/stderr |
+      yq -r '.metadata.namespace' | tee /dev/stderr)
+  [ "${actual}" = "foo" ]
+  local actual=$(helm template \
+      --show-only templates/injector-service.yaml \
+      --set 'namespaceOverride=bar' \
+      --namespace foo \
+      . | tee /dev/stderr |
+      yq -r '.metadata.namespace' | tee /dev/stderr)
+  [ "${actual}" = "bar" ]
+}
+
 @test "injector/Service: service with default port" {
   cd `chart_dir`
   local actual=$(helm template \

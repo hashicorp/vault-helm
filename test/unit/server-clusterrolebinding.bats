@@ -71,3 +71,20 @@ load _helpers
       yq 'length > 0' | tee /dev/stderr)
   [ "${actual}" = "true" ]
 }
+
+@test "server/ClusterRoleBinding: service account namespace" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      --show-only templates/server-clusterrolebinding.yaml \
+      --namespace foo \
+      . | tee /dev/stderr |
+      yq -r '.subjects[0].namespace' | tee /dev/stderr)
+  [ "${actual}" = "foo" ]
+  local actual=$(helm template \
+      --show-only templates/server-clusterrolebinding.yaml \
+      --set 'namespaceOverride=bar' \
+      --namespace foo \
+      . | tee /dev/stderr |
+      yq -r '.subjects[0].namespace' | tee /dev/stderr)
+  [ "${actual}" = "bar" ]
+}

@@ -21,6 +21,23 @@ load _helpers
   [ "${actual}" = "false" ]
 }
 
+@test "injector/ServiceAccount: namespace" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      --show-only templates/injector-serviceaccount.yaml \
+      --namespace foo \
+      . | tee /dev/stderr |
+      yq -r '.metadata.namespace' | tee /dev/stderr)
+  [ "${actual}" = "foo" ]
+  local actual=$(helm template \
+      --show-only templates/injector-serviceaccount.yaml \
+      --set 'namespaceOverride=bar' \
+      --namespace foo \
+      . | tee /dev/stderr |
+      yq -r '.metadata.namespace' | tee /dev/stderr)
+  [ "${actual}" = "bar" ]
+}
+
 @test "injector/ServiceAccount: generic annotations" {
   cd `chart_dir`
   local actual=$(helm template \

@@ -71,7 +71,7 @@ spec:
             {{- else if .Values.global.externalVaultAddr }}
               value: "{{ .Values.global.externalVaultAddr }}"
             {{- else }}
-              value: {{ include "vault.scheme" . }}://{{ template "vault.fullname" . }}.{{ .Release.Namespace }}.svc:{{ .Values.server.service.port }}
+              value: {{ include "vault.scheme" . }}://{{ template "vault.fullname" . }}.{{ include "vault.namespace" . }}.svc:{{ .Values.server.service.port }}
             {{- end }}
           volumeMounts:
             - name: providervol
