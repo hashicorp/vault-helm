@@ -1,6 +1,6 @@
 ## Unreleased
 
-## 0.25.0 (June 22, 2023)
+## 0.25.0 (June 26, 2023)
 
 Changes:
 * Latest Kubernetes version tested is now 1.27
