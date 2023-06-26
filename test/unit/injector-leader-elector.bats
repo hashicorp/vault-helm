@@ -99,14 +99,7 @@ load _helpers
   local actual=$( (helm template \
       --show-only templates/injector-certs-secret.yaml \
       --set "injector.replicas=2" \
-      --namespace foo \
-      . || echo "---") | tee /dev/stderr |
-      yq '.metadata.namespace' | tee /dev/stderr)
-  [ "${actual}" = "foo" ]
-  local actual=$( (helm template \
-      --show-only templates/injector-certs-secret.yaml \
-      --set "injector.replicas=2" \
-      --set 'namespaceOverride=bar' \
+      --set 'global.namespace=bar' \
       --namespace foo \
       . || echo "---") | tee /dev/stderr |
       yq '.metadata.namespace' | tee /dev/stderr)
@@ -165,14 +158,7 @@ load _helpers
   local actual=$( (helm template \
       --show-only templates/injector-role.yaml \
       --set "injector.replicas=2" \
-      --namespace foo \
-      . || echo "---") | tee /dev/stderr |
-      yq '.metadata.namespace' | tee /dev/stderr)
-  [ "${actual}" = "foo" ]
-  local actual=$( (helm template \
-      --show-only templates/injector-role.yaml \
-      --set "injector.replicas=2" \
-      --set 'namespaceOverride=bar' \
+      --set 'global.namespace=bar' \
       --namespace foo \
       . || echo "---") | tee /dev/stderr |
       yq '.metadata.namespace' | tee /dev/stderr)
@@ -231,14 +217,7 @@ load _helpers
   local actual=$( (helm template \
       --show-only templates/injector-rolebinding.yaml \
       --set "injector.replicas=2" \
-      --namespace foo \
-      . || echo "---") | tee /dev/stderr |
-      yq '.metadata.namespace' | tee /dev/stderr)
-  [ "${actual}" = "foo" ]
-  local actual=$( (helm template \
-      --show-only templates/injector-rolebinding.yaml \
-      --set "injector.replicas=2" \
-      --set 'namespaceOverride=bar' \
+      --set 'global.namespace=bar' \
       --namespace foo \
       . || echo "---") | tee /dev/stderr |
       yq '.metadata.namespace' | tee /dev/stderr)

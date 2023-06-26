@@ -48,7 +48,7 @@ Bugs:
 
 Improvements:
 * injector: Add `ephemeralLimit` and `ephemeralRequest` as options for configuring Agent's ephemeral storage resources [GH-798](https://github.com/hashicorp/vault-helm/pull/798)
-* Add `namespaceOverride` to specify namespace from values or command line. [GH-909](https://github.com/hashicorp/vault-helm/pull/909)
+* global: Add `global.namespace` to override the helm installation namespace. [GH-909](https://github.com/hashicorp/vault-helm/pull/909)
 
 ## 0.22.1 (October 26th, 2022)
 

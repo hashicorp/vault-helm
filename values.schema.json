@@ -2,9 +2,6 @@
     "$schema": "http://json-schema.org/schema#",
     "type": "object",
     "properties": {
-        "namespaceOverride": {
-            "type": "string"
-        },
         "csi": {
             "type": "object",
             "properties": {
@@ -231,6 +228,9 @@
                 "enabled": {
                     "type": "boolean"
                 },
+                "namespace": {
+                    "type": "string"
+                },        
                 "externalVaultAddr": {
                     "type": "string"
                 },

@@ -54,7 +54,7 @@ load _helpers
   local actual=$(helm template \
       --show-only templates/injector-deployment.yaml  \
       --set 'injector.enabled=true' \
-      --set 'namespaceOverride=bar' \
+      --set 'global.namespace=bar' \
       --namespace foo \
       . | tee /dev/stderr |
       yq -r '.metadata.namespace' | tee /dev/stderr)

@@ -38,7 +38,7 @@ load _helpers
       --show-only templates/server-route.yaml  \
       --set 'global.openshift=true' \
       --set 'server.route.enabled=true' \
-      --set 'namespaceOverride=bar' \
+      --set 'global.namespace=bar' \
       --namespace foo \
       . | tee /dev/stderr |
       yq -r '.metadata.namespace' | tee /dev/stderr)

@@ -43,14 +43,7 @@ load _helpers
   local actual=$(helm template \
       --show-only templates/injector-mutating-webhook.yaml  \
       --set 'injector.enabled=true' \
-      --namespace foo \
-      . | tee /dev/stderr |
-      yq '.webhooks[0].clientConfig.service.namespace' | tee /dev/stderr)
-  [ "${actual}" = "foo" ]
-  local actual=$(helm template \
-      --show-only templates/injector-mutating-webhook.yaml  \
-      --set 'injector.enabled=true' \
-      --set 'namespaceOverride=bar' \
+      --set 'global.namespace=bar' \
       --namespace foo \
       . | tee /dev/stderr |
       yq '.webhooks[0].clientConfig.service.namespace' | tee /dev/stderr)

@@ -48,7 +48,7 @@ load _helpers
       --show-only templates/injector-psp-role.yaml  \
       --set 'injector.enabled=true' \
       --set 'global.psp.enable=true' \
-      --set 'namespaceOverride=bar' \
+      --set 'global.namespace=bar' \
       --namespace foo \
       . | tee /dev/stderr |
       yq -r '.metadata.namespace' | tee /dev/stderr)

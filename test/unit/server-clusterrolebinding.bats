@@ -82,7 +82,7 @@ load _helpers
   [ "${actual}" = "foo" ]
   local actual=$(helm template \
       --show-only templates/server-clusterrolebinding.yaml \
-      --set 'namespaceOverride=bar' \
+      --set 'global.namespace=bar' \
       --namespace foo \
       . | tee /dev/stderr |
       yq -r '.subjects[0].namespace' | tee /dev/stderr)

@@ -23,7 +23,7 @@ load _helpers
   local actual=$(helm template \
       --show-only templates/server-ingress.yaml  \
       --set 'server.ingress.enabled=true' \
-      --set 'namespaceOverride=bar' \
+      --set 'global.namespace=bar' \
       --namespace foo \
       . | tee /dev/stderr |
       yq -r '.metadata.namespace' | tee /dev/stderr)

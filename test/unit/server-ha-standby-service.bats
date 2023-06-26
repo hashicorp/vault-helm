@@ -70,7 +70,7 @@ load _helpers
   local actual=$(helm template \
       --show-only templates/server-ha-standby-service.yaml \
       --set 'server.ha.enabled=true' \
-      --set 'namespaceOverride=bar' \
+      --set 'global.namespace=bar' \
       --namespace foo \
       . | tee /dev/stderr |
       yq -r '.metadata.namespace' | tee /dev/stderr)

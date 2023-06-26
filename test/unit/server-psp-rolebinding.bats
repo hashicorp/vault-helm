@@ -122,7 +122,7 @@ load _helpers
   local actual=$(helm template \
       --show-only templates/server-psp-rolebinding.yaml \
       --set 'global.psp.enable=true' \
-      --set 'namespaceOverride=bar' \
+      --set 'global.namespace=bar' \
       --namespace foo \
       . | tee /dev/stderr |
       yq -r '.metadata.namespace' | tee /dev/stderr)

@@ -31,7 +31,7 @@ load _helpers
   [ "${actual}" = "foo" ]
   local actual=$(helm template \
       --show-only templates/injector-serviceaccount.yaml \
-      --set 'namespaceOverride=bar' \
+      --set 'global.namespace=bar' \
       --namespace foo \
       . | tee /dev/stderr |
       yq -r '.metadata.namespace' | tee /dev/stderr)

@@ -40,7 +40,7 @@ Expand the name of the chart.
 Allow the release namespace to be overridden
 */}}
 {{- define "vault.namespace" -}}
-{{- default .Release.Namespace .Values.namespaceOverride -}}
+{{- default .Release.Namespace .Values.global.namespace -}}
 {{- end -}}
 
 {{/*

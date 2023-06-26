@@ -23,7 +23,7 @@ load _helpers
   local actual=$(helm template \
       --show-only templates/injector-disruptionbudget.yaml \
       --set 'injector.podDisruptionBudget.minAvailable=2' \
-      --set 'namespaceOverride=bar' \
+      --set 'global.namespace=bar' \
       --namespace foo \
       . | tee /dev/stderr |
       yq -r '.metadata.namespace' | tee /dev/stderr)

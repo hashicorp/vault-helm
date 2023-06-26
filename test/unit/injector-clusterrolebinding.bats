@@ -33,7 +33,7 @@ load _helpers
   local actual=$(helm template \
       --show-only templates/injector-clusterrolebinding.yaml \
       --set "injector.enabled=true" \
-      --set 'namespaceOverride=bar' \
+      --set 'global.namespace=bar' \
       --namespace foo \
       . | tee /dev/stderr |
       yq -r '.subjects[0].namespace' | tee /dev/stderr)
