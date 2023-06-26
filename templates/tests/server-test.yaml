@@ -13,15 +13,35 @@ metadata:
   namespace: {{ .Release.Namespace }}
   annotations:
     "helm.sh/hook": test
+    {{- template "vault.testHookPod.annotations" . }}
 spec:
   {{- include "imagePullSecrets" . | nindent 2 }}
+  {{- if not .Values.global.openshift }}
+  securityContext:
+    runAsNonRoot: true
+    runAsGroup: {{ .Values.server.gid | default 1000 }}
+    runAsUser: {{ .Values.server.uid | default 100 }}
+    fsGroup: {{ .Values.server.gid | default 1000 }}
+  {{- end }}
   containers:
     - name: {{ .Release.Name }}-server-test
       image: {{ .Values.server.image.repository }}:{{ .Values.server.image.tag | default "latest" }}
       imagePullPolicy: {{ .Values.server.image.pullPolicy }}
+      {{- if not .Values.global.openshift }}
+      securityContext:
+        allowPrivilegeEscalation: false
+      {{- end }}
       env:
         - name: VAULT_ADDR
           value: {{ include "vault.scheme" . }}://{{ template "vault.fullname" . }}.{{ .Release.Namespace }}.svc:{{ .Values.server.service.port }}
+        {{- if .Values.server.logLevel }}
+        - name: VAULT_LOG_LEVEL
+          value: "{{ .Values.server.logLevel }}"
+        {{- end }}
+        {{- if .Values.server.logFormat }}
+        - name: VAULT_LOG_FORMAT
+          value: "{{ .Values.server.logFormat }}"
+        {{- end }}
         {{- include "vault.extraEnvironmentVars" .Values.server | nindent 8 }}
       command:
         - /bin/sh
@@ -51,6 +71,7 @@ spec:
     {{- if .Values.server.volumes }}
       {{- toYaml .Values.server.volumes | nindent 4}}
     {{- end }}
+  {{- include "imagePullSecrets" . | nindent 2 }}
   restartPolicy: Never
 {{- end }}
 {{- end }}
