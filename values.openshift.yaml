@@ -13,9 +13,9 @@ injector:
 
   agentImage:
     repository: "registry.connect.redhat.com/hashicorp/vault"
-    tag: "1.13.1-ubi"
+    tag: "1.14.0-ubi"
 
 server:
   image:
     repository: "registry.connect.redhat.com/hashicorp/vault"
-    tag: "1.13.1-ubi"
+    tag: "1.14.0-ubi"

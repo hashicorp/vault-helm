@@ -55,16 +55,16 @@ load _helpers
 
   for i in $(seq 10); do
     sleep 2
-    if [ "$(kubectl --namespace=acceptance logs --tail=-1 -l "app.kubernetes.io/name=vault-csi-provider" -c vault-agent | grep "returning cached response: path=/v1/auth/kubernetes/login")" ]; then
+    if [ "$(kubectl --namespace=acceptance logs --tail=-1 -l "app.kubernetes.io/name=vault-csi-provider" -c vault-agent | grep "secret renewed: path=/v1/auth/kubernetes/login")" ]; then
         echo "Agent returned a cached login response"
         return
     fi
 
-    echo "Waiting for a cached response from Agent..."
+    echo "Waiting to confirm the Agent is renewing CSI's auth token..."
   done
 
   # Print the logs and fail the test
-  echo "Failed to find a log for a cached Agent response"
+  echo "Failed to find a log for the Agent renewing CSI's auth token"
   kubectl --namespace=acceptance logs --tail=-1 -l "app.kubernetes.io/name=vault-csi-provider" -c vault-agent
   kubectl --namespace=acceptance logs --tail=-1 -l "app.kubernetes.io/name=vault-csi-provider" -c vault-csi-provider
   exit 1
