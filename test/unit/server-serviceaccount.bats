@@ -30,6 +30,25 @@ load _helpers
 
 }
 
+@test "server/ServiceAccount: namespace" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      --show-only templates/server-serviceaccount.yaml  \
+      --set 'server.serviceAccount.create=true' \
+      --namespace foo \
+      . | tee /dev/stderr |
+      yq -r '.metadata.namespace' | tee /dev/stderr)
+  [ "${actual}" = "foo" ]
+  local actual=$(helm template \
+      --show-only templates/server-serviceaccount.yaml  \
+      --set 'server.serviceAccount.create=true' \
+      --set 'global.namespace=bar' \
+      --namespace foo \
+      . | tee /dev/stderr |
+      yq -r '.metadata.namespace' | tee /dev/stderr)
+  [ "${actual}" = "bar" ]
+}
+
 @test "server/ServiceAccount: specify annotations" {
   cd `chart_dir`
   local actual=$(helm template \

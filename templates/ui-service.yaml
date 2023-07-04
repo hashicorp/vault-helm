@@ -12,7 +12,7 @@ apiVersion: v1
 kind: Service
 metadata:
   name: {{ template "vault.fullname" . }}-ui
-  namespace: {{ .Release.Namespace }}
+  namespace: {{ include "vault.namespace" . }}
   labels:
     helm.sh/chart: {{ include "vault.chart" . }}
     app.kubernetes.io/name: {{ include "vault.name" . }}-ui

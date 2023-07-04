@@ -11,6 +11,25 @@ load _helpers
   [ "${actual}" = "false" ]
 }
 
+@test "server/ingress: namespace" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      --show-only templates/server-ingress.yaml  \
+      --set 'server.ingress.enabled=true' \
+      --namespace foo \
+      . | tee /dev/stderr |
+      yq -r '.metadata.namespace' | tee /dev/stderr)
+  [ "${actual}" = "foo" ]
+  local actual=$(helm template \
+      --show-only templates/server-ingress.yaml  \
+      --set 'server.ingress.enabled=true' \
+      --set 'global.namespace=bar' \
+      --namespace foo \
+      . | tee /dev/stderr |
+      yq -r '.metadata.namespace' | tee /dev/stderr)
+  [ "${actual}" = "bar" ]
+}
+
 @test "server/ingress: disable by injector.externalVaultAddr" {
   cd `chart_dir`
   local actual=$( (helm template \

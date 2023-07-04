@@ -21,6 +21,25 @@ load _helpers
   [ "${actual}" = "release-name-vault-csi-provider-agent-config" ]
 }
 
+@test "csi/Agent-ConfigMap: namespace" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      --show-only templates/csi-agent-configmap.yaml \
+      --set "csi.enabled=true" \
+      --namespace foo \
+      . | tee /dev/stderr |
+      yq -r '.metadata.namespace' | tee /dev/stderr)
+  [ "${actual}" = "foo" ]
+  local actual=$(helm template \
+      --show-only templates/csi-agent-configmap.yaml \
+      --set "csi.enabled=true" \
+      --set 'global.namespace=bar' \
+      --namespace foo \
+      . | tee /dev/stderr |
+      yq -r '.metadata.namespace' | tee /dev/stderr)
+  [ "${actual}" = "bar" ]
+}
+
 @test "csi/Agent-ConfigMap: Vault addr not affected by injector setting" {
   cd `chart_dir`
   local actual=$(helm template \

@@ -228,6 +228,9 @@
                 "enabled": {
                     "type": "boolean"
                 },
+                "namespace": {
+                    "type": "string"
+                },        
                 "externalVaultAddr": {
                     "type": "string"
                 },

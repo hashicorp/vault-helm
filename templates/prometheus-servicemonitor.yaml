@@ -45,5 +45,5 @@ spec:
       insecureSkipVerify: true
   namespaceSelector:
     matchNames:
-      - {{ .Release.Namespace }}
+      - {{ include "vault.namespace" . }}
 {{ end }}
