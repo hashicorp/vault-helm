@@ -1,5 +1,11 @@
 ## Unreleased
 
+Bugs:
+* csi: Add namespace field to `csi-role` and `csi-rolebindings`. [GH-909](https://github.com/hashicorp/vault-helm/pull/909)
+
+Improvements:
+* global: Add `global.namespace` to override the helm installation namespace. [GH-909](https://github.com/hashicorp/vault-helm/pull/909)
+
 ## 0.25.0 (June 26, 2023)
 
 Changes:
@@ -15,10 +21,6 @@ Improvements:
 
 Bugs:
 * server: Set the default for `prometheusRules.rules` to an empty list [GH-886](https://github.com/hashicorp/vault-helm/pull/886)
-* csi: Add namespace field to `csi-role` and `csi-rolebindings`. [GH-909](https://github.com/hashicorp/vault-helm/pull/909)
-
-Improvements:
-* global: Add `global.namespace` to override the helm installation namespace. [GH-909](https://github.com/hashicorp/vault-helm/pull/909)
 
 ## 0.24.1 (April 17, 2023)
 
