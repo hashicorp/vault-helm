@@ -39,7 +39,7 @@ load _helpers
       --namespace foo \
       . | tee /dev/stderr |
       yq '.webhooks[0].clientConfig.service.namespace' | tee /dev/stderr)
-  [ "${actual}" = "foo" ]
+  [ "${actual}" = "\"foo\"" ]
   local actual=$(helm template \
       --show-only templates/injector-mutating-webhook.yaml  \
       --set 'injector.enabled=true' \
@@ -47,7 +47,7 @@ load _helpers
       --namespace foo \
       . | tee /dev/stderr |
       yq '.webhooks[0].clientConfig.service.namespace' | tee /dev/stderr)
-  [ "${actual}" = "bar" ]
+  [ "${actual}" = "\"bar\"" ]
 }
 
 @test "injector/MutatingWebhookConfiguration: caBundle is empty string" {

@@ -95,7 +95,7 @@ load _helpers
       --namespace foo \
       . || echo "---") | tee /dev/stderr |
       yq '.metadata.namespace' | tee /dev/stderr)
-  [ "${actual}" = "foo" ]
+  [ "${actual}" = "\"foo\"" ]
   local actual=$( (helm template \
       --show-only templates/injector-certs-secret.yaml \
       --set "injector.replicas=2" \
@@ -103,7 +103,7 @@ load _helpers
       --namespace foo \
       . || echo "---") | tee /dev/stderr |
       yq '.metadata.namespace' | tee /dev/stderr)
-  [ "${actual}" = "bar" ]
+  [ "${actual}" = "\"bar\"" ]
 }
 
 @test "injector/role: created/skipped as appropriate" {
@@ -154,7 +154,7 @@ load _helpers
       --namespace foo \
       . || echo "---") | tee /dev/stderr |
       yq '.metadata.namespace' | tee /dev/stderr)
-  [ "${actual}" = "foo" ]
+  [ "${actual}" = "\"foo\"" ]
   local actual=$( (helm template \
       --show-only templates/injector-role.yaml \
       --set "injector.replicas=2" \
@@ -162,7 +162,7 @@ load _helpers
       --namespace foo \
       . || echo "---") | tee /dev/stderr |
       yq '.metadata.namespace' | tee /dev/stderr)
-  [ "${actual}" = "bar" ]
+  [ "${actual}" = "\"bar\"" ]
 }
 
 @test "injector/rolebinding: created/skipped as appropriate" {
@@ -213,7 +213,7 @@ load _helpers
       --namespace foo \
       . || echo "---") | tee /dev/stderr |
       yq '.metadata.namespace' | tee /dev/stderr)
-  [ "${actual}" = "foo" ]
+  [ "${actual}" = "\"foo\"" ]
   local actual=$( (helm template \
       --show-only templates/injector-rolebinding.yaml \
       --set "injector.replicas=2" \
@@ -221,5 +221,5 @@ load _helpers
       --namespace foo \
       . || echo "---") | tee /dev/stderr |
       yq '.metadata.namespace' | tee /dev/stderr)
-  [ "${actual}" = "bar" ]
+  [ "${actual}" = "\"bar\"" ]
 }
