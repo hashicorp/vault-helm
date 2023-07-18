@@ -985,6 +985,9 @@
                         "extraLabels": {
                             "type": "object"
                         },
+                        "generateToken": {
+                            "type": "boolean"
+                        },
                         "name": {
                             "type": "string"
                         },
