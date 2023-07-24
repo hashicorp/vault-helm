@@ -105,7 +105,7 @@ The following are the instructions for running bats tests on your workstation.
 * [helm](https://helm.sh)
   ```bash
   brew install kubernetes-helm
-  ```
+  ``` 
 
 #### Test
 
