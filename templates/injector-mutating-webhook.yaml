@@ -28,7 +28,7 @@ webhooks:
     clientConfig:
       service:
         name: {{ template "vault.fullname" . }}-agent-injector-svc
-        namespace: {{ .Release.Namespace }}
+        namespace: {{ include "vault.namespace" . }}
         path: "/mutate"
       caBundle: {{ .Values.injector.certs.caBundle | quote }}
     rules:

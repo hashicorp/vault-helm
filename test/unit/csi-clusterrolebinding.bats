@@ -42,3 +42,23 @@ load _helpers
       yq -r '.subjects[0].name' | tee /dev/stderr)
   [ "${actual}" = "release-name-vault-csi-provider" ]
 }
+
+# ClusterRoleBinding service account namespace
+@test "csi/ClusterRoleBinding: service account namespace" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      --show-only templates/csi-clusterrolebinding.yaml \
+      --set "csi.enabled=true" \
+      --namespace foo \
+      . | tee /dev/stderr |
+      yq -r '.subjects[0].namespace' | tee /dev/stderr)
+  [ "${actual}" = "foo" ]
+  local actual=$(helm template \
+      --show-only templates/csi-clusterrolebinding.yaml \
+      --set "csi.enabled=true" \
+      --set 'global.namespace=bar' \
+      --namespace foo \
+      . | tee /dev/stderr |
+      yq -r '.subjects[0].namespace' | tee /dev/stderr)
+  [ "${actual}" = "bar" ]
+}
