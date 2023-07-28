@@ -630,11 +630,14 @@ server:
     #   ports:
     #   - protocol: TCP
     #     port: 443
-    podSelector: {}
-    # Restrict traffic to vault pods only with given labels
-    # podSelector:
-    #   matchLabels:
-    #     vault-access: "true"
+    ingress:
+      - from:
+          - namespaceSelector: {}
+        ports:
+        - port: 8200
+          protocol: TCP
+        - port: 8201
+          protocol: TCP
 
   # Priority class for server pods
   priorityClassName: ""
