@@ -1201,6 +1201,12 @@ serverTelemetry:
     # Timeout for Prometheus scrapes
     scrapeTimeout: 10s
 
+    # tlsConfig used for connecting to the Vault API
+    tlsConfig: {}
+
+    # bearerTokenfile used for authentication to the Vault metrics API
+    bearerTokenFile: ""
+
   prometheusRules:
       # The Prometheus operator *must* be installed before enabling this feature,
       # if not the chart will fail to install due to missing CustomResourceDefinitions

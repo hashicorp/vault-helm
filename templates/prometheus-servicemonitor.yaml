@@ -36,13 +36,22 @@ spec:
   - port: {{ include "vault.scheme" . }}
     interval: {{ .Values.serverTelemetry.serviceMonitor.interval }}
     scrapeTimeout: {{ .Values.serverTelemetry.serviceMonitor.scrapeTimeout }}
+    {{- if .Values.serverTelemetry.serviceMonitor.bearerTokenFile }}
+    bearerTokenFile: {{ .Values.serverTelemetry.serviceMonitor.bearerTokenFile }}
+    {{- end }}
     scheme: {{ include "vault.scheme" . | lower }}
     path: /v1/sys/metrics
     params:
       format:
       - prometheus
+    {{- $tlsConfig := .Values.serverTelemetry.serviceMonitor.tlsConfig }}
+    {{- if $tlsConfig }}
+    tlsConfig:
+    {{- toYaml $tlsConfig | nindent 6 }}
+    {{- else }}
     tlsConfig:
       insecureSkipVerify: true
+    {{- end }}
   namespaceSelector:
     matchNames:
       - {{ include "vault.namespace" . }}
