@@ -465,7 +465,7 @@ server:
 
   # authDelegator enables a cluster role binding to be attached to the service
   # account.  This cluster role binding can be used to setup Kubernetes auth
-  # method.  https://www.vaultproject.io/docs/auth/kubernetes.html
+  # method. See https://developer.hashicorp.com/vault/docs/auth/kubernetes
   authDelegator:
     enabled: true
 
@@ -712,7 +712,7 @@ server:
 
   # This configures the Vault Statefulset to create a PVC for data
   # storage when using the file or raft backend storage engines.
-  # See https://www.vaultproject.io/docs/configuration/storage/index.html to know more
+  # See https://developer.hashicorp.com/vault/docs/configuration/storage to know more
   dataStorage:
     enabled: true
     # Size of the PVC created
@@ -731,7 +731,7 @@ server:
   # logs.  Once Vault is deployed, initialized, and unsealed, Vault must
   # be configured to use this for audit logs.  This will be mounted to
   # /vault/audit
-  # See https://www.vaultproject.io/docs/audit/index.html to know more
+  # See https://developer.hashicorp.com/vault/docs/audit to know more
   auditStorage:
     enabled: false
     # Size of the PVC created
@@ -750,7 +750,7 @@ server:
   # and no initialization. This is useful for experimenting with Vault without
   # needing to unseal, store keys, et. al. All data is lost on restart - do not
   # use dev mode for anything other than experimenting.
-  # See https://www.vaultproject.io/docs/concepts/dev-server.html to know more
+  # See https://developer.hashicorp.com/vault/docs/concepts/dev-server to know more
   dev:
     enabled: false
 
@@ -772,7 +772,7 @@ server:
     # Note: Configuration files are stored in ConfigMaps so sensitive data
     # such as passwords should be either mounted through extraSecretEnvironmentVars
     # or through a Kube secret.  For more information see:
-    # https://www.vaultproject.io/docs/platform/k8s/helm/run#protecting-sensitive-vault-configurations
+    # https://developer.hashicorp.com/vault/docs/platform/k8s/helm/run#protecting-sensitive-vault-configurations
     config: |
       ui = true
 
@@ -815,12 +815,12 @@ server:
     replicas: 3
 
     # Set the api_addr configuration for Vault HA
-    # See https://www.vaultproject.io/docs/configuration#api_addr
+    # See https://developer.hashicorp.com/vault/docs/configuration#api_addr
     # If set to null, this will be set to the Pod IP Address
     apiAddr: null
 
     # Set the cluster_addr confuguration for Vault HA
-    # See https://www.vaultproject.io/docs/configuration#cluster_addr
+    # See https://developer.hashicorp.com/vault/docs/configuration#cluster_addr
     # If set to null, this will be set to https://$(HOSTNAME).{{ template "vault.fullname" . }}-internal:8201
     clusterAddr: null
 
@@ -838,7 +838,7 @@ server:
       # Note: Configuration files are stored in ConfigMaps so sensitive data
       # such as passwords should be either mounted through extraSecretEnvironmentVars
       # or through a Kube secret.  For more information see:
-      # https://www.vaultproject.io/docs/platform/k8s/helm/run#protecting-sensitive-vault-configurations
+      # https://developer.hashicorp.com/vault/docs/platform/k8s/helm/run#protecting-sensitive-vault-configurations
       config: |
         ui = true
 
@@ -865,7 +865,7 @@ server:
     # Note: Configuration files are stored in ConfigMaps so sensitive data
     # such as passwords should be either mounted through extraSecretEnvironmentVars
     # or through a Kube secret.  For more information see:
-    # https://www.vaultproject.io/docs/platform/k8s/helm/run#protecting-sensitive-vault-configurations
+    # https://developer.hashicorp.com/vault/docs/platform/k8s/helm/run#protecting-sensitive-vault-configurations
     config: |
       ui = true
 
@@ -1146,7 +1146,7 @@ csi:
   debug: false
 
   # Pass arbitrary additional arguments to vault-csi-provider.
-  # See https://www.vaultproject.io/docs/platform/k8s/csi/configurations#command-line-arguments
+  # See https://developer.hashicorp.com/vault/docs/platform/k8s/csi/configurations#command-line-arguments
   # for the available command line flags.
   extraArgs: []
 
@@ -1155,8 +1155,8 @@ csi:
 # the Vault configuration. There are a few examples included in the `config` sections above.
 #
 # For more information see:
-# https://www.vaultproject.io/docs/configuration/telemetry
-# https://www.vaultproject.io/docs/internals/telemetry
+# https://developer.hashicorp.com/vault/docs/configuration/telemetry
+# https://developer.hashicorp.com/vault/docs/internals/telemetry
 serverTelemetry:
   # Enable support for the Prometheus Operator. Currently, this chart does not support
   # authenticating to Vault's metrics endpoint, so the following `telemetry{}` must be included

@@ -10,7 +10,7 @@ cases of Vault on Kubernetes depending on the values provided.
 
 For full documentation on this Helm chart along with all the ways you can
 use Vault with Kubernetes, please see the
-[Vault and Kubernetes documentation](https://www.vaultproject.io/docs/platform/k8s/).
+[Vault and Kubernetes documentation](https://developer.hashicorp.com/vault/docs/platform/k8s).
 
 ## Prerequisites
 
@@ -39,5 +39,5 @@ $ helm install vault hashicorp/vault
 
 Please see the many options supported in the `values.yaml` file. These are also
 fully documented directly on the [Vault
-website](https://www.vaultproject.io/docs/platform/k8s/helm) along with more
+website](https://developer.hashicorp.com/vault/docs/platform/k8s/helm) along with more
 detailed installation instructions.
