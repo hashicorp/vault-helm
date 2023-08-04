@@ -186,7 +186,7 @@ injector:
   # Deprecated: please use 'webhook.annotations' instead
   # Extra annotations to attach to the webhook
   webhookAnnotations: {}
-
+  
   certs:
     # secretName is the name of the secret that has the TLS certificate and
     # private key to serve the injector webhook. If this is null, then the
@@ -292,7 +292,6 @@ injector:
   serviceAccount:
     # Extra annotations to attach to the injector serviceAccount
     annotations: {}
-
   # A disruption budget limits the number of pods of a replicated application
   # that are down simultaneously from voluntary disruptions
   podDisruptionBudget: {}

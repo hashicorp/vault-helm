@@ -7,11 +7,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-<<<<<<< HEAD
         kind-k8s-version: [1.16.15, 1.20.15, 1.21.14, 1.22.15, 1.23.12, 1.24.6, 1.25.3]
-=======
-        kind-k8s-version: [1.16.15, 1.20.15, 1.21.10, 1.22.7, 1.23.4]
->>>>>>> c575574 (feat(DATAGO-30305): Upgrade vault server to 1.10.x (#16))
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
