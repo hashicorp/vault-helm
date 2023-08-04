@@ -237,7 +237,7 @@ injector:
   # Deprecated: please use 'webhook.annotations' instead
   # Extra annotations to attach to the webhook
   webhookAnnotations: {}
-
+  
   certs:
     # secretName is the name of the secret that has the TLS certificate and
     # private key to serve the injector webhook. If this is null, then the
@@ -343,7 +343,6 @@ injector:
   serviceAccount:
     # Extra annotations to attach to the injector serviceAccount
     annotations: {}
-
   # A disruption budget limits the number of pods of a replicated application
   # that are down simultaneously from voluntary disruptions
   podDisruptionBudget: {}
@@ -693,9 +692,15 @@ server:
     # will be random if left blank.
     #nodePort: 30000
 
-    # If type is set to "LoadBalancer", a specific IP address can be attached
-    # to the load balancer, will be random if left blank.
-    #loadBalancerIP: 
+    # When HA mode is enabled
+    # If type is set to "NodePort", a specific nodePort value can be configured,
+    # will be random if left blank.
+    #activeNodePort: 30001
+
+    # When HA mode is enabled
+    # If type is set to "NodePort", a specific nodePort value can be configured,
+    # will be random if left blank.
+    #standbyNodePort: 30002
 
     # Port on which Vault server is listening
     port: 8200
@@ -932,8 +937,23 @@ server:
     # YAML-formatted multi-line templated string map of the annotations to apply
     # to the statefulSet.
     annotations: {}
-  # A boolean flag to setup logrotate as a side car continer
-  logrotate: null
+
+    # Set the pod and container security contexts.
+    # If not set, these will default to, and for *not* OpenShift:
+    # pod:
+    #   runAsNonRoot: true
+    #   runAsGroup: {{ .Values.server.gid | default 1000 }}
+    #   runAsUser: {{ .Values.server.uid | default 100 }}
+    #   fsGroup: {{ .Values.server.gid | default 1000 }}
+    # container:
+    #   allowPrivilegeEscalation: false
+    #
+    # If not set, these will default to, and for OpenShift:
+    # pod: {}
+    # container: {}
+    securityContext:
+      pod: {}
+      container: {}
 
     # Set the pod and container security contexts.
     # If not set, these will default to, and for *not* OpenShift:
