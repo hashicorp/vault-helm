@@ -2,11 +2,11 @@
 
 load _helpers
 
-@test "server/ServiceAccountToken: verify service account name match" {
+@test "server/ServiceAccountSecret: verify service account name match" {
   cd `chart_dir`
 
   local actual=$( (helm template \
-      --show-only templates/server-serviceaccount-token.yaml  \
+      --show-only templates/server-serviceaccount-secret.yaml  \
       --set 'server.dev.enabled=true' \
       --set 'server.serviceAccount.create=false' \
       . || echo "---") | tee /dev/stderr |
@@ -14,60 +14,60 @@ load _helpers
   [ "${actual}" = "false" ]
 
   local actual=$(helm template \
-      --show-only templates/server-serviceaccount-token.yaml  \
+      --show-only templates/server-serviceaccount-secret.yaml  \
       --set 'server.dev.enabled=true' \
       --set 'server.serviceAccount.name=user-defined-ksa' \
-      --set 'server.serviceAccount.generateToken=true' \
+      --set 'server.serviceAccount.generateSecret=true' \
       . | tee /dev/stderr |
       yq -r '.metadata.name' | tee /dev/stderr)
   [ "${actual}" = "user-defined-ksa-token" ]
 
   local actual=$(helm template \
-      --show-only templates/server-serviceaccount-token.yaml  \
+      --show-only templates/server-serviceaccount-secret.yaml  \
       --set 'server.dev.enabled=true' \
-      --set 'server.serviceAccount.generateToken=true' \
+      --set 'server.serviceAccount.generateSecret=true' \
       . | tee /dev/stderr |
       yq -r '.metadata.name' | tee /dev/stderr)
   [ "${actual}" = "release-name-vault-token" ]
 
 }
 
-@test "server/ServiceAccountToken: annotation mapping to service account" {
+@test "server/ServiceAccountSecret: annotation mapping to service account" {
   cd `chart_dir`
 
   local actual=$(helm template \
-      --show-only templates/server-serviceaccount-token.yaml  \
+      --show-only templates/server-serviceaccount-secret.yaml  \
       --set 'server.dev.enabled=true' \
       --set 'server.serviceAccount.name=user-defined-ksa' \
-      --set 'server.serviceAccount.generateToken=true' \
+      --set 'server.serviceAccount.generateSecret=true' \
       . | tee /dev/stderr |
       yq -r '.metadata.annotations["kubernetes.io/service-account.name"]' | tee /dev/stderr)
   [ "${actual}" = "user-defined-ksa" ]
 
   local actual=$(helm template \
-      --show-only templates/server-serviceaccount-token.yaml  \
+      --show-only templates/server-serviceaccount-secret.yaml  \
       --set 'server.dev.enabled=true' \
-      --set 'server.serviceAccount.generateToken=true' \
+      --set 'server.serviceAccount.generateSecret=true' \
       . | tee /dev/stderr |
       yq -r '.metadata.annotations["kubernetes.io/service-account.name"]' | tee /dev/stderr)
   [ "${actual}" = "release-name-vault" ]
 
 }
 
-@test "server/ServiceAccountToken: namespace" {
+@test "server/ServiceAccountSecret: namespace" {
   cd `chart_dir`
   local actual=$(helm template \
-      --show-only templates/server-serviceaccount-token.yaml  \
+      --show-only templates/server-serviceaccount-secret.yaml  \
       --set 'server.serviceAccount.create=true' \
-      --set 'server.serviceAccount.generateToken=true' \
+      --set 'server.serviceAccount.generateSecret=true' \
       --namespace foo \
       . | tee /dev/stderr |
       yq -r '.metadata.namespace' | tee /dev/stderr)
   [ "${actual}" = "foo" ]
   local actual=$(helm template \
-      --show-only templates/server-serviceaccount-token.yaml  \
+      --show-only templates/server-serviceaccount-secret.yaml  \
       --set 'server.serviceAccount.create=true' \
-      --set 'server.serviceAccount.generateToken=true' \
+      --set 'server.serviceAccount.generateSecret=true' \
       --set 'global.namespace=bar' \
       --namespace foo \
       . | tee /dev/stderr |

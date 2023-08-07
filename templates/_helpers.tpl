@@ -85,11 +85,11 @@ Compute if the server serviceaccount is enabled.
 {{/*
 Compute if the server serviceaccount should have a token created and mounted to the serviceaccount.
 */}}
-{{- define "vault.serverServiceAccountTokenCreationEnabled" -}}
-{{- $_ := set . "serverServiceAccountTokenCreationEnabled"
+{{- define "vault.serverServiceAccountSecretCreationEnabled" -}}
+{{- $_ := set . "serverServiceAccountSecretCreationEnabled"
   (and
     (eq (.Values.server.serviceAccount.create | toString) "true")
-    (eq (.Values.server.serviceAccount.generateToken | toString) "true")) -}}
+    (eq (.Values.server.serviceAccount.generateSecret | toString) "true")) -}}
 {{- end -}}
 
 
