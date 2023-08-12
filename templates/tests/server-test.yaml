@@ -15,7 +15,7 @@ metadata:
     "helm.sh/hook": test
 spec:
   {{- include "imagePullSecrets" . | nindent 2 }}
-  {{- template "server.test.securityContext.pod" . }}
+  {{- include "server.statefulSet.securityContext.pod" . | nindent 2 }}
   containers:
     - name: {{ .Release.Name }}-server-test
       image: {{ .Values.server.image.repository }}:{{ .Values.server.image.tag | default "latest" }}
@@ -44,7 +44,7 @@ spec:
           fi
 
           exit 0
-      {{- template "server.test.securityContext.container" . }}
+      {{- include "server.statefulSet.securityContext.container" . | nindent 6 }}
       volumeMounts:
         {{- if .Values.server.volumeMounts }}
           {{- toYaml .Values.server.volumeMounts | nindent 8}}
