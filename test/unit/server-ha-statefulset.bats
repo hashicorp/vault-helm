@@ -157,7 +157,7 @@ load _helpers
   [ "${actual}" = "10" ]
 }
 
-@test "server/ha-StatefulSet: custom replicas" {
+@test "server/ha-StatefulSet: zero replicas" {
   cd `chart_dir`
   local actual=$(helm template \
       --show-only templates/server-statefulset.yaml  \
@@ -168,7 +168,7 @@ load _helpers
   [ "${actual}" = "0" ]
 }
 
-@test "server/ha-StatefulSet: custom replicas" {
+@test "server/ha-StatefulSet: invalid value for replicas" {
   cd `chart_dir`
   local actual=$(helm template \
       --show-only templates/server-statefulset.yaml  \
