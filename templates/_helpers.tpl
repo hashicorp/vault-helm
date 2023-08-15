@@ -156,7 +156,11 @@ Set's the replica count based on the different modes configured by user
   {{ if eq .mode "standalone" }}
     {{- default 1 -}}
   {{ else if eq .mode "ha" }}
-    {{- .Values.server.ha.replicas | default 3 -}}
+    {{- if kindIs "int64" .Values.server.ha.replicas -}}
+      {{- .Values.server.ha.replicas -}}
+    {{ else }}
+      {{- 3 -}}
+    {{- end -}}
   {{ else }}
     {{- default 1 -}}
   {{ end }}
