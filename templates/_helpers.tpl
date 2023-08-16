@@ -532,9 +532,9 @@ securityContext for the statefulset pod template.
 securityContext:
   {{- $tp := typeOf .Values.server.statefulSet.securityContext.pod }}
   {{- if eq $tp "string" }}
-    {{- tpl .Values.server.statefulSet.securityContext.pod . | nindent 8 }}
+    {{- tpl .Values.server.statefulSet.securityContext.pod . }}
   {{- else }}
-    {{- toYaml .Values.server.statefulSet.securityContext.pod | nindent 8 }}
+    {{- toYaml .Values.server.statefulSet.securityContext.pod }}
   {{- end }}
 {{- else if not .Values.global.openshift }}
 securityContext:
@@ -553,9 +553,9 @@ securityContext for the statefulset vault container
 securityContext:
   {{- $tp := typeOf .Values.server.statefulSet.securityContext.container }}
   {{- if eq $tp "string" }}
-    {{- tpl .Values.server.statefulSet.securityContext.container . | nindent 12 }}
+    {{- tpl .Values.server.statefulSet.securityContext.container . }}
   {{- else }}
-    {{- toYaml .Values.server.statefulSet.securityContext.container | nindent 12 }}
+    {{- toYaml .Values.server.statefulSet.securityContext.container }}
   {{- end }}
 {{- else if not .Values.global.openshift }}
 securityContext:
