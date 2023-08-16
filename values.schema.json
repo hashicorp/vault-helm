@@ -985,7 +985,7 @@
                         "extraLabels": {
                             "type": "object"
                         },
-                        "generateSecret": {
+                        "createSecret": {
                             "type": "boolean"
                         },
                         "name": {

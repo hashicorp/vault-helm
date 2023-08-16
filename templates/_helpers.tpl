@@ -89,7 +89,7 @@ Compute if the server serviceaccount should have a token created and mounted to 
 {{- $_ := set . "serverServiceAccountSecretCreationEnabled"
   (and
     (eq (.Values.server.serviceAccount.create | toString) "true")
-    (eq (.Values.server.serviceAccount.generateSecret | toString) "true")) -}}
+    (eq (.Values.server.serviceAccount.createSecret | toString) "true")) -}}
 {{- end -}}
 
 

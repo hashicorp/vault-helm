@@ -17,7 +17,7 @@ load _helpers
       --show-only templates/server-serviceaccount-secret.yaml  \
       --set 'server.dev.enabled=true' \
       --set 'server.serviceAccount.name=user-defined-ksa' \
-      --set 'server.serviceAccount.generateSecret=true' \
+      --set 'server.serviceAccount.createSecret=true' \
       . | tee /dev/stderr |
       yq -r '.metadata.name' | tee /dev/stderr)
   [ "${actual}" = "user-defined-ksa-token" ]
@@ -25,7 +25,7 @@ load _helpers
   local actual=$(helm template \
       --show-only templates/server-serviceaccount-secret.yaml  \
       --set 'server.dev.enabled=true' \
-      --set 'server.serviceAccount.generateSecret=true' \
+      --set 'server.serviceAccount.createSecret=true' \
       . | tee /dev/stderr |
       yq -r '.metadata.name' | tee /dev/stderr)
   [ "${actual}" = "release-name-vault-token" ]
@@ -39,7 +39,7 @@ load _helpers
       --show-only templates/server-serviceaccount-secret.yaml  \
       --set 'server.dev.enabled=true' \
       --set 'server.serviceAccount.name=user-defined-ksa' \
-      --set 'server.serviceAccount.generateSecret=true' \
+      --set 'server.serviceAccount.createSecret=true' \
       . | tee /dev/stderr |
       yq -r '.metadata.annotations["kubernetes.io/service-account.name"]' | tee /dev/stderr)
   [ "${actual}" = "user-defined-ksa" ]
@@ -47,7 +47,7 @@ load _helpers
   local actual=$(helm template \
       --show-only templates/server-serviceaccount-secret.yaml  \
       --set 'server.dev.enabled=true' \
-      --set 'server.serviceAccount.generateSecret=true' \
+      --set 'server.serviceAccount.createSecret=true' \
       . | tee /dev/stderr |
       yq -r '.metadata.annotations["kubernetes.io/service-account.name"]' | tee /dev/stderr)
   [ "${actual}" = "release-name-vault" ]
@@ -59,7 +59,7 @@ load _helpers
   local actual=$(helm template \
       --show-only templates/server-serviceaccount-secret.yaml  \
       --set 'server.serviceAccount.create=true' \
-      --set 'server.serviceAccount.generateSecret=true' \
+      --set 'server.serviceAccount.createSecret=true' \
       --namespace foo \
       . | tee /dev/stderr |
       yq -r '.metadata.namespace' | tee /dev/stderr)
@@ -67,7 +67,7 @@ load _helpers
   local actual=$(helm template \
       --show-only templates/server-serviceaccount-secret.yaml  \
       --set 'server.serviceAccount.create=true' \
-      --set 'server.serviceAccount.generateSecret=true' \
+      --set 'server.serviceAccount.createSecret=true' \
       --set 'global.namespace=bar' \
       --namespace foo \
       . | tee /dev/stderr |
