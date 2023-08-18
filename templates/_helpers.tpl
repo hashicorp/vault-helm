@@ -530,12 +530,12 @@ securityContext for the statefulset pod template.
 {{- define "server.statefulSet.securityContext.pod" -}}
 {{- if .Values.server.statefulSet.securityContext.pod }}
 securityContext:
-  {{- $tp := typeOf .Values.server.statefulSet.securityContext.pod }}
-  {{- if eq $tp "string" }}
-    {{- tpl .Values.server.statefulSet.securityContext.pod . }}
-  {{- else }}
-    {{- toYaml .Values.server.statefulSet.securityContext.pod }}
-  {{- end }}
+{{ $tp := typeOf .Values.server.statefulSet.securityContext.pod }}
+{{- if eq $tp "string" }}
+{{- tpl .Values.server.statefulSet.securityContext.pod . | indent 2 }}
+{{- else }}
+{{- toYaml .Values.server.statefulSet.securityContext.pod | indent 2 }}
+{{- end }}
 {{- else if not .Values.global.openshift }}
 securityContext:
   runAsNonRoot: true
@@ -551,12 +551,12 @@ securityContext for the statefulset vault container
 {{- define "server.statefulSet.securityContext.container" -}}
 {{- if .Values.server.statefulSet.securityContext.container }}
 securityContext:
-  {{- $tp := typeOf .Values.server.statefulSet.securityContext.container }}
-  {{- if eq $tp "string" }}
-    {{- tpl .Values.server.statefulSet.securityContext.container . }}
-  {{- else }}
-    {{- toYaml .Values.server.statefulSet.securityContext.container }}
-  {{- end }}
+{{ $tp := typeOf .Values.server.statefulSet.securityContext.container }}
+{{- if eq $tp "string" }}
+{{- tpl .Values.server.statefulSet.securityContext.container . | indent 2 }}
+{{- else }}
+{{- toYaml .Values.server.statefulSet.securityContext.container | indent 2 }}
+{{- end }}
 {{- else if not .Values.global.openshift }}
 securityContext:
   allowPrivilegeEscalation: false
