@@ -272,6 +272,15 @@ load _helpers
   [ "${actual}" = "2000" ]
 }
 
+@test "server/standalone-server-test-Pod: nonRoot" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      --show-only templates/tests/server-test.yaml \
+      . | tee /dev/stderr |
+      yq -r '.spec.securityContext.runAsNonRoot' | tee /dev/stderr)
+  [ "${actual}" = "true" ]
+}
+
 @test "server/standalone-server-test-Pod: gid default" {
   cd `chart_dir`
   local actual=$(helm template \
