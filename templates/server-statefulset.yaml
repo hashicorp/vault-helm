@@ -53,7 +53,7 @@ spec:
       {{ if  .Values.server.shareProcessNamespace }}
       shareProcessNamespace: true
       {{ end }}
-      {{- include "server.statefulSet.securityContext.pod" . | nindent 6}}
+      {{- include "server.statefulSet.securityContext.pod" . | nindent 6 }}
       {{- if not .Values.global.openshift }}
       hostNetwork: {{ .Values.server.hostNetwork }}
       {{- end }}
