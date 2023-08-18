@@ -37,6 +37,13 @@ Expand the name of the chart.
 {{- end -}}
 
 {{/*
+Allow the release namespace to be overridden
+*/}}
+{{- define "vault.namespace" -}}
+{{- default .Release.Namespace .Values.global.namespace -}}
+{{- end -}}
+
+{{/*
 Compute if the csi driver is enabled.
 */}}
 {{- define "vault.csiEnabled" -}}
@@ -74,6 +81,17 @@ Compute if the server serviceaccount is enabled.
       (eq (.Values.server.enabled | toString) "true")
       (eq (.Values.global.enabled | toString) "true"))) -}}
 {{- end -}}
+
+{{/*
+Compute if the server serviceaccount should have a token created and mounted to the serviceaccount.
+*/}}
+{{- define "vault.serverServiceAccountSecretCreationEnabled" -}}
+{{- $_ := set . "serverServiceAccountSecretCreationEnabled"
+  (and
+    (eq (.Values.server.serviceAccount.create | toString) "true")
+    (eq (.Values.server.serviceAccount.createSecret | toString) "true")) -}}
+{{- end -}}
+
 
 {{/*
 Compute if the server auth delegator serviceaccount is enabled.
@@ -151,7 +169,11 @@ Set's the replica count based on the different modes configured by user
   {{ if eq .mode "standalone" }}
     {{- default 1 -}}
   {{ else if eq .mode "ha" }}
-    {{- .Values.server.ha.replicas | default 3 -}}
+    {{- if kindIs "int64" .Values.server.ha.replicas -}}
+      {{- .Values.server.ha.replicas -}}
+    {{ else }}
+      {{- 3 -}}
+    {{- end -}}
   {{ else }}
     {{- default 1 -}}
   {{ end }}
@@ -859,6 +881,34 @@ Sets the injector toleration for pod placement
   {{- end }}
 {{- end -}}
 
+{{/*
+Sets the CSI provider nodeSelector for pod placement
+*/}}
+{{- define "csi.pod.nodeselector" -}}
+  {{- if .Values.csi.pod.nodeSelector }}
+      nodeSelector:
+      {{- $tp := typeOf .Values.csi.pod.nodeSelector }}
+      {{- if eq $tp "string" }}
+        {{ tpl .Values.csi.pod.nodeSelector . | nindent 8 | trim }}
+      {{- else }}
+        {{- toYaml .Values.csi.pod.nodeSelector | nindent 8 }}
+      {{- end }}
+  {{- end }}
+{{- end -}}
+{{/*
+Sets the CSI provider affinity for pod placement.
+*/}}
+{{- define "csi.pod.affinity" -}}
+  {{- if .Values.csi.pod.affinity }}
+      affinity:
+        {{ $tp := typeOf .Values.csi.pod.affinity }}
+        {{- if eq $tp "string" }}
+          {{- tpl .Values.csi.pod.affinity . | nindent 8 | trim }}
+        {{- else }}
+          {{- toYaml .Values.csi.pod.affinity | nindent 8 }}
+        {{- end }}
+  {{ end }}
+{{- end -}}
 {{/*
 Sets extra CSI provider pod annotations
 */}}

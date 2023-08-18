@@ -9,7 +9,7 @@ apiVersion: v1
 kind: Service
 metadata:
   name: {{ template "vault.fullname" . }}-agent-injector-svc
-  namespace: {{ .Release.Namespace }}
+  namespace: {{ include "vault.namespace" . }}
   labels:
     app.kubernetes.io/name: {{ include "vault.name" . }}-agent-injector
     app.kubernetes.io/instance: {{ .Release.Name }}

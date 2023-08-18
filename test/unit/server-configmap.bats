@@ -75,6 +75,23 @@ load _helpers
   [ "${actual}" = "false" ]
 }
 
+@test "server/ConfigMap: namespace" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      --show-only templates/server-config-configmap.yaml \
+      --namespace foo \
+      . | tee /dev/stderr |
+      yq -r '.metadata.namespace' | tee /dev/stderr)
+  [ "${actual}" = "foo" ]
+  local actual=$(helm template \
+      --show-only templates/server-config-configmap.yaml \
+      --set 'global.namespace=bar' \
+      --namespace foo \
+      . | tee /dev/stderr |
+      yq -r '.metadata.namespace' | tee /dev/stderr)
+  [ "${actual}" = "bar" ]
+}
+
 @test "server/ConfigMap: standalone extraConfig is set" {
   cd `chart_dir`
   local actual=$(helm template \

@@ -113,6 +113,25 @@ load _helpers
   [ "${actual}" = "false" ]
 }
 
+@test "server/Service: namespace" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      --show-only templates/server-service.yaml  \
+      --set 'server.service.enabled=true' \
+      --namespace foo \
+      . | tee /dev/stderr |
+      yq -r '.metadata.namespace' | tee /dev/stderr)
+  [ "${actual}" = "foo" ]
+  local actual=$(helm template \
+      --show-only templates/server-service.yaml  \
+      --set 'server.service.enabled=true' \
+      --set 'global.namespace=bar' \
+      --namespace foo \
+      . | tee /dev/stderr |
+      yq -r '.metadata.namespace' | tee /dev/stderr)
+  [ "${actual}" = "bar" ]
+}
+
 @test "server/Service: disable with injector.externalVaultAddr" {
   cd `chart_dir`
   local actual=$( (helm template \

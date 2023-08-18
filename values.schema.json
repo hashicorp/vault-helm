@@ -136,6 +136,13 @@
                 "pod": {
                     "type": "object",
                     "properties": {
+                        "affinity": {
+                            "type": [
+                              "null",
+                              "object",
+                              "string"
+                            ]
+                        },
                         "annotations": {
                             "type": [
                                 "object",
@@ -144,6 +151,13 @@
                         },
                         "extraLabels": {
                             "type": "object"
+                        },
+                        "nodeSelector": {
+                            "type": [
+                              "null",
+                              "object",
+                              "string"
+                            ]
                         },
                         "tolerations": {
                             "type": [
@@ -214,6 +228,9 @@
                 "enabled": {
                     "type": "boolean"
                 },
+                "namespace": {
+                    "type": "string"
+                },        
                 "externalVaultAddr": {
                     "type": "string"
                 },
@@ -264,6 +281,12 @@
                             "type": "string"
                         },
                         "memRequest": {
+                            "type": "string"
+                        },
+                        "ephemeralLimit": {
+                            "type": "string"
+                        },
+                        "ephemeralRequest": {
                             "type": "string"
                         },
                         "template": {
@@ -965,6 +988,9 @@
                         "extraLabels": {
                             "type": "object"
                         },
+                        "createSecret": {
+                            "type": "boolean"
+                        },
                         "name": {
                             "type": "string"
                         },
@@ -1060,6 +1086,25 @@
                 },
                 "hostNetwork": {
                     "type": "boolean"
+                }
+            }
+        },
+        "serverTelemetry": {
+            "type": "object",
+            "properties": {
+                "prometheusRules": {
+                    "type": "object",
+                    "properties": {
+                        "enabled": {
+                            "type": "boolean"
+                        },
+                        "rules": {
+                            "type": "array"
+                        },
+                        "selectors": {
+                            "type": "object"
+                        }
+                    }
                 }
             }
         },
