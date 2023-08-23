@@ -5,6 +5,7 @@ Bugs:
 
 Improvements:
 * global: Add `global.namespace` to override the helm installation namespace. [GH-909](https://github.com/hashicorp/vault-helm/pull/909)
+* server: use vault.fullname in Helm test [GH-912](https://github.com/hashicorp/vault-helm/pull/912)
 
 ## 0.25.0 (June 26, 2023)
 
