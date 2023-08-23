@@ -9,7 +9,7 @@ SPDX-License-Identifier: MPL-2.0
 apiVersion: v1
 kind: Pod
 metadata:
-  name: "{{ .Release.Name }}-server-test"
+  name: {{ template "vault.fullname" . }}-server-test
   namespace: {{ include "vault.namespace" . }}
   annotations:
     "helm.sh/hook": test
