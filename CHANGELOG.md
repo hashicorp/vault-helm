@@ -1,5 +1,8 @@
 ## Unreleased
 
+Features:
+* server: Add support for dual stack clusters [GH-833](https://github.com/hashicorp/vault-helm/pull/833)
+
 Bugs:
 * csi: Add namespace field to `csi-role` and `csi-rolebindings`. [GH-909](https://github.com/hashicorp/vault-helm/pull/909)
 

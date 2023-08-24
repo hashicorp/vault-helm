@@ -679,7 +679,7 @@ server:
     # The IP family and IP families options are to set the behaviour in a dual-stack environment.
     # Omitting these values will let the service fall back to whatever the CNI dictates the defaults
     # should be.
-    # These are only supported for kubernetes versions >=1.23.0!
+    # These are only supported for kubernetes versions >=1.23.0
     #
     # Configures the service's supported IP family policy, can be either:
     #     SingleStack: Single-stack service. The control plane allocates a cluster IP for the Service, using the first configured service cluster IP range.
@@ -997,7 +997,7 @@ ui:
   # The IP family and IP families options are to set the behaviour in a dual-stack environment.
   # Omitting these values will let the service fall back to whatever the CNI dictates the defaults
   # should be.
-  # These are only supported for kubernetes versions >=1.23.0!
+  # These are only supported for kubernetes versions >=1.23.0
   #
   # Configures the service's supported IP family, can be either:
   #     SingleStack: Single-stack service. The control plane allocates a cluster IP for the Service, using the first configured service cluster IP range.
