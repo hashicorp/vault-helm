@@ -20,6 +20,14 @@ metadata:
     app.kubernetes.io/managed-by: {{ .Release.Service }}
   {{- template "vault.ui.annotations" . }}
 spec:
+  {{- if (semverCompare ">= 1.23-0" .Capabilities.KubeVersion.Version) }}
+  {{- if .Values.ui.serviceIPFamilyPolicy }}
+  ipFamilyPolicy: {{ .Values.ui.serviceIPFamilyPolicy }}
+  {{- end }}
+  {{- if .Values.ui.serviceIPFamilies }}
+  ipFamilies: {{ .Values.ui.serviceIPFamilies | toYaml | nindent 2 }}
+  {{- end }}
+  {{- end }}
   selector:
     app.kubernetes.io/name: {{ include "vault.name" . }}
     app.kubernetes.io/instance: {{ .Release.Name }}

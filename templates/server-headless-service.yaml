@@ -22,6 +22,14 @@ metadata:
   annotations:
 {{ template "vault.service.annotations" .}}
 spec:
+  {{- if (semverCompare ">= 1.23-0" .Capabilities.KubeVersion.Version) }}
+  {{- if .Values.server.service.ipFamilyPolicy }}
+  ipFamilyPolicy: {{ .Values.server.service.ipFamilyPolicy }}
+  {{- end }}
+  {{- if .Values.server.service.ipFamilies }}
+  ipFamilies: {{ .Values.server.service.ipFamilies | toYaml | nindent 2 }}
+  {{- end }}
+  {{- end }}
   clusterIP: None
   publishNotReadyAddresses: true
   ports:

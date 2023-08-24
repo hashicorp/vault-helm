@@ -676,6 +676,21 @@ server:
     # or NodePort.
     #type: ClusterIP
 
+    # The IP family and IP families options are to set the behaviour in a dual-stack environment.
+    # Omitting these values will let the service fall back to whatever the CNI dictates the defaults
+    # should be.
+    # These are only supported for kubernetes versions >=1.23.0
+    #
+    # Configures the service's supported IP family policy, can be either:
+    #     SingleStack: Single-stack service. The control plane allocates a cluster IP for the Service, using the first configured service cluster IP range.
+    #     PreferDualStack: Allocates IPv4 and IPv6 cluster IPs for the Service.
+    #     RequireDualStack: Allocates Service .spec.ClusterIPs from both IPv4 and IPv6 address ranges.
+    ipFamilyPolicy: ""
+    
+    # Sets the families that should be supported and the order in which they should be applied to ClusterIP as well.
+    # Can be IPv4 and/or IPv6.
+    ipFamilies: []
+
     # Do not wait for pods to be ready before including them in the services'
     # targets. Does not apply to the headless service, which is used for
     # cluster-internal communication.
@@ -978,6 +993,21 @@ ui:
   serviceNodePort: null
   externalPort: 8200
   targetPort: 8200
+
+  # The IP family and IP families options are to set the behaviour in a dual-stack environment.
+  # Omitting these values will let the service fall back to whatever the CNI dictates the defaults
+  # should be.
+  # These are only supported for kubernetes versions >=1.23.0
+  #
+  # Configures the service's supported IP family, can be either:
+  #     SingleStack: Single-stack service. The control plane allocates a cluster IP for the Service, using the first configured service cluster IP range.
+  #     PreferDualStack: Allocates IPv4 and IPv6 cluster IPs for the Service.
+  #     RequireDualStack: Allocates Service .spec.ClusterIPs from both IPv4 and IPv6 address ranges.
+  serviceIPFamilyPolicy: ""
+
+  # Sets the families that should be supported and the order in which they should be applied to ClusterIP as well
+  # Can be IPv4 and/or IPv6.
+  serviceIPFamilies: []
 
   # The externalTrafficPolicy can be set to either Cluster or Local
   # and is only valid for LoadBalancer and NodePort service types.

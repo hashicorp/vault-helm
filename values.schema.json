@@ -967,6 +967,14 @@
                         },
                         "standbyNodePort": {
                             "type": "integer"
+                        },
+                        "ipFamilyPolicy": {
+                            "type": "string"
+                        },
+                        "ipFamilies": {
+                            "type": [
+                                "array"
+                            ]
                         }
                     }
                 },
@@ -1143,6 +1151,16 @@
                 },
                 "targetPort": {
                     "type": "integer"
+                },
+                "serviceIPFamilyPolicy": {
+                    "type": [
+                        "string"
+                    ]
+                },
+                "serviceIPFamilies": {
+                    "type": [
+                        "array"
+                    ]
                 }
             }
         }
