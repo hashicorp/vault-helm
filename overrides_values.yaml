@@ -1,0 +1,93 @@
+global:
+   enabled: true
+   tlsDisable: false
+injector:
+   enabled: true
+server:
+   extraEnvironmentVars:
+      VAULT_CACERT: /vault/userconfig/vault-ha-tls/vault.ca
+      VAULT_TLSCERT: /vault/userconfig/vault-ha-tls/vault.crt
+      VAULT_TLSKEY: /vault/userconfig/vault-ha-tls/vault.key
+   extraSecretEnvironmentVars:
+      - envName: AWS_ACCESS_KEY_ID
+        secretName: kms-creds
+        secretKey: AWS_ACCESS_KEY_ID
+      - envName: AWS_SECRET_ACCESS_KEY
+        secretName: kms-creds
+        secretKey: AWS_SECRET_ACCESS_KEY
+   volumes:
+      - name: userconfig-vault-ha-tls
+        secret:
+         defaultMode: 420
+         secretName: vault-ha-tls
+   volumeMounts:
+      - mountPath: /vault/userconfig/vault-ha-tls
+        name: userconfig-vault-ha-tls
+        readOnly: true
+   standalone:
+      enabled: false
+   affinity: ""
+   ha:
+      enabled: true
+      replicas: 3
+      raft:
+         enabled: true
+         setNodeId: true
+         config: |
+            ui = true
+            listener "tcp" {
+               tls_disable = 0
+               address = "[::]:8200"
+               cluster_address = "[::]:8201"
+               tls_cert_file = "/vault/userconfig/vault-ha-tls/vault.crt"
+               tls_key_file  = "/vault/userconfig/vault-ha-tls/vault.key"
+               tls_client_ca_file = "/vault/userconfig/vault-ha-tls/vault.ca"
+            }
+            storage "raft" {
+               path = "/opt/vault/data"
+
+               retry_join {
+                  leader_api_addr = "https://vault-0.vault-internal:8200"
+                  leader_ca_cert_file = "/vault/userconfig/vault-ha-tls/vault.ca"
+                  leader_client_cert_file = "/vault/userconfig/vault-ha-tls/vault.crt"
+                  leader_client_key_file = "/vault/userconfig/vault-ha-tls/vault.key"
+               }
+               retry_join {
+                  leader_api_addr = "https://vault-1.vault-internal:8200"
+                  leader_ca_cert_file = "/vault/userconfig/vault-ha-tls/vault.ca"
+                  leader_client_cert_file = "/vault/userconfig/vault-ha-tls/vault.crt"
+                  leader_client_key_file = "/vault/userconfig/vault-ha-tls/vault.key"
+               }
+               retry_join {
+                  leader_api_addr = "https://vault-2.vault-internal:8200"
+                  leader_ca_cert_file = "/vault/userconfig/vault-ha-tls/vault.ca"
+                  leader_client_cert_file = "/vault/userconfig/vault-ha-tls/vault.crt"
+                  leader_client_key_file = "/vault/userconfig/vault-ha-tls/vault.key"
+               }
+            
+            }
+            seal "awskms" {
+               region = "us-east-1"
+               kms_key_id = "arn:aws:kms:us-east-1:319211394597:key/3c319721-4b3e-4106-9ea4-2146b3ace80d"
+            }
+            disable_mlock = true
+            service_registration "kubernetes" {}
+   ui:
+     serviceType: "NodePort"
+     serviceNodePort: 8200
+   dataStorage:
+     mountPath: "/opt/vault/data"
+     accessMode: ReadWriteOnly
+   auditStorage:
+     enabled: true
+     mountPath: "/opt/vault/audit"
+     accessMode: ReadWriteOnly
+   resources:
+     requests:
+       memory: 256Mi
+       cpu: 250m
+     limits:
+       memory: 256Mi
+       cpu: 250m
+   logLevel: "info"
+   logFormat: "json"
