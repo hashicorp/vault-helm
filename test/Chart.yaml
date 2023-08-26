@@ -1,0 +1,11 @@
+apiVersion: 2
+name: vault
+description: An Umbrella Helm Chart of Hashicorp Vault
+type: application
+version: 0.25.0
+appVersion: "1.0"
+
+dependencies:
+- name: vault
+  version: 0.25.0
+  repository: https://helm.releases.hashicorp.com
