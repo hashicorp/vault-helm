@@ -22,7 +22,7 @@ spec:
       env:
         - name: VAULT_ADDR
           value: {{ include "vault.scheme" . }}://{{ template "vault.fullname" . }}.{{ include "vault.namespace" . }}.svc:{{ .Values.server.service.port }}
-        {{- include "vault.extraEnvironmentVars" .Values.server | nindent 8 }}
+        {{ template "vault.extraEnvironmentVars" . }}
       command:
         - /bin/sh
         - -c
