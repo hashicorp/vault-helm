@@ -63,6 +63,10 @@ spec:
                   number: {{ $servicePort }}
         {{- end }}
   {{- end }}
+{{ if .Values.server.ingress.extraResources }}
+---
+{{- tpl .Values.server.ingress.extraResources . }}
+{{- end }}
 {{- end }}
 {{- end }}
 {{- end }}

@@ -55,5 +55,9 @@ spec:
     app.kubernetes.io/instance: {{ .Release.Name }}
     {{- end }}
     component: server
+{{ if .Values.server.service.extraResources }}
+---
+{{- tpl .Values.server.service.extraResources . }}
+{{- end }}
 {{- end }}
 {{- end }}
