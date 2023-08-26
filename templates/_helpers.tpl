@@ -933,8 +933,8 @@ Sets extra CSI service account annotations
 Inject extra environment vars in the format key:value, if populated
 */}}
 {{- define "vault.extraEnvironmentVars" -}}
-{{- if .extraEnvironmentVars -}}
-{{- range $key, $value := .extraEnvironmentVars }}
+{{- if .Values.server.extraEnvironmentVars -}}
+{{- range $key, $value := .Value.server.extraEnvironmentVars }}
 - name: {{ printf "%s" $key | replace "." "_" | upper | quote }}
   value: {{ $value | quote }}
 {{- end }}
@@ -945,8 +945,8 @@ Inject extra environment vars in the format key:value, if populated
 Inject extra environment populated by secrets, if populated
 */}}
 {{- define "vault.extraSecretEnvironmentVars" -}}
-{{- if .extraSecretEnvironmentVars -}}
-{{- range .extraSecretEnvironmentVars }}
+{{- if .Value.server.extraSecretEnvironmentVars -}}
+{{- range .Value.server.extraSecretEnvironmentVars }}
 - name: {{ .envName }}
   valueFrom:
    secretKeyRef:
