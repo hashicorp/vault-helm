@@ -1827,6 +1827,28 @@ load _helpers
 }
 
 #--------------------------------------------------------------------
+# hostAliases
+
+@test "server/StatefulSet: server.hostAliases not set" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      --show-only templates/server-statefulset.yaml \
+      . | tee /dev/stderr |
+      yq -r '.spec.template.spec.hostAliases' | tee /dev/stderr)
+  [ "${actual}" = "null" ]
+}
+
+@test "server/StatefulSet: server.hostAliases is set" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      --show-only templates/server-statefulset.yaml \
+      --set 'server.hostAliases[0]=foo' \
+      . | tee /dev/stderr |
+      yq -r '.spec.template.spec.hostAliases[]' | tee /dev/stderr)
+  [ "${actual}" = "foo" ]
+}
+
+#--------------------------------------------------------------------
 # extraPorts
 
 @test "server/standalone-StatefulSet: adds extra ports" {

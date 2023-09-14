@@ -740,6 +740,9 @@
                         }
                     }
                 },
+                "hostAliases": {
+                    "type": "array"
+                },
                 "image": {
                     "type": "object",
                     "properties": {
