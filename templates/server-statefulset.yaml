@@ -64,7 +64,7 @@ spec:
       {{- if .Values.server.hostAliases }}
       hostAliases:
         {{ toYaml .Values.server.hostAliases | nindent 8}}
-      {{- end }}          
+      {{- end }}
       {{- if .Values.server.extraInitContainers }}
       initContainers:
         {{ toYaml .Values.server.extraInitContainers | nindent 8}}
