@@ -61,6 +61,10 @@ spec:
         {{ template "vault.volumes" . }}
         - name: home
           emptyDir: {}
+      {{- if .Values.server.hostAliases }}
+      hostAliases:
+        {{ toYaml .Values.server.hostAliases | nindent 8}}
+      {{- end }}
       {{- if .Values.server.extraInitContainers }}
       initContainers:
         {{ toYaml .Values.server.extraInitContainers | nindent 8}}

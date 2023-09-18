@@ -444,7 +444,11 @@ server:
     #  - secretName: chart-example-tls
     #    hosts:
     #      - chart-example.local
-
+  # hostAliases is a list of aliases to be added to /etc/hosts. Specified as a YAML list.
+  hostAliases: []
+  # - ip: 127.0.0.1
+  #   hostnames:
+  #     - chart-example.local
   # OpenShift only - create a route to expose the service
   # By default the created route will be of type passthrough
   route:
