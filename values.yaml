@@ -658,22 +658,20 @@ server:
   service:
     enabled: true
     # Enable or disable the vault-active service, which selects Vault pods that
-    # have labelled themselves as the cluster leader with `vault-active: "true"`.
-    # Also helps in to add extra annotations for the service definition.
+    # have labeled themselves as the cluster leader with `vault-active: "true"`.
     active:
       enabled: true
-    # Extra annotations for the service definition. This can either be YAML or a
-    # YAML-formatted multi-line templated string map of the annotations to apply
-    # to the service.
+      # Extra annotations for the service definition. This can either be YAML or a
+      # YAML-formatted multi-line templated string map of the annotations to apply
+      # to the active service.
       annotations: {}
     # Enable or disable the vault-standby service, which selects Vault pods that
-    # have labelled themselves as a cluster follower with `vault-active: "false"`.
-    # Also helps in to add extra annotations for the service definition.
+    # have labeled themselves as a cluster follower with `vault-active: "false"`.
     standby:
       enabled: true
-    # Extra annotations for the service definition. This can either be YAML or a
-    # YAML-formatted multi-line templated string map of the annotations to apply
-    # to the service.
+      # Extra annotations for the service definition. This can either be YAML or a
+      # YAML-formatted multi-line templated string map of the annotations to apply
+      # to the standby service.
       annotations: {}
     # If enabled, the service selectors will include `app.kubernetes.io/instance: {{ .Release.Name }}`
     # When disabled, services may select Vault pods not deployed from the chart.
