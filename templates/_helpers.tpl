@@ -711,6 +711,33 @@ Sets extra vault server Service annotations
 {{- end -}}
 
 {{/*
+Sets extra vault server Service (active) annotations
+*/}}
+{{- define "vault.service.active.annotations" -}}
+  {{- if .Values.server.service.active.annotations }}
+    {{- $tp := typeOf .Values.server.service.active.annotations }}
+    {{- if eq $tp "string" }}
+      {{- tpl .Values.server.service.active.annotations . | nindent 4 }}
+    {{- else }}
+      {{- toYaml .Values.server.service.active.annotations | nindent 4 }}
+    {{- end }}
+  {{- end }}
+{{- end -}}
+{{/*
+Sets extra vault server Service annotations
+*/}}
+{{- define "vault.service.standby.annotations" -}}
+  {{- if .Values.server.service.standby.annotations }}
+    {{- $tp := typeOf .Values.server.service.standby.annotations }}
+    {{- if eq $tp "string" }}
+      {{- tpl .Values.server.service.standby.annotations . | nindent 4 }}
+    {{- else }}
+      {{- toYaml .Values.server.service.standby.annotations | nindent 4 }}
+    {{- end }}
+  {{- end }}
+{{- end -}}
+
+{{/*
 Sets PodSecurityPolicy annotations
 */}}
 {{- define "vault.psp.annotations" -}}

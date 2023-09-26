@@ -21,7 +21,8 @@ metadata:
     app.kubernetes.io/instance: {{ .Release.Name }}
     app.kubernetes.io/managed-by: {{ .Release.Service }}
   annotations:
-{{ template "vault.service.annotations" .}}
+{{- template "vault.service.standby.annotations" . }}
+{{- template "vault.service.annotations" . }}
 spec:
   {{- if .Values.server.service.type}}
   type: {{ .Values.server.service.type }}

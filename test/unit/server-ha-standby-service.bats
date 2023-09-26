@@ -24,6 +24,42 @@ load _helpers
   [ "${actual}" = "true" ]
 }
 
+@test "server/ha-standby-Service: with standby annotations string" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      --show-only templates/server-ha-standby-service.yaml \
+      --set 'server.ha.enabled=true' \
+      --set 'server.service.standby.annotations=vaultIsAwesome: true' \
+      . | tee /dev/stderr |
+      yq -r '.metadata.annotations["vaultIsAwesome"]' | tee /dev/stderr)
+  [ "${actual}" = "true" ]
+}
+
+@test "server/ha-standby-Service: with standby annotations yaml" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      --show-only templates/server-ha-standby-service.yaml \
+      --set 'server.ha.enabled=true' \
+      --set 'server.service.standby.annotations.vaultIsAwesome=true' \
+      . | tee /dev/stderr |
+      yq -r '.metadata.annotations["vaultIsAwesome"]' | tee /dev/stderr)
+  [ "${actual}" = "true" ]
+}
+@test "server/ha-standby-Service: with both annotations set" {
+  cd `chart_dir`
+  local object=$(helm template \
+      --show-only templates/server-ha-standby-service.yaml \
+      --set 'server.ha.enabled=true' \
+      --set 'server.service.standby.annotations=vaultIsAwesome: true' \
+      --set 'server.service.annotations=vaultIsNotAwesome: false' \
+      . | tee /dev/stderr |
+      yq -r '.metadata' | tee /dev/stderr)
+
+  local actual=$(echo "$object" | yq '.annotations["vaultIsAwesome"]' | tee /dev/stderr)
+  [ "${actual}" = "true" ]
+  actual=$(echo "$object" | yq '.annotations["vaultIsNotAwesome"]' | tee /dev/stderr)
+  [ "${actual}" = "false" ]
+}
 @test "server/ha-standby-Service: disable with ha.enabled false" {
   cd `chart_dir`
   local actual=$( (helm template \
