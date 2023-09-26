@@ -3,6 +3,7 @@
 Features:
 * server: Add support for dual stack clusters [GH-833](https://github.com/hashicorp/vault-helm/pull/833)
 * server: Support `hostAliases` for the StatefulSet pods [GH-955](https://github.com/hashicorp/vault-helm/pull/955)
+* server: Add `server.service.active.annotations` and `server.service.standby.annotations` [GH-896](https://github.com/hashicorp/vault-helm/pull/896)
 
 Bugs:
 * csi: Add namespace field to `csi-role` and `csi-rolebindings`. [GH-909](https://github.com/hashicorp/vault-helm/pull/909)
