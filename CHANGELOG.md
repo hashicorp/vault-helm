@@ -1,8 +1,8 @@
 ## Unreleased
 
 Changes:
-* `vault` updated to 1.15.0
-* `vault-k8s` updated to 1.3.0
+* Default `vault` version updated to 1.15.0
+* Default `vault-k8s` version updated to 1.3.0
 * Tested with Kubernetes versions 1.24-1.28
 
 Features:
