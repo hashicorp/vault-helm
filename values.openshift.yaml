@@ -19,3 +19,6 @@ server:
   image:
     repository: "registry.connect.redhat.com/hashicorp/vault"
     tag: "1.15.0-ubi"
+
+  readinessProbe:
+    path: "/v1/sys/health?uninitcode=204"
