@@ -4,6 +4,7 @@ Changes:
 * Default `vault` version updated to 1.15.0
 * Default `vault-k8s` version updated to 1.3.0
 * Tested with Kubernetes versions 1.24-1.28
+* server: OpenShift default readiness probe returns 204 when uninitialized [GH-966](https://github.com/hashicorp/vault-helm/pull/966)
 
 Features:
 * server: Add support for dual stack clusters [GH-833](https://github.com/hashicorp/vault-helm/pull/833)
