@@ -1,6 +1,6 @@
 ## Unreleased
 
-## 0.26.0 (October 26, 2023)
+## 0.26.0 (October 27, 2023)
 
 Changes:
 * Default `vault` version updated to 1.15.1
