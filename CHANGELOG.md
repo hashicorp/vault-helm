@@ -1,8 +1,10 @@
 ## Unreleased
 
+## 0.26.0 (October 26, 2023)
+
 Changes:
-* Default `vault` version updated to 1.15.0
-* Default `vault-k8s` version updated to 1.3.0
+* Default `vault` version updated to 1.15.1
+* Default `vault-k8s` version updated to 1.3.1
 * Tested with Kubernetes versions 1.24-1.28
 * server: OpenShift default readiness probe returns 204 when uninitialized [GH-966](https://github.com/hashicorp/vault-helm/pull/966)
 
