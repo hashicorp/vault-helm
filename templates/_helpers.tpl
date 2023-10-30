@@ -289,6 +289,7 @@ storage might be desired by the user.
     - metadata:
         name: data
         {{- include "vault.dataVolumeClaim.annotations" . | nindent 6 }}
+        {{- include "vault.dataVolumeClaim.labels" . | nindent 6 }}
       spec:
         accessModes:
           - {{ .Values.server.dataStorage.accessMode | default "ReadWriteOnce" }}
@@ -303,6 +304,7 @@ storage might be desired by the user.
     - metadata:
         name: audit
         {{- include "vault.auditVolumeClaim.annotations" . | nindent 6 }}
+        {{- include "vault.auditVolumeClaim.labels" . | nindent 6 }}
       spec:
         accessModes:
           - {{ .Values.server.auditStorage.accessMode | default "ReadWriteOnce" }}
@@ -783,6 +785,21 @@ Sets VolumeClaim annotations for data volume
 {{- end -}}
 
 {{/*
+Sets VolumeClaim labels for data volume
+*/}}
+{{- define "vault.dataVolumeClaim.labels" -}}
+  {{- if and (ne .mode "dev") (.Values.server.dataStorage.enabled) (.Values.server.dataStorage.labels) }}
+  labels:
+    {{- $tp := typeOf .Values.server.dataStorage.labels }}
+    {{- if eq $tp "string" }}
+      {{- tpl .Values.server.dataStorage.labels . | nindent 4 }}
+    {{- else }}
+      {{- toYaml .Values.server.dataStorage.labels | nindent 4 }}
+    {{- end }}
+  {{- end }}
+{{- end -}}
+
+{{/*
 Sets VolumeClaim annotations for audit volume
 */}}
 {{- define "vault.auditVolumeClaim.annotations" -}}
@@ -793,6 +810,21 @@ Sets VolumeClaim annotations for audit volume
       {{- tpl .Values.server.auditStorage.annotations . | nindent 4 }}
     {{- else }}
       {{- toYaml .Values.server.auditStorage.annotations | nindent 4 }}
+    {{- end }}
+  {{- end }}
+{{- end -}}
+
+{{/*
+Sets VolumeClaim labels for audit volume
+*/}}
+{{- define "vault.auditVolumeClaim.labels" -}}
+  {{- if and (ne .mode "dev") (.Values.server.auditStorage.enabled) (.Values.server.auditStorage.labels) }}
+  labels:
+    {{- $tp := typeOf .Values.server.auditStorage.labels }}
+    {{- if eq $tp "string" }}
+      {{- tpl .Values.server.auditStorage.labels . | nindent 4 }}
+    {{- else }}
+      {{- toYaml .Values.server.auditStorage.labels | nindent 4 }}
     {{- end }}
   {{- end }}
 {{- end -}}

@@ -559,6 +559,12 @@
                                 "string"
                             ]
                         },
+                        "labels": {
+                            "type": [
+                                "object",
+                                "string"
+                            ]
+                        },
                         "enabled": {
                             "type": [
                                 "boolean",
@@ -594,6 +600,12 @@
                             "type": "string"
                         },
                         "annotations": {
+                            "type": [
+                                "object",
+                                "string"
+                            ]
+                        },
+                        "labels": {
                             "type": [
                                 "object",
                                 "string"
