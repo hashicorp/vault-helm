@@ -1,5 +1,10 @@
 ## Unreleased
 
+## 0.26.1 (October 30, 2023)
+
+Bugs:
+* Fix templating of `server.ha.replicas` when set via override file. The `0.26.0` chart would ignore `server.ha.replicas` and always deploy 3 server replicas when `server.ha.enabled=true` unless overridden by command line when issuing the helm command: `--set server.ha.replicas=<some_number>`. Fixed in [GH-961](https://github.com/hashicorp/vault-helm/pull/961)
+
 ## 0.26.0 (October 27, 2023)
 
 Changes:
