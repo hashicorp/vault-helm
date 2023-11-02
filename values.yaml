@@ -534,6 +534,11 @@ server:
     path: "/v1/sys/health?standbyok=true"
     # Port number on which livenessProbe will be checked.
     port: 8200
+    # Used to define a liveness exec command. If provided, exec is preferred to httpGet as the livenessProbe handler.
+    execCommand: []
+    # - /bin/sh
+    # - -c
+    # - /vault/userconfig/mylivenessscript/run.sh
     # When a probe fails, Kubernetes will try failureThreshold times before giving up
     failureThreshold: 2
     # Number of seconds after the container has started before probe initiates
@@ -544,11 +549,6 @@ server:
     successThreshold: 1
     # Number of seconds after which the probe times out.
     timeoutSeconds: 3
-    # Used to define a liveness command
-    execCommand: []
-    # - /bin/sh
-    # - -c
-    # - /vault/userconfig/mylivenessscript/run.sh
 
   # Optional duration in seconds the pod needs to terminate gracefully.
   # See: https://kubernetes.io/docs/concepts/containers/container-lifecycle-hooks/
