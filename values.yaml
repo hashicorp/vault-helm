@@ -544,6 +544,11 @@ server:
     successThreshold: 1
     # Number of seconds after which the probe times out.
     timeoutSeconds: 3
+    # Used to define a liveness command
+    execCommand: []
+    # - /bin/sh
+    # - -c
+    # - /vault/userconfig/mylivenessscript/run.sh
 
   # Optional duration in seconds the pod needs to terminate gracefully.
   # See: https://kubernetes.io/docs/concepts/containers/container-lifecycle-hooks/
@@ -695,7 +700,7 @@ server:
     # should be.
     # These are only supported for kubernetes versions >=1.23.0
     #
-    # Configures the service's supported IP family policy, can be either:
+     # Configures the service's supported IP family policy, can be either:
     #     SingleStack: Single-stack service. The control plane allocates a cluster IP for the Service, using the first configured service cluster IP range.
     #     PreferDualStack: Allocates IPv4 and IPv6 cluster IPs for the Service.
     #     RequireDualStack: Allocates Service .spec.ClusterIPs from both IPv4 and IPv6 address ranges.
