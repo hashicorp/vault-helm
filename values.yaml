@@ -536,7 +536,7 @@ server:
     # - /bin/sh
     # - -c
     # - /vault/userconfig/mylivenessscript/run.sh
-    # Path on which livenessProbe will be checked if httpGet is used as the livenessProbe handler
+    # Path for the livenessProbe to use httpGet as the livenessProbe handler
     path: "/v1/sys/health?standbyok=true"
     # Port number on which livenessProbe will be checked if httpGet is used as the livenessProbe handler
     port: 8200
