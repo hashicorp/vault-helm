@@ -531,7 +531,7 @@ server:
   # Used to enable a livenessProbe for the pods
   livenessProbe:
     enabled: false
-    # Used to define a liveness exec command. If provided, exec is preferred to httpGet as the livenessProbe handler.
+    # Used to define a liveness exec command. If provided, exec is preferred to httpGet (path) as the livenessProbe handler.
     execCommand: []
     # - /bin/sh
     # - -c
