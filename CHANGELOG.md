@@ -1,5 +1,9 @@
 ## Unreleased
 
+Improvements:
+
+* Support exec in the server liveness probe [GH-971](https://github.com/hashicorp/vault-helm/pull/971)
+
 ## 0.26.1 (October 30, 2023)
 
 Bugs:

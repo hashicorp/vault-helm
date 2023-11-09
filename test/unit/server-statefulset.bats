@@ -1415,6 +1415,41 @@ load _helpers
   [ "${actual}" = "100" ]
 }
 
+@test "server/standalone-StatefulSet: liveness exec disabled by default" {
+  cd `chart_dir`
+  local object=$(helm template \
+      --show-only templates/server-statefulset.yaml  \
+      --set 'server.livenessProbe.enabled=true' \
+      . | tee /dev/stderr |
+      yq -r '.spec.template.spec.containers[0].livenessProbe' | tee /dev/stderr)
+
+  local actual=$(echo $object |
+      yq -r '.exec' | tee /dev/stderr)
+  [ "${actual}" = "null" ]
+
+  local actual=$(echo $object |
+      yq -r '.httpGet' | tee /dev/stderr)
+  [ ! "${actual}" = "null" ]
+}
+
+@test "server/standalone-StatefulSet: liveness exec can be set" {
+  cd `chart_dir`
+  local object=$(helm template \
+      --show-only templates/server-statefulset.yaml  \
+      --set 'server.livenessProbe.enabled=true' \
+      --set='server.livenessProbe.execCommand={/bin/sh,-c,sleep}' \
+      . | tee /dev/stderr |
+      yq -r '.spec.template.spec.containers[0].livenessProbe' | tee /dev/stderr)
+
+  local actual=$(echo $object |
+      yq -r '.exec.command[0]' | tee /dev/stderr)
+  [ "${actual}" = "/bin/sh" ]
+
+  local actual=$(echo $object |
+      yq -r '.httpGet' | tee /dev/stderr)
+  [ "${actual}" = "null" ]
+}
+
 #--------------------------------------------------------------------
 # args
 @test "server/standalone-StatefulSet: add extraArgs" {

@@ -531,8 +531,14 @@ server:
   # Used to enable a livenessProbe for the pods
   livenessProbe:
     enabled: false
+    # Used to define a liveness exec command. If provided, exec is preferred to httpGet (path) as the livenessProbe handler.
+    execCommand: []
+    # - /bin/sh
+    # - -c
+    # - /vault/userconfig/mylivenessscript/run.sh
+    # Path for the livenessProbe to use httpGet as the livenessProbe handler
     path: "/v1/sys/health?standbyok=true"
-    # Port number on which livenessProbe will be checked.
+    # Port number on which livenessProbe will be checked if httpGet is used as the livenessProbe handler
     port: 8200
     # When a probe fails, Kubernetes will try failureThreshold times before giving up
     failureThreshold: 2
