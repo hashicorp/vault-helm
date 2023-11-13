@@ -1,5 +1,9 @@
 ## Unreleased
 
+Features:
+
+* server: Support setting `persistentVolumeClaimRetentionPolicy` on the StatefulSet [GH-965](https://github.com/hashicorp/vault-helm/pull/965)
+
 Improvements:
 
 * Support exec in the server liveness probe [GH-971](https://github.com/hashicorp/vault-helm/pull/971)
