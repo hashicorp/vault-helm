@@ -829,6 +829,12 @@
                         "path": {
                             "type": "string"
                         },
+                        "port": {
+                            "type": "integer"
+                        },
+                        "execCommand": {
+                            "type": "array"
+                        },
                         "periodSeconds": {
                             "type": "integer"
                         },

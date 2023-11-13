@@ -1,9 +1,22 @@
 ## Unreleased
 
+Improvements:
+
+* Support exec in the server liveness probe [GH-971](https://github.com/hashicorp/vault-helm/pull/971)
+
+## 0.26.1 (October 30, 2023)
+
+Bugs:
+* Fix templating of `server.ha.replicas` when set via override file. The `0.26.0` chart would ignore `server.ha.replicas` and always deploy 3 server replicas when `server.ha.enabled=true` unless overridden by command line when issuing the helm command: `--set server.ha.replicas=<some_number>`. Fixed in [GH-961](https://github.com/hashicorp/vault-helm/pull/961)
+
+## 0.26.0 (October 27, 2023)
+
 Changes:
-* Default `vault` version updated to 1.15.0
-* Default `vault-k8s` version updated to 1.3.0
+* Default `vault` version updated to 1.15.1
+* Default `vault-k8s` version updated to 1.3.1
+* Default `vault-csi-provider` version updated to 1.4.1
 * Tested with Kubernetes versions 1.24-1.28
+* server: OpenShift default readiness probe returns 204 when uninitialized [GH-966](https://github.com/hashicorp/vault-helm/pull/966)
 
 Features:
 * server: Add support for dual stack clusters [GH-833](https://github.com/hashicorp/vault-helm/pull/833)
