@@ -872,6 +872,9 @@
                         },
                         "enabled": {
                             "type": "boolean"
+                        },
+                        "ingress": {
+                            "type": "array"
                         }
                     }
                 },
