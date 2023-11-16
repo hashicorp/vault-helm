@@ -631,6 +631,17 @@
                         }
                     }
                 },
+                "persistentVolumeClaimRetentionPolicy": {
+                    "type": "object",
+                    "properties": {
+                        "whenDeleted": {
+                            "type": "string"
+                        },
+                        "whenScaled": {
+                            "type": "string"
+                        }
+                    }
+                },
                 "dev": {
                     "type": "object",
                     "properties": {
@@ -829,6 +840,12 @@
                         },
                         "path": {
                             "type": "string"
+                        },
+                        "port": {
+                            "type": "integer"
+                        },
+                        "execCommand": {
+                            "type": "array"
                         },
                         "periodSeconds": {
                             "type": "integer"

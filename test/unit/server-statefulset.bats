@@ -222,6 +222,73 @@ load _helpers
 }
 
 #--------------------------------------------------------------------
+# persistentVolumeClaimRetentionPolicy
+
+@test "server/standalone-StatefulSet: persistentVolumeClaimRetentionPolicy not set by default when kubernetes < 1.23" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      -s templates/server-statefulset.yaml  \
+      --kube-version "1.22" \
+      . | tee /dev/stderr |
+      yq -r '.spec.persistentVolumeClaimRetentionPolicy' | tee /dev/stderr)
+  [ "${actual}" = "null" ]
+}
+
+@test "server/standalone-StatefulSet: unset persistentVolumeClaimRetentionPolicy.whenDeleted when kubernetes < 1.23" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      -s templates/server-statefulset.yaml  \
+      --kube-version "1.22" \
+      --set 'server.persistentVolumeClaimRetentionPolicy.whenDeleted=Delete' \
+      . | tee /dev/stderr |
+      yq -r '.spec.persistentVolumeClaimRetentionPolicy.whenDeleted' | tee /dev/stderr)
+  [ "${actual}" = "null" ]
+}
+
+@test "server/standalone-StatefulSet: unset persistentVolumeClaimRetentionPolicy.whenScaled when kubernetes < 1.23" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      -s templates/server-statefulset.yaml  \
+      --kube-version "1.22" \
+      --set 'server.persistentVolumeClaimRetentionPolicy.whenScaled=Delete' \
+      . | tee /dev/stderr |
+      yq -r '.spec.persistentVolumeClaimRetentionPolicy.whenScaled' | tee /dev/stderr)
+  [ "${actual}" = "null" ]
+}
+
+@test "server/standalone-StatefulSet: persistentVolumeClaimRetentionPolicy not set by default when kubernetes >= 1.23" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      -s templates/server-statefulset.yaml  \
+      --kube-version "1.23" \
+      . | tee /dev/stderr |
+      yq -r '.spec.persistentVolumeClaimRetentionPolicy' | tee /dev/stderr)
+  [ "${actual}" = "null" ]
+}
+
+@test "server/standalone-StatefulSet: can set persistentVolumeClaimRetentionPolicy.whenDeleted when kubernetes >= 1.23" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      -s templates/server-statefulset.yaml  \
+      --kube-version "1.23" \
+      --set 'server.persistentVolumeClaimRetentionPolicy.whenDeleted=Delete' \
+      . | tee /dev/stderr |
+      yq -r '.spec.persistentVolumeClaimRetentionPolicy.whenDeleted' | tee /dev/stderr)
+  [ "${actual}" = "Delete" ]
+}
+
+@test "server/standalone-StatefulSet: can set persistentVolumeClaimRetentionPolicy.whenScaled when kubernetes >= 1.23" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      -s templates/server-statefulset.yaml  \
+      --kube-version "1.23" \
+      --set 'server.persistentVolumeClaimRetentionPolicy.whenScaled=Delete' \
+      . | tee /dev/stderr |
+      yq -r '.spec.persistentVolumeClaimRetentionPolicy.whenScaled' | tee /dev/stderr)
+  [ "${actual}" = "Delete" ]
+}
+
+#--------------------------------------------------------------------
 # replicas
 
 @test "server/standalone-StatefulSet: default replicas" {
@@ -1413,6 +1480,41 @@ load _helpers
       . | tee /dev/stderr |
       yq -r '.spec.template.spec.containers[0].livenessProbe.timeoutSeconds' | tee /dev/stderr)
   [ "${actual}" = "100" ]
+}
+
+@test "server/standalone-StatefulSet: liveness exec disabled by default" {
+  cd `chart_dir`
+  local object=$(helm template \
+      --show-only templates/server-statefulset.yaml  \
+      --set 'server.livenessProbe.enabled=true' \
+      . | tee /dev/stderr |
+      yq -r '.spec.template.spec.containers[0].livenessProbe' | tee /dev/stderr)
+
+  local actual=$(echo $object |
+      yq -r '.exec' | tee /dev/stderr)
+  [ "${actual}" = "null" ]
+
+  local actual=$(echo $object |
+      yq -r '.httpGet' | tee /dev/stderr)
+  [ ! "${actual}" = "null" ]
+}
+
+@test "server/standalone-StatefulSet: liveness exec can be set" {
+  cd `chart_dir`
+  local object=$(helm template \
+      --show-only templates/server-statefulset.yaml  \
+      --set 'server.livenessProbe.enabled=true' \
+      --set='server.livenessProbe.execCommand={/bin/sh,-c,sleep}' \
+      . | tee /dev/stderr |
+      yq -r '.spec.template.spec.containers[0].livenessProbe' | tee /dev/stderr)
+
+  local actual=$(echo $object |
+      yq -r '.exec.command[0]' | tee /dev/stderr)
+  [ "${actual}" = "/bin/sh" ]
+
+  local actual=$(echo $object |
+      yq -r '.httpGet' | tee /dev/stderr)
+  [ "${actual}" = "null" ]
 }
 
 #--------------------------------------------------------------------
