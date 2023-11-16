@@ -3,6 +3,7 @@
 Features:
 
 * server: Support setting `persistentVolumeClaimRetentionPolicy` on the StatefulSet [GH-965](https://github.com/hashicorp/vault-helm/pull/965)
+* server: Support setting labels on PVCs [GH-969](https://github.com/hashicorp/vault-helm/pull/969)
 
 Improvements:
 
