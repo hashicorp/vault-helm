@@ -83,6 +83,17 @@ Compute if the server serviceaccount is enabled.
 {{- end -}}
 
 {{/*
+Compute if the server serviceaccount should have a token created and mounted to the serviceaccount.
+*/}}
+{{- define "vault.serverServiceAccountSecretCreationEnabled" -}}
+{{- $_ := set . "serverServiceAccountSecretCreationEnabled"
+  (and
+    (eq (.Values.server.serviceAccount.create | toString) "true")
+    (eq (.Values.server.serviceAccount.createSecret | toString) "true")) -}}
+{{- end -}}
+
+
+{{/*
 Compute if the server auth delegator serviceaccount is enabled.
 */}}
 {{- define "vault.serverAuthDelegator" -}}
@@ -156,7 +167,11 @@ Set's the replica count based on the different modes configured by user
   {{ if eq .mode "standalone" }}
     {{- default 1 -}}
   {{ else if eq .mode "ha" }}
-    {{- .Values.server.ha.replicas | default 3 -}}
+    {{- if or (kindIs "int64" .Values.server.ha.replicas) (kindIs "float64" .Values.server.ha.replicas) -}}
+      {{- .Values.server.ha.replicas -}}
+    {{ else }}
+      {{- 3 -}}
+    {{- end -}}
   {{ else }}
     {{- default 1 -}}
   {{ end }}
@@ -274,6 +289,7 @@ storage might be desired by the user.
     - metadata:
         name: data
         {{- include "vault.dataVolumeClaim.annotations" . | nindent 6 }}
+        {{- include "vault.dataVolumeClaim.labels" . | nindent 6 }}
       spec:
         accessModes:
           - {{ .Values.server.dataStorage.accessMode | default "ReadWriteOnce" }}
@@ -288,6 +304,7 @@ storage might be desired by the user.
     - metadata:
         name: audit
         {{- include "vault.auditVolumeClaim.annotations" . | nindent 6 }}
+        {{- include "vault.auditVolumeClaim.labels" . | nindent 6 }}
       spec:
         accessModes:
           - {{ .Values.server.auditStorage.accessMode | default "ReadWriteOnce" }}
@@ -696,6 +713,33 @@ Sets extra vault server Service annotations
 {{- end -}}
 
 {{/*
+Sets extra vault server Service (active) annotations
+*/}}
+{{- define "vault.service.active.annotations" -}}
+  {{- if .Values.server.service.active.annotations }}
+    {{- $tp := typeOf .Values.server.service.active.annotations }}
+    {{- if eq $tp "string" }}
+      {{- tpl .Values.server.service.active.annotations . | nindent 4 }}
+    {{- else }}
+      {{- toYaml .Values.server.service.active.annotations | nindent 4 }}
+    {{- end }}
+  {{- end }}
+{{- end -}}
+{{/*
+Sets extra vault server Service annotations
+*/}}
+{{- define "vault.service.standby.annotations" -}}
+  {{- if .Values.server.service.standby.annotations }}
+    {{- $tp := typeOf .Values.server.service.standby.annotations }}
+    {{- if eq $tp "string" }}
+      {{- tpl .Values.server.service.standby.annotations . | nindent 4 }}
+    {{- else }}
+      {{- toYaml .Values.server.service.standby.annotations | nindent 4 }}
+    {{- end }}
+  {{- end }}
+{{- end -}}
+
+{{/*
 Sets PodSecurityPolicy annotations
 */}}
 {{- define "vault.psp.annotations" -}}
@@ -741,6 +785,21 @@ Sets VolumeClaim annotations for data volume
 {{- end -}}
 
 {{/*
+Sets VolumeClaim labels for data volume
+*/}}
+{{- define "vault.dataVolumeClaim.labels" -}}
+  {{- if and (ne .mode "dev") (.Values.server.dataStorage.enabled) (.Values.server.dataStorage.labels) }}
+  labels:
+    {{- $tp := typeOf .Values.server.dataStorage.labels }}
+    {{- if eq $tp "string" }}
+      {{- tpl .Values.server.dataStorage.labels . | nindent 4 }}
+    {{- else }}
+      {{- toYaml .Values.server.dataStorage.labels | nindent 4 }}
+    {{- end }}
+  {{- end }}
+{{- end -}}
+
+{{/*
 Sets VolumeClaim annotations for audit volume
 */}}
 {{- define "vault.auditVolumeClaim.annotations" -}}
@@ -751,6 +810,21 @@ Sets VolumeClaim annotations for audit volume
       {{- tpl .Values.server.auditStorage.annotations . | nindent 4 }}
     {{- else }}
       {{- toYaml .Values.server.auditStorage.annotations | nindent 4 }}
+    {{- end }}
+  {{- end }}
+{{- end -}}
+
+{{/*
+Sets VolumeClaim labels for audit volume
+*/}}
+{{- define "vault.auditVolumeClaim.labels" -}}
+  {{- if and (ne .mode "dev") (.Values.server.auditStorage.enabled) (.Values.server.auditStorage.labels) }}
+  labels:
+    {{- $tp := typeOf .Values.server.auditStorage.labels }}
+    {{- if eq $tp "string" }}
+      {{- tpl .Values.server.auditStorage.labels . | nindent 4 }}
+    {{- else }}
+      {{- toYaml .Values.server.auditStorage.labels | nindent 4 }}
     {{- end }}
   {{- end }}
 {{- end -}}

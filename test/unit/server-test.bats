@@ -37,6 +37,33 @@ load _helpers
 
 #--------------------------------------------------------------------
 
+@test "server/standalone-server-test-Pod: default metadata.name" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      --show-only templates/tests/server-test.yaml  \
+      . | tee /dev/stderr |
+      yq -r '.metadata.name' | tee /dev/stderr)
+  [ "${actual}" = "release-name-vault-server-test" ]
+}
+
+@test "server/standalone-server-test-Pod: release metadata.name vault" {
+  cd `chart_dir`
+  local actual=$(helm template vault \
+      --show-only templates/tests/server-test.yaml  \
+      . | tee /dev/stderr |
+      yq -r '.metadata.name' | tee /dev/stderr)
+  [ "${actual}" = "vault-server-test" ]
+}
+
+@test "server/standalone-server-test-Pod: release metadata.name foo" {
+  cd `chart_dir`
+  local actual=$(helm template foo \
+      --show-only templates/tests/server-test.yaml  \
+      . | tee /dev/stderr |
+      yq -r '.metadata.name' | tee /dev/stderr)
+  [ "${actual}" = "foo-vault-server-test" ]
+}
+
 @test "server/standalone-server-test-Pod: default server.standalone.enabled" {
   cd `chart_dir`
   local actual=$(helm template \

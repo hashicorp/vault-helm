@@ -559,6 +559,12 @@
                                 "string"
                             ]
                         },
+                        "labels": {
+                            "type": [
+                                "object",
+                                "string"
+                            ]
+                        },
                         "enabled": {
                             "type": [
                                 "boolean",
@@ -599,6 +605,12 @@
                                 "string"
                             ]
                         },
+                        "labels": {
+                            "type": [
+                                "object",
+                                "string"
+                            ]
+                        },
                         "enabled": {
                             "type": [
                                 "boolean",
@@ -616,6 +628,17 @@
                                 "null",
                                 "string"
                             ]
+                        }
+                    }
+                },
+                "persistentVolumeClaimRetentionPolicy": {
+                    "type": "object",
+                    "properties": {
+                        "whenDeleted": {
+                            "type": "string"
+                        },
+                        "whenScaled": {
+                            "type": "string"
                         }
                     }
                 },
@@ -740,6 +763,9 @@
                         }
                     }
                 },
+                "hostAliases": {
+                    "type": "array"
+                },
                 "image": {
                     "type": "object",
                     "properties": {
@@ -815,6 +841,12 @@
                         "path": {
                             "type": "string"
                         },
+                        "port": {
+                            "type": "integer"
+                        },
+                        "execCommand": {
+                            "type": "array"
+                        },
                         "periodSeconds": {
                             "type": "integer"
                         },
@@ -840,6 +872,9 @@
                         },
                         "enabled": {
                             "type": "boolean"
+                        },
+                        "ingress": {
+                            "type": "array"
                         }
                     }
                 },
@@ -919,6 +954,12 @@
                             "properties": {
                                 "enabled": {
                                     "type": "boolean"
+                                },
+                                "annotations": {
+                                    "type": [
+                                        "object",
+                                        "string"
+                                    ]
                                 }
                             }
                         },
@@ -953,6 +994,12 @@
                             "properties": {
                                 "enabled": {
                                     "type": "boolean"
+                                },
+                                "annotations": {
+                                    "type": [
+                                        "object",
+                                        "string"
+                                    ]
                                 }
                             }
                         },
@@ -967,6 +1014,14 @@
                         },
                         "standbyNodePort": {
                             "type": "integer"
+                        },
+                        "ipFamilyPolicy": {
+                            "type": "string"
+                        },
+                        "ipFamilies": {
+                            "type": [
+                                "array"
+                            ]
                         }
                     }
                 },
@@ -984,6 +1039,9 @@
                         },
                         "extraLabels": {
                             "type": "object"
+                        },
+                        "createSecret": {
+                            "type": "boolean"
                         },
                         "name": {
                             "type": "string"
@@ -1140,6 +1198,16 @@
                 },
                 "targetPort": {
                     "type": "integer"
+                },
+                "serviceIPFamilyPolicy": {
+                    "type": [
+                        "string"
+                    ]
+                },
+                "serviceIPFamilies": {
+                    "type": [
+                        "array"
+                    ]
                 }
             }
         }

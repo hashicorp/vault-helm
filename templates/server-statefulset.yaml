@@ -24,6 +24,9 @@ spec:
   replicas: {{ template "vault.replicas" . }}
   updateStrategy:
     type: {{ .Values.server.updateStrategyType }}
+  {{- if and (semverCompare ">= 1.23-0" .Capabilities.KubeVersion.Version) (.Values.server.persistentVolumeClaimRetentionPolicy) }}
+  persistentVolumeClaimRetentionPolicy: {{ toYaml .Values.server.persistentVolumeClaimRetentionPolicy | nindent 4 }}
+  {{- end }}
   selector:
     matchLabels:
       app.kubernetes.io/name: {{ template "vault.name" . }}
@@ -61,6 +64,10 @@ spec:
         {{ template "vault.volumes" . }}
         - name: home
           emptyDir: {}
+      {{- if .Values.server.hostAliases }}
+      hostAliases:
+        {{ toYaml .Values.server.hostAliases | nindent 8}}
+      {{- end }}
       {{- if .Values.server.extraInitContainers }}
       initContainers:
         {{ toYaml .Values.server.extraInitContainers | nindent 8}}
@@ -175,10 +182,18 @@ spec:
           {{- end }}
           {{- if .Values.server.livenessProbe.enabled }}
           livenessProbe:
+            {{- if .Values.server.livenessProbe.execCommand }}
+            exec:
+              command:
+                {{- range (.Values.server.livenessProbe.execCommand) }}
+                - {{ . | quote }}
+                {{- end }}
+            {{- else }}
             httpGet:
               path: {{ .Values.server.livenessProbe.path | quote }}
               port: {{ .Values.server.livenessProbe.port }}
               scheme: {{ include "vault.scheme" . | upper }}
+            {{- end }}
             failureThreshold: {{ .Values.server.livenessProbe.failureThreshold }}
             initialDelaySeconds: {{ .Values.server.livenessProbe.initialDelaySeconds }}
             periodSeconds: {{ .Values.server.livenessProbe.periodSeconds }}

@@ -157,6 +157,28 @@ load _helpers
   [ "${actual}" = "10" ]
 }
 
+@test "server/ha-StatefulSet: zero replicas" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      --show-only templates/server-statefulset.yaml  \
+      --set 'server.ha.enabled=true' \
+      --set 'server.ha.replicas=0' \
+      . | tee /dev/stderr |
+      yq -r '.spec.replicas' | tee /dev/stderr)
+  [ "${actual}" = "0" ]
+}
+
+@test "server/ha-StatefulSet: invalid value for replicas" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      --show-only templates/server-statefulset.yaml  \
+      --set 'server.ha.enabled=true' \
+      --set 'server.ha.replicas=null' \
+      . | tee /dev/stderr |
+      yq -r '.spec.replicas' | tee /dev/stderr)
+  [ "${actual}" = "3" ]
+}
+
 #--------------------------------------------------------------------
 # resources
 

@@ -21,11 +21,20 @@ metadata:
     app.kubernetes.io/instance: {{ .Release.Name }}
     app.kubernetes.io/managed-by: {{ .Release.Service }}
   annotations:
-{{ template "vault.service.annotations" .}}
+{{- template "vault.service.standby.annotations" . }}
+{{- template "vault.service.annotations" . }}
 spec:
   {{- if .Values.server.service.type}}
   type: {{ .Values.server.service.type }}
   {{- end}}
+  {{- if (semverCompare ">= 1.23-0" .Capabilities.KubeVersion.Version) }}
+  {{- if .Values.server.service.ipFamilyPolicy }}
+  ipFamilyPolicy: {{ .Values.server.service.ipFamilyPolicy }}
+  {{- end }}
+  {{- if .Values.server.service.ipFamilies }}
+  ipFamilies: {{ .Values.server.service.ipFamilies | toYaml | nindent 2 }}
+  {{- end }}
+  {{- end }}
   {{- if .Values.server.service.clusterIP }}
   clusterIP: {{ .Values.server.service.clusterIP }}
   {{- end }}
