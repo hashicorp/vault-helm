@@ -68,6 +68,7 @@ spec:
       hostAliases:
         {{ toYaml .Values.server.hostAliases | nindent 8}}
       {{- end }}
+      enableServiceLinks: {{ .Values.server.enableServiceLinks }}
       {{- if .Values.server.extraInitContainers }}
       initContainers:
         {{ toYaml .Values.server.extraInitContainers | nindent 8}}
