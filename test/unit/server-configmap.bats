@@ -145,7 +145,7 @@ load _helpers
   local actual=$(helm template \
       --show-only templates/server-config-configmap.yaml \
       . | tee /dev/stderr |
-      yq '.metadata.annotations["vaultproject.io/config-checksum"] == null' | tee /dev/stderr)
+      yq '.metadata.annotations["vault.hashicorp.com/config-checksum"] == null' | tee /dev/stderr)
   [ "${actual}" = "true" ]
 }
 
@@ -155,6 +155,6 @@ load _helpers
       --show-only templates/server-config-configmap.yaml \
       --set 'server.configAnnotation=true' \
       . | tee /dev/stderr |
-      yq '.metadata.annotations["vaultproject.io/config-checksum"] == null' | tee /dev/stderr)
+      yq '.metadata.annotations["vault.hashicorp.com/config-checksum"] == null' | tee /dev/stderr)
   [ "${actual}" = "false" ]
 }

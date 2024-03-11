@@ -1686,7 +1686,7 @@ load _helpers
   local actual=$(helm template \
       --show-only templates/server-statefulset.yaml \
       . | tee /dev/stderr |
-      yq '.spec.template.metadata.annotations["vaultproject.io/config-checksum"] == null' | tee /dev/stderr)
+      yq '.spec.template.metadata.annotations["vault.hashicorp.com/config-checksum"] == null' | tee /dev/stderr)
   [ "${actual}" = "true" ]
 }
 
@@ -1696,7 +1696,7 @@ load _helpers
       --show-only templates/server-statefulset.yaml \
       --set 'server.configAnnotation=true' \
       . | tee /dev/stderr |
-      yq '.spec.template.metadata.annotations["vaultproject.io/config-checksum"] == null' | tee /dev/stderr)
+      yq '.spec.template.metadata.annotations["vault.hashicorp.com/config-checksum"] == null' | tee /dev/stderr)
   [ "${actual}" = "false" ]
 }
 

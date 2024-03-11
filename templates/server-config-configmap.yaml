@@ -20,7 +20,7 @@ metadata:
     app.kubernetes.io/managed-by: {{ .Release.Service }}
 {{- if .Values.server.configAnnotation }}
   annotations:
-    vaultproject.io/config-checksum: {{ include "vault.config" . | sha256sum }}
+    vault.hashicorp.com/config-checksum: {{ include "vault.config" . | sha256sum }}
 {{- end }}
 data:
   extraconfig-from-values.hcl: |-
