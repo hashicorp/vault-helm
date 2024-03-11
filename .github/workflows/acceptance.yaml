@@ -16,7 +16,7 @@ jobs:
         with:
           config: test/kind/config.yaml
           node_image: kindest/node:v${{ matrix.kind-k8s-version }}
-          version: v0.20.0
+          version: v0.22.0
       - run: bats --tap --timing ./test/acceptance
         env:
           VAULT_LICENSE_CI: ${{ secrets.VAULT_LICENSE_CI }}
