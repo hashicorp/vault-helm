@@ -460,7 +460,7 @@ Sets extra pod annotations
 {{- define "vault.annotations" }}
       annotations:
   {{- if .Values.server.configAnnotation }}
-        vaultproject.io/config-checksum: {{ include "vault.config" . | sha256sum }}
+        vault.hashicorp.com/config-checksum: {{ include "vault.config" . | sha256sum }}
   {{- end }}
   {{- if .Values.server.annotations }}
         {{- $tp := typeOf .Values.server.annotations }}
