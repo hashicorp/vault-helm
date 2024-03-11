@@ -28,7 +28,11 @@ RUN apk update && apk add --no-cache --virtual .build-deps \
     jq
 
 # yq
-RUN pip install yq
+RUN python3 -m venv venv && \
+    . venv/bin/activate && \
+    pip install yq && \
+    ln -s $PWD/venv/bin/yq /usr/local/bin/yq && \
+    deactivate
 
 # gcloud
 RUN curl -OL https://dl.google.com/dl/cloudsdk/channels/rapid/install_google_cloud_sdk.bash && \

@@ -459,7 +459,9 @@ Sets extra pod annotations
 */}}
 {{- define "vault.annotations" }}
       annotations:
-        config/checksum: {{ include "vault.config" . | sha256sum }}
+  {{- if .Values.server.configAnnotation }}
+        vaultproject.io/config-checksum: {{ include "vault.config" . | sha256sum }}
+  {{- end }}
   {{- if .Values.server.annotations }}
         {{- $tp := typeOf .Values.server.annotations }}
         {{- if eq $tp "string" }}
