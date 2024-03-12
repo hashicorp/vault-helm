@@ -668,6 +668,13 @@ server:
   # of the annotations to apply to the server pods
   annotations: {}
 
+  # Optionally customize the pod dnsConfig.
+  # Example:
+  # dnsConfig:
+  #   searches:
+  #     - corp.example.com
+  dnsConfig: {}
+
   # Enables a headless service to be used by the Vault Statefulset
   service:
     enabled: true

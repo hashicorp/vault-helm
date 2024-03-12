@@ -226,6 +226,10 @@ spec:
           {{ toYaml .Values.server.extraContainers | nindent 8}}
         {{- end }}
       {{- include "imagePullSecrets" . | nindent 6 }}
+      {{- if .Values.server.dnsConfig }}
+      dnsConfig:
+        {{- toYaml .Values.server.dnsConfig | nindent 8 }}
+      {{- end }}
   {{ template "vault.volumeclaims" . }}
 {{ end }}
 {{ end }}
