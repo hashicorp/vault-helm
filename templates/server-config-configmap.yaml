@@ -18,7 +18,7 @@ metadata:
     app.kubernetes.io/name: {{ include "vault.name" . }}
     app.kubernetes.io/instance: {{ .Release.Name }}
     app.kubernetes.io/managed-by: {{ .Release.Service }}
-{{- if .Values.server.configAnnotation }}
+{{- if .Values.server.includeConfigAnnotation }}
   annotations:
     vault.hashicorp.com/config-checksum: {{ include "vault.config" . | sha256sum }}
 {{- end }}

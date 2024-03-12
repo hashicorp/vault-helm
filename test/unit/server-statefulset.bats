@@ -1694,7 +1694,7 @@ load _helpers
   cd `chart_dir`
   local actual=$(helm template \
       --show-only templates/server-statefulset.yaml \
-      --set 'server.configAnnotation=true' \
+      --set 'server.includeConfigAnnotation=true' \
       . | tee /dev/stderr |
       yq '.spec.template.metadata.annotations["vault.hashicorp.com/config-checksum"] == null' | tee /dev/stderr)
   [ "${actual}" = "false" ]
