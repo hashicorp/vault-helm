@@ -28,7 +28,7 @@ RUN apk update && apk add --no-cache --virtual .build-deps \
     jq
 
 # yq
-RUN pip install yq
+RUN pip install yq --break-system-packages
 
 # gcloud
 RUN curl -OL https://dl.google.com/dl/cloudsdk/channels/rapid/install_google_cloud_sdk.bash && \
