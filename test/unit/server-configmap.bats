@@ -139,3 +139,22 @@ load _helpers
       yq 'length > 0' | tee /dev/stderr)
   [ "${actual}" = "false" ]
 }
+
+@test "server/ConfigMap: config checksum annotation defaults to off" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      --show-only templates/server-config-configmap.yaml \
+      . | tee /dev/stderr |
+      yq '.metadata.annotations["vault.hashicorp.com/config-checksum"] == null' | tee /dev/stderr)
+  [ "${actual}" = "true" ]
+}
+
+@test "server/ConfigMap: config checksum annotation can be enabled" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      --show-only templates/server-config-configmap.yaml \
+      --set 'server.includeConfigAnnotation=true' \
+      . | tee /dev/stderr |
+      yq '.metadata.annotations["vault.hashicorp.com/config-checksum"] == null' | tee /dev/stderr)
+  [ "${actual}" = "false" ]
+}

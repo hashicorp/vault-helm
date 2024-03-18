@@ -457,9 +457,12 @@ Sets the injector deployment update strategy
 {{/*
 Sets extra pod annotations
 */}}
-{{- define "vault.annotations" -}}
-  {{- if .Values.server.annotations }}
+{{- define "vault.annotations" }}
       annotations:
+  {{- if .Values.server.includeConfigAnnotation }}
+        vault.hashicorp.com/config-checksum: {{ include "vault.config" . | sha256sum }}
+  {{- end }}
+  {{- if .Values.server.annotations }}
         {{- $tp := typeOf .Values.server.annotations }}
         {{- if eq $tp "string" }}
           {{- tpl .Values.server.annotations . | nindent 8 }}
@@ -1074,4 +1077,29 @@ Supported inputs are Values.ui
 {{- end }}
 {{- end -}}
 {{- end }}
+{{- end -}}
+
+{{/*
+config file from values
+*/}}
+{{- define "vault.config" -}}
+  {{- if or (eq .mode "ha") (eq .mode "standalone") }}
+  {{- $type := typeOf (index .Values.server .mode).config }}
+  {{- if eq $type "string" }}
+    disable_mlock = true
+  {{- if eq .mode "standalone" }}
+    {{ tpl .Values.server.standalone.config . | nindent 4 | trim }}
+  {{- else if and (eq .mode "ha") (eq (.Values.server.ha.raft.enabled | toString) "false") }}
+    {{ tpl .Values.server.ha.config . | nindent 4 | trim }}
+  {{- else if and (eq .mode "ha") (eq (.Values.server.ha.raft.enabled | toString) "true") }}
+    {{ tpl .Values.server.ha.raft.config . | nindent 4 | trim }}
+  {{ end }}
+  {{- else }}
+  {{- if and (eq .mode "ha") (eq (.Values.server.ha.raft.enabled | toString) "true") }}
+{{ merge (dict "disable_mlock" true) (index .Values.server .mode).raft.config | toPrettyJson | indent 4 }}
+  {{- else }}
+{{ merge (dict "disable_mlock" true) (index .Values.server .mode).config | toPrettyJson | indent 4 }}
+  {{- end }}
+  {{- end }}
+  {{- end }}
 {{- end -}}

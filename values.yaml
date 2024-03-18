@@ -668,6 +668,13 @@ server:
   # of the annotations to apply to the server pods
   annotations: {}
 
+  # Add an annotation to the server configmap and the statefulset pods,
+  # vaultproject.io/config-checksum, that is a hash of the Vault configuration.
+  # This can be used together with an OnDelete deployment strategy to help
+  # identify which pods still need to be deleted during a deployment to pick up
+  # any configuration changes.
+  configAnnotation: false
+
   # Enables a headless service to be used by the Vault Statefulset
   service:
     enabled: true
@@ -714,7 +721,7 @@ server:
     #     PreferDualStack: Allocates IPv4 and IPv6 cluster IPs for the Service.
     #     RequireDualStack: Allocates Service .spec.ClusterIPs from both IPv4 and IPv6 address ranges.
     ipFamilyPolicy: ""
-    
+
     # Sets the families that should be supported and the order in which they should be applied to ClusterIP as well.
     # Can be IPv4 and/or IPv6.
     ipFamilies: []
