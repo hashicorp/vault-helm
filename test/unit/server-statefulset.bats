@@ -1690,6 +1690,15 @@ load _helpers
   [ "${actual}" = "true" ]
 }
 
+@test "server/standalone-StatefulSet: config checksum annotation off does not set annotations" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      --show-only templates/server-statefulset.yaml \
+      . | tee /dev/stderr |
+      yq '.spec.template.metadata.annotations | length == 0' | tee /dev/stderr)
+  [ "${actual}" = "true" ]
+}
+
 @test "server/standalone-StatefulSet: config checksum annotation can be enabled" {
   cd `chart_dir`
   local actual=$(helm template \
