@@ -1,5 +1,8 @@
 ## Unreleased
 
+Bugs:
+* injector: add missing `get` `nodes` permission to ClusterRole [GH-1005](https://github.com/hashicorp/vault-helm/pull/1005)
+
 ## 0.27.0 (November 16, 2023)
 
 Changes:
