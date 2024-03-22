@@ -23,6 +23,11 @@ metadata:
 spec:
   {{- if .Values.server.service.type}}
   type: {{ .Values.server.service.type }}
+  {{- if eq .Values.server.service.type "LoadBalancer" }} 
+  {{- if not (empty .Values.server.service.loadBalancerIP) }}
+  loadBalancerIP: {{ .Values.server.service.loadBalancerIP }}
+  {{- end}}
+  {{- end}}
   {{- end}}
   {{- if (semverCompare ">= 1.23-0" .Capabilities.KubeVersion.Version) }}
   {{- if .Values.server.service.ipFamilyPolicy }}

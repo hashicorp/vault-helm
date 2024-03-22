@@ -113,6 +113,38 @@ load _helpers
   [ "${actual}" = "false" ]
 }
 
+@test "server/Service: LoadBalancer: not set (fixed) IP (type: ClusterIP)" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      --show-only templates/server-service.yaml \
+      --set 'server.service.type=ClusterIP' \
+      --set 'server.service.loadBalancerIP=192.168.0.10' \
+      . | tee /dev/stderr |
+      yq -r '.spec.loadBalancerIP' | tee /dev/stderr)
+  [ "${actual}" = "null" ]
+}
+
+@test "server/Service: LoadBalancer: not set (fixed) IP (type: null)" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      --show-only templates/server-service.yaml \
+      --set 'server.service.loadBalancerIP=192.168.0.10' \
+      . | tee /dev/stderr |
+      yq -r '.spec.loadBalancerIP' | tee /dev/stderr)
+  [ "${actual}" = "null" ]
+}
+
+@test "server/Service: LoadBalancer: set (fixed) IP (type: LoadBalancer)" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      --show-only templates/server-service.yaml \
+      --set 'server.service.type=LoadBalancer' \
+      --set 'server.service.loadBalancerIP=192.168.0.10' \
+      . | tee /dev/stderr |
+      yq -r '.spec.loadBalancerIP' | tee /dev/stderr)
+  [ "${actual}" = "192.168.0.10" ]
+}
+
 @test "server/Service: namespace" {
   cd `chart_dir`
   local actual=$(helm template \

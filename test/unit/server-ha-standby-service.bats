@@ -94,6 +94,41 @@ load _helpers
   [ "${actual}" = "false" ]
 }
 
+@test "server/ha-standby-Service: LoadBalancer: not set (fixed) IP (type: ClusterIP)" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      --show-only templates/server-ha-standby-service.yaml \
+      --set 'server.ha.enabled=true' \
+      --set 'server.ha.standbyIP=192.168.0.2' \
+      --set 'server.service.type=ClusterIP' \
+      . | tee /dev/stderr |
+      yq -r '.spec.loadBalancerIP' | tee /dev/stderr)
+  [ "${actual}" = "null" ]
+}
+
+@test "server/ha-standby-Service: LoadBalancer: not set (fixed) IP (type: null)" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      --show-only templates/server-ha-standby-service.yaml \
+      --set 'server.ha.enabled=true' \
+      --set 'server.ha.standbyIP=192.168.0.2' \
+      . | tee /dev/stderr |
+      yq -r '.spec.loadBalancerIP' | tee /dev/stderr)
+  [ "${actual}" = "null" ]
+}
+
+@test "server/ha-standby-Service: loadbalancer: set (fixed) ip (type: LoadBalancer)" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      --show-only templates/server-ha-standby-service.yaml \
+      --set 'server.ha.enabled=true' \
+      --set 'server.ha.standbyIP=192.168.0.2' \
+      --set 'server.service.type=LoadBalancer' \
+      . | tee /dev/stderr |
+      yq -r '.spec.loadBalancerIP' | tee /dev/stderr)
+  [ "${actual}" = "192.168.0.2" ]
+}
+
 @test "server/ha-standby-Service: namespace" {
   cd `chart_dir`
   local actual=$(helm template \

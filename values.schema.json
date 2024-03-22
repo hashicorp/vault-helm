@@ -983,6 +983,9 @@
                                 }
                             }
                         },
+                        "loadBalancerIP": {
+                            "type": "string"
+                        },
                         "port": {
                             "type": "integer"
                         },
