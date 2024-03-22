@@ -710,9 +710,9 @@ server:
     # Configures the service type for the main Vault service.  Can be ClusterIP
     # or NodePort or LoadBalancer.
     #type: ClusterIP
-    
+
     # (optional) Set the external IP to be used by the service (type: LoadBalancer only)
-    #loadBalancerIP: 
+    #loadBalancerIP:
 
     # The IP family and IP families options are to set the behaviour in a dual-stack environment.
     # Omitting these values will let the service fall back to whatever the CNI dictates the defaults
@@ -888,10 +888,10 @@ server:
     # See https://developer.hashicorp.com/vault/docs/configuration#cluster_addr
     # If set to null, this will be set to https://$(HOSTNAME).{{ template "vault.fullname" . }}-internal:8201
     clusterAddr: null
-      
-    # Set IPs for active/standby vault instances
-    activeIP:  194.50.28.142
-    standbyIP: 194.50.28.143
+
+    # Set IPs for active/standby vault instances (only valid for service of type "LoadBalancer")
+    #activeIP:
+    #standbyIP:
 
     # Enables Vault's integrated Raft storage.  Unlike the typical HA modes where
     # Vault's persistence is external (such as Consul), enabling Raft mode will create
