@@ -393,6 +393,10 @@ server:
   # Supported log formats include: standard, json
   logFormat: ""
 
+  # Configure the Service - environment variables for the StatefulSet
+  # See https://kubernetes.io/docs/tutorials/services/connect-applications-service/#accessing-the-service
+  enableServiceLinks: true
+
   resources: {}
   # resources:
   #   requests:
