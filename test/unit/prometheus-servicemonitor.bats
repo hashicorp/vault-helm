@@ -123,3 +123,57 @@ load _helpers
   [ "$(echo "$output" | yq -r '.spec.endpoints | length')" = "1" ]
   [ "$(echo "$output" | yq -r '.spec.endpoints[0].port')" = "https" ]
 }
+
+@test "prometheus/ServiceMonitor-server: assertMetricRelabelings default" {
+  cd `chart_dir`
+  local output=$( (helm template \
+      --show-only templates/prometheus-servicemonitor.yaml \
+      --set 'serverTelemetry.serviceMonitor.enabled=true' \
+      . ) | tee /dev/stderr)
+
+  [ "$(echo "$output" | yq -r '.spec.endpoints | length')" = "1" ]
+  [ "$(echo "$output" | yq -r '.spec.endpoints[0] | has("metricRelabelings")')" = "false" ]
+}
+
+@test "prometheus/ServiceMonitor-server: assertMetricRelabelings override" {
+  cd `chart_dir`
+  local output=$( (helm template \
+      --show-only templates/prometheus-servicemonitor.yaml \
+      --set 'serverTelemetry.serviceMonitor.enabled=true' \
+      --set 'serverTelemetry.serviceMonitor.metricRelabelings[0]=foo' \
+      --set 'serverTelemetry.serviceMonitor.metricRelabelings[1]=foo' \
+      . ) | tee /dev/stderr)
+
+  [ "$(echo "$output" | yq -r '.spec.endpoints | length')" = "1" ]
+  [ "$(echo "$output" | yq -r '.spec.endpoints[0] | has("metricRelabelings")')" = "true" ]
+  [ "$(echo "$output" | yq -r '.spec.endpoints[0].metricRelabelings | length')" = "2" ]
+  [ "$(echo "$output" | yq -r '.spec.endpoints[0].metricRelabelings[0]')" = "foo" ]
+  [ "$(echo "$output" | yq -r '.spec.endpoints[0].metricRelabelings[1]')" = "foo" ]
+}
+
+@test "prometheus/ServiceMonitor-server: assertRelabelings default" {
+  cd `chart_dir`
+  local output=$( (helm template \
+      --show-only templates/prometheus-servicemonitor.yaml \
+      --set 'serverTelemetry.serviceMonitor.enabled=true' \
+      . ) | tee /dev/stderr)
+
+  [ "$(echo "$output" | yq -r '.spec.endpoints | length')" = "1" ]
+  [ "$(echo "$output" | yq -r '.spec.endpoints[0] | has("relabelings")')" = "false" ]
+}
+
+@test "prometheus/ServiceMonitor-server: assertRelabelings override" {
+  cd `chart_dir`
+  local output=$( (helm template \
+      --show-only templates/prometheus-servicemonitor.yaml \
+      --set 'serverTelemetry.serviceMonitor.enabled=true' \
+      --set 'serverTelemetry.serviceMonitor.relabelings[0]=foo' \
+      --set 'serverTelemetry.serviceMonitor.relabelings[1]=foo' \
+      . ) | tee /dev/stderr)
+
+  [ "$(echo "$output" | yq -r '.spec.endpoints | length')" = "1" ]
+  [ "$(echo "$output" | yq -r '.spec.endpoints[0] | has("relabelings")')" = "true" ]
+  [ "$(echo "$output" | yq -r '.spec.endpoints[0].relabelings | length')" = "2" ]
+  [ "$(echo "$output" | yq -r '.spec.endpoints[0].relabelings[0]')" = "foo" ]
+  [ "$(echo "$output" | yq -r '.spec.endpoints[0].relabelings[1]')" = "foo" ]
+}
