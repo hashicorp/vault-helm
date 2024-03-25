@@ -1284,6 +1284,10 @@ serverTelemetry:
     # Timeout for Prometheus scrapes
     scrapeTimeout: 10s
 
+    # Configures the relabeling rules to apply to the samples before ingestion
+    # https://github.com/prometheus-operator/prometheus-operator/blob/main/Documentation/api.md#monitoring.coreos.com/v1.RelabelConfig
+    metricRelabelings: []
+
   prometheusRules:
       # The Prometheus operator *must* be installed before enabling this feature,
       # if not the chart will fail to install due to missing CustomResourceDefinitions
