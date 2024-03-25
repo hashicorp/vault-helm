@@ -590,6 +590,9 @@
                     "properties": {
                         "enabled": {
                             "type": "boolean"
+                        },
+                        "namespaceLabelsRole": {
+                            "type": "boolean"
                         }
                     }
                 },
