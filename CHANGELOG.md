@@ -1,6 +1,20 @@
 ## Unreleased
 
+## 0.28.0 (TBD)
+
+Changes:
+
+* Default `vault` version updated to 1.16.1
+* Default `vault-k8s` version updated to 1.4.1
+* Default `vault-csi-provider` version updated to 1.4.2
+* Tested with Kubernetes versions 1.25-1.29
+
+Features:
+
+* server: Add annotation on config change [GH-1001](https://github.com/hashicorp/vault-helm/pull/1001)
+
 Bugs:
+
 * injector: add missing `get` `nodes` permission to ClusterRole [GH-1005](https://github.com/hashicorp/vault-helm/pull/1005)
 
 ## 0.27.0 (November 16, 2023)
