@@ -152,7 +152,7 @@ load _helpers
       --set 'serverTelemetry.serviceMonitor.enabled=true' \
       . ) | tee /dev/stderr)
 
-  [ "$(echo "$output" | yq -r '.spec.endpoints[0] | has("bearerToken")')" = "false" ]
+  [ "$(echo "$output" | yq -r '.spec.endpoints[0] | has("bearerTokenFile")')" = "false" ]
 }
 
 @test "prometheus/ServiceMonitor-server: bearerTokenFile set" {
