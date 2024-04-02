@@ -1234,8 +1234,8 @@ csi:
 # https://developer.hashicorp.com/vault/docs/configuration/telemetry
 # https://developer.hashicorp.com/vault/docs/internals/telemetry
 serverTelemetry:
-  # Enable support for the Prometheus Operator. Currently, this chart does not support
-  # authenticating to Vault's metrics endpoint, so the following `telemetry{}` must be included
+  # Enable support for the Prometheus Operator. If bearerTokenFile is not set for authenticating
+  # to Vault's metrics endpoint, the following Vault server `telemetry{}` config must be included
   # in the `listener "tcp"{}` stanza
   #  telemetry {
   #    unauthenticated_metrics_access = "true"
