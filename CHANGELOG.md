@@ -1,6 +1,6 @@
 ## Unreleased
 
-## 0.28.0 (TBD)
+## 0.28.0 (April 8, 2024)
 
 Changes:
 
