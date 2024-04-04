@@ -3,7 +3,7 @@
 
 # chart_dir returns the directory for the chart
 chart_dir() {
-    echo ${BATS_TEST_DIRNAME}/../..
+    echo "${BATS_TEST_DIRNAME}"/../..
 }
 
 # check_result checks if the specified test passed
@@ -16,6 +16,12 @@ chart_dir() {
 # }
 check_result() {
   local -r var="$1"
-  local check=$(cat $VERIFY_OUTPUT | jq -r ".results[] | select(.check==\"${var}\").outcome")
-  [ "$check" = "PASS" ]
+  local -r check=$(jq -r ".results[] | select(.check==\"${var}\")" < "$VERIFY_OUTPUT")
+  local -r outcome=$(jq -r .outcome <<< "$check")
+  local -r reason=$(jq -r .reason <<< "$check")
+
+  # print the reason if this fails
+  echo "reason: ${reason}"
+
+  [ "$outcome" = "PASS" ]
 }
