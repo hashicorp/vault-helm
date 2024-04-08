@@ -30,7 +30,7 @@ setup_file() {
       --output json \
       --openshift-version $OPENSHIFT_VERSION \
       --disable $DISABLED_TESTS \
-      --chart-values values.openshift.yaml 2>&1 | tee $VERIFY_OUTPUT
+      --chart-values values.openshift.yaml | tee $VERIFY_OUTPUT
 }
 
 teardown_file() {
