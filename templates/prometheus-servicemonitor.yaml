@@ -43,6 +43,9 @@ spec:
       - prometheus
     tlsConfig:
       insecureSkipVerify: true
+    {{- with .Values.serverTelemetry.serviceMonitor.metricRelabelings }}
+    metricRelabelings: {{ toYaml . | nindent 6 }}
+    {{- end }}
   namespaceSelector:
     matchNames:
       - {{ include "vault.namespace" . }}
