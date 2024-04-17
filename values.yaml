@@ -475,6 +475,12 @@ server:
   authDelegator:
     enabled: true
 
+    # namespaceLabelsRole enables a cluster role and cluster role binding to be
+    # attached to the service account. This cluster role and cluster role
+    # binding are used by the auth delegator when using namespace label
+    # selectors on the Kubernetes authentication method.
+    namespaceLabelsRole: true
+
   # extraInitContainers is a list of init containers. Specified as a YAML list.
   # This is useful if you need to run a script to provision TLS certificates or
   # write out configuration files in a dynamic way.
