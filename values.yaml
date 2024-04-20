@@ -881,7 +881,7 @@ server:
     # If set to null, this will be set to the Pod IP Address
     apiAddr: null
 
-    # Set the cluster_addr confuguration for Vault HA
+    # Set the cluster_addr configuration for Vault HA
     # See https://developer.hashicorp.com/vault/docs/configuration#cluster_addr
     # If set to null, this will be set to https://$(HOSTNAME).{{ template "vault.fullname" . }}-internal:8201
     clusterAddr: null
