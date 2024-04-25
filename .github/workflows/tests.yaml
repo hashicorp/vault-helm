@@ -4,7 +4,7 @@ jobs:
   bats-unit-tests:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.1
+      - uses: actions/checkout@0ad4b8fadaa221de15dcec353f45205ec38ea70b # v4.1.4
       - uses: ./.github/actions/setup-test-tools
       - run: bats --tap --timing ./test/unit
   chart-verifier:
@@ -12,7 +12,7 @@ jobs:
     env:
       CHART_VERIFIER_VERSION: '1.13.3'
     steps:
-      - uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.1
+      - uses: actions/checkout@0ad4b8fadaa221de15dcec353f45205ec38ea70b # v4.1.4
       - name: Setup test tools
         uses: ./.github/actions/setup-test-tools
       - uses: actions/setup-go@0c52d547c9bc32b1aa3301fd7a9cb496313a4491 # v5.0.0
