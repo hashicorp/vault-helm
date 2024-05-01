@@ -36,9 +36,6 @@ spec:
   - port: {{ include "vault.scheme" . }}
     interval: {{ .Values.serverTelemetry.serviceMonitor.interval }}
     scrapeTimeout: {{ .Values.serverTelemetry.serviceMonitor.scrapeTimeout }}
-    {{- if .Values.serverTelemetry.serviceMonitor.bearerTokenFile }}
-    bearerTokenFile: {{ .Values.serverTelemetry.serviceMonitor.bearerTokenFile }}
-    {{- end }}
     scheme: {{ include "vault.scheme" . | lower }}
     path: /v1/sys/metrics
     params:
@@ -51,6 +48,11 @@ spec:
     {{- else }}
     tlsConfig:
       insecureSkipVerify: true
+    {{- end }}
+    {{- $authz := .Values.serverTelemetry.serviceMonitor.authorization }}
+    {{- if $authz }}
+    authorization:
+    {{- toYaml $authz | nindent 6 }}
     {{- end }}
   namespaceSelector:
     matchNames:

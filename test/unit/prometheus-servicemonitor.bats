@@ -145,23 +145,23 @@ load _helpers
   [ "$(echo "$output" | yq -r '.spec.endpoints[0].tlsConfig.ca')" = "ca.crt" ]
 }
 
-@test "prometheus/ServiceMonitor-server: bearerTokenFile default" {
+@test "prometheus/ServiceMonitor-server: authorization default" {
   cd `chart_dir`
   local output=$( (helm template \
       --show-only templates/prometheus-servicemonitor.yaml \
       --set 'serverTelemetry.serviceMonitor.enabled=true' \
       . ) | tee /dev/stderr)
 
-  [ "$(echo "$output" | yq -r '.spec.endpoints[0] | has("bearerTokenFile")')" = "false" ]
+  [ "$(echo "$output" | yq -r '.spec.endpoints[0].authorization')" = "null" ]
 }
 
-@test "prometheus/ServiceMonitor-server: bearerTokenFile set" {
+@test "prometheus/ServiceMonitor-server: authorization override" {
   cd `chart_dir`
   local output=$( (helm template \
       --show-only templates/prometheus-servicemonitor.yaml \
+      --set 'serverTelemetry.serviceMonitor.authorization.credentials.name=a-secret' \
       --set 'serverTelemetry.serviceMonitor.enabled=true' \
-      --set 'serverTelemetry.serviceMonitor.bearerTokenFile=tokenfile' \
       . ) | tee /dev/stderr)
 
-  [ "$(echo "$output" | yq -r '.spec.endpoints[0].bearerTokenFile')" = "tokenfile" ]
+  [ "$(echo "$output" | yq -r '.spec.endpoints[0].authorization.credentials.name')" = "a-secret" ]
 }

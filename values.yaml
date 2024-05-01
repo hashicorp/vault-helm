@@ -1234,7 +1234,7 @@ csi:
 # https://developer.hashicorp.com/vault/docs/configuration/telemetry
 # https://developer.hashicorp.com/vault/docs/internals/telemetry
 serverTelemetry:
-  # Enable support for the Prometheus Operator. If bearerTokenFile is not set for authenticating
+  # Enable support for the Prometheus Operator. If authorization is not set for authenticating
   # to Vault's metrics endpoint, the following Vault server `telemetry{}` config must be included
   # in the `listener "tcp"{}` stanza
   #  telemetry {
@@ -1277,11 +1277,24 @@ serverTelemetry:
     # Timeout for Prometheus scrapes
     scrapeTimeout: 10s
 
-    # tlsConfig used for connecting to the Vault API
+    # tlsConfig used for scraping the Vault metrics API.
+    # See API reference: https://prometheus-operator.dev/docs/operator/api/#monitoring.coreos.com/v1.TLSConfig
+    # example:
+    # tlsConfig:
+    #   ca:
+    #     secret:
+    #       name: vault-metrics-client
+    #       key: ca.crt
     tlsConfig: {}
 
-    # bearerTokenfile used for authentication to the Vault metrics API
-    bearerTokenFile: ""
+    # authorization used for scraping the Vault metrics API.
+    # See API reference: https://prometheus-operator.dev/docs/operator/api/#monitoring.coreos.com/v1.SafeAuthorization
+    # example:
+    # authorization:
+    #   credentials:
+    #     name: vault-metrics-client
+    #     key: token
+    authorization: {}
 
   prometheusRules:
       # The Prometheus operator *must* be installed before enabling this feature,
