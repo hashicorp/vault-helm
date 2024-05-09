@@ -41,18 +41,16 @@ spec:
     params:
       format:
       - prometheus
-    {{- $tlsConfig := .Values.serverTelemetry.serviceMonitor.tlsConfig }}
-    {{- if $tlsConfig }}
+    {{- with .Values.serverTelemetry.serviceMonitor.tlsConfig }}
     tlsConfig:
-    {{- toYaml $tlsConfig | nindent 6 }}
+    {{- toYaml . | nindent 6 }}
     {{- else }}
     tlsConfig:
       insecureSkipVerify: true
     {{- end }}
-    {{- $authz := .Values.serverTelemetry.serviceMonitor.authorization }}
-    {{- if $authz }}
+    {{- with .Values.serverTelemetry.serviceMonitor.authorization }}
     authorization:
-    {{- toYaml $authz | nindent 6 }}
+    {{- toYaml . | nindent 6 }}
     {{- end }}
   namespaceSelector:
     matchNames:
