@@ -1,3 +1,8 @@
+{{/*
+Copyright (c) HashiCorp, Inc.
+SPDX-License-Identifier: MPL-2.0
+*/}}
+
 {{ template "vault.mode" . }}
 {{- if ne .mode "external" }}
 {{- if ne .mode "" }}
@@ -7,7 +12,7 @@ apiVersion: apps/v1
 kind: StatefulSet
 metadata:
   name: {{ template "vault.fullname" . }}
-  namespace: {{ .Release.Namespace }}
+  namespace: {{ include "vault.namespace" . }}
   labels:
     app.kubernetes.io/name: {{ include "vault.name" . }}
     app.kubernetes.io/instance: {{ .Release.Name }}
@@ -19,6 +24,9 @@ spec:
   replicas: {{ template "vault.replicas" . }}
   updateStrategy:
     type: {{ .Values.server.updateStrategyType }}
+  {{- if and (semverCompare ">= 1.23-0" .Capabilities.KubeVersion.Version) (.Values.server.persistentVolumeClaimRetentionPolicy) }}
+  persistentVolumeClaimRetentionPolicy: {{ toYaml .Values.server.persistentVolumeClaimRetentionPolicy | nindent 4 }}
+  {{- end }}
   selector:
     matchLabels:
       app.kubernetes.io/name: {{ template "vault.name" . }}
@@ -49,10 +57,17 @@ spec:
       shareProcessNamespace: true
       {{ end }}
       {{- template "server.statefulSet.securityContext.pod" . }}
+      {{- if not .Values.global.openshift }}
+      hostNetwork: {{ .Values.server.hostNetwork }}
+      {{- end }}
       volumes:
         {{ template "vault.volumes" . }}
         - name: home
           emptyDir: {}
+      {{- if .Values.server.hostAliases }}
+      hostAliases:
+        {{ toYaml .Values.server.hostAliases | nindent 8}}
+      {{- end }}
       {{- if .Values.server.extraInitContainers }}
       initContainers:
         {{ toYaml .Values.server.extraInitContainers | nindent 8}}
@@ -102,7 +117,7 @@ spec:
                   fieldPath: metadata.name
             - name: VAULT_CLUSTER_ADDR
               {{- if .Values.server.ha.clusterAddr }}
-              value: {{ .Values.server.ha.clusterAddr }}
+              value: {{ .Values.server.ha.clusterAddr | quote }}
               {{- else }}
               value: "https://$(HOSTNAME).{{ template "vault.fullname" . }}-internal:8201"
               {{- end }}
@@ -140,12 +155,15 @@ spec:
               name: https-internal
             - containerPort: 8202
               name: {{ include "vault.scheme" . }}-rep
+          {{- if .Values.server.extraPorts -}}
+          {{ toYaml .Values.server.extraPorts | nindent 12}}
+          {{- end }}
           {{- if .Values.server.readinessProbe.enabled }}
           readinessProbe:
             {{- if .Values.server.readinessProbe.path }}
             httpGet:
               path: {{ .Values.server.readinessProbe.path | quote }}
-              port: 8200
+              port: {{ .Values.server.readinessProbe.port }}
               scheme: {{ include "vault.scheme" . | upper }}
             {{- else }}
             # Check status; unsealed vault servers return 0
@@ -164,10 +182,18 @@ spec:
           {{- end }}
           {{- if .Values.server.livenessProbe.enabled }}
           livenessProbe:
+            {{- if .Values.server.livenessProbe.execCommand }}
+            exec:
+              command:
+                {{- range (.Values.server.livenessProbe.execCommand) }}
+                - {{ . | quote }}
+                {{- end }}
+            {{- else }}
             httpGet:
               path: {{ .Values.server.livenessProbe.path | quote }}
-              port: 8200
+              port: {{ .Values.server.livenessProbe.port }}
               scheme: {{ include "vault.scheme" . | upper }}
+            {{- end }}
             failureThreshold: {{ .Values.server.livenessProbe.failureThreshold }}
             initialDelaySeconds: {{ .Values.server.livenessProbe.initialDelaySeconds }}
             periodSeconds: {{ .Values.server.livenessProbe.periodSeconds }}

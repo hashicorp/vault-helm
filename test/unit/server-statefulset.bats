@@ -78,6 +78,25 @@ load _helpers
   [ "${actual}" = "false" ]
 }
 
+@test "server/standalone-StatefulSet: namespace" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      --show-only templates/server-statefulset.yaml  \
+      --set 'server.standalone.enabled=true' \
+      --namespace foo \
+      . | tee /dev/stderr |
+      yq -r '.metadata.namespace' | tee /dev/stderr)
+  [ "${actual}" = "foo" ]
+  local actual=$(helm template \
+      --show-only templates/server-statefulset.yaml  \
+      --set 'server.standalone.enabled=true' \
+      --set 'global.namespace=bar' \
+      --namespace foo \
+      . | tee /dev/stderr |
+      yq -r '.metadata.namespace' | tee /dev/stderr)
+  [ "${actual}" = "bar" ]
+}
+
 @test "server/standalone-StatefulSet: image defaults to server.image.repository:tag" {
   cd `chart_dir`
   local actual=$(helm template \
@@ -200,6 +219,73 @@ load _helpers
       . | tee /dev/stderr |
       yq -r '.spec.updateStrategy.type' | tee /dev/stderr)
   [ "${actual}" = "OnDelete" ]
+}
+
+#--------------------------------------------------------------------
+# persistentVolumeClaimRetentionPolicy
+
+@test "server/standalone-StatefulSet: persistentVolumeClaimRetentionPolicy not set by default when kubernetes < 1.23" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      -s templates/server-statefulset.yaml  \
+      --kube-version "1.22" \
+      . | tee /dev/stderr |
+      yq -r '.spec.persistentVolumeClaimRetentionPolicy' | tee /dev/stderr)
+  [ "${actual}" = "null" ]
+}
+
+@test "server/standalone-StatefulSet: unset persistentVolumeClaimRetentionPolicy.whenDeleted when kubernetes < 1.23" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      -s templates/server-statefulset.yaml  \
+      --kube-version "1.22" \
+      --set 'server.persistentVolumeClaimRetentionPolicy.whenDeleted=Delete' \
+      . | tee /dev/stderr |
+      yq -r '.spec.persistentVolumeClaimRetentionPolicy.whenDeleted' | tee /dev/stderr)
+  [ "${actual}" = "null" ]
+}
+
+@test "server/standalone-StatefulSet: unset persistentVolumeClaimRetentionPolicy.whenScaled when kubernetes < 1.23" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      -s templates/server-statefulset.yaml  \
+      --kube-version "1.22" \
+      --set 'server.persistentVolumeClaimRetentionPolicy.whenScaled=Delete' \
+      . | tee /dev/stderr |
+      yq -r '.spec.persistentVolumeClaimRetentionPolicy.whenScaled' | tee /dev/stderr)
+  [ "${actual}" = "null" ]
+}
+
+@test "server/standalone-StatefulSet: persistentVolumeClaimRetentionPolicy not set by default when kubernetes >= 1.23" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      -s templates/server-statefulset.yaml  \
+      --kube-version "1.23" \
+      . | tee /dev/stderr |
+      yq -r '.spec.persistentVolumeClaimRetentionPolicy' | tee /dev/stderr)
+  [ "${actual}" = "null" ]
+}
+
+@test "server/standalone-StatefulSet: can set persistentVolumeClaimRetentionPolicy.whenDeleted when kubernetes >= 1.23" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      -s templates/server-statefulset.yaml  \
+      --kube-version "1.23" \
+      --set 'server.persistentVolumeClaimRetentionPolicy.whenDeleted=Delete' \
+      . | tee /dev/stderr |
+      yq -r '.spec.persistentVolumeClaimRetentionPolicy.whenDeleted' | tee /dev/stderr)
+  [ "${actual}" = "Delete" ]
+}
+
+@test "server/standalone-StatefulSet: can set persistentVolumeClaimRetentionPolicy.whenScaled when kubernetes >= 1.23" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      -s templates/server-statefulset.yaml  \
+      --kube-version "1.23" \
+      --set 'server.persistentVolumeClaimRetentionPolicy.whenScaled=Delete' \
+      . | tee /dev/stderr |
+      yq -r '.spec.persistentVolumeClaimRetentionPolicy.whenScaled' | tee /dev/stderr)
+  [ "${actual}" = "Delete" ]
 }
 
 #--------------------------------------------------------------------
@@ -1396,6 +1482,41 @@ load _helpers
   [ "${actual}" = "100" ]
 }
 
+@test "server/standalone-StatefulSet: liveness exec disabled by default" {
+  cd `chart_dir`
+  local object=$(helm template \
+      --show-only templates/server-statefulset.yaml  \
+      --set 'server.livenessProbe.enabled=true' \
+      . | tee /dev/stderr |
+      yq -r '.spec.template.spec.containers[0].livenessProbe' | tee /dev/stderr)
+
+  local actual=$(echo $object |
+      yq -r '.exec' | tee /dev/stderr)
+  [ "${actual}" = "null" ]
+
+  local actual=$(echo $object |
+      yq -r '.httpGet' | tee /dev/stderr)
+  [ ! "${actual}" = "null" ]
+}
+
+@test "server/standalone-StatefulSet: liveness exec can be set" {
+  cd `chart_dir`
+  local object=$(helm template \
+      --show-only templates/server-statefulset.yaml  \
+      --set 'server.livenessProbe.enabled=true' \
+      --set='server.livenessProbe.execCommand={/bin/sh,-c,sleep}' \
+      . | tee /dev/stderr |
+      yq -r '.spec.template.spec.containers[0].livenessProbe' | tee /dev/stderr)
+
+  local actual=$(echo $object |
+      yq -r '.exec.command[0]' | tee /dev/stderr)
+  [ "${actual}" = "/bin/sh" ]
+
+  local actual=$(echo $object |
+      yq -r '.httpGet' | tee /dev/stderr)
+  [ "${actual}" = "null" ]
+}
+
 #--------------------------------------------------------------------
 # args
 @test "server/standalone-StatefulSet: add extraArgs" {
@@ -1558,6 +1679,34 @@ load _helpers
       . | tee /dev/stderr |
       yq -r '.spec.template.metadata.annotations["vaultIsAwesome"]' | tee /dev/stderr)
   [ "${actual}" = "true" ]
+}
+
+@test "server/standalone-StatefulSet: config checksum annotation defaults to off" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      --show-only templates/server-statefulset.yaml \
+      . | tee /dev/stderr |
+      yq '.spec.template.metadata.annotations["vault.hashicorp.com/config-checksum"] == null' | tee /dev/stderr)
+  [ "${actual}" = "true" ]
+}
+
+@test "server/standalone-StatefulSet: config checksum annotation off does not set annotations" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      --show-only templates/server-statefulset.yaml \
+      . | tee /dev/stderr |
+      yq '.spec.template.metadata.annotations | length == 0' | tee /dev/stderr)
+  [ "${actual}" = "true" ]
+}
+
+@test "server/standalone-StatefulSet: config checksum annotation can be enabled" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      --show-only templates/server-statefulset.yaml \
+      --set 'server.includeConfigAnnotation=true' \
+      . | tee /dev/stderr |
+      yq '.spec.template.metadata.annotations["vault.hashicorp.com/config-checksum"] == null' | tee /dev/stderr)
+  [ "${actual}" = "false" ]
 }
 
 #--------------------------------------------------------------------
@@ -1783,4 +1932,145 @@ load _helpers
       . | tee /dev/stderr |
       yq -r '.spec.template.spec.containers[0].securityContext.foo' | tee /dev/stderr)
   [ "${actual}" = "bar" ]
+}
+
+#--------------------------------------------------------------------
+# hostNetwork
+
+@test "server/StatefulSet: server.hostNetwork not set" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      --show-only templates/server-statefulset.yaml \
+      . | tee /dev/stderr |
+      yq -r '.spec.template.spec.hostNetwork' | tee /dev/stderr)
+  [ "${actual}" = "false" ]
+}
+
+@test "server/StatefulSet: server.hostNetwork is set" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      --show-only templates/server-statefulset.yaml \
+      --set 'server.hostNetwork=true' \
+      . | tee /dev/stderr |
+      yq -r '.spec.template.spec.hostNetwork' | tee /dev/stderr)
+  [ "${actual}" = "true" ]
+}
+
+#--------------------------------------------------------------------
+# hostAliases
+
+@test "server/StatefulSet: server.hostAliases not set" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      --show-only templates/server-statefulset.yaml \
+      . | tee /dev/stderr |
+      yq -r '.spec.template.spec.hostAliases' | tee /dev/stderr)
+  [ "${actual}" = "null" ]
+}
+
+@test "server/StatefulSet: server.hostAliases is set" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      --show-only templates/server-statefulset.yaml \
+      --set 'server.hostAliases[0]=foo' \
+      . | tee /dev/stderr |
+      yq -r '.spec.template.spec.hostAliases[]' | tee /dev/stderr)
+  [ "${actual}" = "foo" ]
+}
+
+#--------------------------------------------------------------------
+# extraPorts
+
+@test "server/standalone-StatefulSet: adds extra ports" {
+  cd `chart_dir`
+
+  # Test that it defines it
+  local object=$(helm template \
+      --show-only templates/server-statefulset.yaml  \
+      --set 'server.extraPorts[0].containerPort=1111' \
+      --set 'server.extraPorts[0].name=foo' \
+      . | tee /dev/stderr |
+      yq -r '.spec.template.spec.containers[0].ports[] | select(.name == "foo")' | tee /dev/stderr)
+
+  local actual=$(echo $object |
+      yq -r '.containerPort' | tee /dev/stderr)
+  [ "${actual}" = "1111" ]
+
+  local actual=$(echo $object |
+      yq -r '.name' | tee /dev/stderr)
+  [ "${actual}" = "foo" ]
+}
+
+#--------------------------------------------------------------------
+# readinessProbe
+
+@test "server/StatefulSet: server.readinessProbe.port is set" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      --show-only templates/server-statefulset.yaml \
+      --set 'server.readinessProbe.enabled=true' \
+      --set 'server.readinessProbe.path=foo' \
+      . | tee /dev/stderr |
+      yq -r '.spec.template.spec.containers[0].readinessProbe.httpGet.port' | tee /dev/stderr)
+  [ "${actual}" = "8200" ]
+}
+
+
+#--------------------------------------------------------------------
+# livenessProbe
+
+@test "server/StatefulSet: server.livenessProbe.port is set" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      --show-only templates/server-statefulset.yaml \
+      --set 'server.livenessProbe.enabled=true' \
+      . | tee /dev/stderr |
+      yq -r '.spec.template.spec.containers[0].livenessProbe.httpGet.port' | tee /dev/stderr)
+  [ "${actual}" = "8200" ]
+}
+
+#--------------------------------------------------------------------
+# labels
+@test "server/standalone-StatefulSet: auditStorage volumeClaim labels string" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      --show-only templates/server-statefulset.yaml \
+      --set 'server.auditStorage.enabled=true' \
+      --set 'server.auditStorage.labels=vaultIsAwesome: true' \
+      . | tee /dev/stderr |
+      yq -r '.spec.volumeClaimTemplates[1].metadata.labels["vaultIsAwesome"]' | tee /dev/stderr)
+  [ "${actual}" = "true" ]
+}
+
+@test "server/standalone-StatefulSet: dataStorage volumeClaim labels string" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      --show-only templates/server-statefulset.yaml \
+      --set 'server.dataStorage.enabled=true' \
+      --set 'server.dataStorage.labels=vaultIsAwesome: true' \
+      . | tee /dev/stderr |
+      yq -r '.spec.volumeClaimTemplates[0].metadata.labels["vaultIsAwesome"]' | tee /dev/stderr)
+  [ "${actual}" = "true" ]
+}
+
+@test "server/standalone-StatefulSet: auditStorage volumeClaim labels yaml" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      --show-only templates/server-statefulset.yaml \
+      --set 'server.auditStorage.enabled=true' \
+      --set 'server.auditStorage.labels.vaultIsAwesome=true' \
+      . | tee /dev/stderr |
+      yq -r '.spec.volumeClaimTemplates[1].metadata.labels["vaultIsAwesome"]' | tee /dev/stderr)
+  [ "${actual}" = "true" ]
+}
+
+@test "server/standalone-StatefulSet: dataStorage volumeClaim labels yaml" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      --show-only templates/server-statefulset.yaml \
+      --set 'server.dataStorage.enabled=true' \
+      --set 'server.dataStorage.labels.vaultIsAwesome=true' \
+      . | tee /dev/stderr |
+      yq -r '.spec.volumeClaimTemplates[0].metadata.labels["vaultIsAwesome"]' | tee /dev/stderr)
+  [ "${actual}" = "true" ]
 }

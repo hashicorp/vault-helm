@@ -21,6 +21,17 @@ load _helpers
   [ "${actual}" = "true" ]
 }
 
+@test "server/network-policy: ingress changed by server.networkPolicy.ingress" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      --set 'server.networkPolicy.enabled=true' \
+      --set 'server.networkPolicy.ingress[0].from[0].podSelector.matchLabels.foo=bar' \
+      --show-only templates/server-network-policy.yaml \
+      . | tee /dev/stderr |
+      yq -r '.spec.ingress[0].from[0].podSelector.matchLabels.foo' | tee /dev/stderr)
+  [ "${actual}" = "bar" ]
+}
+
 @test "server/network-policy: egress enabled by server.networkPolicy.egress" {
   cd `chart_dir`
   local actual=$(helm template \

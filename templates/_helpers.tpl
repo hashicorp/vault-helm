@@ -1,4 +1,9 @@
 {{/*
+Copyright (c) HashiCorp, Inc.
+SPDX-License-Identifier: MPL-2.0
+*/}}
+
+{{/*
 Create a default fully qualified app name.
 We truncate at 63 chars because some Kubernetes name fields are limited to
 this (by the DNS naming spec). If release name contains chart name it will
@@ -32,6 +37,13 @@ Expand the name of the chart.
 {{- end -}}
 
 {{/*
+Allow the release namespace to be overridden
+*/}}
+{{- define "vault.namespace" -}}
+{{- default .Release.Namespace .Values.global.namespace -}}
+{{- end -}}
+
+{{/*
 Compute if the csi driver is enabled.
 */}}
 {{- define "vault.csiEnabled" -}}
@@ -59,7 +71,7 @@ Compute if the server is enabled.
 {{- end -}}
 
 {{/*
-Compute if the server auth delegator serviceaccount is enabled.
+Compute if the server serviceaccount is enabled.
 */}}
 {{- define "vault.serverServiceAccountEnabled" -}}
 {{- $_ := set . "serverServiceAccountEnabled"
@@ -69,6 +81,17 @@ Compute if the server auth delegator serviceaccount is enabled.
       (eq (.Values.server.enabled | toString) "true")
       (eq (.Values.global.enabled | toString) "true"))) -}}
 {{- end -}}
+
+{{/*
+Compute if the server serviceaccount should have a token created and mounted to the serviceaccount.
+*/}}
+{{- define "vault.serverServiceAccountSecretCreationEnabled" -}}
+{{- $_ := set . "serverServiceAccountSecretCreationEnabled"
+  (and
+    (eq (.Values.server.serviceAccount.create | toString) "true")
+    (eq (.Values.server.serviceAccount.createSecret | toString) "true")) -}}
+{{- end -}}
+
 
 {{/*
 Compute if the server auth delegator serviceaccount is enabled.
@@ -144,7 +167,11 @@ Set's the replica count based on the different modes configured by user
   {{ if eq .mode "standalone" }}
     {{- default 1 -}}
   {{ else if eq .mode "ha" }}
-    {{- .Values.server.ha.replicas | default 3 -}}
+    {{- if or (kindIs "int64" .Values.server.ha.replicas) (kindIs "float64" .Values.server.ha.replicas) -}}
+      {{- .Values.server.ha.replicas -}}
+    {{ else }}
+      {{- 3 -}}
+    {{- end -}}
   {{ else }}
     {{- default 1 -}}
   {{ end }}
@@ -262,6 +289,7 @@ storage might be desired by the user.
     - metadata:
         name: data
         {{- include "vault.dataVolumeClaim.annotations" . | nindent 6 }}
+        {{- include "vault.dataVolumeClaim.labels" . | nindent 6 }}
       spec:
         accessModes:
           - {{ .Values.server.dataStorage.accessMode | default "ReadWriteOnce" }}
@@ -276,6 +304,7 @@ storage might be desired by the user.
     - metadata:
         name: audit
         {{- include "vault.auditVolumeClaim.annotations" . | nindent 6 }}
+        {{- include "vault.auditVolumeClaim.labels" . | nindent 6 }}
       spec:
         accessModes:
           - {{ .Values.server.auditStorage.accessMode | default "ReadWriteOnce" }}
@@ -428,9 +457,12 @@ Sets the injector deployment update strategy
 {{/*
 Sets extra pod annotations
 */}}
-{{- define "vault.annotations" -}}
-  {{- if .Values.server.annotations }}
+{{- define "vault.annotations" }}
       annotations:
+  {{- if .Values.server.includeConfigAnnotation }}
+        vault.hashicorp.com/config-checksum: {{ include "vault.config" . | sha256sum }}
+  {{- end }}
+  {{- if .Values.server.annotations }}
         {{- $tp := typeOf .Values.server.annotations }}
         {{- if eq $tp "string" }}
           {{- tpl .Values.server.annotations . | nindent 8 }}
@@ -684,6 +716,33 @@ Sets extra vault server Service annotations
 {{- end -}}
 
 {{/*
+Sets extra vault server Service (active) annotations
+*/}}
+{{- define "vault.service.active.annotations" -}}
+  {{- if .Values.server.service.active.annotations }}
+    {{- $tp := typeOf .Values.server.service.active.annotations }}
+    {{- if eq $tp "string" }}
+      {{- tpl .Values.server.service.active.annotations . | nindent 4 }}
+    {{- else }}
+      {{- toYaml .Values.server.service.active.annotations | nindent 4 }}
+    {{- end }}
+  {{- end }}
+{{- end -}}
+{{/*
+Sets extra vault server Service annotations
+*/}}
+{{- define "vault.service.standby.annotations" -}}
+  {{- if .Values.server.service.standby.annotations }}
+    {{- $tp := typeOf .Values.server.service.standby.annotations }}
+    {{- if eq $tp "string" }}
+      {{- tpl .Values.server.service.standby.annotations . | nindent 4 }}
+    {{- else }}
+      {{- toYaml .Values.server.service.standby.annotations | nindent 4 }}
+    {{- end }}
+  {{- end }}
+{{- end -}}
+
+{{/*
 Sets PodSecurityPolicy annotations
 */}}
 {{- define "vault.psp.annotations" -}}
@@ -729,6 +788,21 @@ Sets VolumeClaim annotations for data volume
 {{- end -}}
 
 {{/*
+Sets VolumeClaim labels for data volume
+*/}}
+{{- define "vault.dataVolumeClaim.labels" -}}
+  {{- if and (ne .mode "dev") (.Values.server.dataStorage.enabled) (.Values.server.dataStorage.labels) }}
+  labels:
+    {{- $tp := typeOf .Values.server.dataStorage.labels }}
+    {{- if eq $tp "string" }}
+      {{- tpl .Values.server.dataStorage.labels . | nindent 4 }}
+    {{- else }}
+      {{- toYaml .Values.server.dataStorage.labels | nindent 4 }}
+    {{- end }}
+  {{- end }}
+{{- end -}}
+
+{{/*
 Sets VolumeClaim annotations for audit volume
 */}}
 {{- define "vault.auditVolumeClaim.annotations" -}}
@@ -739,6 +813,21 @@ Sets VolumeClaim annotations for audit volume
       {{- tpl .Values.server.auditStorage.annotations . | nindent 4 }}
     {{- else }}
       {{- toYaml .Values.server.auditStorage.annotations | nindent 4 }}
+    {{- end }}
+  {{- end }}
+{{- end -}}
+
+{{/*
+Sets VolumeClaim labels for audit volume
+*/}}
+{{- define "vault.auditVolumeClaim.labels" -}}
+  {{- if and (ne .mode "dev") (.Values.server.auditStorage.enabled) (.Values.server.auditStorage.labels) }}
+  labels:
+    {{- $tp := typeOf .Values.server.auditStorage.labels }}
+    {{- if eq $tp "string" }}
+      {{- tpl .Values.server.auditStorage.labels . | nindent 4 }}
+    {{- else }}
+      {{- toYaml .Values.server.auditStorage.labels | nindent 4 }}
     {{- end }}
   {{- end }}
 {{- end -}}
@@ -770,6 +859,16 @@ Sets the container resources if the user has set any.
   {{- if .Values.csi.resources -}}
           resources:
 {{ toYaml .Values.csi.resources | indent 12}}
+  {{ end }}
+{{- end -}}
+
+{{/*
+Sets the container resources for CSI's Agent sidecar if the user has set any.
+*/}}
+{{- define "csi.agent.resources" -}}
+  {{- if .Values.csi.agent.resources -}}
+          resources:
+{{ toYaml .Values.csi.agent.resources | indent 12}}
   {{ end }}
 {{- end -}}
 
@@ -834,6 +933,34 @@ Sets the injector toleration for pod placement
   {{- end }}
 {{- end -}}
 
+{{/*
+Sets the CSI provider nodeSelector for pod placement
+*/}}
+{{- define "csi.pod.nodeselector" -}}
+  {{- if .Values.csi.pod.nodeSelector }}
+      nodeSelector:
+      {{- $tp := typeOf .Values.csi.pod.nodeSelector }}
+      {{- if eq $tp "string" }}
+        {{ tpl .Values.csi.pod.nodeSelector . | nindent 8 | trim }}
+      {{- else }}
+        {{- toYaml .Values.csi.pod.nodeSelector | nindent 8 }}
+      {{- end }}
+  {{- end }}
+{{- end -}}
+{{/*
+Sets the CSI provider affinity for pod placement.
+*/}}
+{{- define "csi.pod.affinity" -}}
+  {{- if .Values.csi.pod.affinity }}
+      affinity:
+        {{ $tp := typeOf .Values.csi.pod.affinity }}
+        {{- if eq $tp "string" }}
+          {{- tpl .Values.csi.pod.affinity . | nindent 8 | trim }}
+        {{- else }}
+          {{- toYaml .Values.csi.pod.affinity | nindent 8 }}
+        {{- end }}
+  {{ end }}
+{{- end -}}
 {{/*
 Sets extra CSI provider pod annotations
 */}}
@@ -950,4 +1077,29 @@ Supported inputs are Values.ui
 {{- end }}
 {{- end -}}
 {{- end }}
+{{- end -}}
+
+{{/*
+config file from values
+*/}}
+{{- define "vault.config" -}}
+  {{- if or (eq .mode "ha") (eq .mode "standalone") }}
+  {{- $type := typeOf (index .Values.server .mode).config }}
+  {{- if eq $type "string" }}
+    disable_mlock = true
+  {{- if eq .mode "standalone" }}
+    {{ tpl .Values.server.standalone.config . | nindent 4 | trim }}
+  {{- else if and (eq .mode "ha") (eq (.Values.server.ha.raft.enabled | toString) "false") }}
+    {{ tpl .Values.server.ha.config . | nindent 4 | trim }}
+  {{- else if and (eq .mode "ha") (eq (.Values.server.ha.raft.enabled | toString) "true") }}
+    {{ tpl .Values.server.ha.raft.config . | nindent 4 | trim }}
+  {{ end }}
+  {{- else }}
+  {{- if and (eq .mode "ha") (eq (.Values.server.ha.raft.enabled | toString) "true") }}
+{{ merge (dict "disable_mlock" true) (index .Values.server .mode).raft.config | toPrettyJson | indent 4 }}
+  {{- else }}
+{{ merge (dict "disable_mlock" true) (index .Values.server .mode).config | toPrettyJson | indent 4 }}
+  {{- end }}
+  {{- end }}
+  {{- end }}
 {{- end -}}

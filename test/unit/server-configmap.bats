@@ -75,6 +75,23 @@ load _helpers
   [ "${actual}" = "false" ]
 }
 
+@test "server/ConfigMap: namespace" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      --show-only templates/server-config-configmap.yaml \
+      --namespace foo \
+      . | tee /dev/stderr |
+      yq -r '.metadata.namespace' | tee /dev/stderr)
+  [ "${actual}" = "foo" ]
+  local actual=$(helm template \
+      --show-only templates/server-config-configmap.yaml \
+      --set 'global.namespace=bar' \
+      --namespace foo \
+      . | tee /dev/stderr |
+      yq -r '.metadata.namespace' | tee /dev/stderr)
+  [ "${actual}" = "bar" ]
+}
+
 @test "server/ConfigMap: standalone extraConfig is set" {
   cd `chart_dir`
   local actual=$(helm template \
@@ -120,5 +137,24 @@ load _helpers
       --set 'injector.externalVaultAddr=http://vault-outside' \
       . || echo "---") | tee /dev/stderr |
       yq 'length > 0' | tee /dev/stderr)
+  [ "${actual}" = "false" ]
+}
+
+@test "server/ConfigMap: config checksum annotation defaults to off" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      --show-only templates/server-config-configmap.yaml \
+      . | tee /dev/stderr |
+      yq '.metadata.annotations["vault.hashicorp.com/config-checksum"] == null' | tee /dev/stderr)
+  [ "${actual}" = "true" ]
+}
+
+@test "server/ConfigMap: config checksum annotation can be enabled" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      --show-only templates/server-config-configmap.yaml \
+      --set 'server.includeConfigAnnotation=true' \
+      . | tee /dev/stderr |
+      yq '.metadata.annotations["vault.hashicorp.com/config-checksum"] == null' | tee /dev/stderr)
   [ "${actual}" = "false" ]
 }

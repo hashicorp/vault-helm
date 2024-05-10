@@ -1,3 +1,8 @@
+{{/*
+Copyright (c) HashiCorp, Inc.
+SPDX-License-Identifier: MPL-2.0
+*/}}
+
 {{- if not .Values.global.openshift }}
 {{ template "vault.mode" . }}
 {{- if ne .mode "external" }}
@@ -12,17 +17,11 @@
 {{- $servicePort := .Values.server.service.port -}}
 {{- $pathType := .Values.server.ingress.pathType -}}
 {{- $kubeVersion := .Capabilities.KubeVersion.Version }}
-{{ if semverCompare ">= 1.19.0-0" $kubeVersion }}
 apiVersion: networking.k8s.io/v1
-{{ else if .Capabilities.APIVersions.Has "networking.k8s.io/v1beta1" }}
-apiVersion: networking.k8s.io/v1beta1
-{{ else }}
-apiVersion: extensions/v1beta1
-{{ end }}
 kind: Ingress
 metadata:
   name: {{ template "vault.fullname" . }}
-  namespace: {{ .Release.Namespace }}
+  namespace: {{ include "vault.namespace" . }}
   labels:
     helm.sh/chart: {{ include "vault.chart" . }}
     app.kubernetes.io/name: {{ include "vault.name" . }}
@@ -56,19 +55,12 @@ spec:
 {{- end }}
         {{- range (.paths | default (list "/")) }}
           - path: {{ . }}
-            {{ if semverCompare ">= 1.19.0-0" $kubeVersion }}
             pathType: {{ $pathType }}
-            {{ end }}
             backend:
-              {{ if semverCompare ">= 1.19.0-0" $kubeVersion }}
               service:
                 name: {{ $serviceName }}
                 port:
                   number: {{ $servicePort }}
-              {{ else }}
-              serviceName: {{ $serviceName }}
-              servicePort: {{ $servicePort }}
-              {{ end }}
         {{- end }}
   {{- end }}
 {{- end }}

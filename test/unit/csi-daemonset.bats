@@ -30,6 +30,26 @@ load _helpers
   [ "${actual}" = "true" ]
 }
 
+# namespace
+@test "csi/daemonset: namespace" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      --show-only templates/csi-daemonset.yaml \
+      --set "csi.enabled=true" \
+      --namespace foo \
+      . | tee /dev/stderr |
+      yq -r '.metadata.namespace' | tee /dev/stderr)
+  [ "${actual}" = "foo" ]
+  local actual=$(helm template \
+      --show-only templates/csi-daemonset.yaml \
+      --set "csi.enabled=true" \
+      --set 'global.namespace=bar' \
+      --namespace foo \
+      . | tee /dev/stderr |
+      yq -r '.metadata.namespace' | tee /dev/stderr)
+  [ "${actual}" = "bar" ]
+}
+
 # priorityClassName
 
 @test "csi/daemonset: priorityClassName not set by default" {
@@ -65,24 +85,32 @@ load _helpers
 }
 
 # Image
-@test "csi/daemonset: image is configurable" {
+@test "csi/daemonset: images are configurable" {
   cd `chart_dir`
-  local actual=$(helm template \
+  local object=$(helm template \
       --show-only templates/csi-daemonset.yaml \
       --set "csi.enabled=true" \
-      --set "csi.image.repository=SomeOtherImage" \
+      --set "csi.image.repository=Image1" \
       --set "csi.image.tag=0.0.1" \
+      --set "csi.image.pullPolicy=PullPolicy1" \
+      --set "csi.agent.image.repository=Image2" \
+      --set "csi.agent.image.tag=0.0.2" \
+      --set "csi.agent.image.pullPolicy=PullPolicy2" \
       . | tee /dev/stderr |
-      yq -r '.spec.template.spec.containers[0].image' | tee /dev/stderr)
-  [ "${actual}" = "SomeOtherImage:0.0.1" ]
+      yq -r '.spec.template.spec.containers' | tee /dev/stderr)
 
-  local actual=$(helm template \
-      --show-only templates/csi-daemonset.yaml \
-      --set "csi.enabled=true" \
-      --set "csi.image.pullPolicy=SomePullPolicy" \
-      . | tee /dev/stderr |
-      yq -r '.spec.template.spec.containers[0].imagePullPolicy' | tee /dev/stderr)
-  [ "${actual}" = "SomePullPolicy" ]
+  local actual=$(echo $object |
+      yq -r '.[0].image' | tee /dev/stderr)
+  [ "${actual}" = "Image1:0.0.1" ]
+  local actual=$(echo $object |
+      yq -r '.[0].imagePullPolicy' | tee /dev/stderr)
+  [ "${actual}" = "PullPolicy1" ]
+  local actual=$(echo $object |
+      yq -r '.[1].image' | tee /dev/stderr)
+  [ "${actual}" = "Image2:0.0.2" ]
+  local actual=$(echo $object |
+      yq -r '.[1].imagePullPolicy' | tee /dev/stderr)
+  [ "${actual}" = "PullPolicy2" ]
 }
 
 @test "csi/daemonset: Custom imagePullSecrets" {
@@ -160,6 +188,25 @@ load _helpers
   [ "${actual}" = "--debug=true" ]
 }
 
+# HMAC secret arg
+@test "csi/daemonset: HMAC secret arg is configurable" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      --show-only templates/csi-daemonset.yaml \
+      --set "csi.enabled=true" \
+      . | tee /dev/stderr |
+      yq -r '.spec.template.spec.containers[0].args[2]' | tee /dev/stderr)
+  [ "${actual}" = "--hmac-secret-name=vault-csi-provider-hmac-key" ]
+
+  local actual=$(helm template \
+      --show-only templates/csi-daemonset.yaml \
+      --set "csi.enabled=true" \
+      --set "csi.hmacSecretName=foo" \
+      . | tee /dev/stderr |
+      yq -r '.spec.template.spec.containers[0].args[2]' | tee /dev/stderr)
+  [ "${actual}" = "--hmac-secret-name=foo" ]
+}
+
 # Extra args
 @test "csi/daemonset: extra args can be passed" {
   cd `chart_dir`
@@ -168,7 +215,7 @@ load _helpers
       --set "csi.enabled=true" \
       . | tee /dev/stderr |
       yq -r '.spec.template.spec.containers[0].args | length' | tee /dev/stderr)
-  [ "${actual}" = "2" ]
+  [ "${actual}" = "3" ]
 
   local object=$(helm template \
       --show-only templates/csi-daemonset.yaml \
@@ -178,15 +225,15 @@ load _helpers
       yq -r '.spec.template.spec.containers[0]')
   local actual=$(echo $object |
       yq -r '.args | length' | tee /dev/stderr)
-  [ "${actual}" = "5" ]
-  local actual=$(echo $object |
-      yq -r '.args[2]' | tee /dev/stderr)
-  [ "${actual}" = "--foo=bar" ]
+  [ "${actual}" = "6" ]
   local actual=$(echo $object |
       yq -r '.args[3]' | tee /dev/stderr)
-  [ "${actual}" = "--bar baz" ]
+  [ "${actual}" = "--foo=bar" ]
   local actual=$(echo $object |
       yq -r '.args[4]' | tee /dev/stderr)
+  [ "${actual}" = "--bar baz" ]
+  local actual=$(echo $object |
+      yq -r '.args[5]' | tee /dev/stderr)
   [ "${actual}" = "first" ]
 }
 
@@ -319,6 +366,74 @@ load _helpers
 }
 
 #--------------------------------------------------------------------
+# nodeSelector
+@test "csi/daemonset: nodeSelector not set by default" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      --show-only templates/csi-daemonset.yaml  \
+      --set 'csi.enabled=true' \
+      . | tee /dev/stderr |
+      yq '.spec.template.spec | .nodeSelector? == null' | tee /dev/stderr)
+  [ "${actual}" = "true" ]
+}
+
+@test "csi/daemonset: nodeSelector can be set as string" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      --show-only templates/csi-daemonset.yaml  \
+      --set 'csi.enabled=true' \
+      --set 'csi.pod.nodeSelector=foobar' \
+      . | tee /dev/stderr |
+      yq '.spec.template.spec.nodeSelector == "foobar"' | tee /dev/stderr)
+  [ "${actual}" = "true" ]
+}
+
+@test "csi/daemonset: nodeSelector can be set as YAML" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      --show-only templates/csi-daemonset.yaml  \
+      --set 'csi.enabled=true' \
+      --set "csi.pod.nodeSelector.foo=bar,csi.pod.nodeSelector.baz=qux" \
+      . | tee /dev/stderr |
+      yq '.spec.template.spec.nodeSelector.foo == "bar" and .spec.template.spec.nodeSelector.baz == "qux"' | tee /dev/stderr)
+  [ "${actual}" = "true" ]
+}
+
+#--------------------------------------------------------------------
+# affinity
+@test "csi/daemonset: affinity not set by default" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      --show-only templates/csi-daemonset.yaml  \
+      --set 'csi.enabled=true' \
+      . | tee /dev/stderr |
+      yq '.spec.template.spec | .affinity? == null' | tee /dev/stderr)
+  [ "${actual}" = "true" ]
+}
+
+@test "csi/daemonset: affinity can be set as string" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      --show-only templates/csi-daemonset.yaml  \
+      --set 'csi.enabled=true' \
+      --set 'csi.pod.affinity=foobar' \
+      . | tee /dev/stderr |
+      yq '.spec.template.spec.affinity == "foobar"' | tee /dev/stderr)
+  [ "${actual}" = "true" ]
+}
+
+@test "csi/daemonset: affinity can be set as YAML" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      --show-only templates/csi-daemonset.yaml  \
+      --set 'csi.enabled=true' \
+      --set "csi.pod.affinity.podAntiAffinity=foobar" \
+      . | tee /dev/stderr |
+      yq '.spec.template.spec.affinity.podAntiAffinity == "foobar"' | tee /dev/stderr)
+  [ "${actual}" = "true" ]
+}
+
+#--------------------------------------------------------------------
 # Extra Labels
 
 @test "csi/daemonset: specify csi.daemonSet.extraLabels" {
@@ -379,21 +494,6 @@ load _helpers
   [ "${actual}" = "/etc/kubernetes/secrets-store-csi-providers" ]
 }
 
-@test "csi/daemonset: csi kubeletRootDir default" {
-  cd `chart_dir`
-
-  # Test that it defines it
-  local object=$(helm template \
-      --show-only templates/csi-daemonset.yaml  \
-      --set 'csi.enabled=true' \
-      . | tee /dev/stderr |
-      yq -r '.spec.template.spec.volumes[] | select(.name == "mountpoint-dir")' | tee /dev/stderr)
-
-  local actual=$(echo $object |
-      yq -r '.hostPath.path' | tee /dev/stderr)
-  [ "${actual}" = "/var/lib/kubelet/pods" ]
-}
-
 @test "csi/daemonset: csi providersDir override " {
   cd `chart_dir`
 
@@ -408,22 +508,6 @@ load _helpers
   local actual=$(echo $object |
       yq -r '.hostPath.path' | tee /dev/stderr)
   [ "${actual}" = "/alt/csi-prov-dir" ]
-}
-
-@test "csi/daemonset: csi kubeletRootDir override" {
-  cd `chart_dir`
-
-  # Test that it defines it
-  local object=$(helm template \
-      --show-only templates/csi-daemonset.yaml  \
-      --set 'csi.enabled=true' \
-      --set 'csi.daemonSet.kubeletRootDir=/alt/kubelet-root' \
-      . | tee /dev/stderr |
-      yq -r '.spec.template.spec.volumes[] | select(.name == "mountpoint-dir")' | tee /dev/stderr)
-
-  local actual=$(echo $object |
-      yq -r '.hostPath.path' | tee /dev/stderr)
-  [ "${actual}" = "/alt/kubelet-root/pods" ]
 }
 
 #--------------------------------------------------------------------
@@ -564,11 +648,39 @@ load _helpers
   [ "${actual}" = "14" ]
 }
 
+@test "csi/daemonset: VAULT_ADDR defaults to Agent unix socket" {
+  cd `chart_dir`
+  local object=$(helm template \
+      --show-only templates/csi-daemonset.yaml \
+      --set 'csi.enabled=true' \
+      . | tee /dev/stderr |
+      yq -r '.spec.template.spec.containers[0].env' | tee /dev/stderr)
+
+  local value=$(echo $object |
+      yq -r 'map(select(.name=="VAULT_ADDR")) | .[] .value' | tee /dev/stderr)
+  [ "${value}" = "unix:///var/run/vault/agent.sock" ]
+}
+
+@test "csi/daemonset: VAULT_ADDR remains pointed to Agent unix socket if external Vault" {
+  cd `chart_dir`
+  local object=$(helm template \
+      --show-only templates/csi-daemonset.yaml \
+      --set 'csi.enabled=true' \
+      --set 'global.externalVaultAddr=http://vault-outside' \
+      . | tee /dev/stderr |
+      yq -r '.spec.template.spec.containers[0].env' | tee /dev/stderr)
+
+  local value=$(echo $object |
+      yq -r 'map(select(.name=="VAULT_ADDR")) | .[] .value' | tee /dev/stderr)
+  [ "${value}" = "unix:///var/run/vault/agent.sock" ]
+}
+
 @test "csi/daemonset: with only injector.externalVaultAddr" {
   cd `chart_dir`
   local object=$(helm template \
       --show-only templates/csi-daemonset.yaml \
       --set 'csi.enabled=true' \
+      --set 'csi.agent.enabled=false' \
       --release-name not-external-test \
       --set 'injector.externalVaultAddr=http://vault-outside' \
       . | tee /dev/stderr |
@@ -584,6 +696,7 @@ load _helpers
   local object=$(helm template \
       --show-only templates/csi-daemonset.yaml \
       --set 'csi.enabled=true' \
+      --set 'csi.agent.enabled=false' \
       --set 'global.externalVaultAddr=http://vault-outside' \
       . | tee /dev/stderr |
       yq -r '.spec.template.spec.containers[0].env' | tee /dev/stderr)
@@ -647,4 +760,94 @@ load _helpers
       . | tee /dev/stderr |
       yq -r '.spec.template.spec.containers[0].securityContext.foo' | tee /dev/stderr)
   [ "${actual}" = "bar" ]
+}
+
+#--------------------------------------------------------------------
+# Agent sidecar configurables
+
+@test "csi/daemonset: Agent sidecar enabled by default" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      --show-only templates/csi-daemonset.yaml \
+      --set 'csi.enabled=true' \
+      . | tee /dev/stderr |
+      yq -r '.spec.template.spec.containers | length' | tee /dev/stderr)
+  [ "${actual}" = "2" ]
+}
+
+@test "csi/daemonset: Agent sidecar can pass extra args" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      --show-only templates/csi-daemonset.yaml \
+      --set 'csi.enabled=true' \
+      --set 'csi.agent.extraArgs[0]=-config=extra-config.hcl' \
+      . | tee /dev/stderr |
+      yq -r '.spec.template.spec.containers[1].args[2]' | tee /dev/stderr)
+  [ "${actual}" = "-config=extra-config.hcl" ]
+}
+
+@test "csi/daemonset: Agent log level settable" {
+  cd `chart_dir`
+  local object=$(helm template \
+      --show-only templates/csi-daemonset.yaml \
+      --set 'csi.enabled=true' \
+      --set 'csi.agent.logLevel=error' \
+      . | tee /dev/stderr |
+      yq -r '.spec.template.spec.containers[1].env' | tee /dev/stderr)
+
+  local value=$(echo $object |
+      yq -r 'map(select(.name=="VAULT_LOG_LEVEL")) | .[] .value' | tee /dev/stderr)
+  [ "${value}" = "error" ]
+}
+
+@test "csi/daemonset: Agent log format settable" {
+  cd `chart_dir`
+  local object=$(helm template \
+      --show-only templates/csi-daemonset.yaml \
+      --set 'csi.enabled=true' \
+      --set 'csi.agent.logFormat=json' \
+      . | tee /dev/stderr |
+      yq -r '.spec.template.spec.containers[1].env' | tee /dev/stderr)
+
+  local value=$(echo $object |
+      yq -r 'map(select(.name=="VAULT_LOG_FORMAT")) | .[] .value' | tee /dev/stderr)
+  [ "${value}" = "json" ]
+}
+
+@test "csi/daemonset: Agent default resources" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      --show-only templates/csi-daemonset.yaml  \
+      --set 'csi.enabled=true' \
+      . | tee /dev/stderr |
+      yq -r '.spec.template.spec.containers[1].resources' | tee /dev/stderr)
+  [ "${actual}" = "null" ]
+}
+
+@test "csi/daemonset: Agent custom resources" {
+  cd `chart_dir`
+  local object=$(helm template \
+      --show-only templates/csi-daemonset.yaml  \
+      --set 'csi.enabled=true' \
+      --set 'csi.agent.resources.requests.memory=256Mi' \
+      --set 'csi.agent.resources.requests.cpu=250m' \
+      --set 'csi.agent.resources.limits.memory=512Mi' \
+      --set 'csi.agent.resources.limits.cpu=500m' \
+      . | tee /dev/stderr |
+      yq -r '.spec.template.spec.containers[1].resources' | tee /dev/stderr)
+  local value=$(echo $object |
+      yq -r '.requests.memory' | tee /dev/stderr)
+  [ "${value}" = "256Mi" ]
+
+  local value=$(echo $object |
+      yq -r '.requests.cpu' | tee /dev/stderr)
+  [ "${value}" = "250m" ]
+
+  local value=$(echo $object |
+      yq -r '.limits.memory' | tee /dev/stderr)
+  [ "${value}" = "512Mi" ]
+
+  local value=$(echo $object |
+      yq -r '.limits.cpu' | tee /dev/stderr)
+  [ "${value}" = "500m" ]
 }

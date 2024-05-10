@@ -1,7 +1,12 @@
+{{/*
+Copyright (c) HashiCorp, Inc.
+SPDX-License-Identifier: MPL-2.0
+*/}}
+
 {{ template "vault.mode" . }}
-{{- if ne .mode "external" }}
 {{- if .serverEnabled -}}
 {{- if eq .mode "ha" }}
+{{- if eq (.Values.server.serviceAccount.serviceDiscovery.enabled | toString) "true" }}
 {{- if .Capabilities.APIVersions.Has "rbac.authorization.k8s.io/v1" -}}
 apiVersion: rbac.authorization.k8s.io/v1
 {{- else }}
@@ -10,7 +15,7 @@ apiVersion: rbac.authorization.k8s.io/v1beta1
 kind: RoleBinding
 metadata:
   name: {{ template "vault.fullname" . }}-discovery-rolebinding
-  namespace: {{ .Release.Namespace }}
+  namespace: {{ include "vault.namespace" . }}
   labels:
     helm.sh/chart: {{ include "vault.chart" . }}
     app.kubernetes.io/name: {{ include "vault.name" . }}
@@ -23,7 +28,7 @@ roleRef:
 subjects:
 - kind: ServiceAccount
   name: {{ template "vault.serviceAccount.name" . }}
-  namespace: {{ .Release.Namespace }}
+  namespace: {{ include "vault.namespace" . }}
 {{ end }}
 {{ end }}
 {{ end }}

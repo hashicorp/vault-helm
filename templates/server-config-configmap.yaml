@@ -1,3 +1,8 @@
+{{/*
+Copyright (c) HashiCorp, Inc.
+SPDX-License-Identifier: MPL-2.0
+*/}}
+
 {{ template "vault.mode" . }}
 {{- if ne .mode "external" }}
 {{- if .serverEnabled -}}
@@ -7,33 +12,19 @@ apiVersion: v1
 kind: ConfigMap
 metadata:
   name: {{ template "vault.fullname" . }}-config
-  namespace: {{ .Release.Namespace }}
+  namespace: {{ include "vault.namespace" . }}
   labels:
     helm.sh/chart: {{ include "vault.chart" . }}
     app.kubernetes.io/name: {{ include "vault.name" . }}
     app.kubernetes.io/instance: {{ .Release.Name }}
     app.kubernetes.io/managed-by: {{ .Release.Service }}
+{{- if .Values.server.includeConfigAnnotation }}
+  annotations:
+    vault.hashicorp.com/config-checksum: {{ include "vault.config" . | sha256sum }}
+{{- end }}
 data:
   extraconfig-from-values.hcl: |-
-  {{- if or (eq .mode "ha") (eq .mode "standalone") }}
-  {{- $type := typeOf (index .Values.server .mode).config }}
-  {{- if eq $type "string" }}
-    disable_mlock = true
-  {{- if eq .mode "standalone" }}
-    {{ tpl .Values.server.standalone.config . | nindent 4 | trim }}
-  {{- else if and (eq .mode "ha") (eq (.Values.server.ha.raft.enabled | toString) "false") }}
-    {{ tpl .Values.server.ha.config . | nindent 4 | trim }}
-  {{- else if and (eq .mode "ha") (eq (.Values.server.ha.raft.enabled | toString) "true") }}
-    {{ tpl .Values.server.ha.raft.config . | nindent 4 | trim }}
-  {{ end }}
-  {{- else }}
-  {{- if and (eq .mode "ha") (eq (.Values.server.ha.raft.enabled | toString) "true") }}
-{{ merge (dict "disable_mlock" true) (index .Values.server .mode).raft.config | toPrettyJson | indent 4 }}
-  {{- else }}
-{{ merge (dict "disable_mlock" true) (index .Values.server .mode).config | toPrettyJson | indent 4 }}
-  {{- end }}
-  {{- end }}
-  {{- end }}
+    {{ template "vault.config" . }}
 {{- end }}
 {{- end }}
 {{- end }}

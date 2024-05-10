@@ -1,3 +1,8 @@
+{{/*
+Copyright (c) HashiCorp, Inc.
+SPDX-License-Identifier: MPL-2.0
+*/}}
+
 {{- template "vault.injectorEnabled" . -}}
 {{- if .injectorEnabled -}}
 # Deployment for the injector
@@ -5,7 +10,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: {{ template "vault.fullname" . }}-agent-injector
-  namespace: {{ .Release.Namespace }}
+  namespace: {{ include "vault.namespace" . }}
   labels:
     app.kubernetes.io/name: {{ include "vault.name" . }}-agent-injector
     app.kubernetes.io/instance: {{ .Release.Name }}
@@ -59,7 +64,7 @@ spec:
             {{- else if .Values.injector.externalVaultAddr }}
               value: "{{ .Values.injector.externalVaultAddr }}"
             {{- else }}
-              value: {{ include "vault.scheme" . }}://{{ template "vault.fullname" . }}.{{ .Release.Namespace }}.svc:{{ .Values.server.service.port }}
+              value: {{ include "vault.scheme" . }}://{{ template "vault.fullname" . }}.{{ include "vault.namespace" . }}.svc:{{ .Values.server.service.port }}
             {{- end }}
             - name: AGENT_INJECT_VAULT_AUTH_PATH
               value: {{ .Values.injector.authPath }}
@@ -74,7 +79,7 @@ spec:
             - name: AGENT_INJECT_TLS_AUTO
               value: {{ template "vault.fullname" . }}-agent-injector-cfg
             - name: AGENT_INJECT_TLS_AUTO_HOSTS
-              value: {{ template "vault.fullname" . }}-agent-injector-svc,{{ template "vault.fullname" . }}-agent-injector-svc.{{ .Release.Namespace }},{{ template "vault.fullname" . }}-agent-injector-svc.{{ .Release.Namespace }}.svc
+              value: {{ template "vault.fullname" . }}-agent-injector-svc,{{ template "vault.fullname" . }}-agent-injector-svc.{{ include "vault.namespace" . }},{{ template "vault.fullname" . }}-agent-injector-svc.{{ include "vault.namespace" . }}.svc
             {{- end }}
             - name: AGENT_INJECT_LOG_FORMAT
               value: {{ .Values.injector.logFormat | default "standard" }}
@@ -104,6 +109,14 @@ spec:
               value: "{{ .Values.injector.agentDefaults.memRequest }}"
             - name: AGENT_INJECT_MEM_LIMIT
               value: "{{ .Values.injector.agentDefaults.memLimit }}"
+            {{- if .Values.injector.agentDefaults.ephemeralRequest }}
+            - name: AGENT_INJECT_EPHEMERAL_REQUEST
+              value: "{{ .Values.injector.agentDefaults.ephemeralRequest }}"
+            {{- end }}
+            {{- if .Values.injector.agentDefaults.ephemeralLimit }}
+            - name: AGENT_INJECT_EPHEMERAL_LIMIT
+              value: "{{ .Values.injector.agentDefaults.ephemeralLimit }}"
+            {{- end }}
             - name: AGENT_INJECT_DEFAULT_TEMPLATE
               value: "{{ .Values.injector.agentDefaults.template }}"
             - name: AGENT_INJECT_TEMPLATE_CONFIG_EXIT_ON_RETRY_FAILURE
@@ -125,21 +138,31 @@ spec:
               path: /health/ready
               port: {{ .Values.injector.port }}
               scheme: HTTPS
-            failureThreshold: 2
-            initialDelaySeconds: 5
-            periodSeconds: 2
-            successThreshold: 1
-            timeoutSeconds: 5
+            failureThreshold: {{ .Values.injector.livenessProbe.failureThreshold }}
+            initialDelaySeconds: {{ .Values.injector.livenessProbe.initialDelaySeconds }}
+            periodSeconds: {{ .Values.injector.livenessProbe.periodSeconds }}
+            successThreshold: {{ .Values.injector.livenessProbe.successThreshold }}
+            timeoutSeconds: {{ .Values.injector.livenessProbe.timeoutSeconds }}
           readinessProbe:
             httpGet:
               path: /health/ready
               port: {{ .Values.injector.port }}
               scheme: HTTPS
-            failureThreshold: 2
-            initialDelaySeconds: 5
-            periodSeconds: 2
-            successThreshold: 1
-            timeoutSeconds: 5
+            failureThreshold: {{ .Values.injector.readinessProbe.failureThreshold }}
+            initialDelaySeconds: {{ .Values.injector.readinessProbe.initialDelaySeconds }}
+            periodSeconds: {{ .Values.injector.readinessProbe.periodSeconds }}
+            successThreshold: {{ .Values.injector.readinessProbe.successThreshold }}
+            timeoutSeconds: {{ .Values.injector.readinessProbe.timeoutSeconds }}
+          startupProbe:
+            httpGet:
+              path: /health/ready
+              port: {{ .Values.injector.port }}
+              scheme: HTTPS
+            failureThreshold: {{ .Values.injector.startupProbe.failureThreshold }}
+            initialDelaySeconds: {{ .Values.injector.startupProbe.initialDelaySeconds }}
+            periodSeconds: {{ .Values.injector.startupProbe.periodSeconds }}
+            successThreshold: {{ .Values.injector.startupProbe.successThreshold }}
+            timeoutSeconds: {{ .Values.injector.startupProbe.timeoutSeconds }}
 {{- if .Values.injector.certs.secretName }}
           volumeMounts:
             - name: webhook-certs

@@ -1,9 +1,14 @@
+{{/*
+Copyright (c) HashiCorp, Inc.
+SPDX-License-Identifier: MPL-2.0
+*/}}
+
 {{- if .Values.injector.podDisruptionBudget }}
-apiVersion: {{ ge .Capabilities.KubeVersion.Minor "21" | ternary "policy/v1" "policy/v1beta1" }}
+apiVersion: policy/v1
 kind: PodDisruptionBudget
 metadata:
   name: {{ template "vault.fullname" . }}-agent-injector
-  namespace: {{ .Release.Namespace }}
+  namespace: {{ include "vault.namespace" . }}
   labels:
     helm.sh/chart: {{ include "vault.chart" . }}
     app.kubernetes.io/name: {{ include "vault.name" . }}-agent-injector

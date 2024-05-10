@@ -1,0 +1,16 @@
+# Copyright (c) HashiCorp, Inc.
+# SPDX-License-Identifier: MPL-2.0
+
+serverTelemetry:
+  serviceMonitor:
+    enabled: true
+    interval: 15s
+    tlsConfig:
+      ca:
+        secret:
+          name: vault-metrics-client
+          key: ca.crt
+    authorization:
+      credentials:
+        name: vault-metrics-client
+        key: token

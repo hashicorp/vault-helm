@@ -1,14 +1,20 @@
+{{/*
+Copyright (c) HashiCorp, Inc.
+SPDX-License-Identifier: MPL-2.0
+*/}}
+
 {{ template "vault.mode" . }}
 {{- if ne .mode "external" }}
 {{- template "vault.serverServiceEnabled" . -}}
 {{- if .serverServiceEnabled -}}
 {{- if eq .mode "ha" }}
+{{- if eq (.Values.server.service.active.enabled | toString) "true" }}
 # Service for active Vault pod
 apiVersion: v1
 kind: Service
 metadata:
   name: {{ template "vault.fullname" . }}-active
-  namespace: {{ .Release.Namespace }}
+  namespace: {{ include "vault.namespace" . }}
   labels:
     helm.sh/chart: {{ include "vault.chart" . }}
     app.kubernetes.io/name: {{ include "vault.name" . }}
@@ -16,11 +22,20 @@ metadata:
     app.kubernetes.io/managed-by: {{ .Release.Service }}
     vault-active: "true"
   annotations:
-{{ template "vault.service.annotations" .}}
+{{- template "vault.service.active.annotations" . }}
+{{- template "vault.service.annotations" . }}
 spec:
   {{- if .Values.server.service.type}}
   type: {{ .Values.server.service.type }}
   {{- end}}
+  {{- if (semverCompare ">= 1.23-0" .Capabilities.KubeVersion.Version) }}
+  {{- if .Values.server.service.ipFamilyPolicy }}
+  ipFamilyPolicy: {{ .Values.server.service.ipFamilyPolicy }}
+  {{- end }}
+  {{- if .Values.server.service.ipFamilies }}
+  ipFamilies: {{ .Values.server.service.ipFamilies | toYaml | nindent 2 }}
+  {{- end }}
+  {{- end }}
   {{- if .Values.server.service.clusterIP }}
   clusterIP: {{ .Values.server.service.clusterIP }}
   {{- end }}
@@ -38,9 +53,12 @@ spec:
       targetPort: 8201
   selector:
     app.kubernetes.io/name: {{ include "vault.name" . }}
+    {{- if eq (.Values.server.service.instanceSelector.enabled | toString) "true" }}
     app.kubernetes.io/instance: {{ .Release.Name }}
+    {{- end }}
     component: server
     vault-active: "true"
+{{- end }}
 {{- end }}
 {{- end }}
 {{- end }}

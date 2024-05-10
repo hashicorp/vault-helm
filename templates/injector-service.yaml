@@ -1,10 +1,15 @@
+{{/*
+Copyright (c) HashiCorp, Inc.
+SPDX-License-Identifier: MPL-2.0
+*/}}
+
 {{- template "vault.injectorEnabled" . -}}
 {{- if .injectorEnabled -}}
 apiVersion: v1
 kind: Service
 metadata:
   name: {{ template "vault.fullname" . }}-agent-injector-svc
-  namespace: {{ .Release.Namespace }}
+  namespace: {{ include "vault.namespace" . }}
   labels:
     app.kubernetes.io/name: {{ include "vault.name" . }}-agent-injector
     app.kubernetes.io/instance: {{ .Release.Name }}

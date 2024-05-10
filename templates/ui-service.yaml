@@ -1,3 +1,8 @@
+{{/*
+Copyright (c) HashiCorp, Inc.
+SPDX-License-Identifier: MPL-2.0
+*/}}
+
 {{ template "vault.mode" . }}
 {{- if ne .mode "external" }}
 {{- template "vault.uiEnabled" . -}}
@@ -7,7 +12,7 @@ apiVersion: v1
 kind: Service
 metadata:
   name: {{ template "vault.fullname" . }}-ui
-  namespace: {{ .Release.Namespace }}
+  namespace: {{ include "vault.namespace" . }}
   labels:
     helm.sh/chart: {{ include "vault.chart" . }}
     app.kubernetes.io/name: {{ include "vault.name" . }}-ui
@@ -15,6 +20,14 @@ metadata:
     app.kubernetes.io/managed-by: {{ .Release.Service }}
   {{- template "vault.ui.annotations" . }}
 spec:
+  {{- if (semverCompare ">= 1.23-0" .Capabilities.KubeVersion.Version) }}
+  {{- if .Values.ui.serviceIPFamilyPolicy }}
+  ipFamilyPolicy: {{ .Values.ui.serviceIPFamilyPolicy }}
+  {{- end }}
+  {{- if .Values.ui.serviceIPFamilies }}
+  ipFamilies: {{ .Values.ui.serviceIPFamilies | toYaml | nindent 2 }}
+  {{- end }}
+  {{- end }}
   selector:
     app.kubernetes.io/name: {{ include "vault.name" . }}
     app.kubernetes.io/instance: {{ .Release.Name }}

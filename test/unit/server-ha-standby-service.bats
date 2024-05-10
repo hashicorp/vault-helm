@@ -24,6 +24,42 @@ load _helpers
   [ "${actual}" = "true" ]
 }
 
+@test "server/ha-standby-Service: with standby annotations string" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      --show-only templates/server-ha-standby-service.yaml \
+      --set 'server.ha.enabled=true' \
+      --set 'server.service.standby.annotations=vaultIsAwesome: true' \
+      . | tee /dev/stderr |
+      yq -r '.metadata.annotations["vaultIsAwesome"]' | tee /dev/stderr)
+  [ "${actual}" = "true" ]
+}
+
+@test "server/ha-standby-Service: with standby annotations yaml" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      --show-only templates/server-ha-standby-service.yaml \
+      --set 'server.ha.enabled=true' \
+      --set 'server.service.standby.annotations.vaultIsAwesome=true' \
+      . | tee /dev/stderr |
+      yq -r '.metadata.annotations["vaultIsAwesome"]' | tee /dev/stderr)
+  [ "${actual}" = "true" ]
+}
+@test "server/ha-standby-Service: with both annotations set" {
+  cd `chart_dir`
+  local object=$(helm template \
+      --show-only templates/server-ha-standby-service.yaml \
+      --set 'server.ha.enabled=true' \
+      --set 'server.service.standby.annotations=vaultIsAwesome: true' \
+      --set 'server.service.annotations=vaultIsNotAwesome: false' \
+      . | tee /dev/stderr |
+      yq -r '.metadata' | tee /dev/stderr)
+
+  local actual=$(echo "$object" | yq '.annotations["vaultIsAwesome"]' | tee /dev/stderr)
+  [ "${actual}" = "true" ]
+  actual=$(echo "$object" | yq '.annotations["vaultIsNotAwesome"]' | tee /dev/stderr)
+  [ "${actual}" = "false" ]
+}
 @test "server/ha-standby-Service: disable with ha.enabled false" {
   cd `chart_dir`
   local actual=$( (helm template \
@@ -44,6 +80,37 @@ load _helpers
       . || echo "---") | tee /dev/stderr |
       yq 'length > 0' | tee /dev/stderr)
   [ "${actual}" = "false" ]
+}
+
+@test "server/ha-standby-Service: disable with server.service.standby.enabled false" {
+  cd `chart_dir`
+  local actual=$( (helm template \
+      --show-only templates/server-ha-standby-service.yaml  \
+      --set 'server.ha.enabled=true' \
+      --set 'server.service.enabled=true' \
+      --set 'server.service.standby.enabled=false' \
+      . || echo "---") | tee /dev/stderr |
+      yq 'length > 0' | tee /dev/stderr)
+  [ "${actual}" = "false" ]
+}
+
+@test "server/ha-standby-Service: namespace" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      --show-only templates/server-ha-standby-service.yaml \
+      --set 'server.ha.enabled=true' \
+      --namespace foo \
+      . | tee /dev/stderr |
+      yq -r '.metadata.namespace' | tee /dev/stderr)
+  [ "${actual}" = "foo" ]
+  local actual=$(helm template \
+      --show-only templates/server-ha-standby-service.yaml \
+      --set 'server.ha.enabled=true' \
+      --set 'global.namespace=bar' \
+      --namespace foo \
+      . | tee /dev/stderr |
+      yq -r '.metadata.namespace' | tee /dev/stderr)
+  [ "${actual}" = "bar" ]
 }
 
 @test "server/ha-standby-Service: type empty by default" {
@@ -224,4 +291,22 @@ load _helpers
       . | tee /dev/stderr |
       yq -r '.spec.publishNotReadyAddresses' | tee /dev/stderr)
   [ "${actual}" = "false" ]
+}
+
+@test "server/ha-standby-Service: instance selector can be disabled" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      --show-only templates/server-ha-standby-service.yaml \
+      --set 'server.ha.enabled=true' \
+      . | tee /dev/stderr |
+      yq -r '.spec.selector["app.kubernetes.io/instance"]' | tee /dev/stderr)
+  [ "${actual}" = "release-name" ]
+
+  local actual=$(helm template \
+      --show-only templates/server-ha-standby-service.yaml \
+      --set 'server.ha.enabled=true' \
+      --set 'server.service.instanceSelector.enabled=false' \
+      . | tee /dev/stderr |
+      yq -r '.spec.selector["app.kubernetes.io/instance"]' | tee /dev/stderr)
+  [ "${actual}" = "null" ]
 }

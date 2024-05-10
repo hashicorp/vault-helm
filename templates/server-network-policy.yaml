@@ -1,3 +1,8 @@
+{{/*
+Copyright (c) HashiCorp, Inc.
+SPDX-License-Identifier: MPL-2.0
+*/}}
+
 {{- if eq (.Values.server.networkPolicy.enabled | toString) "true"  }}
 apiVersion: networking.k8s.io/v1
 kind: NetworkPolicy
@@ -11,14 +16,7 @@ spec:
     matchLabels:
       app.kubernetes.io/name: {{ template "vault.name" . }}
       app.kubernetes.io/instance: {{ .Release.Name }}
-  ingress:
-    - from:
-        - namespaceSelector: {}
-      ports:
-      - port: 8200
-        protocol: TCP
-      - port: 8201
-        protocol: TCP
+  ingress: {{- toYaml .Values.server.networkPolicy.ingress | nindent 4 }}
   {{- if .Values.server.networkPolicy.egress }}
   egress:
   {{- toYaml .Values.server.networkPolicy.egress | nindent 4 }}

@@ -1,10 +1,15 @@
+{{/*
+Copyright (c) HashiCorp, Inc.
+SPDX-License-Identifier: MPL-2.0
+*/}}
+
 {{- template "vault.csiEnabled" . -}}
 {{- if .csiEnabled -}}
 apiVersion: apps/v1
 kind: DaemonSet
 metadata:
   name: {{ template "vault.fullname" . }}-csi-provider
-  namespace: {{ .Release.Namespace }}
+  namespace: {{ include "vault.namespace" . }}
   labels:
     app.kubernetes.io/name: {{ include "vault.name" . }}-csi-provider
     app.kubernetes.io/instance: {{ .Release.Name }}
@@ -40,6 +45,8 @@ spec:
       {{- end }}
       serviceAccountName: {{ template "vault.fullname" . }}-csi-provider
       {{- template "csi.pod.tolerations" . }}
+      {{- template "csi.pod.nodeselector" . }}
+      {{- template "csi.pod.affinity" . }}
       containers:
         - name: {{ include "vault.name" . }}-csi-provider
           {{ template "csi.resources" . }}
@@ -49,22 +56,30 @@ spec:
           args:
             - --endpoint=/provider/vault.sock
             - --debug={{ .Values.csi.debug }}
+            {{- if .Values.csi.hmacSecretName }}
+            - --hmac-secret-name={{ .Values.csi.hmacSecretName }}
+            {{- else }}
+            - --hmac-secret-name={{- include "vault.name" . }}-csi-provider-hmac-key
+            {{- end }}
             {{- if .Values.csi.extraArgs }}
-              {{- toYaml .Values.csi.extraArgs | nindent 12 }}
+            {{- toYaml .Values.csi.extraArgs | nindent 12 }}
             {{- end }}
           env:
             - name: VAULT_ADDR
-            {{- if .Values.global.externalVaultAddr }}
+            {{- if eq (.Values.csi.agent.enabled | toString) "true" }}
+              value: "unix:///var/run/vault/agent.sock"
+            {{- else if .Values.global.externalVaultAddr }}
               value: "{{ .Values.global.externalVaultAddr }}"
             {{- else }}
-              value: {{ include "vault.scheme" . }}://{{ template "vault.fullname" . }}.{{ .Release.Namespace }}.svc:{{ .Values.server.service.port }}
+              value: {{ include "vault.scheme" . }}://{{ template "vault.fullname" . }}.{{ include "vault.namespace" . }}.svc:{{ .Values.server.service.port }}
             {{- end }}
           volumeMounts:
             - name: providervol
               mountPath: "/provider"
-            - name: mountpoint-dir
-              mountPath: {{ .Values.csi.daemonSet.kubeletRootDir }}/pods
-              mountPropagation: HostToContainer
+            {{- if eq (.Values.csi.agent.enabled | toString) "true" }}
+            - name: agent-unix-socket
+              mountPath: /var/run/vault
+            {{- end }}
             {{- if .Values.csi.volumeMounts }}
               {{- toYaml .Values.csi.volumeMounts | nindent 12}}
             {{- end }}
@@ -86,15 +101,57 @@ spec:
             periodSeconds: {{ .Values.csi.readinessProbe.periodSeconds }}
             successThreshold: {{ .Values.csi.readinessProbe.successThreshold }}
             timeoutSeconds: {{ .Values.csi.readinessProbe.timeoutSeconds }}
+        {{- if eq (.Values.csi.agent.enabled | toString) "true" }}
+        - name: {{ include "vault.name" . }}-agent
+          image: "{{ .Values.csi.agent.image.repository }}:{{ .Values.csi.agent.image.tag }}"
+          imagePullPolicy: {{ .Values.csi.agent.image.pullPolicy }}
+          {{ template "csi.agent.resources" . }}
+          command:
+            - vault
+          args:
+            - agent
+            - -config=/etc/vault/config.hcl
+            {{- if .Values.csi.agent.extraArgs }}
+            {{- toYaml .Values.csi.agent.extraArgs | nindent 12 }}
+            {{- end }}
+          ports:
+            - containerPort: 8200
+          env:
+            - name: VAULT_LOG_LEVEL
+              value: "{{ .Values.csi.agent.logLevel }}"
+            - name: VAULT_LOG_FORMAT
+              value: "{{ .Values.csi.agent.logFormat }}"
+          securityContext:
+            runAsNonRoot: true
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            runAsUser: 100
+            runAsGroup: 1000
+          volumeMounts:
+            - name: agent-config
+              mountPath: /etc/vault/config.hcl
+              subPath: config.hcl
+              readOnly: true
+            - name: agent-unix-socket
+              mountPath: /var/run/vault
+            {{- if .Values.csi.volumeMounts }}
+            {{- toYaml .Values.csi.volumeMounts | nindent 12 }}
+            {{- end }}
+        {{- end }}
       volumes:
         - name: providervol
           hostPath:
             path: {{ .Values.csi.daemonSet.providersDir }}
-        - name: mountpoint-dir
-          hostPath:
-            path: {{ .Values.csi.daemonSet.kubeletRootDir }}/pods
-       {{- if .Values.csi.volumes }}
-         {{- toYaml .Values.csi.volumes | nindent 8}}
-       {{- end }}
+        {{- if eq (.Values.csi.agent.enabled | toString) "true" }}
+        - name: agent-config
+          configMap:
+            name: {{ template "vault.fullname" . }}-csi-provider-agent-config
+        - name: agent-unix-socket
+          emptyDir:
+            medium: Memory
+        {{- end }}
+        {{- if .Values.csi.volumes }}
+        {{- toYaml .Values.csi.volumes | nindent 8}}
+        {{- end }}
       {{- include "imagePullSecrets" . | nindent 6 }}
 {{- end }}

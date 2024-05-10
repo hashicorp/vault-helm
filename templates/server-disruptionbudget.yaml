@@ -1,14 +1,19 @@
+{{/*
+Copyright (c) HashiCorp, Inc.
+SPDX-License-Identifier: MPL-2.0
+*/}}
+
 {{ template "vault.mode" . }}
 {{- if ne .mode "external" -}}
 {{- if .serverEnabled -}}
 {{- if and (eq .mode "ha") (eq (.Values.server.ha.disruptionBudget.enabled | toString) "true") -}}
 # PodDisruptionBudget to prevent degrading the server cluster through
 # voluntary cluster changes.
-apiVersion: {{ ge .Capabilities.KubeVersion.Minor "21" | ternary "policy/v1" "policy/v1beta1" }}
+apiVersion: policy/v1
 kind: PodDisruptionBudget
 metadata:
   name: {{ template "vault.fullname" . }}
-  namespace: {{ .Release.Namespace }}
+  namespace: {{ include "vault.namespace" . }}
   labels:
     helm.sh/chart: {{ include "vault.chart" . }}
     app.kubernetes.io/name: {{ include "vault.name" . }}

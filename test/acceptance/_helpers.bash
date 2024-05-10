@@ -1,3 +1,6 @@
+# Copyright (c) HashiCorp, Inc.
+# SPDX-License-Identifier: MPL-2.0
+
 # name_prefix returns the prefix of the resources within Kubernetes.
 name_prefix() {
     printf "vault"
@@ -89,7 +92,6 @@ wait_for_running() {
     for i in $(seq 60); do
         if [ -n "$(check ${POD_NAME})" ]; then
             echo "${POD_NAME} is ready."
-            sleep 5
             return
         fi
 

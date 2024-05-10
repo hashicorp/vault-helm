@@ -157,6 +157,28 @@ load _helpers
   [ "${actual}" = "10" ]
 }
 
+@test "server/ha-StatefulSet: zero replicas" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      --show-only templates/server-statefulset.yaml  \
+      --set 'server.ha.enabled=true' \
+      --set 'server.ha.replicas=0' \
+      . | tee /dev/stderr |
+      yq -r '.spec.replicas' | tee /dev/stderr)
+  [ "${actual}" = "0" ]
+}
+
+@test "server/ha-StatefulSet: invalid value for replicas" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      --show-only templates/server-statefulset.yaml  \
+      --set 'server.ha.enabled=true' \
+      --set 'server.ha.replicas=null' \
+      . | tee /dev/stderr |
+      yq -r '.spec.replicas' | tee /dev/stderr)
+  [ "${actual}" = "3" ]
+}
+
 #--------------------------------------------------------------------
 # resources
 
@@ -474,6 +496,22 @@ load _helpers
   local value=$(echo $object |
       yq -r 'map(select(.name=="VAULT_CLUSTER_ADDR")) | .[] .value' | tee /dev/stderr)
   [ "${value}" = 'http://$(HOSTNAME).release-name-vault-internal:8201' ]
+}
+
+@test "server/ha-StatefulSet: clusterAddr gets quoted" {
+  cd `chart_dir`
+  local customUrl='http://$(HOSTNAME).release-name-vault-internal:8201'
+  local rendered=$(helm template \
+      --show-only templates/server-statefulset.yaml  \
+      --set 'server.ha.enabled=true' \
+      --set 'server.ha.raft.enabled=true' \
+      --set "server.ha.clusterAddr=${customUrl}" \
+      . | tee /dev/stderr | \
+      grep -F "${customUrl}" | tee /dev/stderr)
+
+local value=$(echo $rendered |
+      yq -Y '.' | tee /dev/stderr)
+  [ "${value}" = 'value: "http://$(HOSTNAME).release-name-vault-internal:8201"' ]
 }
 
 #--------------------------------------------------------------------

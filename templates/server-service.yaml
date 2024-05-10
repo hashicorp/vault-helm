@@ -1,3 +1,8 @@
+{{/*
+Copyright (c) HashiCorp, Inc.
+SPDX-License-Identifier: MPL-2.0
+*/}}
+
 {{ template "vault.mode" . }}
 {{- if ne .mode "external" }}
 {{- template "vault.serverServiceEnabled" . -}}
@@ -7,7 +12,7 @@ apiVersion: v1
 kind: Service
 metadata:
   name: {{ template "vault.fullname" . }}
-  namespace: {{ .Release.Namespace }}
+  namespace: {{ include "vault.namespace" . }}
   labels:
     helm.sh/chart: {{ include "vault.chart" . }}
     app.kubernetes.io/name: {{ include "vault.name" . }}
@@ -19,6 +24,14 @@ spec:
   {{- if .Values.server.service.type}}
   type: {{ .Values.server.service.type }}
   {{- end}}
+  {{- if (semverCompare ">= 1.23-0" .Capabilities.KubeVersion.Version) }}
+  {{- if .Values.server.service.ipFamilyPolicy }}
+  ipFamilyPolicy: {{ .Values.server.service.ipFamilyPolicy }}
+  {{- end }}
+  {{- if .Values.server.service.ipFamilies }}
+  ipFamilies: {{ .Values.server.service.ipFamilies | toYaml | nindent 2 }}
+  {{- end }}
+  {{- end }}
   {{- if .Values.server.service.clusterIP }}
   clusterIP: {{ .Values.server.service.clusterIP }}
   {{- end }}
@@ -38,7 +51,9 @@ spec:
       targetPort: 8201
   selector:
     app.kubernetes.io/name: {{ include "vault.name" . }}
+    {{- if eq (.Values.server.service.instanceSelector.enabled | toString) "true" }}
     app.kubernetes.io/instance: {{ .Release.Name }}
+    {{- end }}
     component: server
 {{- end }}
 {{- end }}
