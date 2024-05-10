@@ -32,7 +32,7 @@ webhooks:
         path: "/mutate"
       caBundle: {{ .Values.injector.certs.caBundle | quote }}
     rules:
-      - operations: ["CREATE", "UPDATE"]
+      - operations: ["CREATE"]
         apiGroups: [""]
         apiVersions: ["v1"]
         resources: ["pods"]
