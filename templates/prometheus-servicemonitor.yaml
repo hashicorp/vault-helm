@@ -41,8 +41,17 @@ spec:
     params:
       format:
       - prometheus
+    {{- with .Values.serverTelemetry.serviceMonitor.tlsConfig }}
+    tlsConfig:
+    {{- toYaml . | nindent 6 }}
+    {{- else }}
     tlsConfig:
       insecureSkipVerify: true
+    {{- end }}
+    {{- with .Values.serverTelemetry.serviceMonitor.authorization }}
+    authorization:
+    {{- toYaml . | nindent 6 }}
+    {{- end }}
   namespaceSelector:
     matchNames:
       - {{ include "vault.namespace" . }}

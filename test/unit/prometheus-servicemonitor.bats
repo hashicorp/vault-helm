@@ -123,3 +123,45 @@ load _helpers
   [ "$(echo "$output" | yq -r '.spec.endpoints | length')" = "1" ]
   [ "$(echo "$output" | yq -r '.spec.endpoints[0].port')" = "https" ]
 }
+
+@test "prometheus/ServiceMonitor-server: tlsConfig default" {
+  cd `chart_dir`
+  local output=$( (helm template \
+      --show-only templates/prometheus-servicemonitor.yaml \
+      --set 'serverTelemetry.serviceMonitor.enabled=true' \
+      . ) | tee /dev/stderr)
+
+  [ "$(echo "$output" | yq -r '.spec.endpoints[0].tlsConfig.insecureSkipVerify')" = "true" ]
+}
+
+@test "prometheus/ServiceMonitor-server: tlsConfig override" {
+  cd `chart_dir`
+  local output=$( (helm template \
+      --show-only templates/prometheus-servicemonitor.yaml \
+      --set 'serverTelemetry.serviceMonitor.tlsConfig.ca=ca.crt' \
+      --set 'serverTelemetry.serviceMonitor.enabled=true' \
+      . ) | tee /dev/stderr)
+
+  [ "$(echo "$output" | yq -r '.spec.endpoints[0].tlsConfig.ca')" = "ca.crt" ]
+}
+
+@test "prometheus/ServiceMonitor-server: authorization default" {
+  cd `chart_dir`
+  local output=$( (helm template \
+      --show-only templates/prometheus-servicemonitor.yaml \
+      --set 'serverTelemetry.serviceMonitor.enabled=true' \
+      . ) | tee /dev/stderr)
+
+  [ "$(echo "$output" | yq -r '.spec.endpoints[0].authorization')" = "null" ]
+}
+
+@test "prometheus/ServiceMonitor-server: authorization override" {
+  cd `chart_dir`
+  local output=$( (helm template \
+      --show-only templates/prometheus-servicemonitor.yaml \
+      --set 'serverTelemetry.serviceMonitor.authorization.credentials.name=a-secret' \
+      --set 'serverTelemetry.serviceMonitor.enabled=true' \
+      . ) | tee /dev/stderr)
+
+  [ "$(echo "$output" | yq -r '.spec.endpoints[0].authorization.credentials.name')" = "a-secret" ]
+}

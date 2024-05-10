@@ -1,0 +1,23 @@
+# Copyright (c) HashiCorp, Inc.
+# SPDX-License-Identifier: MPL-2.0
+
+global:
+  tlsDisable: false
+server:
+  dev:
+    enabled: true
+  # >- to convert to a single line with no line breaks.
+  extraArgs: >-
+    -dev-tls
+    -dev-tls-cert-dir=/var/run/tls
+    -dev-tls-san=vault
+    -dev-tls-san=$POD_IP
+  extraEnvironmentVars:
+    VAULT_CACERT: /var/run/tls/vault-ca.pem
+    VAULT_LOCAL_CONFIG: '{"telemetry":{"prometheus_retention_time":"30s","disable_hostname":true}}'
+  volumes:
+    - name: tls
+      emptyDir: {}
+  volumeMounts:
+    - mountPath: /var/run/tls
+      name: tls

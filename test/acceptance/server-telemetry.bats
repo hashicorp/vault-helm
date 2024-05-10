@@ -10,46 +10,29 @@ load _helpers
   kubectl create namespace acceptance
   kubectl config set-context --current --namespace=acceptance
 
+  # Install prometheus-operator and friends.
   helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
   helm repo update
-  helm install \
+  helm upgrade --install \
     --wait \
-    --version 39.6.0 \
+    --version 58.3.1 \
     prometheus prometheus-community/kube-prometheus-stack
 
-  helm install \
+  # Install Vault with telemetry config now that the prometheus CRDs are applied.
+  helm upgrade --install \
     --wait \
-    --values ./test/acceptance/server-test/telemetry.yaml \
+    --values ./test/acceptance/server-test/vault-server.yaml \
+    --values ./test/acceptance/server-test/vault-telemetry.yaml \
     "$(name_prefix)" .
-
-  wait_for_running $(name_prefix)-0
-
-  # Sealed, not initialized
-  wait_for_sealed_vault $(name_prefix)-0
-
-  # Vault Init
-  local token=$(kubectl exec -ti "$(name_prefix)-0" -- \
-    vault operator init -format=json -n 1 -t 1 | \
-    jq -r '.unseal_keys_b64[0]')
-  [ "${token}" != "" ]
-
-  # Vault Unseal
-  local pods=($(kubectl get pods --selector='app.kubernetes.io/name=vault' -o json | jq -r '.items[].metadata.name'))
-  for pod in "${pods[@]}"
-  do
-      kubectl exec -ti ${pod} -- vault operator unseal ${token}
-  done
 
   wait_for_ready "$(name_prefix)-0"
 
-  # Unsealed, initialized
-  local sealed_status=$(kubectl exec "$(name_prefix)-0" -- vault status -format=json |
-    jq -r '.sealed' )
-  [ "${sealed_status}" == "false" ]
+  echo 'path "sys/metrics" {capabilities = ["read"]}' | kubectl exec -i "$(name_prefix)-0" -- vault policy write metrics -
 
-  local init_status=$(kubectl exec "$(name_prefix)-0" -- vault status -format=json |
-    jq -r '.initialized')
-  [ "${init_status}" == "true" ]
+  # Store Vault's dev TLS CA and a token in a secret for prometheus to use.
+  kubectl create secret generic vault-metrics-client \
+    --from-literal="ca.crt=$(kubectl exec "$(name_prefix)-0" -- cat /var/run/tls/vault-ca.pem)" \
+    --from-literal="token=$(kubectl exec "$(name_prefix)-0" -- vault token create -policy=metrics -field=token)"
 
   # unfortunately it can take up to 2 minutes for the vault prometheus job to appear
   # TODO: investigate how reduce this.
