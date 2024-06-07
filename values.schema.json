@@ -722,6 +722,9 @@
                         "string"
                     ]
                 },
+                "enableServiceLinks": {
+                    "type": "boolean"
+                },
                 "enterpriseLicense": {
                     "type": "object",
                     "properties": {
