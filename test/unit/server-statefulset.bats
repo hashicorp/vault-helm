@@ -1139,6 +1139,13 @@ load _helpers
       . | tee /dev/stderr |
       yq -r '.spec.template.metadata.labels.foo' | tee /dev/stderr)
   [ "${actual}" = "bar" ]
+
+  local actual=$(helm template \
+      --show-only templates/server-statefulset.yaml \
+      --set 'server.extraLabels.foo=bar' \
+      . | tee /dev/stderr |
+      yq -r '.metadata.labels.foo' | tee /dev/stderr)
+  [ "${actual}" = "bar" ]
 }
 
 # extra annotations
