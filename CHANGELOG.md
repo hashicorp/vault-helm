@@ -1,5 +1,19 @@
 ## Unreleased
 
+## 0.28.1 (July 8, 2024)
+
+Changes:
+
+* Default `vault` version updated to 1.17.1
+* Default `vault-k8s` version updated to 1.4.2
+* Default `vault-csi-provider` version updated to 1.4.3
+* Tested with Kubernetes versions 1.26-1.30
+
+Improvements:
+
+* Configurable `tlsConfig` and `authorization` for Prometheus ServiceMonitor [GH-1025](https://github.com/hashicorp/vault-helm/pull/1025)
+* Remove UPDATE from injector-mutating-webhook [GH-783](https://github.com/hashicorp/vault-helm/pull/783)
+
 ## 0.28.0 (April 8, 2024)
 
 Changes:

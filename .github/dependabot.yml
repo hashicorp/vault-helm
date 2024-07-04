@@ -5,3 +5,16 @@ updates:
     directory: "/"
     schedule:
       interval: "daily"
+    labels: ["dependencies"]
+    groups:
+      github-actions-breaking:
+        update-types:
+          - major
+      github-actions-backward-compatible:
+        update-types:
+          - minor
+          - patch
+    # only update internal github actions, external github actions are handled
+    # by https://github.com/hashicorp/security-tsccr/tree/main/automation
+    allow:
+      - dependency-name: "hashicorp/*"
