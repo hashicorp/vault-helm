@@ -36,6 +36,7 @@ webhooks:
         apiGroups: [""]
         apiVersions: ["v1"]
         resources: ["pods"]
+        scope: "Namespaced"
 {{- if or (.Values.injector.namespaceSelector) (((.Values.injector.webhook)).namespaceSelector) }}
     namespaceSelector:
 {{ toYaml (((.Values.injector.webhook)).namespaceSelector | default .Values.injector.namespaceSelector) | indent 6}}
