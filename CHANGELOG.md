@@ -13,6 +13,7 @@ Improvements:
 
 * Configurable `tlsConfig` and `authorization` for Prometheus ServiceMonitor [GH-1025](https://github.com/hashicorp/vault-helm/pull/1025)
 * Remove UPDATE from injector-mutating-webhook [GH-783](https://github.com/hashicorp/vault-helm/pull/783)
+* Add scope to mutating webhook [GH-1037](https://github.com/hashicorp/vault-helm/pull/1037)
 
 ## 0.28.0 (April 8, 2024)
 
