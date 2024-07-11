@@ -1236,6 +1236,9 @@
                 "serviceMonitor": {
                     "type": "object",
                     "properties": {
+                        "authorization": {
+                            "type": "object"
+                        },
                         "enabled": {
                             "type": "boolean"
                         },
@@ -1246,6 +1249,9 @@
                             "type": "string"
                         },
                         "selectors": {
+                            "type": "object"
+                        },
+                        "tlsConfig": {
                             "type": "object"
                         }
                     }
