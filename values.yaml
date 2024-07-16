@@ -1285,7 +1285,7 @@ serverTelemetry:
     scrapeTimeout: 10s
 
     # tlsConfig used for scraping the Vault metrics API.
-    # See API reference: https://prometheus-operator.dev/docs/operator/api/#monitoring.coreos.com/v1.TLSConfig
+    # See API reference: https://prometheus-operator.dev/docs/api-reference/api/#monitoring.coreos.com/v1.TLSConfig
     # example:
     # tlsConfig:
     #   ca:
@@ -1295,7 +1295,7 @@ serverTelemetry:
     tlsConfig: {}
 
     # authorization used for scraping the Vault metrics API.
-    # See API reference: https://prometheus-operator.dev/docs/operator/api/#monitoring.coreos.com/v1.SafeAuthorization
+    # See API reference: https://prometheus-operator.dev/docs/api-reference/api/#monitoring.coreos.com/v1.SafeAuthorization
     # example:
     # authorization:
     #   credentials:
