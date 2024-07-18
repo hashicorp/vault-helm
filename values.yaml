@@ -673,7 +673,7 @@ server:
   # This can be used together with an OnDelete deployment strategy to help
   # identify which pods still need to be deleted during a deployment to pick up
   # any configuration changes.
-  configAnnotation: false
+  includeConfigAnnotation: false
 
   # Enables a headless service to be used by the Vault Statefulset
   service:
