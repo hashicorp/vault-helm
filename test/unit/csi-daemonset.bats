@@ -177,16 +177,39 @@ load _helpers
       --set "csi.enabled=true" \
       . | tee /dev/stderr |
       yq -r '.spec.template.spec.containers[0].args[1]' | tee /dev/stderr)
-  [ "${actual}" = "--debug=false" ]
+  [ "${actual}" = "--log-level=info" ]
 
   local actual=$(helm template \
       --show-only templates/csi-daemonset.yaml \
       --set "csi.enabled=true" \
+      --set "csi.logLevel=error" \
       --set "csi.debug=true" \
       . | tee /dev/stderr |
       yq -r '.spec.template.spec.containers[0].args[1]' | tee /dev/stderr)
-  [ "${actual}" = "--debug=true" ]
+  [ "${actual}" = "--log-level=debug" ]
 }
+
+@test "csi/daemonset: default log-level" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      --show-only templates/csi-daemonset.yaml \
+      --set "csi.enabled=true" \
+      . | tee /dev/stderr |
+      yq -r '.spec.template.spec.containers[0].args[1]' | tee /dev/stderr)
+  [ "${actual}" = "--log-level=info" ]
+}
+
+@test "csi/daemonset: log-level is configurable" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      --show-only templates/csi-daemonset.yaml \
+      --set "csi.enabled=true" \
+      --set "csi.logLevel=warn" \
+      . | tee /dev/stderr |
+      yq -r '.spec.template.spec.containers[0].args[1]' | tee /dev/stderr)
+  [ "${actual}" = "--log-level=warn" ]
+}
+
 
 # HMAC secret arg
 @test "csi/daemonset: HMAC secret arg is configurable" {
