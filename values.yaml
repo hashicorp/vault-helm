@@ -671,8 +671,8 @@ server:
   # Add an annotation to the server configmap and the statefulset pods,
   # vaultproject.io/config-checksum, that is a hash of the Vault configuration.
   # This can be used together with an OnDelete deployment strategy to help
-  # identify which pods still need to be deleted during a deployment to pick up
-  # any configuration changes.
+  # identify which pods still need to be deleted during a deployment or with
+  # RollingUpdate on an auto-unsealed vault to pick up any configuration changes.
   includeConfigAnnotation: false
 
   # Enables a headless service to be used by the Vault Statefulset
