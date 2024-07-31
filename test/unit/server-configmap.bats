@@ -4,20 +4,21 @@ load _helpers
 
 @test "server/ConfigMap: enabled by default" {
   cd `chart_dir`
-  local actual=$(helm template \
+  local actual
+  actual=$(helm template \
       --show-only templates/server-config-configmap.yaml \
       . | tee /dev/stderr |
       yq 'length > 0' | tee /dev/stderr)
   [ "${actual}" = "true" ]
 
-  local actual=$(helm template \
+  actual=$(helm template \
       --show-only templates/server-config-configmap.yaml \
       --set 'server.ha.enabled=true' \
       . | tee /dev/stderr |
       yq 'length > 0' | tee /dev/stderr)
   [ "${actual}" = "true" ]
 
-  local actual=$(helm template \
+  actual=$(helm template \
       --show-only templates/server-config-configmap.yaml \
       --set 'server.ha.enabled=true' \
       --set 'server.ha.raft.enabled=true' \
@@ -25,7 +26,7 @@ load _helpers
       yq 'length > 0' | tee /dev/stderr)
   [ "${actual}" = "true" ]
 
-  local actual=$(helm template \
+  actual=$(helm template \
       --show-only templates/server-config-configmap.yaml \
       --set 'server.standalone.enabled=true' \
       . | tee /dev/stderr |
@@ -35,7 +36,8 @@ load _helpers
 
 @test "server/ConfigMap: raft config disabled by default" {
   cd `chart_dir`
-  local actual=$(helm template \
+  local actual
+  actual=$(helm template \
       --show-only templates/server-config-configmap.yaml \
       --set 'server.ha.enabled=true' \
       . | tee /dev/stderr |
@@ -45,7 +47,8 @@ load _helpers
 
 @test "server/ConfigMap: raft config can be enabled" {
   cd `chart_dir`
-  local actual=$(helm template \
+  local actual
+  actual=$(helm template \
       --show-only templates/server-config-configmap.yaml \
       --set 'server.ha.enabled=true' \
       --set 'server.ha.raft.enabled=true' \
@@ -57,7 +60,8 @@ load _helpers
 
 @test "server/ConfigMap: disabled by server.dev.enabled true" {
   cd `chart_dir`
-  local actual=$( (helm template \
+  local actual
+  actual=$( (helm template \
       --show-only templates/server-config-configmap.yaml \
       --set 'server.dev.enabled=true' \
       . || echo "---") | tee /dev/stderr |
@@ -67,7 +71,8 @@ load _helpers
 
 @test "server/ConfigMap: disable with global.enabled" {
   cd `chart_dir`
-  local actual=$( (helm template \
+  local actual
+  actual=$( (helm template \
       --show-only templates/server-config-configmap.yaml  \
       --set 'global.enabled=false' \
       . || echo "---") | tee /dev/stderr |
@@ -77,7 +82,8 @@ load _helpers
 
 @test "server/ConfigMap: namespace" {
   cd `chart_dir`
-  local actual=$(helm template \
+  local actual
+  actual=$(helm template \
       --show-only templates/server-config-configmap.yaml \
       --namespace foo \
       . | tee /dev/stderr |
@@ -92,23 +98,70 @@ load _helpers
   [ "${actual}" = "bar" ]
 }
 
-@test "server/ConfigMap: standalone extraConfig is set" {
+@test "server/ConfigMap: standalone extraConfig is set as JSON" {
   cd `chart_dir`
-  local actual=$(helm template \
+  local data
+  data=$(helm template \
       --show-only templates/server-config-configmap.yaml  \
       --set 'server.standalone.enabled=true' \
-      --set 'server.standalone.config="{\"hello\": \"world\"}"' \
+      --set 'server.standalone.config=\{\"hello\": \"world\"\}' \
       . | tee /dev/stderr |
-      yq '.data["extraconfig-from-values.hcl"] | match("world") | length' | tee /dev/stderr)
-  [ ! -z "${actual}" ]
+      yq '.data')
+  [ "$(echo "${data}" | \
+    yq '(. | length) == 1')" = "true" ]
+  [ "$(echo "${data}" | \
+    yq '."extraconfig-from-values.hcl" == "{\"disable_mlock\":true,\"hello\":\"world\"}"')" = 'true' ]
 
-  local actual=$(helm template \
+  data=$(helm template \
       --show-only templates/server-config-configmap.yaml  \
       --set 'server.standalone.enabled=true' \
-      --set 'server.standalone.config="{\"foo\": \"bar\"}"' \
+      --set 'server.standalone.config=\{\"foo\": \"bar\"\}' \
       . | tee /dev/stderr |
-      yq '.data["extraconfig-from-values.hcl"] | match("bar") | length' | tee /dev/stderr)
-  [ ! -z "${actual}" ]
+      yq '.data' | tee /dev/stderr)
+  [ "$(echo "${data}" | \
+    yq '(. | length) == 1')" = "true" ]
+  [ "$(echo "${data}" | \
+    yq '."extraconfig-from-values.hcl" == "{\"disable_mlock\":true,\"foo\":\"bar\"}"')" = 'true' ]
+
+  data=$(helm template \
+      --show-only templates/server-config-configmap.yaml  \
+      --set 'server.standalone.enabled=true' \
+      --set 'server.standalone.config=\{\"disable_mlock\": false\,\"foo\":\"bar\"\}' \
+      . | tee /dev/stderr |
+      yq '.data' | tee /dev/stderr)
+  [ "$(echo "${data}" | \
+    yq '(. | length) == 1')" = "true" ]
+  [ "$(echo "${data}" | \
+    yq '."extraconfig-from-values.hcl" == "{\"disable_mlock\":false,\"foo\":\"bar\"}"')" = 'true' ]
+}
+
+@test "server/ConfigMap: standalone extraConfig is set as not JSON" {
+  cd `chart_dir`
+  local data
+  data=$(helm template \
+      --show-only templates/server-config-configmap.yaml  \
+      --set 'server.standalone.enabled=true' \
+      --set 'server.standalone.config=baz = false' \
+      . | tee /dev/stderr |
+      yq '.data')
+  [ "$(echo "${data}" | \
+    yq '(. | length) == 1')" = "true" ]
+  [ "$(echo "${data}" | \
+    yq '."extraconfig-from-values.hcl" == "baz = false\ndisable_mlock = true"')" = 'true' ]
+}
+
+@test "server/ConfigMap: standalone structured extraConfig fails" {
+  cd "$(chart_dir)"
+  local ret
+  ret=0
+  local output
+  output="$(helm template \
+        --show-only templates/server-config-configmap.yaml  \
+        --set 'server.standalone.enabled=true' \
+        --set 'server.standalone.config.key1=value1' \
+        . 2>&1)" || ret=$?
+  [ "${ret}" -ne 0 ]
+  echo "${output}" | grep -q "structured server config is not supported, value must be a string"
 }
 
 @test "server/ConfigMap: ha extraConfig is set" {
@@ -119,7 +172,7 @@ load _helpers
       --set 'server.ha.config="{\"hello\": \"world\"}"' \
       . | tee /dev/stderr |
       yq '.data["extraconfig-from-values.hcl"] | match("world") | length' | tee /dev/stderr)
-  [ ! -z "${actual}" ]
+  [ -n "${actual}" ]
 
   local actual=$(helm template \
       --show-only templates/server-config-configmap.yaml  \
@@ -127,7 +180,7 @@ load _helpers
       --set 'server.ha.config="{\"foo\": \"bar\"}"' \
       . | tee /dev/stderr |
       yq '.data["extraconfig-from-values.hcl"] | match("bar") | length' | tee /dev/stderr)
-  [ ! -z "${actual}" ]
+  [ -n "${actual}" ]
 }
 
 @test "server/ConfigMap: disabled by injector.externalVaultAddr" {

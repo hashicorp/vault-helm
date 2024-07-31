@@ -183,7 +183,7 @@ defined a custom configuration.  Additionally iterates over any
 extra volumes the user may have specified (such as a secret with TLS).
 */}}
 {{- define "vault.volumes" -}}
-  {{- if and (ne .mode "dev") (or (.Values.server.standalone.config) (.Values.server.ha.config)) }}
+  {{- if and (ne .mode "dev") (or (.Values.server.standalone.config) (.Values.server.ha.config) (.Values.server.ha.raft.config)) }}
         - name: config
           configMap:
             name: {{ template "vault.fullname" . }}-config
@@ -1083,23 +1083,32 @@ Supported inputs are Values.ui
 config file from values
 */}}
 {{- define "vault.config" -}}
-  {{- if or (eq .mode "ha") (eq .mode "standalone") }}
-  {{- $type := typeOf (index .Values.server .mode).config }}
-  {{- if eq $type "string" }}
-    disable_mlock = true
-  {{- if eq .mode "standalone" }}
-    {{ tpl .Values.server.standalone.config . | nindent 4 | trim }}
-  {{- else if and (eq .mode "ha") (eq (.Values.server.ha.raft.enabled | toString) "false") }}
-    {{ tpl .Values.server.ha.config . | nindent 4 | trim }}
-  {{- else if and (eq .mode "ha") (eq (.Values.server.ha.raft.enabled | toString) "true") }}
-    {{ tpl .Values.server.ha.raft.config . | nindent 4 | trim }}
-  {{ end }}
-  {{- else }}
-  {{- if and (eq .mode "ha") (eq (.Values.server.ha.raft.enabled | toString) "true") }}
-{{ merge (dict "disable_mlock" true) (index .Values.server .mode).raft.config | toPrettyJson | indent 4 }}
-  {{- else }}
-{{ merge (dict "disable_mlock" true) (index .Values.server .mode).config | toPrettyJson | indent 4 }}
-  {{- end }}
-  {{- end }}
-  {{- end }}
+{{- if or (eq .mode "ha") (eq .mode "standalone") }}
+{{- $config := (index .Values.server .mode).config -}}
+{{- if .Values.server.ha.raft.enabled -}}
+{{- $config = .Values.server.ha.raft.config -}}
+{{- end -}}
+{{- $type := typeOf $config -}}
+{{- if eq $type "string" -}}
+{{/* Vault supports both HCL and JSON as its conifugration format */}}
+{{- $json := $config | fromJson -}}
+{{/*
+Helm's fromJson does not behave according to the corresponding sprig function nor Helm docs,
+which claim that it should return empty string on invalid JSON, it atually returns
+a map containing a single 'Error' element.
+https://github.com/helm/helm/blob/50c22ed7f953fadb32755e5881ba95a92da852b2/pkg/engine/funcs.go#L158
+ */}}
+{{- if or (and (eq ($json | len) 1) (hasKey $json "Error")) (eq ($json | len) 0) -}}
+{{- $config = printf "%s\n%s" $config "disable_mlock = true" -}}
+{{- else -}}
+{{- if not (hasKey $json "disable_mlock") -}}
+{{- $_ := set $json "disable_mlock" true -}}
+{{- end -}}
+{{- $config = $json | mustToJson -}}
+{{- end -}}
+{{- else }}
+{{- fail "structured server config is not supported, value must be a string"}}
+{{- end }}
+{{- $config | nindent 4 | trim }}
+{{- end -}}
 {{- end -}}
