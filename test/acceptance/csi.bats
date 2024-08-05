@@ -27,7 +27,7 @@ load _helpers
     --namespace=acceptance \
     --set="server.dev.enabled=true" \
     --set="csi.enabled=true" \
-    --set="csi.debug=true" \
+    --set="csi.logLevel=debug" \
     --set="csi.agent.logLevel=debug" \
     --set="injector.enabled=false" \
     .
