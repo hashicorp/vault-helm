@@ -89,7 +89,7 @@ load _helpers
       . | tee /dev/stderr |
       yq -r '.metadata.namespace' | tee /dev/stderr)
   [ "${actual}" = "foo" ]
-  local actual=$(helm template \
+  actual=$(helm template \
       --show-only templates/server-config-configmap.yaml \
       --set 'global.namespace=bar' \
       --namespace foo \
@@ -164,23 +164,30 @@ load _helpers
   echo "${output}" | grep -q "structured server config is not supported, value must be a string"
 }
 
-@test "server/ConfigMap: ha extraConfig is set" {
+@test "server/ConfigMap: ha extraConfig is set as JSON" {
   cd `chart_dir`
-  local actual=$(helm template \
+  local data
+  data=$(helm template \
       --show-only templates/server-config-configmap.yaml  \
       --set 'server.ha.enabled=true' \
-      --set 'server.ha.config="{\"hello\": \"world\"}"' \
+      --set 'server.ha.config=\{\"hello\": \"ha-world\"\}' \
       . | tee /dev/stderr |
-      yq '.data["extraconfig-from-values.hcl"] | match("world") | length' | tee /dev/stderr)
-  [ -n "${actual}" ]
+      yq '.data' | tee /dev/stderr)
+  [ "$(echo "${data}" | \
+    yq '(. | length) == 1')" = "true" ]
+  [ "$(echo "${data}" | \
+    yq '."extraconfig-from-values.hcl" == "{\"disable_mlock\":true,\"hello\":\"ha-world\"}"')" = 'true' ]
 
-  local actual=$(helm template \
+ data=$(helm template \
       --show-only templates/server-config-configmap.yaml  \
       --set 'server.ha.enabled=true' \
-      --set 'server.ha.config="{\"foo\": \"bar\"}"' \
+      --set 'server.ha.config=\{\"foo\": \"bar\"\,\"disable_mlock\":false\}' \
       . | tee /dev/stderr |
-      yq '.data["extraconfig-from-values.hcl"] | match("bar") | length' | tee /dev/stderr)
-  [ -n "${actual}" ]
+      yq '.data' | tee /dev/stderr)
+  [ "$(echo "${data}" | \
+    yq '(. | length) == 1')" = "true" ]
+  [ "$(echo "${data}" | \
+    yq '."extraconfig-from-values.hcl" == "{\"disable_mlock\":false,\"foo\":\"bar\"}"')" = 'true' ]
 }
 
 @test "server/ConfigMap: disabled by injector.externalVaultAddr" {

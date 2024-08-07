@@ -1090,11 +1090,11 @@ config file from values
 {{- end -}}
 {{- $type := typeOf $config -}}
 {{- if eq $type "string" -}}
-{{/* Vault supports both HCL and JSON as its conifugration format */}}
+{{/* Vault supports both HCL and JSON as its configuration format */}}
 {{- $json := $config | fromJson -}}
 {{/*
 Helm's fromJson does not behave according to the corresponding sprig function nor Helm docs,
-which claim that it should return empty string on invalid JSON, it atually returns
+which claim that it should return empty string on invalid JSON, it actually returns
 a map containing a single 'Error' element.
 https://github.com/helm/helm/blob/50c22ed7f953fadb32755e5881ba95a92da852b2/pkg/engine/funcs.go#L158
  */}}
