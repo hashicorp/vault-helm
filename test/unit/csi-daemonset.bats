@@ -191,7 +191,8 @@ load _helpers
 
 @test "csi/daemonset: default log-level" {
   cd `chart_dir`
-  local actual=$(helm template \
+  local actual
+  actual=$(helm template \
       --show-only templates/csi-daemonset.yaml \
       --set "csi.enabled=true" \
       . | tee /dev/stderr |
