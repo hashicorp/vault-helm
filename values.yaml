@@ -1225,7 +1225,7 @@ csi:
     # Number of seconds after which the probe times out.
     timeoutSeconds: 3
 
-  # Configures the log verbosity of the injector.
+  # Configures the log level for the Vault CSI provider.
   # Supported log levels include: trace, debug, info, warn, error, and off
   logLevel: "info"
 
