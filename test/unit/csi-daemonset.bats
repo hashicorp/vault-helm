@@ -179,7 +179,7 @@ load _helpers
       yq -r '.spec.template.spec.containers[0].args[1]' | tee /dev/stderr)
   [ "${actual}" = "--log-level=info" ]
 
-  local actual=$(helm template \
+  actual=$(helm template \
       --show-only templates/csi-daemonset.yaml \
       --set "csi.enabled=true" \
       --set "csi.logLevel=error" \
