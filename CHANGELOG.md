@@ -1,5 +1,8 @@
 ## Unreleased
 
+* Default `vault` version updated to 1.17.3
+* Default `vault-csi-provider` version updated to 1.5.0
+
 ## 0.28.1 (July 11, 2024)
 
 Changes:
