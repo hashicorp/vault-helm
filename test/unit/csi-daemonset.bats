@@ -172,7 +172,8 @@ load _helpers
 # Debug arg
 @test "csi/daemonset: debug arg is configurable" {
   cd `chart_dir`
-  local actual=$(helm template \
+  local actual
+  actual=$(helm template \
       --show-only templates/csi-daemonset.yaml \
       --set "csi.enabled=true" \
       . | tee /dev/stderr |
