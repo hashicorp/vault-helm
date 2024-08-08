@@ -1,5 +1,7 @@
 ## Unreleased
 
+Changes:
+
 * Default `vault` version updated to 1.17.3
 * Default `vault-csi-provider` version updated to 1.5.0
 
