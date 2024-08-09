@@ -55,10 +55,12 @@ spec:
           imagePullPolicy: {{ .Values.csi.image.pullPolicy }}
           args:
             - --endpoint=/provider/vault.sock
-            {{- if .Values.csi.debug }}
+            {{- if .Values.csi.logLevel }}
+            - --log-level={{ .Values.csi.logLevel }}
+            {{- else if .Values.csi.debug }}
             - --log-level=debug
             {{- else }}
-            - --log-level={{ .Values.csi.logLevel }}
+            - --log-level=info
             {{- end }}
             {{- if .Values.csi.hmacSecretName }}
             - --hmac-secret-name={{ .Values.csi.hmacSecretName }}
