@@ -183,7 +183,7 @@ load _helpers
   actual=$(helm template \
       --show-only templates/csi-daemonset.yaml \
       --set "csi.enabled=true" \
-      --set "csi.logLevel=error" \
+      --set "csi.logLevel=" \
       --set "csi.debug=true" \
       . | tee /dev/stderr |
       yq -r '.spec.template.spec.containers[0].args[1]' | tee /dev/stderr)
