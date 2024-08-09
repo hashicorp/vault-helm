@@ -76,7 +76,7 @@ injector:
   # required.
   agentImage:
     repository: "hashicorp/vault"
-    tag: "1.17.2"
+    tag: "1.17.3"
 
   # The default values for the injected Vault Agent containers.
   agentDefaults:
@@ -1088,7 +1088,7 @@ csi:
 
   image:
     repository: "hashicorp/vault-csi-provider"
-    tag: "1.4.3"
+    tag: "1.5.0"
     pullPolicy: IfNotPresent
 
   # volumes is a list of volumes made available to all containers. These are rendered
@@ -1226,7 +1226,12 @@ csi:
     # Number of seconds after which the probe times out.
     timeoutSeconds: 3
 
-  # Enables debug logging.
+  # Configures the log level for the Vault CSI provider.
+  # Supported log levels include: trace, debug, info, warn, error, and off
+  logLevel: "info"
+
+  # Deprecated, set logLevel to debug instead.
+  # If set to true, the logLevel will be set to debug.
   debug: false
 
   # Pass arbitrary additional arguments to vault-csi-provider.
