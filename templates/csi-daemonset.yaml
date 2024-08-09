@@ -59,8 +59,6 @@ spec:
             - --log-level={{ .Values.csi.logLevel }}
             {{- else if .Values.csi.debug }}
             - --log-level=debug
-            {{- else }}
-            - --log-level=info
             {{- end }}
             {{- if .Values.csi.hmacSecretName }}
             - --hmac-secret-name={{ .Values.csi.hmacSecretName }}
