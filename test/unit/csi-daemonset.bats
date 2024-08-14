@@ -536,6 +536,28 @@ load _helpers
 }
 
 #--------------------------------------------------------------------
+# hostNetwork
+
+@test "csi/daemonset: csi.hostNetwork not set" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      --show-only templates/csi-daemonset.yaml \
+      . | tee /dev/stderr |
+      yq -r '.spec.template.spec.hostNetwork' | tee /dev/stderr)
+  [ "${actual}" = "false" ]
+}
+
+@test "server/StatefulSet: server.hostNetwork is set" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      --show-only templates/csi-daemonset.yaml \
+      --set 'csi.hostNetwork=true' \
+      . | tee /dev/stderr |
+      yq -r '.spec.template.spec.hostNetwork' | tee /dev/stderr)
+  [ "${actual}" = "true" ]
+}
+
+#--------------------------------------------------------------------
 # Readiness/liveness probes
 
 @test "csi/daemonset: csi.livenessProbe is configurable" {

@@ -197,6 +197,9 @@
                 "resources": {
                     "type": "object"
                 },
+                "hostNetwork": {
+                    "type": "boolean"
+                },
                 "serviceAccount": {
                     "type": "object",
                     "properties": {
