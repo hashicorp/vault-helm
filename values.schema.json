@@ -962,6 +962,9 @@
                         }
                     }
                 },
+                "podManagementPolicy": {
+                    "type": "string"
+                },
                 "postStart": {
                     "type": "array"
                 },

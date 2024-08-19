@@ -20,7 +20,7 @@ metadata:
   {{- template "vault.statefulSet.annotations" . }}
 spec:
   serviceName: {{ template "vault.fullname" . }}-internal
-  podManagementPolicy: Parallel
+  podManagementPolicy: {{ .Values.server.podManagementPolicy }}
   replicas: {{ template "vault.replicas" . }}
   updateStrategy:
     type: {{ .Values.server.updateStrategyType }}
