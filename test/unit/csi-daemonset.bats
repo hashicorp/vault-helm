@@ -542,6 +542,7 @@ load _helpers
   cd `chart_dir`
   local actual=$(helm template \
       --show-only templates/csi-daemonset.yaml \
+      --set 'csi.enabled=true' \
       . | tee /dev/stderr |
       yq -r '.spec.template.spec.hostNetwork' | tee /dev/stderr)
   [ "${actual}" = "false" ]
@@ -550,9 +551,10 @@ load _helpers
 @test "server/StatefulSet: server.hostNetwork is set" {
   cd `chart_dir`
   local actual=$(helm template \
-      --show-only templates/csi-daemonset.yaml \
-      --set 'csi.hostNetwork=true' \
-      . | tee /dev/stderr |
+        --show-only templates/csi-daemonset.yaml \
+        --set 'csi.enabled=true' \
+        --set 'csi.hostNetwork=true' \
+        . | tee /dev/stderr |
       yq -r '.spec.template.spec.hostNetwork' | tee /dev/stderr)
   [ "${actual}" = "true" ]
 }

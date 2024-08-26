@@ -102,6 +102,9 @@
                 "hmacSecretName": {
                     "type": "string"
                 },
+                "hostNetwork": {
+                    "type": "boolean"
+                },
                 "image": {
                     "type": "object",
                     "properties": {
@@ -196,9 +199,6 @@
                 },
                 "resources": {
                     "type": "object"
-                },
-                "hostNetwork": {
-                    "type": "boolean"
                 },
                 "serviceAccount": {
                     "type": "object",
