@@ -574,7 +574,7 @@ load _helpers
   [ "${actual}" = "false" ]
 }
 
-@test "server/StatefulSet: server.hostNetwork is set" {
+@test "csi/daemonset: csi.hostNetwork is set" {
   cd `chart_dir`
   local actual=$(helm template \
         --show-only templates/csi-daemonset.yaml \
