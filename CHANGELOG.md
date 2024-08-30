@@ -1,5 +1,14 @@
 ## Unreleased
 
+Changes:
+
+* Default `vault` version updated to 1.17.3
+* Default `vault-csi-provider` version updated to 1.5.0
+
+Bugs:
+
+* Properly handle JSON formatted server config [GH-1049](https://github.com/hashicorp/vault-helm/pull/1049)
+
 ## 0.28.1 (July 11, 2024)
 
 Changes:

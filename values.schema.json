@@ -667,7 +667,7 @@
                         }
                     }
                 },
-                "configAnnotation": {
+                "includeConfigAnnotation": {
                     "type": "boolean"
                 },
                 "dataStorage": {
