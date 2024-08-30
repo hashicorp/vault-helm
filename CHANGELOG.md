@@ -5,6 +5,10 @@ Changes:
 * Default `vault` version updated to 1.17.3
 * Default `vault-csi-provider` version updated to 1.5.0
 
+Features:
+
+* csi: Allow modification of the hostNetwork parameter on the DaemonSet [GH-1046](https://github.com/hashicorp/vault-helm/pull/1046)
+
 Bugs:
 
 * Properly handle JSON formatted server config [GH-1049](https://github.com/hashicorp/vault-helm/pull/1049)
