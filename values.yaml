@@ -1120,6 +1120,10 @@ csi:
   # generating secret versions.
   hmacSecretName: ""
 
+  # Allow modification of the hostNetwork parameter to avoid the need of a
+  # dedicated pod ip
+  hostNetwork: false
+
   # Settings for the daemonSet used to run the provider.
   daemonSet:
     updateStrategy:
