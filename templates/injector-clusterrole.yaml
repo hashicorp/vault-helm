@@ -21,4 +21,10 @@ rules:
     - "list"
     - "watch"
     - "patch"
+{{- if and (eq (.Values.injector.leaderElector.enabled | toString) "true") (gt (.Values.injector.replicas | int) 1) }}
+- apiGroups: [""]
+  resources: ["nodes"]
+  verbs:
+    - "get"
+{{ end }}
 {{ end }}

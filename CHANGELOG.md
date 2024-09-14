@@ -1,11 +1,128 @@
 ## Unreleased
 
 Changes:
-* Earliest Kubernetes version tested is now 1.20
+
+* Default `vault` version updated to 1.17.3
+* Default `vault-csi-provider` version updated to 1.5.0
+
+Features:
+
+* csi: Allow modification of the hostNetwork parameter on the DaemonSet [GH-1046](https://github.com/hashicorp/vault-helm/pull/1046)
+
+Bugs:
+
+* Properly handle JSON formatted server config [GH-1049](https://github.com/hashicorp/vault-helm/pull/1049)
+
+## 0.28.1 (July 11, 2024)
+
+Changes:
+
+* Default `vault` version updated to 1.17.2
+* Default `vault-k8s` version updated to 1.4.2
+* Default `vault-csi-provider` version updated to 1.4.3
+* Tested with Kubernetes versions 1.26-1.30
+
+Improvements:
+
+* Configurable `tlsConfig` and `authorization` for Prometheus ServiceMonitor [GH-1025](https://github.com/hashicorp/vault-helm/pull/1025)
+* Remove UPDATE from injector-mutating-webhook [GH-783](https://github.com/hashicorp/vault-helm/pull/783)
+* Add scope to mutating webhook [GH-1037](https://github.com/hashicorp/vault-helm/pull/1037)
+
+## 0.28.0 (April 8, 2024)
+
+Changes:
+
+* Default `vault` version updated to 1.16.1
+* Default `vault-k8s` version updated to 1.4.1
+* Default `vault-csi-provider` version updated to 1.4.2
+* Tested with Kubernetes versions 1.25-1.29
+
+Features:
+
+* server: Add annotation on config change [GH-1001](https://github.com/hashicorp/vault-helm/pull/1001)
+
+Bugs:
+
+* injector: add missing `get` `nodes` permission to ClusterRole [GH-1005](https://github.com/hashicorp/vault-helm/pull/1005)
+
+## 0.27.0 (November 16, 2023)
+
+Changes:
+
+* Default `vault` version updated to 1.15.2
+
+Features:
+
+* server: Support setting `persistentVolumeClaimRetentionPolicy` on the StatefulSet [GH-965](https://github.com/hashicorp/vault-helm/pull/965)
+* server: Support setting labels on PVCs [GH-969](https://github.com/hashicorp/vault-helm/pull/969)
+* server: Support setting ingress rules for networkPolicy [GH-877](https://github.com/hashicorp/vault-helm/pull/877)
+
+Improvements:
+
+* Support exec in the server liveness probe [GH-971](https://github.com/hashicorp/vault-helm/pull/971)
+
+## 0.26.1 (October 30, 2023)
+
+Bugs:
+* Fix templating of `server.ha.replicas` when set via override file. The `0.26.0` chart would ignore `server.ha.replicas` and always deploy 3 server replicas when `server.ha.enabled=true` unless overridden by command line when issuing the helm command: `--set server.ha.replicas=<some_number>`. Fixed in [GH-961](https://github.com/hashicorp/vault-helm/pull/961)
+
+## 0.26.0 (October 27, 2023)
+
+Changes:
+* Default `vault` version updated to 1.15.1
+* Default `vault-k8s` version updated to 1.3.1
+* Default `vault-csi-provider` version updated to 1.4.1
+* Tested with Kubernetes versions 1.24-1.28
+* server: OpenShift default readiness probe returns 204 when uninitialized [GH-966](https://github.com/hashicorp/vault-helm/pull/966)
+
+Features:
+* server: Add support for dual stack clusters [GH-833](https://github.com/hashicorp/vault-helm/pull/833)
+* server: Support `hostAliases` for the StatefulSet pods [GH-955](https://github.com/hashicorp/vault-helm/pull/955)
+* server: Add `server.service.active.annotations` and `server.service.standby.annotations` [GH-896](https://github.com/hashicorp/vault-helm/pull/896)
+* server: Add long-lived service account token option [GH-923](https://github.com/hashicorp/vault-helm/pull/923)
+
+Bugs:
+* csi: Add namespace field to `csi-role` and `csi-rolebindings`. [GH-909](https://github.com/hashicorp/vault-helm/pull/909)
+
+Improvements:
+* global: Add `global.namespace` to override the helm installation namespace. [GH-909](https://github.com/hashicorp/vault-helm/pull/909)
+* server: use vault.fullname in Helm test [GH-912](https://github.com/hashicorp/vault-helm/pull/912)
+* server: Allow scaling HA replicas to zero [GH-943](https://github.com/hashicorp/vault-helm/pull/943)
+
+## 0.25.0 (June 26, 2023)
+
+Changes:
+* Latest Kubernetes version tested is now 1.27
+* server: Headless service ignores `server.service.publishNotReadyAddresses` setting and always sets it as `true` [GH-902](https://github.com/hashicorp/vault-helm/pull/902)
+* `vault` updated to 1.14.0 [GH-916](https://github.com/hashicorp/vault-helm/pull/916)
+* `vault-csi-provider` updated to 1.4.0 [GH-916](https://github.com/hashicorp/vault-helm/pull/916)
+
+Improvements:
+* CSI: Make `nodeSelector` and `affinity` configurable for CSI daemonset's pods [GH-862](https://github.com/hashicorp/vault-helm/pull/862)
+* injector: Add `ephemeralLimit` and `ephemeralRequest` as options for configuring Agent's ephemeral storage resources [GH-798](https://github.com/hashicorp/vault-helm/pull/798)
+* Minimum kubernetes version for chart reverted to 1.20.0 to allow installation on clusters older than the oldest tested version [GH-916](https://github.com/hashicorp/vault-helm/pull/916)
+
+Bugs:
+* server: Set the default for `prometheusRules.rules` to an empty list [GH-886](https://github.com/hashicorp/vault-helm/pull/886)
+
+## 0.24.1 (April 17, 2023)
+
+Bugs:
+* csi: Add RBAC required by v1.3.0 to create secret for HMAC key used to generate secret versions [GH-872](https://github.com/hashicorp/vault-helm/pull/872)
+
+## 0.24.0 (April 6, 2023)
+
+Changes:
+* Earliest Kubernetes version tested is now 1.22
+* `vault` updated to 1.13.1 [GH-863](https://github.com/hashicorp/vault-helm/pull/863)
+* `vault-k8s` updated to 1.2.1 [GH-868](https://github.com/hashicorp/vault-helm/pull/868)
+* `vault-csi-provider` updated to 1.3.0 [GH-749](https://github.com/hashicorp/vault-helm/pull/749)
 
 Features:
 * server: New `extraPorts` option for adding ports to the Vault server statefulset [GH-841](https://github.com/hashicorp/vault-helm/pull/841)
+* server: Add configurable Port Number in readinessProbe and livenessProbe for the server-statefulset [GH-831](https://github.com/hashicorp/vault-helm/pull/831)
 * injector: Make livenessProbe and readinessProbe configurable and add configurable startupProbe [GH-852](https://github.com/hashicorp/vault-helm/pull/852)
+* csi: Add an Agent sidecar to Vault CSI Provider pods to provide lease caching and renewals [GH-749](https://github.com/hashicorp/vault-helm/pull/749)
 
 ## 0.23.0 (November 28th, 2022)
 

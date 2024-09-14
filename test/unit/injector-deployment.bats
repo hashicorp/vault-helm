@@ -42,6 +42,25 @@ load _helpers
   [ "${actual}" = "true" ]
 }
 
+@test "injector/deployment: namespace" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      --show-only templates/injector-deployment.yaml  \
+      --set 'injector.enabled=true' \
+      --namespace foo \
+      . | tee /dev/stderr |
+      yq -r '.metadata.namespace' | tee /dev/stderr)
+  [ "${actual}" = "foo" ]
+  local actual=$(helm template \
+      --show-only templates/injector-deployment.yaml  \
+      --set 'injector.enabled=true' \
+      --set 'global.namespace=bar' \
+      --namespace foo \
+      . | tee /dev/stderr |
+      yq -r '.metadata.namespace' | tee /dev/stderr)
+  [ "${actual}" = "bar" ]
+}
+
 @test "injector/deployment: image defaults to injector.image" {
   cd `chart_dir`
   local actual=$(helm template \
@@ -963,6 +982,7 @@ EOF
   local value=$(echo $object |
       yq -r 'map(select(.name=="AGENT_INJECT_MEM_REQUEST")) | .[] .value' | tee /dev/stderr)
   [ "${value}" = "64Mi" ]
+
 }
 
 @test "injector/deployment: can set agent default resources" {
@@ -973,6 +993,8 @@ EOF
       --set 'injector.agentDefaults.cpuRequest=cpuRequest' \
       --set 'injector.agentDefaults.memLimit=memLimit' \
       --set 'injector.agentDefaults.memRequest=memRequest' \
+      --set 'injector.agentDefaults.ephemeralLimit=ephemeralLimit' \
+      --set 'injector.agentDefaults.ephemeralRequest=ephemeralRequest' \
       . | tee /dev/stderr |
       yq -r '.spec.template.spec.containers[0].env' | tee /dev/stderr)
 
@@ -991,6 +1013,14 @@ EOF
   local value=$(echo $object |
       yq -r 'map(select(.name=="AGENT_INJECT_MEM_REQUEST")) | .[] .value' | tee /dev/stderr)
   [ "${value}" = "memRequest" ]
+
+  local value=$(echo $object |
+      yq -r 'map(select(.name=="AGENT_INJECT_EPHEMERAL_LIMIT")) | .[] .value' | tee /dev/stderr)
+  [ "${value}" = "ephemeralLimit" ]
+
+  local value=$(echo $object |
+      yq -r 'map(select(.name=="AGENT_INJECT_EPHEMERAL_REQUEST")) | .[] .value' | tee /dev/stderr)
+  [ "${value}" = "ephemeralRequest" ]
 }
 
 @test "injector/deployment: agent default template" {

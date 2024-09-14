@@ -37,6 +37,13 @@ Expand the name of the chart.
 {{- end -}}
 
 {{/*
+Allow the release namespace to be overridden
+*/}}
+{{- define "vault.namespace" -}}
+{{- default .Release.Namespace .Values.global.namespace -}}
+{{- end -}}
+
+{{/*
 Compute if the csi driver is enabled.
 */}}
 {{- define "vault.csiEnabled" -}}
@@ -74,6 +81,17 @@ Compute if the server serviceaccount is enabled.
       (eq (.Values.server.enabled | toString) "true")
       (eq (.Values.global.enabled | toString) "true"))) -}}
 {{- end -}}
+
+{{/*
+Compute if the server serviceaccount should have a token created and mounted to the serviceaccount.
+*/}}
+{{- define "vault.serverServiceAccountSecretCreationEnabled" -}}
+{{- $_ := set . "serverServiceAccountSecretCreationEnabled"
+  (and
+    (eq (.Values.server.serviceAccount.create | toString) "true")
+    (eq (.Values.server.serviceAccount.createSecret | toString) "true")) -}}
+{{- end -}}
+
 
 {{/*
 Compute if the server auth delegator serviceaccount is enabled.
@@ -149,7 +167,11 @@ Set's the replica count based on the different modes configured by user
   {{ if eq .mode "standalone" }}
     {{- default 1 -}}
   {{ else if eq .mode "ha" }}
-    {{- .Values.server.ha.replicas | default 3 -}}
+    {{- if or (kindIs "int64" .Values.server.ha.replicas) (kindIs "float64" .Values.server.ha.replicas) -}}
+      {{- .Values.server.ha.replicas -}}
+    {{ else }}
+      {{- 3 -}}
+    {{- end -}}
   {{ else }}
     {{- default 1 -}}
   {{ end }}
@@ -161,7 +183,7 @@ defined a custom configuration.  Additionally iterates over any
 extra volumes the user may have specified (such as a secret with TLS).
 */}}
 {{- define "vault.volumes" -}}
-  {{- if and (ne .mode "dev") (or (.Values.server.standalone.config) (.Values.server.ha.config)) }}
+  {{- if and (ne .mode "dev") (or (.Values.server.standalone.config) (.Values.server.ha.config) (.Values.server.ha.raft.config)) }}
         - name: config
           configMap:
             name: {{ template "vault.fullname" . }}-config
@@ -267,6 +289,7 @@ storage might be desired by the user.
     - metadata:
         name: data
         {{- include "vault.dataVolumeClaim.annotations" . | nindent 6 }}
+        {{- include "vault.dataVolumeClaim.labels" . | nindent 6 }}
       spec:
         accessModes:
           - {{ .Values.server.dataStorage.accessMode | default "ReadWriteOnce" }}
@@ -281,6 +304,7 @@ storage might be desired by the user.
     - metadata:
         name: audit
         {{- include "vault.auditVolumeClaim.annotations" . | nindent 6 }}
+        {{- include "vault.auditVolumeClaim.labels" . | nindent 6 }}
       spec:
         accessModes:
           - {{ .Values.server.auditStorage.accessMode | default "ReadWriteOnce" }}
@@ -433,9 +457,12 @@ Sets the injector deployment update strategy
 {{/*
 Sets extra pod annotations
 */}}
-{{- define "vault.annotations" -}}
-  {{- if .Values.server.annotations }}
+{{- define "vault.annotations" }}
       annotations:
+  {{- if .Values.server.includeConfigAnnotation }}
+        vault.hashicorp.com/config-checksum: {{ include "vault.config" . | sha256sum }}
+  {{- end }}
+  {{- if .Values.server.annotations }}
         {{- $tp := typeOf .Values.server.annotations }}
         {{- if eq $tp "string" }}
           {{- tpl .Values.server.annotations . | nindent 8 }}
@@ -689,6 +716,33 @@ Sets extra vault server Service annotations
 {{- end -}}
 
 {{/*
+Sets extra vault server Service (active) annotations
+*/}}
+{{- define "vault.service.active.annotations" -}}
+  {{- if .Values.server.service.active.annotations }}
+    {{- $tp := typeOf .Values.server.service.active.annotations }}
+    {{- if eq $tp "string" }}
+      {{- tpl .Values.server.service.active.annotations . | nindent 4 }}
+    {{- else }}
+      {{- toYaml .Values.server.service.active.annotations | nindent 4 }}
+    {{- end }}
+  {{- end }}
+{{- end -}}
+{{/*
+Sets extra vault server Service annotations
+*/}}
+{{- define "vault.service.standby.annotations" -}}
+  {{- if .Values.server.service.standby.annotations }}
+    {{- $tp := typeOf .Values.server.service.standby.annotations }}
+    {{- if eq $tp "string" }}
+      {{- tpl .Values.server.service.standby.annotations . | nindent 4 }}
+    {{- else }}
+      {{- toYaml .Values.server.service.standby.annotations | nindent 4 }}
+    {{- end }}
+  {{- end }}
+{{- end -}}
+
+{{/*
 Sets PodSecurityPolicy annotations
 */}}
 {{- define "vault.psp.annotations" -}}
@@ -734,6 +788,21 @@ Sets VolumeClaim annotations for data volume
 {{- end -}}
 
 {{/*
+Sets VolumeClaim labels for data volume
+*/}}
+{{- define "vault.dataVolumeClaim.labels" -}}
+  {{- if and (ne .mode "dev") (.Values.server.dataStorage.enabled) (.Values.server.dataStorage.labels) }}
+  labels:
+    {{- $tp := typeOf .Values.server.dataStorage.labels }}
+    {{- if eq $tp "string" }}
+      {{- tpl .Values.server.dataStorage.labels . | nindent 4 }}
+    {{- else }}
+      {{- toYaml .Values.server.dataStorage.labels | nindent 4 }}
+    {{- end }}
+  {{- end }}
+{{- end -}}
+
+{{/*
 Sets VolumeClaim annotations for audit volume
 */}}
 {{- define "vault.auditVolumeClaim.annotations" -}}
@@ -744,6 +813,21 @@ Sets VolumeClaim annotations for audit volume
       {{- tpl .Values.server.auditStorage.annotations . | nindent 4 }}
     {{- else }}
       {{- toYaml .Values.server.auditStorage.annotations | nindent 4 }}
+    {{- end }}
+  {{- end }}
+{{- end -}}
+
+{{/*
+Sets VolumeClaim labels for audit volume
+*/}}
+{{- define "vault.auditVolumeClaim.labels" -}}
+  {{- if and (ne .mode "dev") (.Values.server.auditStorage.enabled) (.Values.server.auditStorage.labels) }}
+  labels:
+    {{- $tp := typeOf .Values.server.auditStorage.labels }}
+    {{- if eq $tp "string" }}
+      {{- tpl .Values.server.auditStorage.labels . | nindent 4 }}
+    {{- else }}
+      {{- toYaml .Values.server.auditStorage.labels | nindent 4 }}
     {{- end }}
   {{- end }}
 {{- end -}}
@@ -775,6 +859,16 @@ Sets the container resources if the user has set any.
   {{- if .Values.csi.resources -}}
           resources:
 {{ toYaml .Values.csi.resources | indent 12}}
+  {{ end }}
+{{- end -}}
+
+{{/*
+Sets the container resources for CSI's Agent sidecar if the user has set any.
+*/}}
+{{- define "csi.agent.resources" -}}
+  {{- if .Values.csi.agent.resources -}}
+          resources:
+{{ toYaml .Values.csi.agent.resources | indent 12}}
   {{ end }}
 {{- end -}}
 
@@ -839,6 +933,34 @@ Sets the injector toleration for pod placement
   {{- end }}
 {{- end -}}
 
+{{/*
+Sets the CSI provider nodeSelector for pod placement
+*/}}
+{{- define "csi.pod.nodeselector" -}}
+  {{- if .Values.csi.pod.nodeSelector }}
+      nodeSelector:
+      {{- $tp := typeOf .Values.csi.pod.nodeSelector }}
+      {{- if eq $tp "string" }}
+        {{ tpl .Values.csi.pod.nodeSelector . | nindent 8 | trim }}
+      {{- else }}
+        {{- toYaml .Values.csi.pod.nodeSelector | nindent 8 }}
+      {{- end }}
+  {{- end }}
+{{- end -}}
+{{/*
+Sets the CSI provider affinity for pod placement.
+*/}}
+{{- define "csi.pod.affinity" -}}
+  {{- if .Values.csi.pod.affinity }}
+      affinity:
+        {{ $tp := typeOf .Values.csi.pod.affinity }}
+        {{- if eq $tp "string" }}
+          {{- tpl .Values.csi.pod.affinity . | nindent 8 | trim }}
+        {{- else }}
+          {{- toYaml .Values.csi.pod.affinity | nindent 8 }}
+        {{- end }}
+  {{ end }}
+{{- end -}}
 {{/*
 Sets extra CSI provider pod annotations
 */}}
@@ -955,4 +1077,38 @@ Supported inputs are Values.ui
 {{- end }}
 {{- end -}}
 {{- end }}
+{{- end -}}
+
+{{/*
+config file from values
+*/}}
+{{- define "vault.config" -}}
+{{- if or (eq .mode "ha") (eq .mode "standalone") }}
+{{- $config := (index .Values.server .mode).config -}}
+{{- if .Values.server.ha.raft.enabled -}}
+{{- $config = .Values.server.ha.raft.config -}}
+{{- end -}}
+{{- $type := typeOf $config -}}
+{{- if eq $type "string" -}}
+{{/* Vault supports both HCL and JSON as its configuration format */}}
+{{- $json := $config | fromJson -}}
+{{/*
+Helm's fromJson does not behave according to the corresponding sprig function nor Helm docs,
+which claim that it should return empty string on invalid JSON, it actually returns
+a map containing a single 'Error' element.
+https://github.com/helm/helm/blob/50c22ed7f953fadb32755e5881ba95a92da852b2/pkg/engine/funcs.go#L158
+ */}}
+{{- if or (and (eq ($json | len) 1) (hasKey $json "Error")) (eq ($json | len) 0) -}}
+{{- $config = printf "%s\n%s" $config "disable_mlock = true" -}}
+{{- else -}}
+{{- if not (hasKey $json "disable_mlock") -}}
+{{- $_ := set $json "disable_mlock" true -}}
+{{- end -}}
+{{- $config = $json | mustToJson -}}
+{{- end -}}
+{{- else }}
+{{- fail "structured server config is not supported, value must be a string"}}
+{{- end }}
+{{- $config | nindent 4 | trim }}
+{{- end -}}
 {{- end -}}

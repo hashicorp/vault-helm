@@ -9,13 +9,16 @@ global:
 injector:
   image:
     repository: "registry.connect.redhat.com/hashicorp/vault-k8s"
-    tag: "1.1.0-ubi"
+    tag: "1.4.2-ubi"
 
   agentImage:
     repository: "registry.connect.redhat.com/hashicorp/vault"
-    tag: "1.12.1-ubi"
+    tag: "1.17.2-ubi"
 
 server:
   image:
     repository: "registry.connect.redhat.com/hashicorp/vault"
-    tag: "1.12.1-ubi"
+    tag: "1.17.2-ubi"
+
+  readinessProbe:
+    path: "/v1/sys/health?uninitcode=204"

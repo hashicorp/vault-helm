@@ -6,7 +6,7 @@ load _helpers
   cd `chart_dir`
   local actual=$( (helm template \
       --show-only templates/prometheus-prometheusrules.yaml  \
-      --set 'serverTelemetry.prometheusRules.rules.foo=bar' \
+      --set 'serverTelemetry.prometheusRules.rules[0].foo=bar' \
       . || echo "---") | tee /dev/stderr |
       yq 'length > 0' | tee /dev/stderr)
   [ "${actual}" = "false" ]
@@ -26,16 +26,16 @@ load _helpers
   local output=$( (helm template \
       --show-only templates/prometheus-prometheusrules.yaml \
       --set 'serverTelemetry.prometheusRules.enabled=true' \
-      --set 'serverTelemetry.prometheusRules.rules.foo=bar' \
-      --set 'serverTelemetry.prometheusRules.rules.baz=qux' \
+      --set 'serverTelemetry.prometheusRules.rules[0].foo=bar' \
+      --set 'serverTelemetry.prometheusRules.rules[1].baz=qux' \
       .) | tee  /dev/stderr )
 
   [ "$(echo "$output" | yq -r '.spec.groups | length')" = "1" ]
   [ "$(echo "$output" | yq -r '.spec.groups[0] | length')" = "2" ]
   [ "$(echo "$output" | yq -r '.spec.groups[0].name')" = "release-name-vault" ]
   [ "$(echo "$output" | yq -r '.spec.groups[0].rules | length')" = "2" ]
-  [ "$(echo "$output" | yq -r '.spec.groups[0].rules.foo')" = "bar" ]
-  [ "$(echo "$output" | yq -r '.spec.groups[0].rules.baz')" = "qux" ]
+  [ "$(echo "$output" | yq -r '.spec.groups[0].rules[0].foo')" = "bar" ]
+  [ "$(echo "$output" | yq -r '.spec.groups[0].rules[1].baz')" = "qux" ]
 }
 
 @test "prometheus/PrometheusRules-server: assertSelectors default" {
@@ -43,7 +43,7 @@ load _helpers
   local output=$( (helm template \
       --show-only templates/prometheus-prometheusrules.yaml \
       --set 'serverTelemetry.prometheusRules.enabled=true' \
-      --set 'serverTelemetry.prometheusRules.rules.foo=bar' \
+      --set 'serverTelemetry.prometheusRules.rules[0].foo=bar' \
       . ) | tee /dev/stderr)
 
   [ "$(echo "$output" | yq -r '.metadata.labels | length')" = "5" ]
@@ -55,7 +55,7 @@ load _helpers
   local output=$( (helm template \
       --show-only templates/prometheus-prometheusrules.yaml \
       --set 'serverTelemetry.prometheusRules.enabled=true' \
-      --set 'serverTelemetry.prometheusRules.rules.foo=bar' \
+      --set 'serverTelemetry.prometheusRules.rules[0].foo=bar' \
       --set 'serverTelemetry.prometheusRules.selectors.baz=qux' \
       --set 'serverTelemetry.prometheusRules.selectors.bar=foo' \
       . ) | tee /dev/stderr)
