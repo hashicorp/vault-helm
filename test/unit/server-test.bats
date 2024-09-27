@@ -212,7 +212,7 @@ load _helpers
       . | tee /dev/stderr |
       yq -r '.spec.volumes[] | select(.name == "plugins")' | tee /dev/stderr)
 
-  local actual=$(echo $object |
+  local actual=$(echo "$object" |
       yq -r '.emptyDir' | tee /dev/stderr)
   [ "${actual}" = "{}" ]
 }
@@ -232,11 +232,11 @@ load _helpers
       . | tee /dev/stderr |
       yq -r '.spec.containers[0].volumeMounts[] | select(.name == "plugins")' | tee /dev/stderr)
 
-  local actual=$(echo $object |
+  local actual=$(echo "$object" |
       yq -r '.mountPath' | tee /dev/stderr)
   [ "${actual}" = "/usr/local/libexec/vault" ]
 
-  local actual=$(echo $object |
+  local actual=$(echo "$object" |
       yq -r '.readOnly' | tee /dev/stderr)
   [ "${actual}" = "true" ]
 }
@@ -254,11 +254,11 @@ load _helpers
       . | tee /dev/stderr |
       yq -r '.spec.containers[0].env' | tee /dev/stderr)
 
-  local name=$(echo $object |
+  local name=$(echo "$object" |
       yq -r 'map(select(.name=="FOO")) | .[] .value' | tee /dev/stderr)
   [ "${name}" = "bar" ]
 
-  local name=$(echo $object |
+  local name=$(echo "$object" |
       yq -r 'map(select(.name=="FOOBAR")) | .[] .value' | tee /dev/stderr)
   [ "${name}" = "foobar" ]
 
@@ -269,11 +269,11 @@ load _helpers
       . | tee /dev/stderr |
       yq -r '.spec.containers[0].env' | tee /dev/stderr)
 
-  local name=$(echo $object |
+  local name=$(echo "$object" |
       yq -r 'map(select(.name=="FOO")) | .[] .value' | tee /dev/stderr)
   [ "${name}" = "bar" ]
 
-  local name=$(echo $object |
+  local name=$(echo "$object" |
       yq -r 'map(select(.name=="FOOBAR")) | .[] .value' | tee /dev/stderr)
   [ "${name}" = "foobar" ]
 }
