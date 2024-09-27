@@ -217,6 +217,18 @@ load _helpers
   [ "${actual}" = "{}" ]
 }
 
+@test "server/standalone-server-test-Pod: no server.volumes adds no volumes" {
+  cd `chart_dir`
+
+  # Test that it defines it
+  local actual=$(helm template \
+      --show-only templates/tests/server-test.yaml  \
+      . | tee /dev/stderr |
+      yq -r '.spec.volumes' | tee /dev/stderr)
+
+  [ "${actual}" = "null" ]
+}
+
 #--------------------------------------------------------------------
 # volumeMounts
 
@@ -239,6 +251,18 @@ load _helpers
   local actual=$(echo "$object" |
       yq -r '.readOnly' | tee /dev/stderr)
   [ "${actual}" = "true" ]
+}
+
+@test "server/standalone-server-test-Pod: no server.volumeMounts adds no volumeMounts" {
+  cd `chart_dir`
+
+  # Test that it defines it
+  local actual=$(helm template \
+      --show-only templates/tests/server-test.yaml  \
+      . | tee /dev/stderr |
+      yq -r '.spec.containers[0].volumeMounts' | tee /dev/stderr)
+
+  [ "${actual}" = "null" ]
 }
 
 #--------------------------------------------------------------------
