@@ -1,0 +1,24 @@
+# Copyright (c) HashiCorp, Inc.
+# SPDX-License-Identifier: MPL-2.0
+
+# These overrides are appropriate defaults for deploying this chart on OpenShift
+
+global:
+  openshift: true
+
+injector:
+  image:
+    repository: "registry.connect.redhat.com/hashicorp/vault-k8s"
+    tag: "1.4.2-ubi"
+
+  agentImage:
+    repository: "registry.connect.redhat.com/hashicorp/vault"
+    tag: "1.17.2-ubi"
+
+server:
+  image:
+    repository: "registry.connect.redhat.com/hashicorp/vault"
+    tag: "1.17.2-ubi"
+
+  readinessProbe:
+    path: "/v1/sys/health?uninitcode=204"
