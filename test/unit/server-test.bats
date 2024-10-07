@@ -277,3 +277,71 @@ load _helpers
       yq -r 'map(select(.name=="FOOBAR")) | .[] .value' | tee /dev/stderr)
   [ "${name}" = "foobar" ]
 }
+
+#--------------------------------------------------------------------
+# Security Contexts
+@test "server/standalone-server-test-Pod: uid default" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      --show-only templates/tests/server-test.yaml \
+      . | tee /dev/stderr |
+      yq -r '.spec.securityContext.runAsUser' | tee /dev/stderr)
+  [ "${actual}" = "100" ]
+}
+
+@test "server/standalone-server-test-Pod: uid configurable" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      --show-only templates/tests/server-test.yaml \
+      --set 'server.uid=2000' \
+      . | tee /dev/stderr |
+      yq -r '.spec.securityContext.runAsUser' | tee /dev/stderr)
+  [ "${actual}" = "2000" ]
+}
+
+@test "server/standalone-server-test-Pod: nonRoot" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      --show-only templates/tests/server-test.yaml \
+      . | tee /dev/stderr |
+      yq -r '.spec.securityContext.runAsNonRoot' | tee /dev/stderr)
+  [ "${actual}" = "true" ]
+}
+
+@test "server/standalone-server-test-Pod: gid default" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      --show-only templates/tests/server-test.yaml \
+      . | tee /dev/stderr |
+      yq -r '.spec.securityContext.runAsGroup' | tee /dev/stderr)
+  [ "${actual}" = "1000" ]
+}
+
+@test "server/standalone-server-test-Pod: gid configurable" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      --show-only templates/tests/server-test.yaml \
+      --set 'server.gid=2000' \
+      . | tee /dev/stderr |
+      yq -r '.spec.securityContext.runAsGroup' | tee /dev/stderr)
+  [ "${actual}" = "2000" ]
+}
+
+@test "server/standalone-server-test-Pod: fsgroup default" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      --show-only templates/tests/server-test.yaml \
+      . | tee /dev/stderr |
+      yq -r '.spec.securityContext.fsGroup' | tee /dev/stderr)
+  [ "${actual}" = "1000" ]
+}
+
+@test "server/standalone-server-test-Pod: fsgroup configurable" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      --show-only templates/tests/server-test.yaml \
+      --set 'server.gid=2000' \
+      . | tee /dev/stderr |
+      yq -r '.spec.securityContext.fsGroup' | tee /dev/stderr)
+  [ "${actual}" = "2000" ]
+}
