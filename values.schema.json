@@ -742,6 +742,7 @@
                 "extraContainers": {
                     "type": [
                         "null",
+                        "string",
                         "array"
                     ]
                 },
