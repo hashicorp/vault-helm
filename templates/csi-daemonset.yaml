@@ -14,6 +14,7 @@ metadata:
     app.kubernetes.io/name: {{ include "vault.name" . }}-csi-provider
     app.kubernetes.io/instance: {{ .Release.Name }}
     app.kubernetes.io/managed-by: {{ .Release.Service }}
+    app.kubernetes.io/version: {{ .Chart.AppVersion }}
     {{- if  .Values.csi.daemonSet.extraLabels -}}
       {{- toYaml .Values.csi.daemonSet.extraLabels | nindent 4 -}}
     {{- end -}}
@@ -34,6 +35,7 @@ spec:
       labels:
         app.kubernetes.io/name: {{ template "vault.name" . }}-csi-provider
         app.kubernetes.io/instance: {{ .Release.Name }}
+        app.kubernetes.io/version: {{ .Chart.AppVersion }}
         {{- if  .Values.csi.pod.extraLabels -}}
           {{- toYaml .Values.csi.pod.extraLabels | nindent 8 -}}
         {{- end -}}
