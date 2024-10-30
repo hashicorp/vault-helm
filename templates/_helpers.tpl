@@ -548,39 +548,39 @@ securityContext for the injector container level.
 securityContext for the statefulset pod template.
 */}}
 {{- define "server.statefulSet.securityContext.pod" -}}
-  {{- if .Values.server.statefulSet.securityContext.pod }}
-      securityContext:
-        {{- $tp := typeOf .Values.server.statefulSet.securityContext.pod }}
-        {{- if eq $tp "string" }}
-          {{- tpl .Values.server.statefulSet.securityContext.pod . | nindent 8 }}
-        {{- else }}
-          {{- toYaml .Values.server.statefulSet.securityContext.pod | nindent 8 }}
-        {{- end }}
-  {{- else if not .Values.global.openshift }}
-      securityContext:
-        runAsNonRoot: true
-        runAsGroup: {{ .Values.server.gid | default 1000 }}
-        runAsUser: {{ .Values.server.uid | default 100 }}
-        fsGroup: {{ .Values.server.gid | default 1000 }}
-  {{- end }}
+{{- if .Values.server.statefulSet.securityContext.pod }}
+securityContext:
+{{ $tp := typeOf .Values.server.statefulSet.securityContext.pod }}
+{{- if eq $tp "string" }}
+{{- tpl .Values.server.statefulSet.securityContext.pod . | indent 2 }}
+{{- else }}
+{{- toYaml .Values.server.statefulSet.securityContext.pod | indent 2 }}
+{{- end }}
+{{- else if not .Values.global.openshift }}
+securityContext:
+  runAsNonRoot: true
+  runAsGroup: {{ .Values.server.gid | default 1000 }}
+  runAsUser: {{ .Values.server.uid | default 100 }}
+  fsGroup: {{ .Values.server.gid | default 1000 }}
+{{- end }}
 {{- end -}}
 
 {{/*
 securityContext for the statefulset vault container
 */}}
 {{- define "server.statefulSet.securityContext.container" -}}
-  {{- if .Values.server.statefulSet.securityContext.container }}
-          securityContext:
-            {{- $tp := typeOf .Values.server.statefulSet.securityContext.container }}
-            {{- if eq $tp "string" }}
-              {{- tpl .Values.server.statefulSet.securityContext.container . | nindent 12 }}
-            {{- else }}
-              {{- toYaml .Values.server.statefulSet.securityContext.container | nindent 12 }}
-            {{- end }}
-  {{- else if not .Values.global.openshift }}
-          securityContext:
-            allowPrivilegeEscalation: false
-  {{- end }}
+{{- if .Values.server.statefulSet.securityContext.container }}
+securityContext:
+{{ $tp := typeOf .Values.server.statefulSet.securityContext.container }}
+{{- if eq $tp "string" }}
+{{- tpl .Values.server.statefulSet.securityContext.container . | indent 2 }}
+{{- else }}
+{{- toYaml .Values.server.statefulSet.securityContext.container | indent 2 }}
+{{- end }}
+{{- else if not .Values.global.openshift }}
+securityContext:
+  allowPrivilegeEscalation: false
+{{- end }}
 {{- end -}}
 
 
