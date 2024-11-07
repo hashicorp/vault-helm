@@ -6,9 +6,9 @@ setup_file() {
     cd `chart_dir`
     export VERIFY_OUTPUT="/$BATS_RUN_TMPDIR/verify.json"
     export CHART_VOLUME=vault-helm-chart-src
-    local IMAGE="quay.io/redhat-certification/chart-verifier:1.10.1"
+    local IMAGE="quay.io/redhat-certification/chart-verifier:1.13.8"
     # chart-verifier requires an openshift version if a cluster isn't available
-    local OPENSHIFT_VERSION="4.12"
+    local OPENSHIFT_VERSION="4.17"
     local DISABLED_TESTS="chart-testing"
 
     local run_cmd="chart-verifier"

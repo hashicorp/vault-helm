@@ -139,6 +139,9 @@
                         }
                     }
                 },
+                "logLevel": {
+                    "type": "string"
+                },
                 "pod": {
                     "type": "object",
                     "properties": {
@@ -667,9 +670,6 @@
                         }
                     }
                 },
-                "includeConfigAnnotation": {
-                    "type": "boolean"
-                },
                 "dataStorage": {
                     "type": "object",
                     "properties": {
@@ -848,6 +848,9 @@
                             "type": "string"
                         }
                     }
+                },
+                "includeConfigAnnotation": {
+                    "type": "boolean"
                 },
                 "ingress": {
                     "type": "object",

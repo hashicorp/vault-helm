@@ -10,14 +10,14 @@ jobs:
   chart-verifier:
     runs-on: ubuntu-latest
     env:
-      CHART_VERIFIER_VERSION: '1.13.4'
+      CHART_VERIFIER_VERSION: '1.13.8'
     steps:
       - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
       - name: Setup test tools
         uses: ./.github/actions/setup-test-tools
       - uses: actions/setup-go@41dfa10bad2bb2ae585af6ee5bb4d7d973ad74ed # v5.1.0
         with:
-          go-version: '1.22.5'
+          go-version: '1.22.8'
       - run: go install "github.com/redhat-certification/chart-verifier@${CHART_VERIFIER_VERSION}"
       - run: bats --tap --timing ./test/chart
 permissions:

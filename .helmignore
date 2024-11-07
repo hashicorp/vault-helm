@@ -26,3 +26,4 @@
 .github/
 .gitlab-ci.yml
 test/
+scratch/
