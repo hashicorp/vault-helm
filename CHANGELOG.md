@@ -1,6 +1,12 @@
 ## Unreleased
 
+Bugs:
+* server: restore support for templated config [GH-1073](https://github.com/hashicorp/vault-helm/pull/1073)
+
 ## 0.29.0 (November 7, 2024)
+
+KNOWN ISSUES:
+* Template support in server config stopped working [GH-1072](https://github.com/hashicorp/vault-helm/issues/1072)
 
 Changes:
 
