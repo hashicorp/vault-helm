@@ -136,10 +136,11 @@ load _helpers
       --set 'server.standalone.config=\{\"hello\": \"world\"\}' \
       . | tee /dev/stderr |
       yq '.data')
-  [ "$(echo "${data}" | \
-    yq '(. | length) == 1')" = "true" ]
-  [ "$(echo "${data}" | \
-    yq '."extraconfig-from-values.hcl" == "{\"disable_mlock\":true,\"hello\":\"world\"}"')" = 'true' ]
+  local checkLength=$(echo "${data}" | yq '(. | length) == 1')
+  [ "${checkLength}" = "true" ]
+  local checkExtraConfig=$(echo "${data}" | \
+    yq '."extraconfig-from-values.hcl" == "{\"disable_mlock\":true,\"hello\":\"world\"}"')
+  [ "${checkExtraConfig}" = 'true' ]
 
   data=$(helm template \
       --show-only templates/server-config-configmap.yaml  \
@@ -147,10 +148,11 @@ load _helpers
       --set 'server.standalone.config=\{\"foo\": \"bar\"\}' \
       . | tee /dev/stderr |
       yq '.data' | tee /dev/stderr)
-  [ "$(echo "${data}" | \
-    yq '(. | length) == 1')" = "true" ]
-  [ "$(echo "${data}" | \
-    yq '."extraconfig-from-values.hcl" == "{\"disable_mlock\":true,\"foo\":\"bar\"}"')" = 'true' ]
+  checkLength=$(echo "${data}" | yq '(. | length) == 1')
+  [ "${checkLength}" = "true" ]
+  checkExtraConfig=$(echo "${data}" | \
+    yq '."extraconfig-from-values.hcl" == "{\"disable_mlock\":true,\"foo\":\"bar\"}"')
+  [ "${checkExtraConfig}" = 'true' ]
 
   data=$(helm template \
       --show-only templates/server-config-configmap.yaml  \
@@ -158,10 +160,11 @@ load _helpers
       --set 'server.standalone.config=\{\"disable_mlock\": false\,\"foo\":\"bar\"\}' \
       . | tee /dev/stderr |
       yq '.data' | tee /dev/stderr)
-  [ "$(echo "${data}" | \
-    yq '(. | length) == 1')" = "true" ]
-  [ "$(echo "${data}" | \
-    yq '."extraconfig-from-values.hcl" == "{\"disable_mlock\":false,\"foo\":\"bar\"}"')" = 'true' ]
+  checkLength=$(echo "${data}" | yq '(. | length) == 1')
+  [ "${checkLength}" = "true" ]
+  checkExtraConfig=$(echo "${data}" | \
+    yq '."extraconfig-from-values.hcl" == "{\"disable_mlock\":false,\"foo\":\"bar\"}"')
+  [ "${checkExtraConfig}" = 'true' ]
 }
 
 @test "server/ConfigMap: standalone extraConfig is set as not JSON" {
@@ -202,10 +205,11 @@ load _helpers
       --set 'server.ha.config=\{\"hello\": \"ha-world\"\}' \
       . | tee /dev/stderr |
       yq '.data' | tee /dev/stderr)
-  [ "$(echo "${data}" | \
-    yq '(. | length) == 1')" = "true" ]
-  [ "$(echo "${data}" | \
-    yq '."extraconfig-from-values.hcl" == "{\"disable_mlock\":true,\"hello\":\"ha-world\"}"')" = 'true' ]
+  local checkLength=$(echo "${data}" | yq '(. | length) == 1')
+  [ "${checkLength}" = "true" ]
+  local checkExtraConfig=$(echo "${data}" | \
+    yq '."extraconfig-from-values.hcl" == "{\"disable_mlock\":true,\"hello\":\"ha-world\"}"')
+  [ "$checkExtraConfig" = 'true' ]
 
  data=$(helm template \
       --show-only templates/server-config-configmap.yaml  \
@@ -213,10 +217,11 @@ load _helpers
       --set 'server.ha.config=\{\"foo\": \"bar\"\,\"disable_mlock\":false\}' \
       . | tee /dev/stderr |
       yq '.data' | tee /dev/stderr)
-  [ "$(echo "${data}" | \
-    yq '(. | length) == 1')" = "true" ]
-  [ "$(echo "${data}" | \
-    yq '."extraconfig-from-values.hcl" == "{\"disable_mlock\":false,\"foo\":\"bar\"}"')" = 'true' ]
+  checkLength=$(echo "${data}" | yq '(. | length) == 1')
+  [ "$checkLength" = "true" ]
+  checkExtraConfig=$(echo "${data}" | \
+    yq '."extraconfig-from-values.hcl" == "{\"disable_mlock\":false,\"foo\":\"bar\"}"')
+  [ "${checkExtraConfig}" = 'true' ]
 }
 
 @test "server/ConfigMap: disabled by injector.externalVaultAddr" {
