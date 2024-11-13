@@ -57,6 +57,35 @@ load _helpers
   [ "${actual}" = "true" ]
 }
 
+@test "server/ConfigMap: raft config templated not JSON" {
+  cd `chart_dir`
+  local actual
+  actual=$(helm template \
+      --show-only templates/server-config-configmap.yaml \
+      --set 'server.ha.enabled=true' \
+      --set 'server.ha.raft.enabled=true' \
+      --set "server.ha.raft.config=hello = {{ .Chart.Name }}" \
+      . | tee /dev/stderr |
+      yq '.data' | tee /dev/stderr)
+  local check=$(echo "${actual}" | \
+    yq '."extraconfig-from-values.hcl" == "hello = vault\ndisable_mlock = true"')
+  [ "${check}" = "true" ]
+}
+
+@test "server/ConfigMap: raft config templated JSON" {
+  cd `chart_dir`
+  local actual
+  actual=$(helm template \
+      --show-only templates/server-config-configmap.yaml \
+      --set 'server.ha.enabled=true' \
+      --set 'server.ha.raft.enabled=true' \
+      --set "server.ha.raft.config=\{\"hello\": \"{{ .Chart.Name }}\"\}" \
+      . | tee /dev/stderr |
+      yq '.data' | tee /dev/stderr)
+  local check=$(echo "${actual}" | \
+    yq '."extraconfig-from-values.hcl" == "{\"disable_mlock\":true,\"hello\":\"vault\"}"')
+  [ "${check}" = "true" ]
+}
 
 @test "server/ConfigMap: disabled by server.dev.enabled true" {
   cd `chart_dir`

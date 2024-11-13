@@ -1091,7 +1091,7 @@ config file from values
 {{- $type := typeOf $config -}}
 {{- if eq $type "string" -}}
 {{/* Vault supports both HCL and JSON as its configuration format */}}
-{{- $json := $config | fromJson -}}
+{{- $json := tpl $config . | fromJson -}}
 {{/*
 Helm's fromJson does not behave according to the corresponding sprig function nor Helm docs,
 which claim that it should return empty string on invalid JSON, it actually returns
@@ -1109,6 +1109,6 @@ https://github.com/helm/helm/blob/50c22ed7f953fadb32755e5881ba95a92da852b2/pkg/e
 {{- else }}
 {{- fail "structured server config is not supported, value must be a string"}}
 {{- end }}
-{{- $config | nindent 4 | trim }}
+{{- tpl $config . | nindent 4 | trim }}
 {{- end -}}
 {{- end -}}
