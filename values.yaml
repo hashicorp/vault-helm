@@ -281,6 +281,12 @@ injector:
   extraEnvironmentVars: {}
     # KUBERNETES_SERVICE_HOST: kubernetes.default.svc
 
+  # extraEnvironmentVarsFieldPath is a list of extra environment variables to set in the
+  # injector deployment using the downward API.
+  extraEnvironmentVarsFieldPath: {}
+    # CLUSTERID: metadata.labels['clusterID']
+    # CLUSTERENVIRONMENT: metadata.annotations['clusterEnvironment']
+
   # Affinity Settings for injector pods
   # This can either be a multi-line string or YAML matching the PodSpec's affinity field.
   # Commenting out or setting as empty the affinity variable, will allow

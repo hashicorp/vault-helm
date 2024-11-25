@@ -54,6 +54,7 @@ spec:
           imagePullPolicy: "{{ .Values.injector.image.pullPolicy }}"
           {{- template "injector.securityContext.container" . }}
           env:
+            {{- include "vault.extraEnvironmentVarsFieldPath" .Values.injector | nindent 12 }}
             - name: AGENT_INJECT_LISTEN
               value: {{ printf ":%v" .Values.injector.port  }}
             - name: AGENT_INJECT_LOG_LEVEL
