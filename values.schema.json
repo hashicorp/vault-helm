@@ -584,6 +584,12 @@
                         "failurePolicy": {
                             "type": "string"
                         },
+                        "matchConditions": {
+                            "type": "array",
+                            "items": {
+                                "type": "object"
+                            }
+                        },
                         "matchPolicy": {
                             "type": "string"
                         },
