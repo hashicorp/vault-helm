@@ -1026,6 +1026,10 @@ server:
   # Should the server pods run on the host network
   hostNetwork: false
 
+  # Should the server pods export all k8s services via
+  # environment variables
+  enableServiceLinks: true
+
 # Vault UI
 ui:
   # True if you want to create a Service entry for the Vault UI.
