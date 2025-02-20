@@ -49,6 +49,9 @@ spec:
     - name: https-internal
       port: 8201
       targetPort: 8201
+  {{- if .Values.server.service.extraPorts -}}
+  {{ toYaml .Values.server.service.extraPorts | nindent 4}}
+  {{- end }}
   selector:
     app.kubernetes.io/name: {{ include "vault.name" . }}
     {{- if eq (.Values.server.service.instanceSelector.enabled | toString) "true" }}

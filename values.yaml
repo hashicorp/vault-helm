@@ -760,6 +760,13 @@ server:
     # to the service.
     annotations: {}
 
+    # extraPorts is a list of extra ports. Specified as a YAML list.
+    # Useful if you host additional services inside your Vault pod(s).
+    extraPorts: null
+      # - name: extra
+      #   port: 9000
+      #   targetPort: 9000
+
   # This configures the Vault Statefulset to create a PVC for data
   # storage when using the file or raft backend storage engines.
   # See https://developer.hashicorp.com/vault/docs/configuration/storage to know more
