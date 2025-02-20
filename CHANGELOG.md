@@ -1,5 +1,8 @@
 ## Unreleased
 
+Features:
+* server: New `extraPorts` option for adding ports to the Vault's server Service.
+
 ## 0.29.1 (November 20, 2024)
 
 Bugs:
