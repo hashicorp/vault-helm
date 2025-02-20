@@ -1106,6 +1106,12 @@
                         },
                         "targetPort": {
                             "type": "integer"
+                        },
+                        "extraPorts": {
+                            "type": [
+                                "null",
+                                "array"
+                            ]
                         }
                     }
                 },
