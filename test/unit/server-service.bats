@@ -509,3 +509,28 @@ load _helpers
       yq -r '.spec.ipFamilies' | tee /dev/stderr)
   [ "${actual}" = "null" ]
 }
+
+@test "server/Service: adds extra ports" {
+  cd `chart_dir`
+
+  # Test that it defines it
+  local object=$(helm template \
+      --show-only templates/server-service.yaml  \
+      --set 'server.service.extraPorts[0].name=foo' \
+      --set 'server.service.extraPorts[0].port=1111' \
+      --set 'server.service.extraPorts[0].targetPort=2222' \
+      . | tee /dev/stderr |
+      yq -r '.spec.ports[2] | select(.name == "foo")' | tee /dev/stderr)
+
+  local actual=$(echo $object |
+      yq -r '.name' | tee /dev/stderr)
+  [ "${actual}" = "foo" ]
+
+  local actual=$(echo $object |
+      yq -r '.port' | tee /dev/stderr)
+  [ "${actual}" = "1111" ]
+
+  local actual=$(echo $object |
+      yq -r '.targetPort' | tee /dev/stderr)
+  [ "${actual}" = "2222" ]
+}
