@@ -1193,6 +1193,15 @@ load _helpers
   [ "${actual}" = "2000" ]
 }
 
+@test "server/standalone-StatefulSet: runAsNonRoot" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      --show-only templates/server-statefulset.yaml \
+      . | tee /dev/stderr |
+      yq -r '.spec.template.spec.securityContext.runAsNonRoot' | tee /dev/stderr)
+  [ "${actual}" = "true" ]
+}
+
 @test "server/standalone-StatefulSet: gid default" {
   cd `chart_dir`
   local actual=$(helm template \
