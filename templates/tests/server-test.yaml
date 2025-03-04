@@ -13,10 +13,10 @@ metadata:
   namespace: {{ include "vault.namespace" . }}
   annotations:
     "helm.sh/hook": test
+  {{- with .Values.server.extraLabels }}
   labels: 
-    {{- if  .Values.server.extraLabels -}}
-      {{- toYaml .Values.server.extraLabels | nindent 8 -}}
-    {{- end -}}   
+    {{- toYaml . | nindent 4 }}
+  {{- end }}    
 spec:
   {{- include "imagePullSecrets" . | nindent 2 }}
   containers:
