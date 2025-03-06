@@ -14,9 +14,9 @@ metadata:
   annotations:
     "helm.sh/hook": test
   {{- with .Values.server.extraLabels }}
-  labels: 
+  labels:
     {{- toYaml . | nindent 4 }}
-  {{- end }}    
+  {{- end }}
 spec:
   {{- include "imagePullSecrets" . | nindent 2 }}
   containers:
