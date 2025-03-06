@@ -277,6 +277,7 @@ load _helpers
       yq -r 'map(select(.name=="FOOBAR")) | .[] .value' | tee /dev/stderr)
   [ "${name}" = "foobar" ]
 }
+
 # ----------------------------------------------------------------------
 # extraLabels
 
