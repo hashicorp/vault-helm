@@ -288,6 +288,7 @@ load _helpers
       --set 'server.extraLabels.foo=bar' \
       . | tee /dev/stderr |
       yq -r '.metadata.labels.foo' | tee /dev/stderr)
+
   [ "${actual}" = "bar" ]
 }
 
