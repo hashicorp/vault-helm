@@ -47,14 +47,14 @@ spec:
           fi
 
           exit 0
+      {{- if .Values.server.volumeMounts }}
       volumeMounts:
-        {{- if .Values.server.volumeMounts }}
-          {{- toYaml .Values.server.volumeMounts | nindent 8}}
-        {{- end }}
+        {{- toYaml .Values.server.volumeMounts | nindent 8}}
+      {{- end }}
+  {{- if .Values.server.volumes }}
   volumes:
-    {{- if .Values.server.volumes }}
-      {{- toYaml .Values.server.volumes | nindent 4}}
-    {{- end }}
+    {{- toYaml .Values.server.volumes | nindent 4}}
+  {{- end }}
   restartPolicy: Never
 {{- end }}
 {{- end }}
