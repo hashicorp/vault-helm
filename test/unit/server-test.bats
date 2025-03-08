@@ -277,3 +277,29 @@ load _helpers
       yq -r 'map(select(.name=="FOOBAR")) | .[] .value' | tee /dev/stderr)
   [ "${name}" = "foobar" ]
 }
+
+# ----------------------------------------------------------------------
+# extraLabels
+
+@test "server/standalone=server-test-Pod: specify extraLabels" {
+  cd `chart_dir`
+
+  local actual=$(helm template \
+      --show-only templates/tests/server-test.yaml  \
+      --set 'server.extraLabels.foo=bar' \
+      . | tee /dev/stderr |
+      yq -r '.metadata.labels.foo' | tee /dev/stderr)
+
+  [ "${actual}" = "bar" ]
+}
+
+@test "server/standalone=server-test-Pod: no extraLabels set" {
+  cd `chart_dir`
+
+  local actual=$(helm template \
+      --show-only templates/tests/server-test.yaml  \
+      . | tee /dev/stderr |
+      yq -r '.metadata.labels // "null"' | tee /dev/stderr)
+
+  [ "${actual}" = "null" ]
+}
