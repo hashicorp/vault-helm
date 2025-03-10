@@ -371,10 +371,6 @@ server:
     # The key within the Kubernetes secret that holds the enterprise license.
     secretKey: "license"
 
-  # Resource requests, limits, etc. for the server cluster placement. This
-  # should map directly to the value of the resources field for a PodSpec.
-  # By default no direct resource request is made.
-
   image:
     repository: "hashicorp/vault"
     tag: "1.18.1"
@@ -392,7 +388,10 @@ server:
   # Configure the logging format for the Vault server.
   # Supported log formats include: standard, json
   logFormat: ""
-
+  
+  # Resource requests, limits, etc. for the server cluster placement. This
+  # should map directly to the value of the resources field for a PodSpec.
+  # By default no direct resource request is made.
   resources: {}
   # resources:
   #   requests:
