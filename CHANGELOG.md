@@ -2,7 +2,9 @@
 
 Changes:
 
+* Default `vault` version updated to 1.19.0
 * Default `vault-k8s` version updated to 1.6.2
+* Tested with Kubernetes versions 1.28-1.32
 
 ## 0.29.1 (November 20, 2024)
 
