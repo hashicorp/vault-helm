@@ -20,6 +20,7 @@ teardown() {
   fi
 }
 
+# bats test_tags=enterprise-only
 @test "injector/enterprise: testing cross namespace access" {
   cd `chart_dir`
 

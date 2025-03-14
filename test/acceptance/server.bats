@@ -2,6 +2,7 @@
 
 load _helpers
 
+# bats test_tags=community-only
 @test "server/standalone: testing deployment" {
   cd `chart_dir`
 

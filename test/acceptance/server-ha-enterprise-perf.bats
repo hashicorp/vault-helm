@@ -2,6 +2,7 @@
 
 load _helpers
 
+# bats test_tags=enterprise-only
 @test "server/ha-enterprise-raft: testing performance replica deployment" {
   cd `chart_dir`
 
