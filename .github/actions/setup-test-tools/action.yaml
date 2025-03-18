@@ -12,7 +12,7 @@ runs:
     - run: sudo npm install -g bats@${BATS_VERSION}
       shell: bash
       env:
-        BATS_VERSION: '1.11.0'
+        BATS_VERSION: '1.11.1'
     - run: bats -v
       shell: bash
     - uses: actions/setup-python@42375524e23c412d93fb67b49958b491fce71c38 # v5.4.0
