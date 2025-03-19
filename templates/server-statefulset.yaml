@@ -59,6 +59,7 @@ spec:
       {{- template "server.statefulSet.securityContext.pod" . }}
       {{- if not .Values.global.openshift }}
       hostNetwork: {{ .Values.server.hostNetwork }}
+      enableServiceLinks: {{ .Values.server.enableServiceLinks }}
       {{- end }}
       volumes:
         {{ template "vault.volumes" . }}
