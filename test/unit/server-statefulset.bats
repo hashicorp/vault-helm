@@ -1571,6 +1571,33 @@ load _helpers
   [[ "${actual}" = "sleep 10 &&"* ]]
 }
 
+@test "server/standalone-StatefulSet: default preStop" {
+  cd `chart_dir`
+  local command=$(helm template \
+      --show-only templates/server-statefulset.yaml  \
+      . | tee /dev/stderr |
+      yq -r '.spec.template.spec.containers[0].lifecycle.preStop.exec.command' | tee /dev/stderr)
+
+  [ "$(echo ${command} | yq -r 'length')" = 3 ]
+  [ "$(echo ${command} | yq -r '.[0]')" = '/bin/sh' ]
+  [ "$(echo ${command} | yq -r '.[1]')" = '-c' ]
+  [ "$(echo ${command} | yq -r '.[2]')" = 'sleep 5 && kill -SIGTERM $(pidof vault)' ]
+}
+
+@test "server/standalone-StatefulSet: custom preStop" {
+  cd `chart_dir`
+  local command=$(helm template \
+      --show-only templates/server-statefulset.yaml  \
+      --set='server.preStop={/bin/sh,-c,sleep}' \
+      . | tee /dev/stderr |
+      yq -r '.spec.template.spec.containers[0].lifecycle.preStop.exec.command' | tee /dev/stderr)
+
+  [ "$(echo ${command} | yq -r 'length')" = 3 ]
+  [ "$(echo ${command} | yq -r '.[0]')" = '/bin/sh' ]
+  [ "$(echo ${command} | yq -r '.[1]')" = '-c' ]
+  [ "$(echo ${command} | yq -r '.[2]')" = 'sleep' ]
+}
+
 @test "server/standalone-StatefulSet: vault port name is http, when tlsDisable is true" {
   cd `chart_dir`
 
