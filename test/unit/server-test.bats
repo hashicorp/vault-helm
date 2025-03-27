@@ -212,9 +212,21 @@ load _helpers
       . | tee /dev/stderr |
       yq -r '.spec.volumes[] | select(.name == "plugins")' | tee /dev/stderr)
 
-  local actual=$(echo $object |
+  local actual=$(echo "$object" |
       yq -r '.emptyDir' | tee /dev/stderr)
   [ "${actual}" = "{}" ]
+}
+
+@test "server/standalone-server-test-Pod: no server.volumes adds no volumes" {
+  cd `chart_dir`
+
+  # Test that it defines it
+  local actual=$(helm template \
+      --show-only templates/tests/server-test.yaml  \
+      . | tee /dev/stderr |
+      yq -r '.spec.volumes' | tee /dev/stderr)
+
+  [ "${actual}" = "null" ]
 }
 
 #--------------------------------------------------------------------
@@ -232,13 +244,25 @@ load _helpers
       . | tee /dev/stderr |
       yq -r '.spec.containers[0].volumeMounts[] | select(.name == "plugins")' | tee /dev/stderr)
 
-  local actual=$(echo $object |
+  local actual=$(echo "$object" |
       yq -r '.mountPath' | tee /dev/stderr)
   [ "${actual}" = "/usr/local/libexec/vault" ]
 
-  local actual=$(echo $object |
+  local actual=$(echo "$object" |
       yq -r '.readOnly' | tee /dev/stderr)
   [ "${actual}" = "true" ]
+}
+
+@test "server/standalone-server-test-Pod: no server.volumeMounts adds no volumeMounts" {
+  cd `chart_dir`
+
+  # Test that it defines it
+  local actual=$(helm template \
+      --show-only templates/tests/server-test.yaml  \
+      . | tee /dev/stderr |
+      yq -r '.spec.containers[0].volumeMounts' | tee /dev/stderr)
+
+  [ "${actual}" = "null" ]
 }
 
 #--------------------------------------------------------------------
@@ -254,11 +278,11 @@ load _helpers
       . | tee /dev/stderr |
       yq -r '.spec.containers[0].env' | tee /dev/stderr)
 
-  local name=$(echo $object |
+  local name=$(echo "$object" |
       yq -r 'map(select(.name=="FOO")) | .[] .value' | tee /dev/stderr)
   [ "${name}" = "bar" ]
 
-  local name=$(echo $object |
+  local name=$(echo "$object" |
       yq -r 'map(select(.name=="FOOBAR")) | .[] .value' | tee /dev/stderr)
   [ "${name}" = "foobar" ]
 
@@ -269,11 +293,11 @@ load _helpers
       . | tee /dev/stderr |
       yq -r '.spec.containers[0].env' | tee /dev/stderr)
 
-  local name=$(echo $object |
+  local name=$(echo "$object" |
       yq -r 'map(select(.name=="FOO")) | .[] .value' | tee /dev/stderr)
   [ "${name}" = "bar" ]
 
-  local name=$(echo $object |
+  local name=$(echo "$object" |
       yq -r 'map(select(.name=="FOOBAR")) | .[] .value' | tee /dev/stderr)
   [ "${name}" = "foobar" ]
 }
