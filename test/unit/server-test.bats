@@ -220,7 +220,7 @@ load _helpers
 @test "server/standalone-server-test-Pod: no server.volumes adds no volumes" {
   cd `chart_dir`
 
-  # Test that it defines it
+  # Test that it is not defined
   local actual=$(helm template \
       --show-only templates/tests/server-test.yaml  \
       . | tee /dev/stderr |
@@ -256,7 +256,7 @@ load _helpers
 @test "server/standalone-server-test-Pod: no server.volumeMounts adds no volumeMounts" {
   cd `chart_dir`
 
-  # Test that it defines it
+  # Test that it is not defined
   local actual=$(helm template \
       --show-only templates/tests/server-test.yaml  \
       . | tee /dev/stderr |
