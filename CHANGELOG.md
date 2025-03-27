@@ -6,6 +6,10 @@ Changes:
 * Default `vault-k8s` version updated to 1.6.2
 * Tested with Kubernetes versions 1.28-1.32
 
+Features:
+
+* server: Support setting custom preStop commands [GH-1099](https://github.com/hashicorp/vault-helm/pull/1099)
+
 ## 0.29.1 (November 20, 2024)
 
 Bugs:
