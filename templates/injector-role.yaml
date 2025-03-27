@@ -25,6 +25,10 @@ rules:
       - "list"
       - "update"
   - apiGroups: [""]
+    resources: ["configmaps"]
+    verbs:
+      - "delete"
+  - apiGroups: [""]
     resources: ["pods"]
     verbs:
       - "get"
