@@ -206,14 +206,22 @@ spec:
             # causes issues with graceful shutdowns such as deregistering itself
             # from Consul (zombie services).
             preStop:
+            {{- if .Values.server.preStop }}
               exec:
-                command: [
-                  "/bin/sh", "-c",
-                  # Adding a sleep here to give the pod eviction a
-                  # chance to propagate, so requests will not be made
-                  # to this pod while it's terminating
-                  "sleep {{ .Values.server.preStopSleepSeconds }} && kill -SIGTERM $(pidof vault)",
-                ]
+                command:
+                {{- range (.Values.server.preStop) }}
+                - {{ . | quote }}
+                {{- end }}
+            {{- else }}
+              exec:
+                command:
+                - "/bin/sh"
+                - "-c"
+                # Adding a sleep here to give the pod eviction a
+                # chance to propagate, so requests will not be made
+                # to this pod while it's terminating
+                - "sleep {{ .Values.server.preStopSleepSeconds }} && kill -SIGTERM $(pidof vault)"
+            {{- end}}
             {{- if .Values.server.postStart }}
             postStart:
               exec:
