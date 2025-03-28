@@ -21,6 +21,7 @@ spec:
   selector:
     matchLabels:
       app.kubernetes.io/name: {{ template "vault.name" . }}-agent-injector
+      app.kubernetes.io/version: {{ .Chart.AppVersion }}
       app.kubernetes.io/instance: {{ .Release.Name }}
       component: webhook
   {{ template "injector.strategy" . }}
@@ -29,6 +30,7 @@ spec:
       labels:
         app.kubernetes.io/name: {{ template "vault.name" . }}-agent-injector
         app.kubernetes.io/instance: {{ .Release.Name }}
+        app.kubernetes.io/version: {{ .Chart.AppVersion }}
         component: webhook
         {{- if  .Values.injector.extraLabels -}}
           {{- toYaml .Values.injector.extraLabels | nindent 8 -}}
