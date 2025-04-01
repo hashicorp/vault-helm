@@ -287,7 +287,7 @@ storage might be desired by the user.
   volumeClaimTemplates:
       {{- if and (eq (.Values.server.dataStorage.enabled | toString) "true") (or (eq .mode "standalone") (eq (.Values.server.ha.raft.enabled | toString ) "true" )) }}
     - metadata:
-        name: data
+        name: {{ .Values.server.dataStorage.name | default "data" }}
         {{- include "vault.dataVolumeClaim.annotations" . | nindent 6 }}
         {{- include "vault.dataVolumeClaim.labels" . | nindent 6 }}
       spec:
@@ -299,10 +299,13 @@ storage might be desired by the user.
           {{- if .Values.server.dataStorage.storageClass }}
         storageClassName: {{ .Values.server.dataStorage.storageClass }}
           {{- end }}
+          {{- if .Values.server.dataStorage.volumeName }}
+        volumeName: {{ .Values.server.dataStorage.volumeName | quote }}
+          {{- end }}
       {{ end }}
       {{- if eq (.Values.server.auditStorage.enabled | toString) "true" }}
     - metadata:
-        name: audit
+        name: {{ .Values.server.auditStorage.name | default "audit" }}
         {{- include "vault.auditVolumeClaim.annotations" . | nindent 6 }}
         {{- include "vault.auditVolumeClaim.labels" . | nindent 6 }}
       spec:
@@ -313,6 +316,9 @@ storage might be desired by the user.
             storage: {{ .Values.server.auditStorage.size }}
           {{- if .Values.server.auditStorage.storageClass }}
         storageClassName: {{ .Values.server.auditStorage.storageClass }}
+          {{- end }}
+          {{- if .Values.server.auditStorage.volumeName }}
+        volumeName: {{ .Values.server.auditStorage.volumeName | quote }}
           {{- end }}
       {{ end }}
   {{ end }}
