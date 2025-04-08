@@ -1236,11 +1236,18 @@ load _helpers
 
 @test "server/standalone-StatefulSet: readinessProbe default" {
   cd `chart_dir`
-  local actual=$(helm template \
+  local object=$(helm template \
       --show-only templates/server-statefulset.yaml \
       . | tee /dev/stderr |
-      yq -r '.spec.template.spec.containers[0].readinessProbe.exec.command[2]' | tee /dev/stderr)
+      yq -r '.spec.template.spec.containers[0].readinessProbe' | tee /dev/stderr)
+
+  local actual=$(echo $object |
+      yq -r '.exec.command[2]' | tee /dev/stderr)
   [ "${actual}" = "vault status -tls-skip-verify" ]
+
+  local actual=$(echo $object |
+      yq -r '.httpGet' | tee /dev/stderr)
+  [ "${actual}" = "null" ]
 }
 
 @test "server/standalone-StatefulSet: readinessProbe configurable" {
@@ -1255,21 +1262,39 @@ load _helpers
 
 @test "server/standalone-StatefulSet: readiness execCommand configurable" {
   cd `chart_dir`
-  local actual=$(helm template \
+  local object=$(helm template \
       --show-only templates/server-statefulset.yaml \
       --set 'server.readinessProbe.execCommand={/bin/sh,-c,sleep}' \
       . | tee /dev/stderr |
-      yq -r '.spec.template.spec.containers[0].readinessProbe.exec.command[2]' | tee /dev/stderr)
+      yq -r '.spec.template.spec.containers[0].readinessProbe' | tee /dev/stderr)
+
+  local actual=$(echo $object |
+      yq -r '.exec.command[2]' | tee /dev/stderr)
   [ "${actual}" = "sleep" ]
+
+  local actual=$(echo $object |
+      yq -r '.httpGet' | tee /dev/stderr)
+  [ "${actual}" = "null" ]
 }
 
-@test "server/standalone-StatefulSet: readiness httpGet path configurable" {
+@test "server/standalone-StatefulSet: readiness httpGet configurable" {
   cd `chart_dir`
-  local actual=$(helm template \
+  local object=$(helm template \
       --show-only templates/server-statefulset.yaml \
       --set 'server.readinessProbe.path=/v1/sys/health?standbyok=true' \
       . | tee /dev/stderr |
-      yq -r '.spec.template.spec.containers[0].readinessProbe.httpGet.path' | tee /dev/stderr)
+      yq -r '.spec.template.spec.containers[0].readinessProbe' | tee /dev/stderr)
+
+  local actual=$(echo $object |
+      yq -r '.exec' | tee /dev/stderr)
+  [ "${actual}" = "null" ]
+
+  local actual=$(echo $object |
+      yq -r '.httpGet' | tee /dev/stderr)
+  [ "${actual}" != "null" ]
+
+  local actual=$(echo $object |
+      yq -r '.httpGet.path' | tee /dev/stderr)
   [ "${actual}" = "/v1/sys/health?standbyok=true" ]
 }
 
