@@ -1,5 +1,9 @@
 ## Unreleased
 
+Improvements:
+
+* Support custom exec command in the server readiness probe [GH-1106](https://github.com/hashicorp/vault-helm/pull/1106)
+
 ## 0.30.0 (March 27, 2025)
 
 Changes:
