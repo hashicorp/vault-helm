@@ -1253,6 +1253,26 @@ load _helpers
   [ "${actual}" = "null" ]
 }
 
+@test "server/standalone-StatefulSet: readiness execCommand configurable" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      --show-only templates/server-statefulset.yaml \
+      --set 'server.readinessProbe.execCommand={/bin/sh,-c,sleep}' \
+      . | tee /dev/stderr |
+      yq -r '.spec.template.spec.containers[0].readinessProbe.exec.command[2]' | tee /dev/stderr)
+  [ "${actual}" = "sleep" ]
+}
+
+@test "server/standalone-StatefulSet: readiness httpGet path configurable" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      --show-only templates/server-statefulset.yaml \
+      --set 'server.readinessProbe.path=/v1/sys/health?standbyok=true' \
+      . | tee /dev/stderr |
+      yq -r '.spec.template.spec.containers[0].readinessProbe.httpGet.path' | tee /dev/stderr)
+  [ "${actual}" = "/v1/sys/health?standbyok=true" ]
+}
+
 @test "server/standalone-StatefulSet: readiness failureThreshold default" {
   cd `chart_dir`
   local actual=$(helm template \
