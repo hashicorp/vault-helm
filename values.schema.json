@@ -627,6 +627,12 @@
                 "auditStorage": {
                     "type": "object",
                     "properties": {
+                        "name": {
+                            "type": "string"
+                        },
+                        "volumeName": {
+                            "type": "string"
+                        },
                         "accessMode": {
                             "type": "string"
                         },
@@ -673,6 +679,12 @@
                 "dataStorage": {
                     "type": "object",
                     "properties": {
+                        "name": {
+                            "type": "string"
+                        },
+                        "volumeName": {
+                            "type": "string"
+                        },
                         "accessMode": {
                             "type": "string"
                         },
