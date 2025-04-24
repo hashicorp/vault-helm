@@ -1,0 +1,58 @@
+{{/*
+Copyright (c) HashiCorp, Inc.
+SPDX-License-Identifier: MPL-2.0
+*/}}
+
+{{- if not .Values.global.openshift }}
+{{ template "vault.mode" . }}
+{{- if ne .mode "external" }}
+{{- if .Values.server.httproute.enabled -}}
+{{- $serviceName := include "vault.fullname" . -}}
+{{- template "vault.serverServiceEnabled" . -}}
+{{- if .serverServiceEnabled -}}
+{{- if and (eq .mode "ha" ) (eq (.Values.server.httproute.activeService | toString) "true") }}
+{{- $serviceName = printf "%s-%s" $serviceName "active" -}}
+{{- end }}
+{{- $servicePort := .Values.server.service.port -}}
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: {{ template "vault.fullname" . }}
+  namespace: {{ include "vault.namespace" . }}
+  labels:
+    helm.sh/chart: {{ include "vault.chart" . }}
+    app.kubernetes.io/name: {{ include "vault.name" . }}
+    app.kubernetes.io/instance: {{ .Release.Name }}
+    app.kubernetes.io/managed-by: {{ .Release.Service }}
+    {{- with .Values.server.httproute.labels }}
+    {{- toYaml . | nindent 4 }}
+    {{- end }}
+  {{- template "vault.httproute.annotations" . }}
+spec:
+  {{- with .Values.server.httproute.parentRefs }}
+  parentRefs:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+  {{- with .Values.server.httproute.hostnames }}
+  hostnames:
+    {{- tpl (toYaml .) $ | nindent 4 }}
+  {{- end }}
+  rules:
+    {{- if .Values.server.httproute.additionalRules }}
+    {{- tpl (toYaml .Values.server.httproute.additionalRules) $ | nindent 4 }}
+    {{- end }}
+    - backendRefs:
+        - name: {{ $serviceName }}
+          port: {{ $servicePort }}
+      {{- with .Values.server.httproute.filters }}
+      filters:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.server.httproute.matches }}
+      matches:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+  {{- end }}
+{{- end }}
+{{- end }}
+{{- end }}
