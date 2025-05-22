@@ -16,5 +16,3 @@ updates:
           - patch
     # only update internal github actions, external github actions are handled
     # by https://github.com/hashicorp/security-tsccr/tree/main/automation
-    allow:
-      - dependency-name: "hashicorp/*"
