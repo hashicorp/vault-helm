@@ -172,7 +172,11 @@ spec:
             #   1 - error
             #   2 - sealed
             exec:
+              {{- if .Values.server.readinessProbe.execCommand }}
+              command: {{- toYaml .Values.server.readinessProbe.execCommand | nindent 14 }}
+              {{- else }}
               command: ["/bin/sh", "-ec", "vault status -tls-skip-verify"]
+              {{- end }}
             {{- end }}
             failureThreshold: {{ .Values.server.readinessProbe.failureThreshold }}
             initialDelaySeconds: {{ .Values.server.readinessProbe.initialDelaySeconds }}

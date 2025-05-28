@@ -512,11 +512,17 @@ server:
   # Used to define custom readinessProbe settings
   readinessProbe:
     enabled: true
-    # If you need to use a http path instead of the default exec
+    # Set this, if you want to use a httpGet (path) instead of the default exec as the readinessProbe handler.
     # path: /v1/sys/health?standbyok=true
-
-    # Port number on which readinessProbe will be checked.
+    # Port number on which readinessProbe will be checked if httpGet is used as the readinessProbe handler.
     port: 8200
+
+    # If you need to overwrite default exec command, you can set it here.
+    # execCommand:
+    # - "/bin/sh"
+    # - "-ec"
+    # - "vault status -tls-skip-verify"
+
     # When a probe fails, Kubernetes will try failureThreshold times before giving up
     failureThreshold: 2
     # Number of seconds after the container has started before probe initiates
