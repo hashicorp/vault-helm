@@ -181,6 +181,11 @@ injector:
     #      sidecar-injector: enabled
     namespaceSelector: {}
 
+    # scope decied the scope of the webhook. It can be either "Cluster" or "Namespaced" or "*"
+    # by default it is set to "Namespaced"
+    # See https://kubernetes.io/docs/reference/access-authn-authz/extensible-admission-controllers/#matching-requests-rules
+    scope: "Namespaced"
+
     # objectSelector is the selector for restricting the webhook to only
     # specific labels.
     # See https://kubernetes.io/docs/reference/access-authn-authz/extensible-admission-controllers/#matching-requests-objectselector
@@ -388,7 +393,7 @@ server:
   # Configure the logging format for the Vault server.
   # Supported log formats include: standard, json
   logFormat: ""
-  
+
   # Resource requests, limits, etc. for the server cluster placement. This
   # should map directly to the value of the resources field for a PodSpec.
   # By default no direct resource request is made.
