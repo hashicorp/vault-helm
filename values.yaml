@@ -181,7 +181,7 @@ injector:
     #      sidecar-injector: enabled
     namespaceSelector: {}
 
-    # scope decied the scope of the webhook. It can be either "Cluster" or "Namespaced" or "*"
+    # scope decided the scope of the webhook. It can be either "Cluster" or "Namespaced" or "*"
     # by default it is set to "Namespaced"
     # See https://kubernetes.io/docs/reference/access-authn-authz/extensible-admission-controllers/#matching-requests-rules
     scope: "Namespaced"
