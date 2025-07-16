@@ -5,12 +5,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        kind-k8s-version:
-          - 1.32.3
-          - 1.31.6
-          - 1.30.10
-          - 1.29.14
-          - 1.28.15
+        kind-k8s-version: ["1.33.1", "1.32.5", "1.31.9", "1.30.13", "1.29.14"]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
@@ -21,7 +16,7 @@ jobs:
         with:
           config: test/kind/config.yaml
           node_image: kindest/node:v${{ matrix.kind-k8s-version }}
-          version: v0.27.0
+          version: v0.29.0
       - run: bats --tap --timing ./test/acceptance
         env:
           VAULT_LICENSE_CI: ${{ secrets.VAULT_LICENSE_CI }}
