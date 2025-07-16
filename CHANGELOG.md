@@ -1,5 +1,9 @@
 ## Unreleased
 
+Bugs:
+
+* server: Allow `server.service.active.annotations` and `server.service.standby.annotation` to override `server.service.annotations` [GH-1121](https://github.com/hashicorp/vault-helm/pull/1121)
+
 ## 0.30.0 (March 27, 2025)
 
 Changes:

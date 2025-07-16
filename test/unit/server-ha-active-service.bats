@@ -23,6 +23,7 @@ load _helpers
       yq -r '.metadata.annotations["vaultIsAwesome"]' | tee /dev/stderr)
   [ "${actual}" = "true" ]
 }
+
 @test "server/ha-active-Service: with both annotations set" {
   cd `chart_dir`
   local object=$(helm template \
@@ -38,6 +39,23 @@ load _helpers
   actual=$(echo "$object" | yq '.annotations["vaultIsNotAwesome"]' | tee /dev/stderr)
   [ "${actual}" = "false" ]
 }
+
+@test "server/ha-active-Service: with both annotations set active overrides general" {
+  cd "$(chart_dir)"
+  local metadata
+  metadata=$(helm template \
+      --show-only templates/server-ha-active-service.yaml \
+      --set 'server.ha.enabled=true' \
+      --set 'server.service.active.annotations=myAnnotation: active' \
+      --set 'server.service.annotations=myAnnotation: general' \
+      . | tee /dev/stderr |
+      yq -r '.metadata' | tee /dev/stderr)
+
+  local actual
+  actual=$(echo "$metadata" | yq -r '.annotations["myAnnotation"]' | tee /dev/stderr)
+  [ "${actual}" = "active" ]
+}
+
 @test "server/ha-active-Service: disable with ha.enabled false" {
   cd `chart_dir`
   local actual=$( (helm template \
