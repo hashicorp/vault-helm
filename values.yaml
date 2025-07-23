@@ -68,7 +68,7 @@ injector:
   # image sets the repo and tag of the vault-k8s image to use for the injector.
   image:
     repository: "hashicorp/vault-k8s"
-    tag: "1.5.0"
+    tag: "1.6.2"
     pullPolicy: IfNotPresent
 
   # agentImage sets the repo and tag of the Vault image to use for the Vault Agent
@@ -76,7 +76,7 @@ injector:
   # required.
   agentImage:
     repository: "hashicorp/vault"
-    tag: "1.18.1"
+    tag: "1.19.0"
 
   # The default values for the injected Vault Agent containers.
   agentDefaults:
@@ -371,13 +371,9 @@ server:
     # The key within the Kubernetes secret that holds the enterprise license.
     secretKey: "license"
 
-  # Resource requests, limits, etc. for the server cluster placement. This
-  # should map directly to the value of the resources field for a PodSpec.
-  # By default no direct resource request is made.
-
   image:
     repository: "hashicorp/vault"
-    tag: "1.18.1"
+    tag: "1.19.0"
     # Overrides the default Image Pull Policy
     pullPolicy: IfNotPresent
 
@@ -392,7 +388,10 @@ server:
   # Configure the logging format for the Vault server.
   # Supported log formats include: standard, json
   logFormat: ""
-
+  
+  # Resource requests, limits, etc. for the server cluster placement. This
+  # should map directly to the value of the resources field for a PodSpec.
+  # By default no direct resource request is made.
   resources: {}
   # resources:
   #   requests:
@@ -555,8 +554,17 @@ server:
   # See: https://kubernetes.io/docs/concepts/containers/container-lifecycle-hooks/
   terminationGracePeriodSeconds: 10
 
-  # Used to set the sleep time during the preStop step
+  # Used to set the sleep time during the preStop step, if custom preStop
+  # commands are not set.
   preStopSleepSeconds: 5
+
+  # Used to define custom preStop exec commands to run before the pod is
+  # terminated. If not set, this will default to:
+  # preStop:
+  #   - "/bin/sh"
+  #   - "-c"
+  #   - "sleep {{ .Values.server.preStopSleepSeconds }} && kill -SIGTERM $(pidof vault)"
+  preStop: []
 
   # Used to define commands to run after the pod is ready.
   # This can be used to automate processes such as initialization
@@ -1177,7 +1185,7 @@ csi:
 
     image:
       repository: "hashicorp/vault"
-      tag: "1.18.1"
+      tag: "1.19.0"
       pullPolicy: IfNotPresent
 
     logFormat: standard

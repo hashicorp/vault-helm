@@ -6,16 +6,16 @@ description: Install bats and python-yq
 runs:
   using: "composite"
   steps:
-    - uses: actions/setup-node@39370e3970a6d050c480ffad4ff0ed4d3fdee5af # v4.1.0
+    - uses: actions/setup-node@cdca7365b2dadb8aad0a33bc7601856ffabcc48e # v4.3.0
       with:
         node-version: '20'
     - run: sudo npm install -g bats@${BATS_VERSION}
       shell: bash
       env:
-        BATS_VERSION: '1.11.0'
+        BATS_VERSION: '1.11.1'
     - run: bats -v
       shell: bash
-    - uses: actions/setup-python@0b93645e9fea7318ecaed2b359559ac225c90a2b # v5.3.0
+    - uses: actions/setup-python@8d9ed9ac5c53483de85588cdf95a591a75ab9f55 # v5.5.0
       with:
         python-version: '3.12'
     - run: pip install yq
