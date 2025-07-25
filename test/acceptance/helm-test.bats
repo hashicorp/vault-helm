@@ -8,8 +8,9 @@ load _helpers
   kubectl delete namespace acceptance --ignore-not-found=true
   kubectl create namespace acceptance
   kubectl config set-context --current --namespace=acceptance
+  eval "${PRE_CHART_CMDS}"
 
-  helm install "$(name_prefix)" .
+  helm install "$(name_prefix)" . ${SET_CHART_VALUES}
   wait_for_running $(name_prefix)-0
 
   helm test "$(name_prefix)"
@@ -23,5 +24,6 @@ teardown() {
       helm delete vault
       kubectl delete --all pvc
       kubectl delete namespace acceptance --ignore-not-found=true
+      kubectl config unset contexts."$(kubectl config current-context)".namespace
   fi
 }

@@ -1,29 +1,77 @@
 name: Acceptance Tests
 on: [push, workflow_dispatch]
 jobs:
-  kind:
+  versions:
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo "setting versions"
+    outputs:
+      # JSON encoded array of k8s versions.
+      K8S_VERSIONS: '["1.33.1", "1.32.5", "1.31.9", "1.30.13", "1.29.14"]'
+      K8S_1: "1.33.1"
+      K8S_2: "1.32.5"
+      K8S_3: "1.31.9"
+      K8S_4: "1.30.13"
+      K8S_5: "1.29.14"
+      VAULT_N: "1.20.0"
+      VAULT_N_1: "1.19.6"
+      VAULT_N_2: "1.18.11"
+      VAULT_LTS_1: "1.16.22"
+
+  kind-ce-vault:
+    name: ce vault:${{ matrix.vault-version }} k8s:${{ matrix.k8s-version }}
+    runs-on: ubuntu-latest
+    needs: versions
     strategy:
       fail-fast: false
       matrix:
-        kind-k8s-version:
-          - 1.32.3
-          - 1.31.6
-          - 1.30.10
-          - 1.29.14
-          - 1.28.15
-    runs-on: ubuntu-latest
+        vault-version:
+          - ${{ needs.versions.outputs.VAULT_N }}
+        k8s-version:
+          - ${{ needs.versions.outputs.K8S_1 }}
+          - ${{ needs.versions.outputs.K8S_2 }}
+          - ${{ needs.versions.outputs.K8S_3 }}
+          - ${{ needs.versions.outputs.K8S_4 }}
+          - ${{ needs.versions.outputs.K8S_5 }}
     steps:
       - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
-      - name: Setup test tools
-        uses: ./.github/actions/setup-test-tools
-      - name: Create K8s Kind Cluster
-        uses: helm/kind-action@a1b0e391336a6ee6713a0583f8c6240d70863de3 # v1.12.0
+      - uses: ./.github/actions/acceptance-test
+        name: vault:${{ matrix.vault-version }} kind:${{ matrix.k8s-version }}
         with:
-          config: test/kind/config.yaml
-          node_image: kindest/node:v${{ matrix.kind-k8s-version }}
-          version: v0.27.0
-      - run: bats --tap --timing ./test/acceptance
-        env:
-          VAULT_LICENSE_CI: ${{ secrets.VAULT_LICENSE_CI }}
+          k8s-version: ${{ matrix.k8s-version }}
+          vault-version: ${{ matrix.vault-version }}
+          vault-license: ${{ secrets.VAULT_LICENSE_CI }}
+          vault-enterprise: false
+
+  kind-ent-vault:
+    name: ent vault:${{ matrix.vault-version }} k8s:${{ matrix.k8s-version }}
+    runs-on: ubuntu-latest
+    needs: versions
+    strategy:
+      fail-fast: false
+      matrix:
+        vault-version:
+          - ${{ needs.versions.outputs.VAULT_N }}
+          - ${{ needs.versions.outputs.VAULT_N_1 }}
+          - ${{ needs.versions.outputs.VAULT_N_2 }}
+          - ${{ needs.versions.outputs.VAULT_LTS_1 }}
+        k8s-version:
+          - ${{ needs.versions.outputs.K8S_1 }}
+          - ${{ needs.versions.outputs.K8S_2 }}
+          - ${{ needs.versions.outputs.K8S_3 }}
+          - ${{ needs.versions.outputs.K8S_4 }}
+          - ${{ needs.versions.outputs.K8S_5 }}
+
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+      - uses: ./.github/actions/acceptance-test
+        name: vault:${{ matrix.vault-version }} kind:${{ matrix.k8s-version }}
+        with:
+          k8s-version: ${{ matrix.k8s-version }}
+          vault-version: ${{ matrix.vault-version }}
+          vault-license: ${{ secrets.VAULT_LICENSE_CI }}
+          vault-enterprise: true
+
+
 permissions:
   contents: read

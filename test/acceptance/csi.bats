@@ -7,6 +7,8 @@ load _helpers
 
   kubectl delete namespace acceptance --ignore-not-found=true
   kubectl create namespace acceptance
+  kubectl config set-context --current --namespace=acceptance
+  eval "${PRE_CHART_CMDS}"
 
   # Install Secrets Store CSI driver
   # Configure it to pass in a JWT for the provider to use, and rotate secrets rapidly
@@ -22,7 +24,7 @@ load _helpers
     --set enableSecretRotation=true \
     --set rotationPollInterval=5s
   # Install Vault and Vault provider
-  helm install vault \
+  helm install vault . \
     --wait --timeout=5m \
     --namespace=acceptance \
     --set="server.dev.enabled=true" \
@@ -30,7 +32,7 @@ load _helpers
     --set="csi.logLevel=debug" \
     --set="csi.agent.logLevel=debug" \
     --set="injector.enabled=false" \
-    .
+    ${SET_CHART_VALUES}
   kubectl --namespace=acceptance wait --for=condition=Ready --timeout=5m pod -l app.kubernetes.io/name=vault
   kubectl --namespace=acceptance wait --for=condition=Ready --timeout=5m pod -l app.kubernetes.io/name=vault-csi-provider
 
@@ -79,5 +81,6 @@ teardown() {
       helm --namespace=acceptance delete secrets-store-csi-driver
       kubectl delete --all pvc
       kubectl delete namespace acceptance
+      kubectl config unset contexts."$(kubectl config current-context)".namespace
   fi
 }
