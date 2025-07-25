@@ -12,6 +12,7 @@ load _helpers
 
   eval "${PRE_CHART_CMDS}"
   helm install "$(name_prefix)" . --set='server.dev.enabled=true' ${SET_CHART_VALUES}
+  check_vault_versions "$(name_prefix)"
   wait_for_running "$(name_prefix)-0"
 
   # Replicas

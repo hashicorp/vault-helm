@@ -6,7 +6,7 @@ setup_suite() {
         # If VAULT_VERSION is not set, use the defaults from values.yaml
         INJECTOR_AGENT_VERSION=$(yq -r '.injector.agentImage.tag' values.yaml)
         SERVER_VAULT_VERSION=$(yq -r '.server.image.tag' values.yaml)
-        CSI_AGENT_VERSION=$(yq -r '.csi.image.tag' values.yaml)
+        CSI_AGENT_VERSION=$(yq -r '.csi.agent.image.tag' values.yaml)
     else
         INJECTOR_AGENT_VERSION=${VAULT_VERSION}
         SERVER_VAULT_VERSION=${VAULT_VERSION}
@@ -17,7 +17,7 @@ setup_suite() {
     VAULT_REPOSITORY=${VAULT_REPOSITORY:-hashicorp/vault}
 
     PRE_CHART_CMDS=""
-    if [ -n "${ENT_TESTS}" ]; then
+    if [ "${ENT_TESTS}" = "true" ]; then
         SERVER_VAULT_VERSION="${SERVER_VAULT_VERSION}-ent"
         INJECTOR_AGENT_VERSION="${INJECTOR_AGENT_VERSION}-ent"
         CSI_AGENT_VERSION="${CSI_AGENT_VERSION}-ent"
@@ -34,7 +34,6 @@ setup_suite() {
     CHART_VALUES+=(--set csi.agent.image.tag="${CSI_AGENT_VERSION}")
     CHART_VALUES+=(--set csi.agent.image.repository="${VAULT_REPOSITORY}")
 
-    echo "Using chart values: ${CHART_VALUES[*]}" >&3
     SET_CHART_VALUES=${CHART_VALUES[*]}
     export SET_CHART_VALUES PRE_CHART_CMDS
 }

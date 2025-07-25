@@ -56,12 +56,7 @@ runs:
         VAULT_LICENSE_CI: ${{ inputs.vault-license }}
         VAULT_VERSION: ${{ inputs.vault-version }}
         ENT_TESTS: ${{ inputs.vault-enterprise }}
-      run: |
-        if [ "${{ inputs.vault-enterprise }}" == "true" ]; then
-          bats --tap --timing ./test/acceptance
-        else
-          bats --tap --timing ./test/acceptance --filter-tags '!enterprise-only'
-        fi
+      run: bats --tap --timing ./test/acceptance
 
     - name: export kind cluster logs
       if: always()

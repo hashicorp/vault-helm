@@ -11,6 +11,7 @@ load _helpers
     --timeout=5m \
     --set="injector.replicas=3" \
     ${SET_CHART_VALUES}
+  check_vault_versions "$(name_prefix)"
   kubectl wait --for condition=Ready pod -l app.kubernetes.io/name=vault-agent-injector --timeout=5m
 
   pods=($(kubectl get pods -l app.kubernetes.io/name=vault-agent-injector -o json | jq -r '.items[] | .metadata.name'))

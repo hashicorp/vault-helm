@@ -1,7 +1,5 @@
 #!/usr/bin/env bats
 
-# bats file_tags=enterprise-only
-
 load _helpers
 
 setup() {
@@ -24,13 +22,16 @@ teardown() {
 }
 
 @test "injector/enterprise: testing cross namespace access" {
+  if [ ! "$ENT_TESTS" = "true" ]; then
+    skip "Enterprise tests are not enabled"
+  fi
+
   cd `chart_dir`
 
   kubectl create secret generic test \
     --from-file ./test/acceptance/injector-test/bootstrap-cross-namespace.sh
 
   kubectl label secret test app=vault-agent-demo
-  echo "Using chart values: $SET_CHART_VALUES" >&3
   helm install "$(name_prefix)" . \
     --set="server.extraVolumes[0].type=secret" \
     --set="server.extraVolumes[0].name=test" \
@@ -38,6 +39,7 @@ teardown() {
     --set='server.ha.raft.enabled=true' \
     --set='server.ha.replicas=1' \
     ${SET_CHART_VALUES}
+  check_vault_versions "$(name_prefix)"
   wait_for_running "$(name_prefix)-0"
 
   wait_for_ready $(kubectl get pod -l component=webhook -o jsonpath="{.items[0].metadata.name}")

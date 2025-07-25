@@ -8,6 +8,7 @@ load _helpers
   helm install "$(name_prefix)" . \
     --set='server.ha.enabled=true' \
     ${SET_CHART_VALUES}
+  check_vault_versions "$(name_prefix)"
   wait_for_running $(name_prefix)-0
 
   # Sealed, not initialized

@@ -1,10 +1,12 @@
 #!/usr/bin/env bats
 
-# bats file_tags=enterprise-only
-
 load _helpers
 
 @test "server/ha-enterprise-raft: testing performance replica deployment" {
+  if [ ! "$ENT_TESTS" = "true" ]; then
+    skip "Enterprise tests are not enabled"
+  fi
+
   cd `chart_dir`
 
   helm install "$(name_prefix)-east" . \
@@ -12,6 +14,7 @@ load _helpers
     --set='server.ha.enabled=true' \
     --set='server.ha.raft.enabled=true' \
     ${SET_CHART_VALUES}
+  check_vault_versions "$(name_prefix)-east"
   wait_for_running "$(name_prefix)-east-0"
 
   # Sealed, not initialized
@@ -77,6 +80,7 @@ load _helpers
     --set='server.ha.enabled=true' \
     --set='server.ha.raft.enabled=true' \
     ${SET_CHART_VALUES}
+  check_vault_versions "$(name_prefix)-west"
   wait_for_running "$(name_prefix)-west-0"
 
   # Sealed, not initialized

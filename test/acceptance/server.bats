@@ -11,10 +11,11 @@ load _helpers
 
   eval "${PRE_CHART_CMDS}"
   helm install "$(name_prefix)" . ${SET_CHART_VALUES}
-  wait_for_running $(name_prefix)-0
+  check_vault_versions "$(name_prefix)"
+  wait_for_running "$(name_prefix)-0"
 
   # Sealed, not initialized
-  wait_for_sealed_vault $(name_prefix)-0
+  wait_for_sealed_vault "$(name_prefix)-0"
 
   local init_status=$(kubectl exec "$(name_prefix)-0" -- vault status -format=json |
     jq -r '.initialized')

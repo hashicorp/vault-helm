@@ -10,6 +10,7 @@ load _helpers
 
   eval "${PRE_CHART_CMDS}"
   helm install "$(name_prefix)" -f ./test/acceptance/server-test/annotations-overrides.yaml . ${SET_CHART_VALUES}
+  check_vault_versions "$(name_prefix)"
   wait_for_running $(name_prefix)-0
 
   # service annotations

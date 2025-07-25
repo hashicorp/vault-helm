@@ -33,6 +33,8 @@ load _helpers
     --set="csi.agent.logLevel=debug" \
     --set="injector.enabled=false" \
     ${SET_CHART_VALUES}
+  check_vault_versions vault
+
   kubectl --namespace=acceptance wait --for=condition=Ready --timeout=5m pod -l app.kubernetes.io/name=vault
   kubectl --namespace=acceptance wait --for=condition=Ready --timeout=5m pod -l app.kubernetes.io/name=vault-csi-provider
 
