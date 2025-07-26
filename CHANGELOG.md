@@ -1,5 +1,13 @@
 ## Unreleased
 
+Changes:
+
+* Default `vault` version updated to 1.20.1
+* Default `vault-k8s` version updated to 1.7.0
+* Default `vault-csi-provider` version updated to 1.5.1
+* Tested with Kubernetes versions 1.33-1.29
+* Tested with Vault versions 1.20-1.18, 1.16
+
 Bugs:
 
 * server: Allow `server.service.active.annotations` and `server.service.standby.annotation` to override `server.service.annotations` [GH-1121](https://github.com/hashicorp/vault-helm/pull/1121)
