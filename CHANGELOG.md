@@ -1,5 +1,7 @@
 ## Unreleased
 
+## 0.30.1 (July 28, 2025)
+
 Changes:
 
 * Default `vault` version updated to 1.20.1
