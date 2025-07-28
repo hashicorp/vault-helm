@@ -13,12 +13,12 @@ injector:
 
   agentImage:
     repository: "registry.connect.redhat.com/hashicorp/vault"
-    tag: "1.20.0-ubi"
+    tag: "1.20.1-ubi"
 
 server:
   image:
     repository: "registry.connect.redhat.com/hashicorp/vault"
-    tag: "1.20.0-ubi"
+    tag: "1.20.1-ubi"
 
   readinessProbe:
     path: "/v1/sys/health?uninitcode=204"
