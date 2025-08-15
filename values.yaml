@@ -50,6 +50,9 @@ injector:
 
   replicas: 1
 
+  # Number of old ReplicaSets to retain to allow rollback.
+  revisionHistoryLimit: 10
+
   # Configures the port the injector should listen on
   port: 8080
 
