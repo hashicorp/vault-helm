@@ -773,6 +773,8 @@ server:
   # See https://developer.hashicorp.com/vault/docs/configuration/storage to know more
   dataStorage:
     enabled: true
+    # Name of the PVC to create
+    name: "data"
     # Size of the PVC created
     size: 10Gi
     # Location where the PVC will be mounted.
@@ -786,6 +788,8 @@ server:
     annotations: {}
     # Labels to apply to the PVC
     labels: {}
+    # Volume name
+    volumeName: ""
 
   # Persistent Volume Claim (PVC) retention policy
   # ref: https://kubernetes.io/docs/concepts/workloads/controllers/statefulset/#persistentvolumeclaim-retention
@@ -802,6 +806,8 @@ server:
   # See https://developer.hashicorp.com/vault/docs/audit to know more
   auditStorage:
     enabled: false
+    # Name of the PVC to create
+    name: "audit"
     # Size of the PVC created
     size: 10Gi
     # Location where the PVC will be mounted.
@@ -815,6 +821,8 @@ server:
     annotations: {}
     # Labels to apply to the PVC
     labels: {}
+    # Volume name
+    volumeName: ""
 
   # Run Vault in "dev" mode. This requires no further setup, no state management,
   # and no initialization. This is useful for experimenting with Vault without
