@@ -14,3 +14,6 @@ serverTelemetry:
       credentials:
         name: vault-metrics-client
         key: token
+    metricRelabelings:
+      - sourceLabels: [cluster]
+        targetLabel: vault_cluster
