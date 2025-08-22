@@ -178,6 +178,16 @@ Set's the replica count based on the different modes configured by user
 {{- end -}}
 
 {{/*
+Returns the minReadySeconds value for the StatefulSet.
+*/}}
+{{- define "vault.minReadySeconds" -}}
+  {{- if ne .mode "dev" -}}
+    {{ .Values.server.statefulSet.minReadySeconds }}
+  {{- end -}}
+{{- end -}}
+
+
+{{/*
 Set's up configmap mounts if this isn't a dev deployment and the user
 defined a custom configuration.  Additionally iterates over any
 extra volumes the user may have specified (such as a secret with TLS).
@@ -738,6 +748,19 @@ Sets extra vault server Service annotations
       {{- tpl .Values.server.service.standby.annotations . | nindent 4 }}
     {{- else }}
       {{- toYaml .Values.server.service.standby.annotations | nindent 4 }}
+    {{- end }}
+  {{- end }}
+{{- end -}}
+{{/*
+Sets extra vault server headless Service annotations
+*/}}
+{{- define "vault.service.headless.annotations" -}}
+  {{- if .Values.server.service.headless.annotations }}
+    {{- $tp := typeOf .Values.server.service.headless.annotations }}
+    {{- if eq $tp "string" }}
+      {{- tpl .Values.server.service.headless.annotations . | nindent 4 }}
+    {{- else }}
+      {{- toYaml .Values.server.service.headless.annotations | nindent 4 }}
     {{- end }}
   {{- end }}
 {{- end -}}
