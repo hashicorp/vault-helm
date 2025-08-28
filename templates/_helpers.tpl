@@ -914,9 +914,26 @@ Sets CSI daemonset securityContext for container
     {{- else }}
       {{- toYaml .Values.csi.daemonSet.securityContext.container | nindent 12 }}
     {{- end }}
+  {{- else if .Values.global.openshift }}
+          securityContext:
+            privileged: true
   {{- end }}
 {{- end -}}
 
+{{/*
+Sets CSI Vault Agent container securityContext
+*/}}
+{{- define "csi.agent.securityContext.container" -}}
+  {{- if .Values.csi.agent.securityContext.container }}
+          securityContext:
+            {{- $tp := typeOf .Values.csi.agent.securityContext.container }}
+            {{- if eq $tp "string" }}
+              {{- tpl .Values.csi.agent.securityContext.container . | nindent 12 }}
+            {{- else }}
+              {{- toYaml .Values.csi.agent.securityContext.container | nindent 12 }}
+            {{- end }}
+  {{- end }}
+{{- end -}}
 
 {{/*
 Sets the injector toleration for pod placement

@@ -126,12 +126,7 @@ spec:
               value: "{{ .Values.csi.agent.logLevel }}"
             - name: VAULT_LOG_FORMAT
               value: "{{ .Values.csi.agent.logFormat }}"
-          securityContext:
-            runAsNonRoot: true
-            allowPrivilegeEscalation: false
-            readOnlyRootFilesystem: true
-            runAsUser: 100
-            runAsGroup: 1000
+          {{- template "csi.agent.securityContext.container" . }}
           volumeMounts:
             - name: agent-config
               mountPath: /etc/vault/config.hcl

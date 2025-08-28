@@ -1142,13 +1142,15 @@ csi:
     # to the daemonSet.
     annotations: {}
     # Provider host path (must match the CSI provider's path)
-    providersDir: "/etc/kubernetes/secrets-store-csi-providers"
+    providersDir: "/var/run/secrets-store-csi-providers"
     # Kubelet host path
     kubeletRootDir: "/var/lib/kubelet"
     # Extra labels to attach to the vault-csi-provider daemonSet
     # This should be a YAML map of the labels to apply to the csi provider daemonSet
     extraLabels: {}
-    # security context for the pod template and container in the csi provider daemonSet
+    # Security context for the pod template and container in the csi provider
+    # daemonSet. For OpenShift, the container securityContext defaults to
+    # `privileged: true`.
     securityContext:
       pod: {}
       container: {}
@@ -1199,6 +1201,18 @@ csi:
     #   limits:
     #     memory: 256Mi
     #     cpu: 250m
+
+    # Security context for the vault agent sidecar container
+    securityContext:
+      container:
+        allowPrivilegeEscalation: false
+        capabilities:
+          drop:
+            - ALL
+        readOnlyRootFilesystem: true
+        runAsNonRoot: true
+        runAsUser: 100
+        runAsGroup: 1000
 
   # Priority class for csi pods
   priorityClassName: ""
