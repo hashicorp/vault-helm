@@ -1,5 +1,9 @@
 ## Unreleased
 
+Bugs:
+
+* server: add IPC_LOCK container capability to prevent unecessary major page faults [GH-1139](https://github.com/hashicorp/vault-helm/pull/1139)
+
 ## 0.30.1 (July 28, 2025)
 
 Changes:
