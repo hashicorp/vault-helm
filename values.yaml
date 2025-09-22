@@ -1335,6 +1335,14 @@ serverTelemetry:
     #     key: token
     authorization: {}
 
+    # metricRelabelings configures the relabeling rules to apply to the samples before ingestion.
+    # See API reference: https://prometheus-operator.dev/docs/api-reference/api/#monitoring.coreos.com/v1.RelabelConfig
+    # example:
+    # metricRelabelings:
+    #   - sourceLabels: [cluster]
+    #     targetLabel: vault_cluster
+    metricRelabelings: []
+
   prometheusRules:
       # The Prometheus operator *must* be installed before enabling this feature,
       # if not the chart will fail to install due to missing CustomResourceDefinitions

@@ -165,3 +165,27 @@ load _helpers
 
   [ "$(echo "$output" | yq -r '.spec.endpoints[0].authorization.credentials.name')" = "a-secret" ]
 }
+
+@test "prometheus/ServiceMonitor-server: metricRelabelings default" {
+  cd `chart_dir`
+  local output=$( (helm template \
+      --show-only templates/prometheus-servicemonitor.yaml \
+      --set 'serverTelemetry.serviceMonitor.enabled=true' \
+      . ) | tee /dev/stderr)
+
+  [ "$(echo "$output" | yq -r '.spec.endpoints[0].metricRelabelings')" = "null" ]
+}
+
+@test "prometheus/ServiceMonitor-server: metricRelabelings override" {
+  cd `chart_dir`
+  local output=$( (helm template \
+      --show-only templates/prometheus-servicemonitor.yaml \
+      --set 'serverTelemetry.serviceMonitor.metricRelabelings[0].sourceLabels=[cluster]' \
+      --set 'serverTelemetry.serviceMonitor.metricRelabelings[0].targetLabel=vault_cluster' \
+      --set 'serverTelemetry.serviceMonitor.enabled=true' \
+      . ) | tee /dev/stderr)
+
+  [ "$(echo "$output" | yq -r '.spec.endpoints[0].metricRelabelings[0] | length')" = "2" ]
+  [ "$(echo "$output" | yq -r '.spec.endpoints[0].metricRelabelings[0].sourceLabels')" = "[cluster]" ]
+  [ "$(echo "$output" | yq -r '.spec.endpoints[0].metricRelabelings[0].targetLabel')" = "vault_cluster" ]
+}

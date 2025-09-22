@@ -1262,6 +1262,9 @@
                         "interval": {
                             "type": "string"
                         },
+                        "metricRelabelings": {
+                            "type": "array"
+                        },
                         "scrapeTimeout": {
                             "type": "string"
                         },
