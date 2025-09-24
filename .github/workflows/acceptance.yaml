@@ -11,10 +11,10 @@ jobs:
       K8S_3: "1.31.9"
       K8S_4: "1.30.13"
       K8S_5: "1.29.14"
-      VAULT_N: "1.20.1"
-      VAULT_N_1: "1.19.7"
-      VAULT_N_2: "1.18.12"
-      VAULT_LTS_1: "1.16.23"
+      VAULT_N: "1.20.4"
+      VAULT_N_1: "1.19.10"
+      VAULT_N_2: "1.18.15"
+      VAULT_LTS_1: "1.16.26"
 
   kind-ce-vault:
     name: ce vault:${{ matrix.vault-version }} k8s:${{ matrix.k8s-version }}
