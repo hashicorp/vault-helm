@@ -6,7 +6,7 @@ jobs:
     steps:
       - run: echo "setting versions"
     outputs:
-      K8S_1: "1.33.1"
+      K8S_1: "1.33.2"
       K8S_2: "1.32.5"
       K8S_3: "1.31.9"
       K8S_4: "1.30.13"
@@ -32,7 +32,7 @@ jobs:
           - ${{ needs.versions.outputs.K8S_4 }}
           - ${{ needs.versions.outputs.K8S_5 }}
     steps:
-      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+      - uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
       - uses: ./.github/actions/acceptance-test
         name: vault:${{ matrix.vault-version }} kind:${{ matrix.k8s-version }}
         with:
