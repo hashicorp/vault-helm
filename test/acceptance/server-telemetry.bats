@@ -9,6 +9,7 @@ load _helpers
   kubectl delete namespace acceptance --ignore-not-found=true
   kubectl create namespace acceptance
   kubectl config set-context --current --namespace=acceptance
+  eval "${PRE_CHART_CMDS}"
 
   # Install prometheus-operator and friends.
   helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
@@ -19,11 +20,12 @@ load _helpers
     prometheus prometheus-community/kube-prometheus-stack
 
   # Install Vault with telemetry config now that the prometheus CRDs are applied.
-  helm upgrade --install \
+  helm upgrade "$(name_prefix)" . \
+    --install \
     --wait \
     --values ./test/acceptance/server-test/vault-server.yaml \
     --values ./test/acceptance/server-test/vault-telemetry.yaml \
-    "$(name_prefix)" .
+    ${SET_CHART_VALUES}
 
   wait_for_ready "$(name_prefix)-0"
 
@@ -69,5 +71,6 @@ teardown() {
       helm uninstall prometheus
       kubectl delete --all pvc
       kubectl delete namespace acceptance --ignore-not-found=true
+      kubectl config unset contexts."$(kubectl config current-context)".namespace
   fi
 }

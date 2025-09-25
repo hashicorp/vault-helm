@@ -43,6 +43,32 @@ helm_install_ha() {
         ${BATS_TEST_DIRNAME}/../..
 }
 
+# check_vault_versions checks the deployed helm chart values match the expected
+# vault version, where expected is either specified by the VAULT_VERSION
+# environment variable or the defaults in values.yaml.
+check_vault_versions(){
+    helm_deployment_name=$1
+    local expected_version
+    if [ -n "${VAULT_VERSION}" ]; then
+        expected_version=${VAULT_VERSION}
+    else
+        # expect the defaults in values.yaml to all be the same
+        expected_version=$(yq -r '.server.image.tag' values.yaml)
+        [ "${expected_version}" = "$(yq -r '.injector.agentImage.tag' values.yaml)" ]
+        [ "${expected_version}" = "$(yq -r '.csi.agent.image.tag' values.yaml)" ]
+    fi
+
+    if [ "${ENT_TESTS}" = "true" ]; then
+        expected_version="${expected_version}-ent"
+    fi
+
+    local values
+    values=$(helm get values "${helm_deployment_name}" --all)
+    [ "${expected_version}" = "$(echo "${values}" | yq -r '.server.image.tag')" ]
+    [ "${expected_version}" = "$(echo "${values}" | yq -r '.injector.agentImage.tag')" ]
+    [ "${expected_version}" = "$(echo "${values}" | yq -r '.csi.agent.image.tag')" ]
+}
+
 # wait for consul to be ready
 wait_for_running_consul() {
     kubectl wait --for=condition=Ready --timeout=5m pod -l app=consul,component=client
