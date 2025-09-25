@@ -1,5 +1,21 @@
 ## Unreleased
 
+## 0.31.0 (September 25, 2025)
+
+Changes:
+
+* Default `vault` version updated to 1.20.4
+* Default `vault-csi-provider` version updated to 1.6.0
+* Change default `csi.daemonSet.providersDir` to "/var/run/secrets-store-csi-providers"
+
+Features:
+
+* csi: Add Red Hat certified vault-csi-provider image to OpenShift defaults [GH-1134](https://github.com/hashicorp/vault-helm/pull/1134)
+
+Improvements:
+
+* server: Add metricRelabelings to serviceMonitor options [GH-1131](https://github.com/hashicorp/vault-helm/pull/1131)
+
 ## 0.30.1 (July 28, 2025)
 
 Changes:
