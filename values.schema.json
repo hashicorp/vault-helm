@@ -846,6 +846,44 @@
                 "hostNetwork": {
                     "type": "boolean"
                 },
+                "httproute": {
+                    "type": "object",
+                    "properties": {
+                        "activeService": {
+                            "type": "boolean"
+                        },
+                        "additionalRules": {
+                            "type": "array"
+                        },
+                        "annotations": {
+                            "type": [
+                                "object",
+                                "string"
+                            ]
+                        },
+                        "enabled": {
+                            "type": "boolean"
+                        },
+                        "filters": {
+                            "type": "array"
+                        },
+                        "hostnames": {
+                            "type": "array"
+                        },
+                        "labels": {
+                            "type": "object"
+                        },
+                        "matches": {
+                            "type": [
+                                "array",
+                                "object"
+                            ]
+                        },
+                        "parentRefs": {
+                            "type": "array"
+                        }
+                    }
+                },
                 "image": {
                     "type": "object",
                     "properties": {
