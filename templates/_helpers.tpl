@@ -189,14 +189,26 @@ extra volumes the user may have specified (such as a secret with TLS).
             name: {{ template "vault.fullname" . }}-config
   {{ end }}
   {{- range .Values.server.extraVolumes }}
-        - name: userconfig-{{ .name }}
-          {{ .type }}:
-          {{- if (eq .type "configMap") }}
-            name: {{ .name }}
-          {{- else if (eq .type "secret") }}
-            secretName: {{ .name }}
-          {{- end }}
-            defaultMode: {{ .defaultMode | default 420 }}
+    - name: userconfig-{{ .name }}
+    {{- if .configMap }}
+      configMap:
+        name: {{ .configMap.name | default .name }}
+        defaultMode: {{ .configMap.defaultMode | default .defaultMode | default 420 }}
+    {{- else if .secret }}
+      secret:
+        secretName: {{ .secret.secretName | default .name }}
+        defaultMode: {{ .secret.defaultMode | default .defaultMode | default 420 }}
+    {{- else if .type }}
+      {{ .type }}:
+      {{- if eq .type "configMap" }}
+        name: {{ .name }}
+      {{- else if eq .type "secret" }}
+        secretName: {{ .name }}
+      {{- end }}
+        defaultMode: {{ .defaultMode | default 420 }}
+    {{- else }}
+      # unknown volume type — skipped
+    {{- end }}
   {{- end }}
   {{- if .Values.server.volumes }}
     {{- toYaml .Values.server.volumes | nindent 8}}
