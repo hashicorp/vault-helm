@@ -22,3 +22,13 @@ server:
 
   readinessProbe:
     path: "/v1/sys/health?uninitcode=204"
+
+csi:
+  image:
+    repository: "registry.connect.redhat.com/hashicorp/vault-csi-provider"
+    tag: "1.6.0-ubi"
+
+  agent:
+    image:
+      repository: "registry.connect.redhat.com/hashicorp/vault"
+      tag: "1.20.4-ubi"

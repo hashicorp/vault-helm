@@ -36,6 +36,17 @@
                         },
                         "resources": {
                             "type": "object"
+                        },
+                        "securityContext": {
+                            "type": "object",
+                            "properties": {
+                                "container": {
+                                    "type": [
+                                        "object",
+                                        "string"
+                                    ]
+                                }
+                            }
                         }
                     }
                 },

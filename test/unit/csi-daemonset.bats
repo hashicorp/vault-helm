@@ -517,7 +517,7 @@ load _helpers
 
   local actual=$(echo $object |
       yq -r '.hostPath.path' | tee /dev/stderr)
-  [ "${actual}" = "/etc/kubernetes/secrets-store-csi-providers" ]
+  [ "${actual}" = "/var/run/secrets-store-csi-providers" ]
 }
 
 @test "csi/daemonset: csi providersDir override " {
@@ -769,6 +769,19 @@ load _helpers
   [ "${actual}" = "null" ]
 }
 
+@test "csi/daemonset: default csi.daemonSet.securityContext.container with openshift=true" {
+  cd "$(chart_dir)"
+  local sc
+  sc=$(helm template \
+      --show-only templates/csi-daemonset.yaml \
+      --set 'csi.enabled=true' \
+      --set 'global.openshift=true' \
+      . | tee /dev/stderr |
+      yq -r '.spec.template.spec.containers[0].securityContext' | tee /dev/stderr)
+
+  [ "$(echo $sc | yq -r .privileged)" = "true" ]
+}
+
 @test "csi/daemonset: default csi.daemonSet.securityContext.container" {
   cd `chart_dir`
   local actual=$(helm template \
@@ -900,4 +913,42 @@ load _helpers
   local value=$(echo $object |
       yq -r '.limits.cpu' | tee /dev/stderr)
   [ "${value}" = "500m" ]
+}
+
+@test "csi/daemonset: default csi.agent.securityContext.container" {
+  cd "$(chart_dir)"
+  local sc
+  sc=$(helm template \
+      --show-only templates/csi-daemonset.yaml \
+      --set 'csi.enabled=true' \
+      . | tee /dev/stderr |
+      yq -r '.spec.template.spec.containers[1].securityContext' | tee /dev/stderr)
+
+  [ "$(echo ${sc} | yq -r '.runAsNonRoot')" = "true" ]
+  [ "$(echo ${sc} | yq -r '.allowPrivilegeEscalation')" = "false" ]
+  [ "$(echo ${sc} | yq -r '.readOnlyRootFilesystem')" = "true" ]
+  [ "$(echo ${sc} | yq -r '.runAsUser')" = "100" ]
+  [ "$(echo ${sc} | yq -r '.runAsGroup')" = "1000" ]
+}
+
+@test "csi/daemonset: specify csi.agent.securityContext.container yaml" {
+  cd "$(chart_dir)"
+  local actual=$(helm template \
+      --show-only templates/csi-daemonset.yaml \
+      --set 'csi.enabled=true' \
+      --set 'csi.agent.securityContext.container.foo=bar' \
+      . | tee /dev/stderr |
+      yq -r '.spec.template.spec.containers[1].securityContext.foo' | tee /dev/stderr)
+  [ "${actual}" = "bar" ]
+}
+
+@test "csi/daemonset: specify csi.agent.securityContext.container yaml string" {
+  cd "$(chart_dir)"
+  local actual=$(helm template \
+      --show-only templates/csi-daemonset.yaml \
+      --set 'csi.enabled=true' \
+      --set 'csi.agent.securityContext.container=foo: bar' \
+      . | tee /dev/stderr |
+      yq -r '.spec.template.spec.containers[1].securityContext.foo' | tee /dev/stderr)
+  [ "${actual}" = "bar" ]
 }

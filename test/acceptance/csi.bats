@@ -13,7 +13,7 @@ load _helpers
   # Install Secrets Store CSI driver
   # Configure it to pass in a JWT for the provider to use, and rotate secrets rapidly
   # so we can see Agent's cache working.
-  CSI_DRIVER_VERSION=1.4.6
+  CSI_DRIVER_VERSION=1.5.3
   helm install secrets-store-csi-driver secrets-store-csi-driver \
     --repo https://kubernetes-sigs.github.io/secrets-store-csi-driver/charts \
     --version=$CSI_DRIVER_VERSION \
