@@ -3,13 +3,14 @@
 Changes:
 
 * Tested with Vault versions 1.20-1.18, 1.16
+* Default `vault-csi-provider` version updated to 1.6.0
 
 ## 0.31.0 (September 25, 2025)
 
 Changes:
 
 * Default `vault` version updated to 1.20.4
-* Default `vault-csi-provider` version updated to 1.6.0
+* Default `vault-csi-provider` version updated to 1.6.0 for OpenShift
 * Change default `csi.daemonSet.providersDir` to "/var/run/secrets-store-csi-providers"
 
 Features:

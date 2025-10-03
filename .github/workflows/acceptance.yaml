@@ -6,9 +6,9 @@ jobs:
     steps:
       - run: echo "setting versions"
     outputs:
-      K8S_1: "1.33.2"
-      K8S_2: "1.32.5"
-      K8S_3: "1.31.9"
+      K8S_1: "1.33.4"
+      K8S_2: "1.32.8"
+      K8S_3: "1.31.12"
       K8S_4: "1.30.13"
       K8S_5: "1.29.14"
       VAULT_N: "1.20.4"
