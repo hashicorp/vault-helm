@@ -20,7 +20,9 @@ metadata:
     app.kubernetes.io/managed-by: {{ .Release.Service }}
     vault-internal: "true"
   annotations:
+{{- if not .Values.server.service.excludeInternalService }}
 {{ template "vault.service.annotations" .}}
+{{- end }}
 spec:
   {{- if (semverCompare ">= 1.23-0" .Capabilities.KubeVersion.Version) }}
   {{- if .Values.server.service.ipFamilyPolicy }}
