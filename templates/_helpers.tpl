@@ -286,7 +286,9 @@ storage might be desired by the user.
   {{- if and (ne .mode "dev") (or .Values.server.dataStorage.enabled .Values.server.auditStorage.enabled) }}
   volumeClaimTemplates:
       {{- if and (eq (.Values.server.dataStorage.enabled | toString) "true") (or (eq .mode "standalone") (eq (.Values.server.ha.raft.enabled | toString ) "true" )) }}
-    - metadata:
+    - apiVersion: v1
+      kind: PersistentVolumeClaim
+      metadata:
         name: data
         {{- include "vault.dataVolumeClaim.annotations" . | nindent 6 }}
         {{- include "vault.dataVolumeClaim.labels" . | nindent 6 }}
