@@ -20,7 +20,7 @@ metadata:
     app.kubernetes.io/managed-by: {{ .Release.Service }}
     vault-internal: "true"
   annotations:
-{{- if not .Values.server.service.excludeInternalService }}
+{{- if not .Values.server.service.excludeAnnotationsFromInternalService }}
 {{ template "vault.service.annotations" .}}
 {{- end }}
 spec:
