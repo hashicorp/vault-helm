@@ -1373,3 +1373,14 @@ serverTelemetry:
       #    for: 5m
       #    labels:
       #      severity: critical
+
+
+# -- List of extra manifests to deploy
+extraObjects: []
+# - |
+#   apiVersion: v1
+#   kind: ConfigMap
+#   metadata:
+#     name: example-cm
+#   data:
+#     foo: bar
