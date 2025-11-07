@@ -102,6 +102,7 @@ Compute if the server auth delegator serviceaccount is enabled.
     (eq (.Values.server.authDelegator.enabled | toString) "true" )
     (or (eq (.Values.server.serviceAccount.create | toString) "true")
         (not (eq .Values.server.serviceAccount.name "")))
+    (eq (.Values.server.serviceAccount.createClusterRoleBinding | toString) "true")
     (or
       (eq (.Values.server.enabled | toString) "true")
       (eq (.Values.global.enabled | toString) "true"))) -}}
