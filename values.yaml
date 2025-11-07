@@ -336,6 +336,10 @@ injector:
 
   # Injector serviceAccount specific config
   serviceAccount:
+    # Specifies whether a service account should be created
+    create: true
+    # Specifies whether a ClusterRole and ClusterRoleBinding should be created (if not, cluster administrator is responsible to create them)
+    createClusterRoleAndBinding: true  
     # Extra annotations to attach to the injector serviceAccount
     annotations: {}
 
@@ -988,6 +992,8 @@ server:
     # The name of the service account to use.
     # If not set and create is true, a name is generated using the fullname template
     name: ""
+    # Specifies whether a ClusterRoleBinding should be created (if not, cluster administrator is responsible to create them)
+    createClusterRoleBinding: true    
     # Create a Secret API object to store a non-expiring token for the service account.
     # Prior to v1.24.0, Kubernetes used to generate this secret for each service account by default.
     # Kubernetes now recommends using short-lived tokens from the TokenRequest API or projected volumes instead if possible.
@@ -1218,6 +1224,10 @@ csi:
   priorityClassName: ""
 
   serviceAccount:
+    # Specifies whether a service account should be created
+    create: true
+    # Specifies whether a ClusterRole and ClusterRoleBinding should be created (if not, cluster administrator is responsible to create them)
+    createClusterRoleAndBinding: true  
     # Extra annotations for the serviceAccount definition. This can either be
     # YAML or a YAML-formatted multi-line templated string map of the
     # annotations to apply to the serviceAccount.
