@@ -183,7 +183,7 @@ defined a custom configuration.  Additionally iterates over any
 extra volumes the user may have specified (such as a secret with TLS).
 */}}
 {{- define "vault.volumes" -}}
-  {{- if and (ne .mode "dev") (or (.Values.server.standalone.config) (.Values.server.ha.config) (.Values.server.ha.raft.config)) }}
+  {{- if and (ne .mode "dev") (ne .mode "external") (.serverEnabled) (or (.Values.server.standalone.config) (.Values.server.ha.config) (.Values.server.ha.raft.config)) }}
         - name: config
           configMap:
             name: {{ template "vault.fullname" . }}-config
@@ -215,7 +215,7 @@ file with IP addresses to make the out of box experience easier
 for users looking to use this chart with Consul Helm.
 */}}
 {{- define "vault.args" -}}
-  {{ if or (eq .mode "standalone") (eq .mode "ha") }}
+  {{ if and (ne .mode "dev") (ne .mode "external") (.serverEnabled) (or (.Values.server.standalone.config) (.Values.server.ha.config) (.Values.server.ha.raft.config)) }}
           - |
             cp /vault/config/extraconfig-from-values.hcl /tmp/storageconfig.hcl;
             [ -n "${HOST_IP}" ] && sed -Ei "s|HOST_IP|${HOST_IP?}|g" /tmp/storageconfig.hcl;
