@@ -1116,7 +1116,10 @@ a map containing a single 'Error' element.
 https://github.com/helm/helm/blob/50c22ed7f953fadb32755e5881ba95a92da852b2/pkg/engine/funcs.go#L158
  */}}
 {{- if or (and (eq ($json | len) 1) (hasKey $json "Error")) (eq ($json | len) 0) -}}
+{{- /* Only append disable_mlock if it is not already explicitly defined in HCL */}}
+{{- if not (regexMatch "(?m)^\\s*disable_mlock\\s*=\\s*(true|false)" $config) -}}
 {{- $config = printf "%s\n%s" $config "disable_mlock = true" -}}
+{{- end -}}
 {{- else -}}
 {{- if not (hasKey $json "disable_mlock") -}}
 {{- $_ := set $json "disable_mlock" true -}}
