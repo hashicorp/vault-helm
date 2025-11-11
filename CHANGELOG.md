@@ -2,8 +2,9 @@
 
 Changes:
 
-* Tested with Vault versions 1.21-1.19, 1.16
+* Default `vault` version updated to 1.21.0
 * Default `vault-csi-provider` version updated to 1.6.0
+* Tested with Vault versions 1.21-1.19, 1.16
 
 ## 0.31.0 (September 25, 2025)
 
