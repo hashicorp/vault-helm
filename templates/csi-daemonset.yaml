@@ -108,7 +108,7 @@ spec:
             timeoutSeconds: {{ .Values.csi.readinessProbe.timeoutSeconds }}
         {{- if eq (.Values.csi.agent.enabled | toString) "true" }}
         - name: {{ include "vault.name" . }}-agent
-          image: "{{ .Values.csi.agent.image.repository }}:{{ .Values.csi.agent.image.tag }}"
+          image: "{{ .Values.csi.agent.image.repository }}:{{ .Values.csi.agent.image.tag | default .Release.appVersion }}"
           imagePullPolicy: {{ .Values.csi.agent.image.pullPolicy }}
           {{ template "csi.agent.resources" . }}
           command:
