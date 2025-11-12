@@ -224,6 +224,34 @@ load _helpers
   [ "${checkExtraConfig}" = 'true' ]
 }
 
+@test "server/ConfigMap: ha extraConfig is set as HCL" {
+  cd `chart_dir`
+  local data
+  data=$(helm template \
+      --show-only templates/server-config-configmap.yaml  \
+      --set 'server.ha.enabled=true' \
+      --set 'server.ha.config=key = "value"' \
+      . | tee /dev/stderr |
+      yq '.data' | tee /dev/stderr)
+  local checkLength=$(echo "${data}" | yq '(. | length) == 1')
+  [ "${checkLength}" = "true" ]
+  local checkExtraConfig=$(echo "${data}" | \
+    yq '."extraconfig-from-values.hcl" == "key = \"value\"\ndisable_mlock = true"')
+  [ "${checkExtraConfig}" = 'true' ]
+
+    data=$(helm template \
+        --show-only templates/server-config-configmap.yaml  \
+        --set 'server.ha.enabled=true' \
+        --set 'server.ha.config=disable_mlock = false' \
+        . | tee /dev/stderr |
+        yq '.data' | tee /dev/stderr)
+    checkLength=$(echo "${data}" | yq '(. | length) == 1')
+    [ "${checkLength}" = "true" ]
+    checkExtraConfig=$(echo "${data}" | \
+        yq '."extraconfig-from-values.hcl" == "disable_mlock = false"')
+    [ "${checkExtraConfig}" = 'true' ]
+}
+
 @test "server/ConfigMap: disabled by injector.externalVaultAddr" {
   cd `chart_dir`
   local actual=$( (helm template \
