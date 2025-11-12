@@ -69,7 +69,7 @@ spec:
             - name: AGENT_INJECT_VAULT_AUTH_PATH
               value: {{ .Values.injector.authPath }}
             - name: AGENT_INJECT_VAULT_IMAGE
-              value: "{{ .Values.injector.agentImage.repository }}:{{ .Values.injector.agentImage.tag }}"
+              value: "{{ .Values.injector.agentImage.repository }}:{{ .Values.injector.agentImage.tag | default .Release.appVersion }}"
             {{- if .Values.injector.certs.secretName }}
             - name: AGENT_INJECT_TLS_CERT_FILE
               value: "/etc/webhook/certs/{{ .Values.injector.certs.certName }}"
