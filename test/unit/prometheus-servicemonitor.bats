@@ -189,3 +189,93 @@ load _helpers
   [ "$(echo "$output" | yq -r '.spec.endpoints[0].metricRelabelings[0].sourceLabels')" = "[cluster]" ]
   [ "$(echo "$output" | yq -r '.spec.endpoints[0].metricRelabelings[0].targetLabel')" = "vault_cluster" ]
 }
+
+@test "prometheus/ServiceMonitor-server: default matchLabels for standalone mode" {
+  cd `chart_dir`
+  local output=$( (helm template \
+      --show-only templates/prometheus-servicemonitor.yaml \
+      --set 'serverTelemetry.serviceMonitor.enabled=true' \
+      . ) | tee /dev/stderr)
+
+  [ "$(echo "$output" | yq -r '.spec.selector.matchLabels["vault-internal"]')" = "true" ]
+  [ "$(echo "$output" | yq -r '.spec.selector.matchLabels["app.kubernetes.io/name"]')" = "vault" ]
+  [ "$(echo "$output" | yq -r '.spec.selector.matchLabels["app.kubernetes.io/instance"]')" = "release-name" ]
+}
+
+@test "prometheus/ServiceMonitor-server: default matchLabels for HA mode" {
+  cd `chart_dir`
+  local output=$( (helm template \
+      --show-only templates/prometheus-servicemonitor.yaml \
+      --set 'serverTelemetry.serviceMonitor.enabled=true' \
+      --set 'server.ha.enabled=true' \
+      --set 'server.ha.raft.enabled=true' \
+      . ) | tee /dev/stderr)
+
+  [ "$(echo "$output" | yq -r '.spec.selector.matchLabels["vault-active"]')" = "true" ]
+  [ "$(echo "$output" | yq -r '.spec.selector.matchLabels["app.kubernetes.io/name"]')" = "vault" ]
+  [ "$(echo "$output" | yq -r '.spec.selector.matchLabels["app.kubernetes.io/instance"]')" = "release-name" ]
+}
+
+@test "prometheus/ServiceMonitor-server: custom matchLabels for standalone mode" {
+  cd `chart_dir`
+  local output=$( (helm template \
+      --show-only templates/prometheus-servicemonitor.yaml \
+      --set 'serverTelemetry.serviceMonitor.enabled=true' \
+      --set 'serverTelemetry.serviceMonitor.matchLabels.component=server' \
+      --set 'serverTelemetry.serviceMonitor.matchLabels.service=vault-standalone' \
+      . ) | tee /dev/stderr)
+
+  [ "$(echo "$output" | yq -r '.spec.selector.matchLabels["component"]')" = "server" ]
+  [ "$(echo "$output" | yq -r '.spec.selector.matchLabels["service"]')" = "vault-standalone" ]
+  [ "$(echo "$output" | yq -r '.spec.selector.matchLabels["vault-internal"]')" = "null" ]
+  [ "$(echo "$output" | yq -r '.spec.selector.matchLabels["app.kubernetes.io/name"]')" = "vault" ]
+  [ "$(echo "$output" | yq -r '.spec.selector.matchLabels["app.kubernetes.io/instance"]')" = "release-name" ]
+}
+
+@test "prometheus/ServiceMonitor-server: custom matchLabels for HA mode" {
+  cd `chart_dir`
+  local output=$( (helm template \
+      --show-only templates/prometheus-servicemonitor.yaml \
+      --set 'serverTelemetry.serviceMonitor.enabled=true' \
+      --set 'server.ha.enabled=true' \
+      --set 'server.ha.raft.enabled=true' \
+      --set 'serverTelemetry.serviceMonitor.matchLabels.component=server' \
+      --set 'serverTelemetry.serviceMonitor.matchLabels.service=vault-ha' \
+      . ) | tee /dev/stderr)
+
+  [ "$(echo "$output" | yq -r '.spec.selector.matchLabels["component"]')" = "server" ]
+  [ "$(echo "$output" | yq -r '.spec.selector.matchLabels["service"]')" = "vault-ha" ]
+  [ "$(echo "$output" | yq -r '.spec.selector.matchLabels["vault-active"]')" = "null" ]
+  [ "$(echo "$output" | yq -r '.spec.selector.matchLabels["app.kubernetes.io/name"]')" = "vault" ]
+  [ "$(echo "$output" | yq -r '.spec.selector.matchLabels["app.kubernetes.io/instance"]')" = "release-name" ]
+}
+
+@test "prometheus/ServiceMonitor-server: custom matchLabels with vault-internal override" {
+  cd `chart_dir`
+  local output=$( (helm template \
+      --show-only templates/prometheus-servicemonitor.yaml \
+      --set 'serverTelemetry.serviceMonitor.enabled=true' \
+      --set 'serverTelemetry.serviceMonitor.matchLabels.vault-internal=false' \
+      --set 'serverTelemetry.serviceMonitor.matchLabels.custom=value' \
+      . ) | tee /dev/stderr)
+
+  # Custom labels should be able to override the default label
+  [ "$(echo "$output" | yq -r '.spec.selector.matchLabels["vault-internal"]')" = "false" ]
+  [ "$(echo "$output" | yq -r '.spec.selector.matchLabels["custom"]')" = "value" ]
+}
+
+@test "prometheus/ServiceMonitor-server: custom matchLabels with vault-active override in HA mode" {
+  cd `chart_dir`
+  local output=$( (helm template \
+      --show-only templates/prometheus-servicemonitor.yaml \
+      --set 'serverTelemetry.serviceMonitor.enabled=true' \
+      --set 'server.ha.enabled=true' \
+      --set 'server.ha.raft.enabled=true' \
+      --set 'serverTelemetry.serviceMonitor.matchLabels.vault-active=false' \
+      --set 'serverTelemetry.serviceMonitor.matchLabels.custom=value' \
+      . ) | tee /dev/stderr)
+
+  # Custom labels should be able to override the default HA label
+  [ "$(echo "$output" | yq -r '.spec.selector.matchLabels["vault-active"]')" = "false" ]
+  [ "$(echo "$output" | yq -r '.spec.selector.matchLabels["custom"]')" = "value" ]
+}

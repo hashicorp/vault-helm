@@ -1343,6 +1343,21 @@ serverTelemetry:
     #     targetLabel: vault_cluster
     metricRelabelings: []
 
+    # matchLabels configures the service selector labels for the ServiceMonitor.
+    # By default, the ServiceMonitor targets services with:
+    #   - HA mode: vault-active: "true" (scrapes the raft leader only)
+    #   - Standalone mode: vault-internal: "true"
+    #
+    # To scrape metrics from all Vault pods including standbys (Enterprise only):
+    # 1. Enable unauthenticated_metrics_access in your Vault listener telemetry config
+    # 2. Set matchLabels to target the vault-internal headless service
+    # See: https://developer.hashicorp.com/vault/docs/configuration/telemetry#prometheus
+    #
+    # Example:
+    # matchLabels:
+    #   vault-internal: "true"
+    matchLabels: {}
+
   prometheusRules:
       # The Prometheus operator *must* be installed before enabling this feature,
       # if not the chart will fail to install due to missing CustomResourceDefinitions
