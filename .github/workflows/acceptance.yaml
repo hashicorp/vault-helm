@@ -32,7 +32,7 @@ jobs:
           - ${{ needs.versions.outputs.K8S_4 }}
           - ${{ needs.versions.outputs.K8S_5 }}
     steps:
-      - uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
+      - uses: actions/checkout@93cb6efe18208431cddfb8368fd83d5badbf9bfd # v5.0.1
       - uses: ./.github/actions/acceptance-test
         name: vault:${{ matrix.vault-version }} kind:${{ matrix.k8s-version }}
         with:
