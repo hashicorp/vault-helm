@@ -21,7 +21,7 @@ spec:
   {{- include "imagePullSecrets" . | nindent 2 }}
   containers:
     - name: {{ .Release.Name }}-server-test
-      image: {{ .Values.server.image.repository }}:{{ .Values.server.image.tag | default "latest" }}
+      image: {{ .Values.server.image.repository }}:{{ .Values.server.image.tag | default .Release.appVersion }}
       imagePullPolicy: {{ .Values.server.image.pullPolicy }}
       env:
         - name: VAULT_ADDR
