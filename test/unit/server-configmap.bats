@@ -70,6 +70,39 @@ load _helpers
   local check=$(echo "${actual}" | \
     yq '."extraconfig-from-values.hcl" == "hello = vault\ndisable_mlock = true"')
   [ "${check}" = "true" ]
+
+  # Test 'disable_mlock = false' respected
+  actual=$(helm template \
+       --show-only templates/server-config-configmap.yaml \
+       . \
+       -f - <<EOF \
+       | tee /dev/stderr \
+       | yq '.data' | tee /dev/stderr
+server:
+  ha:
+    enabled: true
+    raft:
+      enabled: true
+      config: |
+        hello = {{ .Chart.Name }}
+        disable_mlock = false
+EOF
+)
+  local check=$(echo "${actual}" | \
+    yq '."extraconfig-from-values.hcl" == "hello = vault\ndisable_mlock = false"')
+  [ "${check}" = "true" ]
+
+  # Test 'disable_mlock = false' respected, as only value set
+  actual=$(helm template \
+      --show-only templates/server-config-configmap.yaml \
+      --set 'server.ha.enabled=true' \
+      --set 'server.ha.raft.enabled=true' \
+      --set "server.ha.raft.config=disable_mlock = false" \
+      . | tee /dev/stderr |
+      yq '.data' | tee /dev/stderr)
+  local check=$(echo "${actual}" | \
+    yq '."extraconfig-from-values.hcl" == "disable_mlock = false"')
+  [ "${check}" = "true" ]
 }
 
 @test "server/ConfigMap: raft config templated JSON" {
