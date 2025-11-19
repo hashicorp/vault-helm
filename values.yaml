@@ -702,6 +702,12 @@ server:
       # YAML-formatted multi-line templated string map of the annotations to apply
       # to the standby service.
       annotations: {}
+    # Configuration for the headless service (vault-internal)
+    headless:
+      # Extra annotations for the headless service. This can either be YAML or a
+      # YAML-formatted multi-line templated string map of the annotations to apply
+      # to the headless service only.
+      annotations: {}
     # If enabled, the service selectors will include `app.kubernetes.io/instance: {{ .Release.Name }}`
     # When disabled, services may select Vault pods not deployed from the chart.
     # Does not affect the headless vault-internal service with `ClusterIP: None`
@@ -1013,6 +1019,12 @@ server:
     # YAML-formatted multi-line templated string map of the annotations to apply
     # to the statefulSet.
     annotations: {}
+
+    # Configure minReadySeconds for the StatefulSet
+    # Minimum number of seconds for which a newly created pod should be ready
+    # without any of its container crashing, for it to be considered available.
+    # 0 means the pod will be considered available as soon as it is ready.
+    minReadySeconds: 0
 
     # Set the pod and container security contexts.
     # If not set, these will default to, and for *not* OpenShift:
