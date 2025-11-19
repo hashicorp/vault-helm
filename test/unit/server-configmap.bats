@@ -272,17 +272,17 @@ EOF
     yq '."extraconfig-from-values.hcl" == "key = \"value\"\ndisable_mlock = true"')
   [ "${checkExtraConfig}" = 'true' ]
 
-    data=$(helm template \
-        --show-only templates/server-config-configmap.yaml  \
-        --set 'server.ha.enabled=true' \
-        --set 'server.ha.config=disable_mlock = false' \
-        . | tee /dev/stderr |
-        yq '.data' | tee /dev/stderr)
-    checkLength=$(echo "${data}" | yq '(. | length) == 1')
-    [ "${checkLength}" = "true" ]
-    checkExtraConfig=$(echo "${data}" | \
-        yq '."extraconfig-from-values.hcl" == "disable_mlock = false"')
-    [ "${checkExtraConfig}" = 'true' ]
+  data=$(helm template \
+      --show-only templates/server-config-configmap.yaml  \
+      --set 'server.ha.enabled=true' \
+      --set 'server.ha.config=disable_mlock = false' \
+      . | tee /dev/stderr |
+      yq '.data' | tee /dev/stderr)
+  checkLength=$(echo "${data}" | yq '(. | length) == 1')
+  [ "${checkLength}" = "true" ]
+  checkExtraConfig=$(echo "${data}" | \
+      yq '."extraconfig-from-values.hcl" == "disable_mlock = false"')
+  [ "${checkExtraConfig}" = 'true' ]
 }
 
 @test "server/ConfigMap: disabled by injector.externalVaultAddr" {
