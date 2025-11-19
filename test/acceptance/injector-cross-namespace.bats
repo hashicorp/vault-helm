@@ -6,7 +6,7 @@ setup() {
   kubectl delete namespace acceptance --ignore-not-found=true
   kubectl create namespace acceptance
   kubectl config set-context --current --namespace=acceptance
-  kubectl create secret generic vault-license --from-literal license=$VAULT_LICENSE_CI
+  eval "${PRE_CHART_CMDS}"
 }
 
 teardown() {
@@ -17,26 +17,29 @@ teardown() {
       kubectl delete --all pvc
       kubectl delete secret test
       kubectl delete namespace acceptance
+      kubectl config unset contexts."$(kubectl config current-context)".namespace
   fi
 }
 
 @test "injector/enterprise: testing cross namespace access" {
+  if [ ! "$ENT_TESTS" = "true" ]; then
+    skip "Enterprise tests are not enabled"
+  fi
+
   cd `chart_dir`
 
   kubectl create secret generic test \
     --from-file ./test/acceptance/injector-test/bootstrap-cross-namespace.sh
 
   kubectl label secret test app=vault-agent-demo
-
-  helm install "$(name_prefix)" \
-    --set='server.image.repository=hashicorp/vault-enterprise' \
-    --set="server.image.tag=$(yq -r '.server.image.tag' values.yaml)-ent" \
+  helm install "$(name_prefix)" . \
     --set="server.extraVolumes[0].type=secret" \
     --set="server.extraVolumes[0].name=test" \
     --set='server.ha.enabled=true' \
     --set='server.ha.raft.enabled=true' \
     --set='server.ha.replicas=1' \
-    --set='server.enterpriseLicense.secretName=vault-license' .
+    ${SET_CHART_VALUES}
+  check_vault_versions "$(name_prefix)"
   wait_for_running "$(name_prefix)-0"
 
   wait_for_ready $(kubectl get pod -l component=webhook -o jsonpath="{.items[0].metadata.name}")

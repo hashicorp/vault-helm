@@ -3,13 +3,17 @@
 load _helpers
 
 @test "server/dev: testing deployment" {
-  cd `chart_dir`
+  cd "$(chart_dir)"
   kubectl delete namespace acceptance --ignore-not-found=true
   kubectl create namespace acceptance
   kubectl config set-context --current --namespace=acceptance
 
-  helm install "$(name_prefix)" --set='server.dev.enabled=true' .
-  wait_for_running $(name_prefix)-0
+  echo "Using chart vars: ${SET_CHART_VALUES}"
+
+  eval "${PRE_CHART_CMDS}"
+  helm install "$(name_prefix)" . --set='server.dev.enabled=true' ${SET_CHART_VALUES}
+  check_vault_versions "$(name_prefix)"
+  wait_for_running "$(name_prefix)-0"
 
   # Replicas
   local replicas=$(kubectl get statefulset "$(name_prefix)" --output json |
@@ -18,8 +22,8 @@ load _helpers
 
   # Volume Mounts
   local volumeCount=$(kubectl get statefulset "$(name_prefix)" --output json |
-    jq -r '.spec.template.spec.containers[0].volumeMounts | length')
-  [ "${volumeCount}" == "1" ]
+    jq -r '.spec.template.spec.containers[0].volumeMounts | length >= 1')
+  [ "${volumeCount}" == "true" ]
 
   # Service
   local service=$(kubectl get service "$(name_prefix)" --output json |
@@ -60,5 +64,6 @@ teardown() {
       helm delete vault
       kubectl delete --all pvc
       kubectl delete namespace acceptance --ignore-not-found=true
+      kubectl config unset contexts."$(kubectl config current-context)".namespace
   fi
 }
