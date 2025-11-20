@@ -171,6 +171,13 @@ injector:
     #
     timeoutSeconds: 30
 
+    # reinvocationPolicy specifies whether the webhook should be called again if other
+    # webhooks modify the object. Valid values are "Never" and "IfNeeded".
+    # See https://kubernetes.io/docs/reference/access-authn-authz/extensible-admission-controllers/#reinvocation-policy
+    # for more details.
+    #
+    reinvocationPolicy: Never
+
     # namespaceSelector is the selector for restricting the webhook to only
     # specific namespaces.
     # See https://kubernetes.io/docs/reference/access-authn-authz/extensible-admission-controllers/#matching-requests-namespaceselector
