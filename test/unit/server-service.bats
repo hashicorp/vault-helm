@@ -509,3 +509,79 @@ load _helpers
       yq -r '.spec.ipFamilies' | tee /dev/stderr)
   [ "${actual}" = "null" ]
 }
+
+#--------------------------------------------------------------------
+# serviceCA annotation
+
+@test "server/Service: serviceCA annotation not added by default" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      --show-only templates/server-service.yaml \
+      . | tee /dev/stderr |
+      yq -r '.metadata.annotations["service.beta.openshift.io/serving-cert-secret-name"]' | tee /dev/stderr)
+  [ "${actual}" = "null" ]
+}
+
+@test "server/Service: serviceCA annotation not added when only global.openshift=true" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      --show-only templates/server-service.yaml \
+      --set 'global.openshift=true' \
+      . | tee /dev/stderr |
+      yq -r '.metadata.annotations["service.beta.openshift.io/serving-cert-secret-name"]' | tee /dev/stderr)
+  [ "${actual}" = "null" ]
+}
+
+@test "server/Service: serviceCA annotation not added when only server.serviceCA.enabled=true" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      --show-only templates/server-service.yaml \
+      --set 'server.serviceCA.enabled=true' \
+      . | tee /dev/stderr |
+      yq -r '.metadata.annotations["service.beta.openshift.io/serving-cert-secret-name"]' | tee /dev/stderr)
+  [ "${actual}" = "null" ]
+}
+
+@test "server/Service: serviceCA annotation added when both flags are true" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      --show-only templates/server-service.yaml \
+      --set 'global.openshift=true' \
+      --set 'server.serviceCA.enabled=true' \
+      . | tee /dev/stderr |
+      yq -r '.metadata.annotations["service.beta.openshift.io/serving-cert-secret-name"]' | tee /dev/stderr)
+  [ "${actual}" = "vault-tls" ]
+}
+
+@test "server/Service: serviceCA annotation uses custom secret name" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      --show-only templates/server-service.yaml \
+      --set 'global.openshift=true' \
+      --set 'server.serviceCA.enabled=true' \
+      --set 'server.serviceCA.secretName=custom-tls' \
+      . | tee /dev/stderr |
+      yq -r '.metadata.annotations["service.beta.openshift.io/serving-cert-secret-name"]' | tee /dev/stderr)
+  [ "${actual}" = "custom-tls" ]
+}
+
+@test "server/Service: serviceCA annotation works with existing annotations" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      --show-only templates/server-service.yaml \
+      --set 'global.openshift=true' \
+      --set 'server.serviceCA.enabled=true' \
+      --set 'server.service.annotations.custom-annotation=custom-value' \
+      . | tee /dev/stderr |
+      yq -r '.metadata.annotations["service.beta.openshift.io/serving-cert-secret-name"]' | tee /dev/stderr)
+  [ "${actual}" = "vault-tls" ]
+  
+  local custom=$(helm template \
+      --show-only templates/server-service.yaml \
+      --set 'global.openshift=true' \
+      --set 'server.serviceCA.enabled=true' \
+      --set 'server.service.annotations.custom-annotation=custom-value' \
+      . | tee /dev/stderr |
+      yq -r '.metadata.annotations["custom-annotation"]' | tee /dev/stderr)
+  [ "${custom}" = "custom-value" ]
+}

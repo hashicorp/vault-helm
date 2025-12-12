@@ -20,6 +20,9 @@ metadata:
     app.kubernetes.io/managed-by: {{ .Release.Service }}
   annotations:
 {{ template "vault.service.annotations" .}}
+{{- if and .Values.global.openshift .Values.server.serviceCA.enabled }}
+    service.beta.openshift.io/serving-cert-secret-name: {{ .Values.server.serviceCA.secretName | quote }}
+{{- end }}
 spec:
   {{- if .Values.server.service.type}}
   type: {{ .Values.server.service.type }}
