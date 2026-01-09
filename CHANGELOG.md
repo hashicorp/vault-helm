@@ -7,6 +7,7 @@ Changes:
 * Default `vault-k8s` version updated to 1.7.1
 * Tested with Vault versions 1.21-1.19, 1.16
 * Tested with Kubernetes versions 1.35-1.31
+* Test with Kind v0.31.0
 
 ## 0.31.0 (September 25, 2025)
 
