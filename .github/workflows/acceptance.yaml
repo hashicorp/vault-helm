@@ -6,15 +6,15 @@ jobs:
     steps:
       - run: echo "setting versions"
     outputs:
-      K8S_1: "1.33.4"
-      K8S_2: "1.32.8"
-      K8S_3: "1.31.12"
-      K8S_4: "1.30.13"
-      K8S_5: "1.29.14"
-      VAULT_N: "1.21.0"
-      VAULT_N_1: "1.20.5"
-      VAULT_N_2: "1.19.11"
-      VAULT_LTS_1: "1.16.27"
+      K8S_1: "1.35.0"
+      K8S_2: "1.34.3"
+      K8S_3: "1.33.7"
+      K8S_4: "1.32.11"
+      K8S_5: "1.31.14"
+      VAULT_N: "1.21.2"
+      VAULT_N_1: "1.20.7"
+      VAULT_N_2: "1.19.13"
+      VAULT_LTS_1: "1.16.29"
 
   kind-ce-vault:
     name: ce vault:${{ matrix.vault-version }} k8s:${{ matrix.k8s-version }}

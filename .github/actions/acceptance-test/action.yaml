@@ -34,7 +34,7 @@ runs:
         cluster_name: ${{ inputs.kind-cluster-name }}
         config: test/kind/config.yaml
         node_image: kindest/node:v${{ inputs.k8s-version }}
-        version: "v0.29.0"
+        version: "v0.31.0"
 
     - name: Create kind export log root
       id: create_kind_export_log_root
