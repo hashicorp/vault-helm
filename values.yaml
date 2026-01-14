@@ -371,6 +371,50 @@ server:
     # The key within the Kubernetes secret that holds the enterprise license.
     secretKey: "license"
 
+  # OpenShift service-ca operator integration
+  # Automates TLS certificate generation via the service-ca operator
+  serviceCA:
+    # Enable service-ca operator annotations and ConfigMap creation
+    # Requires: global.openshift=true
+    enabled: false
+    
+    # Secret name where service-ca will store the generated certificate
+    # IMPORTANT: Must match the secret name in server.volumes below
+    secretName: "vault-tls"
+    
+    # ConfigMap name for service-ca CA bundle injection
+    # IMPORTANT: Must match the ConfigMap name in server.volumes below
+    configMapName: "service-ca-bundle"
+  
+  # IMPORTANT: Configure server.volumes, server.volumeMounts, AND server config to use service-ca
+  #
+  # Step 1: Mount the service-ca resources as volumes
+  # volumes:
+  #   - name: vault-tls
+  #     secret:
+  #       secretName: vault-tls  # Must match serviceCA.secretName above
+  #   - name: service-ca-bundle
+  #     configMap:
+  #       name: service-ca-bundle  # Must match serviceCA.configMapName above
+  #
+  # volumeMounts:
+  #   - name: vault-tls
+  #     mountPath: /vault/userconfig/vault-tls
+  #     readOnly: true
+  #   - name: service-ca-bundle
+  #     mountPath: /vault/userconfig/service-ca-bundle
+  #     readOnly: true
+  #
+  # Step 2: Configure Vault listener to use the certificates (in server.ha.config or server.ha.raft.config)
+  # listener "tcp" {
+  #   tls_disable = 0
+  #   address = "[::]:8200"
+  #   cluster_address = "[::]:8201"
+  #   tls_cert_file = "/vault/userconfig/vault-tls/tls.crt"
+  #   tls_key_file  = "/vault/userconfig/vault-tls/tls.key"
+  #   tls_client_ca_file = "/vault/userconfig/service-ca-bundle/service-ca.crt"
+  # }
+
   image:
     repository: "hashicorp/vault"
     tag: "1.21.0"

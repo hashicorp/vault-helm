@@ -1,0 +1,23 @@
+{{/*
+Copyright (c) HashiCorp, Inc.
+SPDX-License-Identifier: MPL-2.0
+*/}}
+
+{{- if and .Values.global.openshift .Values.server.serviceCA.enabled }}
+# ConfigMap for OpenShift service-ca operator
+# The service-ca operator will automatically inject the CA bundle
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ .Values.server.serviceCA.configMapName }}
+  namespace: {{ include "vault.namespace" . }}
+  labels:
+    helm.sh/chart: {{ include "vault.chart" . }}
+    app.kubernetes.io/name: {{ include "vault.name" . }}
+    app.kubernetes.io/instance: {{ .Release.Name }}
+    app.kubernetes.io/managed-by: {{ .Release.Service }}
+  annotations:
+    service.beta.openshift.io/inject-cabundle: "true"
+data: {}
+{{- end }}
+

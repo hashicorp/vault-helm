@@ -1043,6 +1043,20 @@
                         }
                     }
                 },
+                "serviceCA": {
+                    "type": "object",
+                    "properties": {
+                        "enabled": {
+                            "type": "boolean"
+                        },
+                        "secretName": {
+                            "type": "string"
+                        },
+                        "configMapName": {
+                            "type": "string"
+                        }
+                    }
+                },
                 "service": {
                     "type": "object",
                     "properties": {
