@@ -1,13 +1,29 @@
 ## Unreleased
 
+## 0.32.0 (January 14, 2026)
+
 Changes:
 
-* Default `vault` version updated to 1.21.0
-* Default `vault-csi-provider` version updated to 1.6.0
-* Default `vault-k8s` version updated to 1.7.1
+* Default `vault` version updated to 1.21.2
+* Default `vault-csi-provider` version updated to 1.7.0
+* Default `vault-k8s` version updated to 1.7.2
 * Tested with Vault versions 1.21-1.19, 1.16
 * Tested with Kubernetes versions 1.35-1.31
 * Test with Kind v0.31.0
+
+Features:
+
+* server: Add OpenShift service-ca operator automation [GH-1165](https://github.com/hashicorp/vault-helm/pull/1165)
+
+Improvements:
+
+* server: Allow users to specify the target service for the ServiceMonitor [GH-1148](https://github.com/hashicorp/vault-helm/pull/1148)
+
+Bugs:
+
+* server: Add namespace to network policy template [GH-1152](https://github.com/hashicorp/vault-helm/pull/1152)
+* server: Check if `disable_mlock` is already set before adding to end of HCL config [GH-1154](https://github.com/hashicorp/vault-helm/pull/1154)
+* server: provide declarative parameters for volumeClaimTemplates [GH-982](https://github.com/hashicorp/vault-helm/pull/982)
 
 ## 0.31.0 (September 25, 2025)
 
