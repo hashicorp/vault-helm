@@ -5,7 +5,7 @@
 Changes:
 
 * Default `vault` version updated to 1.21.2
-* Default `vault-csi-provider` version updated to 1.6.0
+* Default `vault-csi-provider` version updated to 1.7.0
 * Default `vault-k8s` version updated to 1.7.2
 * Tested with Vault versions 1.21-1.19, 1.16
 * Tested with Kubernetes versions 1.35-1.31
