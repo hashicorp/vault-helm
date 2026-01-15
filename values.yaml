@@ -3,6 +3,10 @@
 
 # Available parameters and their default values for the Vault chart.
 
+# Set cluster name instead of having it auto-generated.
+# examples may include: "vault1-gke-uswest", "vault2-eks-useast", etc.
+cluster_name: ""
+
 global:
   # enabled is the master enabled switch. Setting this to true or false
   # will enable or disable all the components within this chart by default.
@@ -956,6 +960,7 @@ server:
       # Supported formats are HCL and JSON.
       config: |
         ui = true
+        cluster_name = {{ .Values.cluster_name | default (printf "%s-k8s" (include "vault.name" .)) | quote }}
 
         listener "tcp" {
           tls_disable = 1
