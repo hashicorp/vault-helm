@@ -812,6 +812,12 @@ server:
     # to the service.
     annotations: {}
 
+    # If enabled, the above annotations will not be applied to the internal service
+    # that is used for inter-pod communication within the Vault cluster.
+    # Use this when you're running single node vaults in combination with the OpenShift service CA
+    # which will apply this to all services in the namespace and cause issues.
+    excludeAnnotationsFromInternalService: false
+
   # This configures the Vault Statefulset to create a PVC for data
   # storage when using the file or raft backend storage engines.
   # See https://developer.hashicorp.com/vault/docs/configuration/storage to know more
