@@ -1039,6 +1039,16 @@ Inject extra environment populated by secrets, if populated
 {{- end -}}
 {{- end -}}
 
+{{- define "vault.extraEnvironmentVarsFromConfigMap" -}}
+{{- if .extraEnvironmentVarsFromConfigMap -}}
+envFrom:
+{{- range .extraEnvironmentVarsFromConfigMap }}
+  - configMapRef:
+      name: {{ . }}
+{{- end -}}
+{{- end -}}
+{{- end -}}
+
 {{/* Scheme for health check and local endpoint */}}
 {{- define "vault.scheme" -}}
 {{- if .Values.global.tlsDisable -}}
