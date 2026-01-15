@@ -691,6 +691,21 @@ Sets extra ingress annotations
 {{- end -}}
 
 {{/*
+Sets extra httproute annotations
+*/}}
+{{- define "vault.httproute.annotations" -}}
+  {{- if .Values.server.httproute.annotations }}
+  annotations:
+    {{- $tp := typeOf .Values.server.httproute.annotations }}
+    {{- if eq $tp "string" }}
+      {{- tpl .Values.server.httproute.annotations . | nindent 4 }}
+    {{- else }}
+      {{- toYaml .Values.server.httproute.annotations | nindent 4 }}
+    {{- end }}
+  {{- end }}
+{{- end -}}
+
+{{/*
 Sets extra route annotations
 */}}
 {{- define "vault.route.annotations" -}}
