@@ -955,7 +955,7 @@ load _helpers
 #--------------------------------------------------------------------
 # extraInitContainers
 
-@test "server/standalone-StatefulSet: adds extra init containers" {
+@test "server/standalone-StatefulSet: adds extra init container" {
   cd `chart_dir`
 
   # Test that it defines it
@@ -1001,6 +1001,56 @@ load _helpers
 
 }
 
+@test "server/standalone-StatefulSet: adds extra init templated container" {
+  cd `chart_dir`
+
+  # Test that it defines it
+  local object=$(helm template \
+      --namespace my-namespace \
+      --show-only templates/server-statefulset.yaml  \
+      --set 'global.extraInitContainer.imageRepo=test-image' \
+      --set 'global.extraInitContainer.imageTag=test-tag' \
+      --set 'global.extraInitContainer.name=test-container' \
+      --set 'server.extraInitContainers[0].image=\{\{ printf \"%s:%s\" .Values.global.extraInitContainer.imageRepo .Values.global.extraInitContainer.imageTag \}\}' \
+      --set 'server.extraInitContainers[0].name=\{\{ .Values.global.extraInitContainer.name \}\}' \
+      --set 'server.extraInitContainers[0].ports[0].name=test-port' \
+      --set 'server.extraInitContainers[0].ports[0].containerPort=9410' \
+      --set 'server.extraInitContainers[0].ports[0].protocol=TCP' \
+      --set 'server.extraInitContainers[0].env[0].name=NAMESPACE' \
+      --set 'server.extraInitContainers[0].env[0].value=\{\{ .Release.Namespace \}\}' \
+      . | tee /dev/stderr |
+      yq -r '.spec.template.spec.initContainers[] | select(.name == "test-container")' | tee /dev/stderr)
+
+  local actual=$(echo $object |
+      yq -r '.name' | tee /dev/stderr)
+  [ "${actual}" = "test-container" ]
+
+  local actual=$(echo $object |
+      yq -r '.image' | tee /dev/stderr)
+  [ "${actual}" = "test-image:test-tag" ]
+
+  local actual=$(echo $object |
+      yq -r '.ports[0].name' | tee /dev/stderr)
+  [ "${actual}" = "test-port" ]
+
+  local actual=$(echo $object |
+      yq -r '.ports[0].containerPort' | tee /dev/stderr)
+  [ "${actual}" = "9410" ]
+
+  local actual=$(echo $object |
+      yq -r '.ports[0].protocol' | tee /dev/stderr)
+  [ "${actual}" = "TCP" ]
+
+  local actual=$(echo $object |
+      yq -r '.env[0].name' | tee /dev/stderr)
+  [ "${actual}" = "NAMESPACE" ]
+
+  local actual=$(echo $object |
+      yq -r '.env[0].value' | tee /dev/stderr)
+  [ "${actual}" = "my-namespace" ]
+
+}
+
 @test "server/standalone-StatefulSet: add two extra init containers" {
   cd `chart_dir`
 
@@ -1023,7 +1073,7 @@ load _helpers
 #--------------------------------------------------------------------
 # extraContainers
 
-@test "server/standalone-StatefulSet: adds extra containers" {
+@test "server/standalone-StatefulSet: adds extra container" {
   cd `chart_dir`
 
   # Test that it defines it
@@ -1067,6 +1117,55 @@ load _helpers
       yq -r '.env[0].value' | tee /dev/stderr)
   [ "${actual}" = "test_env_value" ]
 
+}
+
+@test "server/standalone-StatefulSet: adds extra templated container" {
+  cd `chart_dir`
+
+  # Test that it defines it
+  local object=$(helm template \
+      --namespace my-namespace \
+      --show-only templates/server-statefulset.yaml  \
+      --set 'global.extraContainer.imageRepo=test-image' \
+      --set 'global.extraContainer.imageTag=test-tag' \
+      --set 'global.extraContainer.name=test-container' \
+      --set 'server.extraContainers[0].image=\{\{ printf \"%s:%s\" .Values.global.extraContainer.imageRepo .Values.global.extraContainer.imageTag \}\}' \
+      --set 'server.extraContainers[0].name=\{\{ .Values.global.extraContainer.name \}\}' \
+      --set 'server.extraContainers[0].ports[0].name=test-port' \
+      --set 'server.extraContainers[0].ports[0].containerPort=9410' \
+      --set 'server.extraContainers[0].ports[0].protocol=TCP' \
+      --set 'server.extraContainers[0].env[0].name=NAMESPACE' \
+      --set 'server.extraContainers[0].env[0].value=\{\{ .Release.Namespace \}\}' \
+      . | tee /dev/stderr |
+      yq -r '.spec.template.spec.containers[] | select(.name == "test-container")' | tee /dev/stderr)
+
+  local actual=$(echo $object |
+      yq -r '.name' | tee /dev/stderr)
+  [ "${actual}" = "test-container" ]
+
+  local actual=$(echo $object |
+      yq -r '.image' | tee /dev/stderr)
+  [ "${actual}" = "test-image:test-tag" ]
+
+  local actual=$(echo $object |
+      yq -r '.ports[0].name' | tee /dev/stderr)
+  [ "${actual}" = "test-port" ]
+
+  local actual=$(echo $object |
+      yq -r '.ports[0].containerPort' | tee /dev/stderr)
+  [ "${actual}" = "9410" ]
+
+  local actual=$(echo $object |
+      yq -r '.ports[0].protocol' | tee /dev/stderr)
+  [ "${actual}" = "TCP" ]
+
+  local actual=$(echo $object |
+      yq -r '.env[0].name' | tee /dev/stderr)
+  [ "${actual}" = "NAMESPACE" ]
+
+  local actual=$(echo $object |
+      yq -r '.env[0].value' | tee /dev/stderr)
+  [ "${actual}" = "my-namespace" ]
 }
 
 @test "server/standalone-StatefulSet: add two extra containers" {
