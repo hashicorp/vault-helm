@@ -231,7 +231,11 @@ spec:
                 {{- end }}
             {{- end }}
         {{- if .Values.server.extraContainers }}
-          {{ toYaml .Values.server.extraContainers | nindent 8}}
+          {{- if eq (typeOf .Values.server.extraContainers) "string" }}
+            {{- tpl .Values.server.extraContainers . | nindent 8 }}
+          {{- else }}
+            {{ toYaml .Values.server.extraContainers | nindent 8 }}
+          {{- end }}
         {{- end }}
       {{- include "imagePullSecrets" . | nindent 6 }}
   {{ template "vault.volumeclaims" . }}
