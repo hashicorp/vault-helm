@@ -1136,3 +1136,10 @@ https://github.com/helm/helm/blob/50c22ed7f953fadb32755e5881ba95a92da852b2/pkg/e
 {{- tpl $config . | nindent 4 | trim }}
 {{- end -}}
 {{- end -}}
+
+{{/*
+vault internal k8s address
+*/}}
+{{- define "vault.internalAddress" -}}
+{{ include "vault.scheme" . }}://{{ template "vault.fullname" . }}{{- if eq .mode "ha" -}}-active{{- end -}}.{{ include "vault.namespace" . }}.svc:{{ .Values.server.service.port }}
+{{- end -}}
