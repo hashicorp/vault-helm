@@ -711,7 +711,7 @@ server:
   # Priority class for server pods
   priorityClassName: ""
 
-  # Extra labels to attach to the server pods
+  # Extra labels to attach to the server statefulset and pods
   # This should be a YAML map of the labels to apply to the server pods
   extraLabels: {}
 
