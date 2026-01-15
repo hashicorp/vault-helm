@@ -11,7 +11,11 @@ SPDX-License-Identifier: MPL-2.0
 apiVersion: apps/v1
 kind: StatefulSet
 metadata:
+{{- if .Values.server.nameOverride }}
+  name: {{ .Values.nameOverride }}
+{{- else }}
   name: {{ template "vault.fullname" . }}
+{{- end }}
   namespace: {{ include "vault.namespace" . }}
   labels:
     app.kubernetes.io/name: {{ include "vault.name" . }}
