@@ -171,6 +171,15 @@ injector:
     #
     timeoutSeconds: 30
 
+    # matchConditions is the selector for restricting the webhook fine-grained request filtering.
+    # See https://kubernetes.io/docs/reference/access-authn-authz/extensible-admission-controllers/#matching-requests-matchconditions
+    # for more details.
+    # Example:
+    # matchConditions:
+    # - name: include-vault-pods
+    #   expression: "has(object.metadata.annotations) && 'vault.hashicorp.com/agent-inject' in object.metadata.annotations"
+    matchConditions: []
+
     # namespaceSelector is the selector for restricting the webhook to only
     # specific namespaces.
     # See https://kubernetes.io/docs/reference/access-authn-authz/extensible-admission-controllers/#matching-requests-namespaceselector
