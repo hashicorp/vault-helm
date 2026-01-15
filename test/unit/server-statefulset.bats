@@ -320,6 +320,30 @@ load _helpers
 }
 
 #--------------------------------------------------------------------
+# minReadySeconds
+
+@test "server/standalone-StatefulSet: default minReadySeconds" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      --show-only templates/server-statefulset.yaml  \
+      --set 'server.standalone.enabled=true' \
+      . | tee /dev/stderr |
+      yq -r '.spec.minReadySeconds' | tee /dev/stderr)
+  [ "${actual}" = "0" ]
+}
+
+@test "server/standalone-StatefulSet: can set minReadySeconds" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      --show-only templates/server-statefulset.yaml  \
+      --set 'server.standalone.enabled=true' \
+      --set 'server.statefulSet.minReadySeconds=10' \
+      . | tee /dev/stderr |
+      yq -r '.spec.minReadySeconds' | tee /dev/stderr)
+  [ "${actual}" = "10" ]
+}
+
+#--------------------------------------------------------------------
 # resources
 
 @test "server/standalone-StatefulSet: default resources" {
