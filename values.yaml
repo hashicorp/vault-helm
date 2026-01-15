@@ -421,6 +421,10 @@ server:
     # Overrides the default Image Pull Policy
     pullPolicy: IfNotPresent
 
+  # Configure the Pod Management Policy for the StatefulSet
+  # See https://kubernetes.io/docs/concepts/workloads/controllers/statefulset/#pod-management-policies
+  podManagementPolicy: "Parallel"
+
   # Configure the Update Strategy Type for the StatefulSet
   # See https://kubernetes.io/docs/concepts/workloads/controllers/statefulset/#update-strategies
   updateStrategyType: "OnDelete"
