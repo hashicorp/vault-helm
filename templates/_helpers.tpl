@@ -1025,6 +1025,20 @@ Inject extra environment vars in the format key:value, if populated
 {{- end -}}
 
 {{/*
+Inject extra environment vars via fields available through the downward API
+*/}}
+{{- define "vault.extraEnvironmentVarsFieldPath" -}}
+{{- if .extraEnvironmentVarsFieldPath -}}
+{{- range $key, $value := .extraEnvironmentVarsFieldPath }}
+- name: {{ printf "%s" $key | replace "." "_" | upper | quote }}
+  valueFrom:
+    fieldRef:
+      fieldPath: {{ $value }}
+{{- end }}
+{{- end -}}
+{{- end -}}
+
+{{/*
 Inject extra environment populated by secrets, if populated
 */}}
 {{- define "vault.extraSecretEnvironmentVars" -}}
