@@ -969,6 +969,20 @@ server:
 
         storage "raft" {
           path = "/vault/data"
+          retry_join {
+            auto_join = "provider=k8s label_selector=\"app.kubernetes.io/name={{ include "vault.name" . }},app.kubernetes.io/instance={{ .Release.Name }},component=server\",namespace={{ .Release.Namespace }}"
+            auto_join_scheme = "http"
+           
+            # Example configuration if using TLS
+            # auto_join_scheme = "https"
+            # leader_tls_servername = "vault"
+            # leader_ca_cert_file = "/vault/userconfig/vault-server-tls/vault.ca"
+            # leader_client_key_file = "/vault/userconfig/vault-server-tls/vault.key"
+            # leader_client_cert_file = "/vault/userconfig/vault-server-tls/vault.crt"
+           
+
+          }
+
         }
 
         service_registration "kubernetes" {}
