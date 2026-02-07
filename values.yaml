@@ -958,8 +958,12 @@ server:
       #   - Nodes labeled with topology.kubernetes.io/zone
       #   - VAULT_REDUNDANCY_ZONE placeholder in server.ha.raft.config
       #   - server.topologySpreadConstraints with topology.kubernetes.io/zone (optional but recommended for proper zone separation)
-      # When enabled, the zone label from the node is exposed as VAULT_REDUNDANCY_ZONE
-      # environment variable and substituted into the raft config.
+      # When enabled:
+      #   - The zone label from the node is exposed as VAULT_REDUNDANCY_ZONE
+      #     environment variable and substituted into the raft config.
+      #   - The PDB maxUnavailable defaults to 1 (instead of ⌊(n-1)/2⌋) because
+      #     the PDB cannot distinguish voting from non-voting pods. Override with
+      #     server.ha.disruptionBudget.maxUnavailable if needed.
       # See: https://developer.hashicorp.com/vault/docs/enterprise/redundancy-zones
       redundancyZones:
         enabled: false
@@ -1036,8 +1040,9 @@ server:
     disruptionBudget:
       enabled: true
 
-    # maxUnavailable will default to (n/2)-1 where n is the number of
-    # replicas. If you'd like a custom value, you can specify an override here.
+    # maxUnavailable will default to ⌊(n-1)/2⌋ (equivalently, ceil(n/2)-1) where
+    # n is the number of replicas. If you'd like a custom value, you can specify
+    # an override here.
       maxUnavailable: null
 
   # Definition of the serviceAccount used to run Vault.

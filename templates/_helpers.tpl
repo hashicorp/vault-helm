@@ -126,14 +126,20 @@ Compute if the ui is enabled.
 
 {{/*
 Compute the maximum number of unavailable replicas for the PodDisruptionBudget.
-This defaults to (n/2)-1 where n is the number of members of the server cluster.
+This defaults to ⌊(n-1)/2⌋ (equivalently, ceil(n/2)-1) where n is the number of
+members of the server cluster.
 Add a special case for replicas=1, where it should default to 0 as well.
+When redundancy zones are enabled, default to 1 because the PDB cannot distinguish
+between voting and non-voting pods. The standard formula may allow enough simultaneous
+evictions to lose quorum among the voting members.
 */}}
 {{- define "vault.pdb.maxUnavailable" -}}
 {{- if eq (int .Values.server.ha.replicas) 1 -}}
 {{ 0 }}
 {{- else if .Values.server.ha.disruptionBudget.maxUnavailable -}}
 {{ .Values.server.ha.disruptionBudget.maxUnavailable -}}
+{{- else if and (eq (.Values.server.ha.raft.enabled | toString) "true") (eq (.Values.server.ha.raft.redundancyZones.enabled | toString) "true") -}}
+{{ 1 }}
 {{- else -}}
 {{- div (sub (div (mul (int .Values.server.ha.replicas) 10) 2) 1) 10 -}}
 {{- end -}}
