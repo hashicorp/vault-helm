@@ -1,5 +1,5 @@
 {
-    "$schema": "http://json-schema.org/schema#",
+    "$schema": "https://json-schema.org/draft-07/schema#",
     "type": "object",
     "properties": {
         "csi": {
@@ -36,6 +36,17 @@
                         },
                         "resources": {
                             "type": "object"
+                        },
+                        "securityContext": {
+                            "type": "object",
+                            "properties": {
+                                "container": {
+                                    "type": [
+                                        "object",
+                                        "string"
+                                    ]
+                                }
+                            }
                         }
                     }
                 },
@@ -1032,6 +1043,20 @@
                         }
                     }
                 },
+                "serviceCA": {
+                    "type": "object",
+                    "properties": {
+                        "enabled": {
+                            "type": "boolean"
+                        },
+                        "secretName": {
+                            "type": "string"
+                        },
+                        "configMapName": {
+                            "type": "string"
+                        }
+                    }
+                },
                 "service": {
                     "type": "object",
                     "properties": {
@@ -1250,6 +1275,9 @@
                         },
                         "interval": {
                             "type": "string"
+                        },
+                        "metricRelabelings": {
+                            "type": "array"
                         },
                         "scrapeTimeout": {
                             "type": "string"

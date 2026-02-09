@@ -1,4 +1,4 @@
-# Copyright (c) HashiCorp, Inc.
+# Copyright IBM Corp. 2018, 2025
 # SPDX-License-Identifier: MPL-2.0
 
 serverTelemetry:
@@ -14,3 +14,6 @@ serverTelemetry:
       credentials:
         name: vault-metrics-client
         key: token
+    metricRelabelings:
+      - sourceLabels: [cluster]
+        targetLabel: vault_cluster
