@@ -234,7 +234,7 @@ for users looking to use this chart with Consul Helm.
             if [ -n "${VAULT_REDUNDANCY_ZONE}" ]; then
               sed -Ei 's|(\"?autopilot_redundancy_zone\"?[[:space:]]*[=:][[:space:]]*)\"VAULT_REDUNDANCY_ZONE\"|\1\"'"${VAULT_REDUNDANCY_ZONE}"'\"|g' /tmp/storageconfig.hcl;
             else
-              echo "ERROR: Missing zone label on node. Enabling redundancy zones in vault-helm requires the PodTopologyLabels admission controller (enabled by default in Kubernetes 1.35+) and nodes labeled with topology.kubernetes.io/zone. Verify: kubectl get nodes -L topology.kubernetes.io/zone" >&2;
+              echo "ERROR: Missing zone label on pod. Enabling redundancy zones in vault-helm requires the PodTopologyLabels admission controller (enabled by default in Kubernetes 1.35+) and nodes labeled with topology.kubernetes.io/zone. Verify node labels: kubectl get nodes -L topology.kubernetes.io/zone; verify pod labels: kubectl get pod \${HOSTNAME} -o jsonpath='{.metadata.labels}'" >&2;
               exit 1;
             fi;
 {{- else if eq (.Values.server.ha.raft.enabled | toString) "true" }}
@@ -1158,12 +1158,16 @@ https://github.com/helm/helm/blob/50c22ed7f953fadb32755e5881ba95a92da852b2/pkg/e
 
 {{/*
 Validates redundancy zones configuration:
-1. Requires HA mode enabled
-2. Requires Raft storage enabled
-3. Requires VAULT_REDUNDANCY_ZONE placeholder in config (HCL or JSON)
+1. Requires Kubernetes >= 1.35 (PodTopologyLabelsAdmission)
+2. Requires HA mode enabled
+3. Requires Raft storage enabled
+4. Requires VAULT_REDUNDANCY_ZONE placeholder in config (HCL or JSON)
 */}}
 {{- define "vault.validateRedundancyZones" -}}
 {{- if eq (.Values.server.ha.raft.redundancyZones.enabled | toString) "true" -}}
+  {{- if semverCompare "< 1.35-0" .Capabilities.KubeVersion.Version -}}
+    {{- fail "server.ha.raft.redundancyZones.enabled=true requires Kubernetes >= 1.35 (PodTopologyLabelsAdmission)" -}}
+  {{- end -}}
   {{- if ne (.Values.server.ha.enabled | toString) "true" -}}
     {{- fail "server.ha.raft.redundancyZones.enabled=true requires server.ha.enabled=true" -}}
   {{- end -}}

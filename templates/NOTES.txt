@@ -26,7 +26,8 @@ but does NOT guarantee distribution across availability zones.
 Without topologySpreadConstraints, Kubernetes may schedule multiple Vault pods
 in the same availability zone, which defeats the purpose of redundancy zones.
 
-To ensure pods are distributed across zones, add topologySpreadConstraints to your values:
+To ensure pods are distributed across zones, add topologySpreadConstraints
+with topologyKey "topology.kubernetes.io/zone" to your values:
 
   server:
     topologySpreadConstraints: |

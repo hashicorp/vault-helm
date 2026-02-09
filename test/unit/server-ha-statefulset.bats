@@ -841,6 +841,20 @@ local value=$(echo $rendered |
   [[ "${result}" == *"requires server.ha.raft.enabled=true"* ]]
 }
 
+@test "server/ha-StatefulSet: redundancy zones: requires Kubernetes >= 1.35" {
+  cd `chart_dir`
+  local result=$(helm template \
+      --show-only templates/server-statefulset.yaml  \
+      --kube-version 1.34.0 \
+      --set 'server.ha.enabled=true' \
+      --set 'server.ha.raft.enabled=true' \
+      --set 'server.ha.raft.redundancyZones.enabled=true' \
+      --set-string 'server.ha.raft.config=storage "raft" { path = "/vault/data" autopilot_redundancy_zone = "VAULT_REDUNDANCY_ZONE" } service_registration "kubernetes" {}' \
+      . 2>&1 || true)
+
+  [[ "${result}" == *"requires Kubernetes >= 1.35"* ]]
+}
+
 @test "server/ha-StatefulSet: redundancy zones: requires placeholder in config" {
   cd `chart_dir`
   local result=$(helm template \
