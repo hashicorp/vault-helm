@@ -1,5 +1,9 @@
 ## Unreleased
 
+Changes:
+
+* Default `vault-k8s` version updated to 1.7.3
+
 ## 0.32.0 (January 14, 2026)
 
 Changes:
