@@ -706,7 +706,11 @@ Sets extra route annotations
 {{- end -}}
 
 {{/*
-Sets extra vault server Service annotations
+Sets extra vault server Service annotations.
+These are applied to all services: main, internal, active, and standby.
+Use the per-service annotation templates (vault.service.main.annotations,
+vault.service.internal.annotations, vault.service.active.annotations,
+vault.service.standby.annotations) to target a specific service.
 */}}
 {{- define "vault.service.annotations" -}}
   {{- if .Values.server.service.annotations }}
@@ -715,6 +719,34 @@ Sets extra vault server Service annotations
       {{- tpl .Values.server.service.annotations . | nindent 4 }}
     {{- else }}
       {{- toYaml .Values.server.service.annotations | nindent 4 }}
+    {{- end }}
+  {{- end }}
+{{- end -}}
+
+{{/*
+Sets extra vault server Service annotations for the main service
+*/}}
+{{- define "vault.service.main.annotations" -}}
+  {{- if .Values.server.service.main.annotations }}
+    {{- $tp := typeOf .Values.server.service.main.annotations }}
+    {{- if eq $tp "string" }}
+      {{- tpl .Values.server.service.main.annotations . | nindent 4 }}
+    {{- else }}
+      {{- toYaml .Values.server.service.main.annotations | nindent 4 }}
+    {{- end }}
+  {{- end }}
+{{- end -}}
+
+{{/*
+Sets extra vault server Service annotations for the internal headless service
+*/}}
+{{- define "vault.service.internal.annotations" -}}
+  {{- if .Values.server.service.internal.annotations }}
+    {{- $tp := typeOf .Values.server.service.internal.annotations }}
+    {{- if eq $tp "string" }}
+      {{- tpl .Values.server.service.internal.annotations . | nindent 4 }}
+    {{- else }}
+      {{- toYaml .Values.server.service.internal.annotations | nindent 4 }}
     {{- end }}
   {{- end }}
 {{- end -}}
