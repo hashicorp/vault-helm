@@ -1,0 +1,79 @@
+# Copyright (c) HashiCorp, Inc.
+# SPDX-License-Identifier: MPL-2.0
+
+name: Acceptance test
+description: Run the acceptance tests against a single version of k8s and Vault
+inputs:
+  k8s-version:
+    description: 'Kubernetes version to use for the kind cluster'
+    required: true
+  vault-version:
+    description: 'Vault version to use for the tests'
+    required: true
+  vault-enterprise:
+    description: 'Test against Vault Enterprise'
+    required: true
+  kind-cluster-name:
+    description: 'Name of the kind cluster to create and test against'
+    default: 'vault-helm'
+  bats-version:
+    description: 'Version of bats to run tests with'
+    default: '1.12.0'
+  vault-license:
+    description: 'Vault license to use for enterprise tests'
+    required: true
+runs:
+  using: "composite"
+  steps:
+    - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+    - name: Setup test tools
+      uses: ./.github/actions/setup-test-tools
+    - name: Create K8s Kind Cluster
+      uses: helm/kind-action@a1b0e391336a6ee6713a0583f8c6240d70863de3 # v1.12.0
+      with:
+        cluster_name: ${{ inputs.kind-cluster-name }}
+        config: test/kind/config.yaml
+        node_image: kindest/node:v${{ inputs.k8s-version }}
+        version: "v0.31.0"
+
+    - name: Create kind export log root
+      id: create_kind_export_log_root
+      shell: bash
+      run: |
+        vault_flavor=community
+        if [ ${{ inputs.vault-enterprise }} == 'true' ]; then
+          vault_flavor=ent
+        fi
+        log_artifact_name="kind-${{ inputs.kind-cluster-name }}-$(git rev-parse --short ${{ github.sha }})-${{ inputs.k8s-version }}-${{ inputs.vault-version }}-${vault_flavor}-helm-logs"
+        log_root="/tmp/${log_artifact_name}"
+        mkdir -p "${log_root}"
+        echo "log_root=${log_root}" >> $GITHUB_OUTPUT
+        echo "log_artifact_name=${log_artifact_name}" >> $GITHUB_OUTPUT
+
+    - name: bats tests
+      shell: bash
+      env:
+        VAULT_LICENSE_CI: ${{ inputs.vault-license }}
+        VAULT_VERSION: ${{ inputs.vault-version }}
+        ENT_TESTS: ${{ inputs.vault-enterprise }}
+      run: bats --tap --timing ./test/acceptance
+
+    - name: export kind cluster logs
+      if: always()
+      shell: bash
+      run: |
+       kind export logs --name ${{ inputs.kind-cluster-name }} ${{ steps.create_kind_export_log_root.outputs.log_root }}
+
+    - name: Store kind cluster logs
+      if: success()
+      uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+      with:
+        name: ${{ steps.create_kind_export_log_root.outputs.log_artifact_name }}
+        path: ${{ steps.create_kind_export_log_root.outputs.log_root }}
+
+    - name: Store kind cluster logs failure
+      if: failure()
+      uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+      with:
+        name: ${{ steps.create_kind_export_log_root.outputs.log_artifact_name }}-failed
+        path: ${{ steps.create_kind_export_log_root.outputs.log_root }}

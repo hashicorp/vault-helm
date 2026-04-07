@@ -1,5 +1,5 @@
 {{/*
-Copyright (c) HashiCorp, Inc.
+Copyright IBM Corp. 2018, 2025
 SPDX-License-Identifier: MPL-2.0
 */}}
 
@@ -286,7 +286,9 @@ storage might be desired by the user.
   {{- if and (ne .mode "dev") (or .Values.server.dataStorage.enabled .Values.server.auditStorage.enabled) }}
   volumeClaimTemplates:
       {{- if and (eq (.Values.server.dataStorage.enabled | toString) "true") (or (eq .mode "standalone") (eq (.Values.server.ha.raft.enabled | toString ) "true" )) }}
-    - metadata:
+    - apiVersion: v1
+      kind: PersistentVolumeClaim
+      metadata:
         name: data
         {{- include "vault.dataVolumeClaim.annotations" . | nindent 6 }}
         {{- include "vault.dataVolumeClaim.labels" . | nindent 6 }}
@@ -301,7 +303,9 @@ storage might be desired by the user.
           {{- end }}
       {{ end }}
       {{- if eq (.Values.server.auditStorage.enabled | toString) "true" }}
-    - metadata:
+    - apiVersion: v1
+      kind: PersistentVolumeClaim
+      metadata:
         name: audit
         {{- include "vault.auditVolumeClaim.annotations" . | nindent 6 }}
         {{- include "vault.auditVolumeClaim.labels" . | nindent 6 }}
@@ -1116,7 +1120,10 @@ a map containing a single 'Error' element.
 https://github.com/helm/helm/blob/50c22ed7f953fadb32755e5881ba95a92da852b2/pkg/engine/funcs.go#L158
  */}}
 {{- if or (and (eq ($json | len) 1) (hasKey $json "Error")) (eq ($json | len) 0) -}}
+{{- /* Only append disable_mlock if it is not already explicitly defined in HCL */}}
+{{- if not (regexMatch "(?m)^\\s*disable_mlock\\s*=\\s*(true|false)" $config) -}}
 {{- $config = printf "%s\n%s" $config "disable_mlock = true" -}}
+{{- end -}}
 {{- else -}}
 {{- if not (hasKey $json "disable_mlock") -}}
 {{- $_ := set $json "disable_mlock" true -}}

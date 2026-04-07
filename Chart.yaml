@@ -1,10 +1,10 @@
-# Copyright (c) HashiCorp, Inc.
+# Copyright IBM Corp. 2018, 2025
 # SPDX-License-Identifier: MPL-2.0
 
 apiVersion: v2
 name: vault
 version: 0.32.0
-appVersion: 1.21.0
+appVersion: 1.21.2
 kubeVersion: ">= 1.20.0-0"
 description: Official HashiCorp Vault Chart
 home: https://www.vaultproject.io
