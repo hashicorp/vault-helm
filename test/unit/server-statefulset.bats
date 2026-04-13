@@ -517,6 +517,27 @@ load _helpers
       yq -r '.spec.template.spec.containers[0].volumeMounts[] | select(.name == "audit")' | tee /dev/stderr)
 }
 
+@test "server-standalone-StatefulSet: can customize audit pvc name" {
+  cd `chart_dir`
+  local object=$(helm template \
+      --show-only templates/server-statefulset.yaml  \
+      --set 'server.auditStorage.enabled=true' \
+      --set 'server.auditStorage.name=customAudit' \
+      . | tee /dev/stderr |
+      yq -r '.spec.template.spec.containers[0].volumeMounts[] | select(.name == "customAudit")' | tee /dev/stderr)
+}
+
+@test "server-standalone-StatefulSet: can customize data pvc name" {
+  cd `chart_dir`
+  local object=$(helm template \
+      --show-only templates/server-statefulset.yaml  \
+      --set 'server.dataStorage.enabled=true' \
+      --set 'server.dataStorage.name=customData' \
+      . | tee /dev/stderr |
+      yq -r '.spec.template.spec.containers[0].volumeMounts[] | select(.name == "customData")' | tee /dev/stderr)
+}
+
+
 #--------------------------------------------------------------------
 # volumes
 

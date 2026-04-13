@@ -817,6 +817,8 @@ server:
   # See https://developer.hashicorp.com/vault/docs/configuration/storage to know more
   dataStorage:
     enabled: true
+    # name of data PVC
+    name: data
     # Size of the PVC created
     size: 10Gi
     # Location where the PVC will be mounted.
@@ -846,6 +848,8 @@ server:
   # See https://developer.hashicorp.com/vault/docs/audit to know more
   auditStorage:
     enabled: false
+    # name of audit PVC
+    name: audit
     # Size of the PVC created
     size: 10Gi
     # Location where the PVC will be mounted.
