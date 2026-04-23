@@ -949,6 +949,25 @@ server:
       # Set the Node Raft ID to the name of the pod
       setNodeId: false
 
+      # Vault Enterprise Redundancy Zones
+      # Enables automatic zone detection for Vault Enterprise autopilot redundancy zones.
+      # Requires:
+      #   - Kubernetes 1.35+ (PodTopologyLabelsAdmission enabled by default)
+      #   - Vault Enterprise
+      #   - server.ha.enabled=true and server.ha.raft.enabled=true
+      #   - Nodes labeled with topology.kubernetes.io/zone
+      #   - VAULT_REDUNDANCY_ZONE placeholder in server.ha.raft.config
+      #   - server.topologySpreadConstraints with topology.kubernetes.io/zone (optional but recommended for proper zone separation)
+      # When enabled:
+      #   - The zone label from the node is exposed as VAULT_REDUNDANCY_ZONE
+      #     environment variable and substituted into the raft config.
+      #   - The PDB maxUnavailable defaults to 1 (instead of ⌊(n-1)/2⌋) because
+      #     the PDB cannot distinguish voting from non-voting pods. Override with
+      #     server.ha.disruptionBudget.maxUnavailable if needed.
+      # See: https://developer.hashicorp.com/vault/docs/enterprise/redundancy-zones
+      redundancyZones:
+        enabled: false
+
       # Note: Configuration files are stored in ConfigMaps so sensitive data
       # such as passwords should be either mounted through extraSecretEnvironmentVars
       # or through a Kube secret.  For more information see:
@@ -969,6 +988,8 @@ server:
 
         storage "raft" {
           path = "/vault/data"
+          # Uncomment for Vault Enterprise redundancy zones (requires server.ha.raft.redundancyZones.enabled = true)
+          # autopilot_redundancy_zone = "VAULT_REDUNDANCY_ZONE"
         }
 
         service_registration "kubernetes" {}
@@ -1019,8 +1040,9 @@ server:
     disruptionBudget:
       enabled: true
 
-    # maxUnavailable will default to (n/2)-1 where n is the number of
-    # replicas. If you'd like a custom value, you can specify an override here.
+    # maxUnavailable will default to ⌊(n-1)/2⌋ (equivalently, ceil(n/2)-1) where
+    # n is the number of replicas. If you'd like a custom value, you can specify
+    # an override here.
       maxUnavailable: null
 
   # Definition of the serviceAccount used to run Vault.

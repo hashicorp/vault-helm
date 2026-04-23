@@ -832,6 +832,17 @@
                                 },
                                 "setNodeId": {
                                     "type": "boolean"
+                                },
+                                "redundancyZones": {
+                                    "type": "object",
+                                    "description": "Vault Enterprise redundancy zones configuration for autopilot. Requires Kubernetes 1.35+ with PodTopologyLabelsAdmission and nodes labeled with topology.kubernetes.io/zone.",
+                                    "properties": {
+                                        "enabled": {
+                                            "type": "boolean",
+                                            "description": "Enable automatic zone detection for Vault Enterprise autopilot redundancy zones.",
+                                            "default": false
+                                        }
+                                    }
                                 }
                             }
                         },

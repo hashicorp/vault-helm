@@ -789,3 +789,240 @@ local value=$(echo $rendered |
       yq '.spec.template.spec.securityContext.runAsGroup | length > 0' | tee /dev/stderr)
   [ "${actual}" = "false" ]
 }
+
+#--------------------------------------------------------------------
+# Redundancy Zones
+
+@test "server/ha-StatefulSet: redundancy zones: disabled by default" {
+  cd `chart_dir`
+  local value=$(helm template \
+      --show-only templates/server-statefulset.yaml  \
+      --set 'server.ha.enabled=true' \
+      --set 'server.ha.raft.enabled=true' \
+      . | tee /dev/stderr |
+      yq -r '.spec.template.spec.containers[0].env | map(select(.name=="VAULT_REDUNDANCY_ZONE")) | length' | tee /dev/stderr)
+  [ "${value}" = "0" ]
+}
+
+@test "server/ha-StatefulSet: redundancy zones: enabled injects env var" {
+  cd `chart_dir`
+  local value=$(helm template \
+      --show-only templates/server-statefulset.yaml  \
+      --set 'server.ha.enabled=true' \
+      --set 'server.ha.raft.enabled=true' \
+      --set 'server.ha.raft.redundancyZones.enabled=true' \
+      --set-string 'server.ha.raft.config=storage "raft" { path = "/vault/data" autopilot_redundancy_zone = "VAULT_REDUNDANCY_ZONE" }' \
+      . | tee /dev/stderr |
+      yq -r '.spec.template.spec.containers[0].env | map(select(.name=="VAULT_REDUNDANCY_ZONE")) | .[].valueFrom.fieldRef.fieldPath' | tee /dev/stderr)
+  [ "${value}" = "metadata.labels['topology.kubernetes.io/zone']" ]
+}
+
+@test "server/ha-StatefulSet: redundancy zones: requires ha enabled" {
+  cd `chart_dir`
+  local result=$(helm template \
+      --show-only templates/server-statefulset.yaml  \
+      --set 'server.ha.enabled=false' \
+      --set 'server.ha.raft.enabled=true' \
+      --set 'server.ha.raft.redundancyZones.enabled=true' \
+      . 2>&1 || true)
+
+  [[ "${result}" == *"requires server.ha.enabled=true"* ]]
+}
+
+@test "server/ha-StatefulSet: redundancy zones: requires raft enabled" {
+  cd `chart_dir`
+  local result=$(helm template \
+      --show-only templates/server-statefulset.yaml  \
+      --set 'server.ha.enabled=true' \
+      --set 'server.ha.raft.enabled=false' \
+      --set 'server.ha.raft.redundancyZones.enabled=true' \
+      . 2>&1 || true)
+
+  [[ "${result}" == *"requires server.ha.raft.enabled=true"* ]]
+}
+
+@test "server/ha-StatefulSet: redundancy zones: requires Kubernetes >= 1.35" {
+  cd `chart_dir`
+  local result=$(helm template \
+      --show-only templates/server-statefulset.yaml  \
+      --kube-version 1.34.0 \
+      --set 'server.ha.enabled=true' \
+      --set 'server.ha.raft.enabled=true' \
+      --set 'server.ha.raft.redundancyZones.enabled=true' \
+      --set-string 'server.ha.raft.config=storage "raft" { path = "/vault/data" autopilot_redundancy_zone = "VAULT_REDUNDANCY_ZONE" } service_registration "kubernetes" {}' \
+      . 2>&1 || true)
+
+  [[ "${result}" == *"requires Kubernetes >= 1.35"* ]]
+}
+
+@test "server/ha-StatefulSet: redundancy zones: requires placeholder in config" {
+  cd `chart_dir`
+  local result=$(helm template \
+      --show-only templates/server-statefulset.yaml  \
+      --set 'server.ha.enabled=true' \
+      --set 'server.ha.raft.enabled=true' \
+      --set 'server.ha.raft.redundancyZones.enabled=true' \
+      --set-string 'server.ha.raft.config=storage "raft" { path = "/vault/data" }' \
+      . 2>&1 || true)
+
+  [[ "${result}" == *"autopilot_redundancy_zone"* ]]
+  [[ "${result}" == *"must not be commented"* ]]
+}
+
+@test "server/ha-StatefulSet: redundancy zones: rejects # commented placeholder" {
+  cd `chart_dir`
+  local result=$(helm template \
+      --show-only templates/server-statefulset.yaml  \
+      --set 'server.ha.enabled=true' \
+      --set 'server.ha.raft.enabled=true' \
+      --set 'server.ha.raft.redundancyZones.enabled=true' \
+      --set-string 'server.ha.raft.config=storage "raft" { path = "/vault/data"
+          # autopilot_redundancy_zone = "VAULT_REDUNDANCY_ZONE"
+        }' \
+      . 2>&1 || true)
+
+  [[ "${result}" == *"must not be commented"* ]]
+}
+
+@test "server/ha-StatefulSet: redundancy zones: passes with HCL config" {
+  cd `chart_dir`
+  helm template \
+      --show-only templates/server-statefulset.yaml  \
+      --set 'server.ha.enabled=true' \
+      --set 'server.ha.raft.enabled=true' \
+      --set 'server.ha.raft.redundancyZones.enabled=true' \
+      --set-string 'server.ha.raft.config=storage "raft" { path = "/vault/data" autopilot_redundancy_zone = "VAULT_REDUNDANCY_ZONE" }' \
+      .
+}
+
+@test "server/ha-StatefulSet: redundancy zones: runtime patterns support HCL and JSON" {
+  cd `chart_dir`
+  # Test grep pattern (used when feature is disabled to detect placeholder)
+  local args_disabled=$(helm template \
+      --show-only templates/server-statefulset.yaml  \
+      --set 'server.ha.enabled=true' \
+      --set 'server.ha.raft.enabled=true' \
+      . | yq -r '.spec.template.spec.containers[0].args[0]')
+
+  # Verify grep pattern filters out commented lines and matches uncommented HCL (=) and JSON (:) formats
+  [[ "${args_disabled}" == *"grep -vE '^[[:space:]]*(#|//)'"* ]]
+  [[ "${args_disabled}" == *'grep -qE '"'"'\"?autopilot_redundancy_zone\"?[[:space:]]*[=:][[:space:]]*\"VAULT_REDUNDANCY_ZONE\"'"'"* ]]
+
+  # Test sed pattern (used when feature is enabled to substitute placeholder)
+  local args_enabled=$(helm template \
+      --show-only templates/server-statefulset.yaml  \
+      --set 'server.ha.enabled=true' \
+      --set 'server.ha.raft.enabled=true' \
+      --set 'server.ha.raft.redundancyZones.enabled=true' \
+      --set-string 'server.ha.raft.config=storage "raft" { path = "/vault/data" autopilot_redundancy_zone = "VAULT_REDUNDANCY_ZONE" }' \
+      . | yq -r '.spec.template.spec.containers[0].args[0]')
+
+  # Verify sed pattern handles both HCL (=) and JSON (:) formats
+  [[ "${args_enabled}" == *'\"?autopilot_redundancy_zone\"?'* ]]
+  [[ "${args_enabled}" == *'[=:]'* ]]
+}
+
+@test "server/ha-StatefulSet: redundancy zones: rejects // commented placeholder" {
+  cd `chart_dir`
+  local result=$(helm template \
+      --show-only templates/server-statefulset.yaml  \
+      --set 'server.ha.enabled=true' \
+      --set 'server.ha.raft.enabled=true' \
+      --set 'server.ha.raft.redundancyZones.enabled=true' \
+      --set-string 'server.ha.raft.config=storage "raft" { path = "/vault/data"
+          // autopilot_redundancy_zone = "VAULT_REDUNDANCY_ZONE"
+        }' \
+      . 2>&1 || true)
+
+  [[ "${result}" == *"autopilot_redundancy_zone"* ]]
+  [[ "${result}" == *"must not be commented"* ]]
+}
+
+@test "server/ha-StatefulSet: redundancy zones: placeholder without enabled flag fails at runtime" {
+  cd `chart_dir`
+  local args=$(helm template \
+      --show-only templates/server-statefulset.yaml  \
+      --set 'server.ha.enabled=true' \
+      --set 'server.ha.raft.enabled=true' \
+      --set 'server.ha.raft.redundancyZones.enabled=false' \
+      --set-string 'server.ha.raft.config=storage "raft" { path = "/vault/data" autopilot_redundancy_zone = "VAULT_REDUNDANCY_ZONE" }' \
+      . | tee /dev/stderr |
+      yq -r '.spec.template.spec.containers[0].args[0]')
+
+  [[ "${args}" == *"ERROR: autopilot_redundancy_zone placeholder found but server.ha.raft.redundancyZones.enabled=false"* ]]
+}
+
+@test "server/ha-StatefulSet: redundancy zones: fails when VAULT_REDUNDANCY_ZONE is empty" {
+  cd `chart_dir`
+  local args=$(helm template \
+      --show-only templates/server-statefulset.yaml  \
+      --set 'server.ha.enabled=true' \
+      --set 'server.ha.raft.enabled=true' \
+      --set 'server.ha.raft.redundancyZones.enabled=true' \
+      --set-string 'server.ha.raft.config=storage "raft" { path = "/vault/data" autopilot_redundancy_zone = "VAULT_REDUNDANCY_ZONE" }' \
+      . | yq -r '.spec.template.spec.containers[0].args[0]')
+
+  # Verify script contains zone check that exits on failure
+  [[ "${args}" == *'if [ -n "${VAULT_REDUNDANCY_ZONE}" ]; then'* ]]
+  [[ "${args}" == *'exit 1'* ]]
+
+  # Verify shell logic fails when VAULT_REDUNDANCY_ZONE is unset
+  run env -u VAULT_REDUNDANCY_ZONE sh -c 'if [ -n "${VAULT_REDUNDANCY_ZONE}" ]; then echo "success"; else echo "error"; exit 1; fi'
+  [ "$status" -eq 1 ]
+}
+
+@test "server/ha-StatefulSet: redundancy zones: succeeds when VAULT_REDUNDANCY_ZONE is set" {
+  cd `chart_dir`
+  local args=$(helm template \
+      --show-only templates/server-statefulset.yaml  \
+      --set 'server.ha.enabled=true' \
+      --set 'server.ha.raft.enabled=true' \
+      --set 'server.ha.raft.redundancyZones.enabled=true' \
+      --set-string 'server.ha.raft.config=storage "raft" { path = "/vault/data" autopilot_redundancy_zone = "VAULT_REDUNDANCY_ZONE" }' \
+      . | yq -r '.spec.template.spec.containers[0].args[0]')
+
+  # Verify script contains zone check with sed substitution
+  [[ "${args}" == *'if [ -n "${VAULT_REDUNDANCY_ZONE}" ]; then'* ]]
+  [[ "${args}" == *'sed -Ei'* ]]
+
+  # Verify shell logic succeeds when VAULT_REDUNDANCY_ZONE is set
+  run env VAULT_REDUNDANCY_ZONE="us-east-1a" sh -c 'if [ -n "${VAULT_REDUNDANCY_ZONE}" ]; then echo "success"; else echo "error"; exit 1; fi'
+  [ "$status" -eq 0 ]
+}
+
+@test "server/ha-StatefulSet: redundancy zones: runtime grep ignores commented placeholder" {
+  # Test that the grep pattern used at runtime correctly ignores commented lines
+  # and matches uncommented HCL (=) and JSON (:) formats.
+
+  # Uncommented placeholder should match (HCL)
+  run sh -c 'echo "autopilot_redundancy_zone = \"VAULT_REDUNDANCY_ZONE\"" | grep -vE "^[[:space:]]*(#|//)" | grep -qE "\"?autopilot_redundancy_zone\"?[[:space:]]*[=:][[:space:]]*\"VAULT_REDUNDANCY_ZONE\""'
+  [ "$status" -eq 0 ]
+
+  # Uncommented placeholder should match (JSON)
+  run sh -c 'echo "\"autopilot_redundancy_zone\": \"VAULT_REDUNDANCY_ZONE\"" | grep -vE "^[[:space:]]*(#|//)" | grep -qE "\"?autopilot_redundancy_zone\"?[[:space:]]*[=:][[:space:]]*\"VAULT_REDUNDANCY_ZONE\""'
+  [ "$status" -eq 0 ]
+
+  # Uncommented placeholder should match (minified JSON)
+  run sh -c 'echo "{\"autopilot_redundancy_zone\":\"VAULT_REDUNDANCY_ZONE\"}" | grep -vE "^[[:space:]]*(#|//)" | grep -qE "\"?autopilot_redundancy_zone\"?[[:space:]]*[=:][[:space:]]*\"VAULT_REDUNDANCY_ZONE\""'
+  [ "$status" -eq 0 ]
+
+  # # commented placeholder should NOT match
+  run sh -c 'echo "# autopilot_redundancy_zone = \"VAULT_REDUNDANCY_ZONE\"" | grep -vE "^[[:space:]]*(#|//)" | grep -qE "\"?autopilot_redundancy_zone\"?[[:space:]]*[=:][[:space:]]*\"VAULT_REDUNDANCY_ZONE\""'
+  [ "$status" -eq 1 ]
+
+  # Indented # commented placeholder should NOT match
+  run sh -c 'echo "  # autopilot_redundancy_zone = \"VAULT_REDUNDANCY_ZONE\"" | grep -vE "^[[:space:]]*(#|//)" | grep -qE "\"?autopilot_redundancy_zone\"?[[:space:]]*[=:][[:space:]]*\"VAULT_REDUNDANCY_ZONE\""'
+  [ "$status" -eq 1 ]
+
+  # // commented placeholder should NOT match
+  run sh -c 'echo "// autopilot_redundancy_zone = \"VAULT_REDUNDANCY_ZONE\"" | grep -vE "^[[:space:]]*(#|//)" | grep -qE "\"?autopilot_redundancy_zone\"?[[:space:]]*[=:][[:space:]]*\"VAULT_REDUNDANCY_ZONE\""'
+  [ "$status" -eq 1 ]
+
+  # Indented // commented placeholder should NOT match
+  run sh -c 'echo "  // autopilot_redundancy_zone = \"VAULT_REDUNDANCY_ZONE\"" | grep -vE "^[[:space:]]*(#|//)" | grep -qE "\"?autopilot_redundancy_zone\"?[[:space:]]*[=:][[:space:]]*\"VAULT_REDUNDANCY_ZONE\""'
+  [ "$status" -eq 1 ]
+
+  # Commented placeholder should NOT match (JSON)
+  run sh -c 'echo "  // \"autopilot_redundancy_zone\": \"VAULT_REDUNDANCY_ZONE\"" | grep -vE "^[[:space:]]*(#|//)" | grep -qE "\"?autopilot_redundancy_zone\"?[[:space:]]*[=:][[:space:]]*\"VAULT_REDUNDANCY_ZONE\""'
+  [ "$status" -eq 1 ]
+}

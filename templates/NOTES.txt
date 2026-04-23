@@ -11,4 +11,37 @@ Your release is named {{ .Release.Name }}. To learn more about the release, try:
 
   $ helm status {{ .Release.Name }}
   $ helm get manifest {{ .Release.Name }}
+{{- if and (eq (.Values.server.ha.raft.redundancyZones.enabled | toString) "true") (not .Values.server.topologySpreadConstraints) }}
 
+##############################################################################
+######   WARNING: Redundancy Zones Enabled Without topologySpreadConstraints
+##############################################################################
+
+You have enabled Vault Enterprise redundancy zones (server.ha.raft.redundancyZones.enabled=true)
+but have not configured topologySpreadConstraints.
+
+The chart's default pod anti-affinity spreads pods across nodes (kubernetes.io/hostname),
+but does NOT guarantee distribution across availability zones.
+
+Without topologySpreadConstraints, Kubernetes may schedule multiple Vault pods
+in the same availability zone, which defeats the purpose of redundancy zones.
+
+To ensure pods are distributed across zones, add topologySpreadConstraints
+with topologyKey "topology.kubernetes.io/zone" to your values:
+
+  server:
+    topologySpreadConstraints: |
+      - maxSkew: 1
+        topologyKey: topology.kubernetes.io/zone
+        whenUnsatisfiable: DoNotSchedule
+        labelSelector:
+          matchLabels:
+            app.kubernetes.io/name: {{ template "vault.name" . }}
+            app.kubernetes.io/instance: {{ .Release.Name }}
+            component: server
+
+For more information, see:
+https://developer.hashicorp.com/vault/docs/enterprise/redundancy-zones
+
+##############################################################################
+{{- end }}

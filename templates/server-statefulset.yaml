@@ -7,6 +7,7 @@ SPDX-License-Identifier: MPL-2.0
 {{- if ne .mode "external" }}
 {{- if ne .mode "" }}
 {{- if .serverEnabled -}}
+{{- include "vault.validateRedundancyZones" . -}}
 # StatefulSet to run the actual vault server cluster.
 apiVersion: apps/v1
 kind: StatefulSet
@@ -126,6 +127,12 @@ spec:
               valueFrom:
                 fieldRef:
                   fieldPath: metadata.name
+            {{- end }}
+            {{- if and (eq (.Values.server.ha.raft.enabled | toString) "true") (eq (.Values.server.ha.raft.redundancyZones.enabled | toString) "true") }}
+            - name: VAULT_REDUNDANCY_ZONE
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.labels['topology.kubernetes.io/zone']
             {{- end }}
             - name: HOME
               value: "/home/vault"
