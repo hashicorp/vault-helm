@@ -8,7 +8,7 @@ load _helpers
 @test "Notes: redundancy zones: warns when enabled without topologySpreadConstraints" {
   cd `chart_dir`
   local result=$(helm install test . \
-      --dry-run \
+      --dry-run=client \
       --set 'server.ha.enabled=true' \
       --set 'server.ha.raft.enabled=true' \
       --set 'server.ha.raft.redundancyZones.enabled=true' \
@@ -23,7 +23,7 @@ load _helpers
 @test "Notes: redundancy zones: no warning when enabled with topologySpreadConstraints" {
   cd `chart_dir`
   local result=$(helm install test . \
-      --dry-run \
+      --dry-run=client \
       --set 'server.ha.enabled=true' \
       --set 'server.ha.raft.enabled=true' \
       --set 'server.ha.raft.redundancyZones.enabled=true' \
@@ -39,7 +39,7 @@ load _helpers
 @test "Notes: redundancy zones: no warning when disabled" {
   cd `chart_dir`
   local result=$(helm install test . \
-      --dry-run \
+      --dry-run=client \
       --set 'server.ha.enabled=true' \
       --set 'server.ha.raft.enabled=true' \
       --set 'server.ha.raft.redundancyZones.enabled=false' \
