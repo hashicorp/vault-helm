@@ -187,3 +187,19 @@ wait_for_complete_job() {
     echo "${POD_NAME} never completed."
     return 1
 }
+
+# skip_if_k8s_version_lt skips the test if Kubernetes version is less than the specified version
+# Usage: skip_if_k8s_version_lt "1.35"
+skip_if_k8s_version_lt() {
+    local required_version=$1
+    local required_major=$(echo $required_version | cut -d. -f1)
+    local required_minor=$(echo $required_version | cut -d. -f2)
+
+    local k8s_version=$(kubectl version -o json | jq -r '.serverVersion.gitVersion' | sed 's/v//')
+    local k8s_major=$(echo $k8s_version | cut -d. -f1)
+    local k8s_minor=$(echo $k8s_version | cut -d. -f2)
+
+    if [ "$k8s_major" -lt "$required_major" ] || ([ "$k8s_major" -eq "$required_major" ] && [ "$k8s_minor" -lt "$required_minor" ]); then
+        skip "Test requires Kubernetes >= ${required_version}, current version is ${k8s_version}"
+    fi
+}

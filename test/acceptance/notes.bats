@@ -6,6 +6,8 @@ load _helpers
 # Redundancy Zones Warning
 
 @test "Notes: redundancy zones: warns when enabled without topologySpreadConstraints" {
+  skip_if_k8s_version_lt "1.35"
+
   cd `chart_dir`
   local result=$(helm install test . \
       --dry-run \
@@ -21,6 +23,8 @@ load _helpers
 }
 
 @test "Notes: redundancy zones: no warning when enabled with topologySpreadConstraints" {
+  skip_if_k8s_version_lt "1.35"
+
   cd `chart_dir`
   local result=$(helm install test . \
       --dry-run \
@@ -37,6 +41,8 @@ load _helpers
 }
 
 @test "Notes: redundancy zones: no warning when disabled" {
+  skip_if_k8s_version_lt "1.35"
+
   cd `chart_dir`
   local result=$(helm install test . \
       --dry-run \
