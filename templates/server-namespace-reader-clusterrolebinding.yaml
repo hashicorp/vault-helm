@@ -1,0 +1,30 @@
+{{/*
+Copyright IBM Corp. 2018, 2025
+SPDX-License-Identifier: MPL-2.0
+*/}}
+
+{{/*
+ClusterRoleBinding for namespace reader - required for Kubernetes auth
+bound_service_account_namespace_selector feature
+*/}}
+
+{{ template "vault.serverAuthDelegator" . }}
+{{- if .serverAuthDelegator -}}
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: {{ template "vault.fullname" . }}-namespace-reader-binding
+  labels:
+    helm.sh/chart: {{ include "vault.chart" . }}
+    app.kubernetes.io/name: {{ include "vault.name" . }}
+    app.kubernetes.io/instance: {{ .Release.Name }}
+    app.kubernetes.io/managed-by: {{ .Release.Service }}
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: {{ template "vault.fullname" . }}-namespace-reader
+subjects:
+  - kind: ServiceAccount
+    name: {{ template "vault.serviceAccount.name" . }}
+    namespace: {{ include "vault.namespace" . }}
+{{ end }}
