@@ -1,5 +1,9 @@
 ## Unreleased
 
+Features:
+
+* server: Add Vault Enterprise redundancy zones support (requires Kubernetes 1.35+)
+
 ## 0.32.0 (January 14, 2026)
 
 Changes:
