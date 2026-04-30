@@ -746,6 +746,16 @@ server:
       # YAML-formatted multi-line templated string map of the annotations to apply
       # to the standby service.
       annotations: {}
+    # Extra annotations for the main service definition. This can either be
+    # YAML or a YAML-formatted multi-line templated string map of the
+    # annotations to apply to the main service.
+    main:
+      annotations: {}
+    # Extra annotations for the internal headless service definition. This can
+    # either be YAML or a YAML-formatted multi-line templated string map of the
+    # annotations to apply to the internal service.
+    internal:
+      annotations: {}
     # If enabled, the service selectors will include `app.kubernetes.io/instance: {{ .Release.Name }}`
     # When disabled, services may select Vault pods not deployed from the chart.
     # Does not affect the headless vault-internal service with `ClusterIP: None`
