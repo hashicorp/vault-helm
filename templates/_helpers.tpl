@@ -263,24 +263,38 @@ Set's additional environment variables based on the mode.
 {{- end -}}
 
 {{/*
+gets the configured audit storage name
+*/}}
+{{- define "vault.auditStorageName" }}
+{{- .Values.server.auditStorage.name | default "audit" }}
+{{- end }}
+
+{{/*
+gets the configured data storage name
+*/}}
+{{- define "vault.dataStorageName" }}
+{{- .Values.server.dataStorage.name | default "data" }}
+{{- end }}
+
+{{/*
 Set's which additional volumes should be mounted to the container
 based on the mode configured.
 */}}
 {{- define "vault.mounts" -}}
-  {{ if eq (.Values.server.auditStorage.enabled | toString) "true" }}
-            - name: audit
+  {{- if eq (.Values.server.auditStorage.enabled | toString) "true" }}
+            - name: {{ include "vault.auditStorageName" . }}
               mountPath: {{ .Values.server.auditStorage.mountPath }}
-  {{ end }}
-  {{ if or (eq .mode "standalone") (and (eq .mode "ha") (eq (.Values.server.ha.raft.enabled | toString) "true"))  }}
-    {{ if eq (.Values.server.dataStorage.enabled | toString) "true" }}
-            - name: data
+  {{- end }}
+  {{- if or (eq .mode "standalone") (and (eq .mode "ha") (eq (.Values.server.ha.raft.enabled | toString) "true"))  }}
+    {{- if eq (.Values.server.dataStorage.enabled | toString) "true" }}
+            - name: {{ include "vault.dataStorageName" . }}
               mountPath: {{ .Values.server.dataStorage.mountPath }}
-    {{ end }}
-  {{ end }}
-  {{ if and (ne .mode "dev") (or (.Values.server.standalone.config)  (.Values.server.ha.config)) }}
+    {{- end }}
+  {{- end }}
+  {{- if and (ne .mode "dev") (or (.Values.server.standalone.config)  (.Values.server.ha.config)) }}
             - name: config
               mountPath: /vault/config
-  {{ end }}
+  {{- end }}
   {{- range .Values.server.extraVolumes }}
             - name: userconfig-{{ .name }}
               readOnly: true
