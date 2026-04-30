@@ -585,3 +585,13 @@ load _helpers
       yq -r '.metadata.annotations["custom-annotation"]' | tee /dev/stderr)
   [ "${custom}" = "custom-value" ]
 }
+
+@test "server/Service: specify extraLabels" {
+  cd `chart_dir`
+  local custom=$(helm template \
+      --show-only templates/server-service.yaml \
+      --set 'server.service.extraLabels.foo=bar' \
+      . | tee /dev/stderr |
+      yq -r '.metadata.labels["foo"]' | tee /dev/stderr)
+  [ "${custom}" = "bar" ]
+}
