@@ -1182,3 +1182,10 @@ Validates redundancy zones configuration:
   {{- end -}}
 {{- end -}}
 {{- end -}}
+
+{{/*
+vault internal k8s address
+*/}}
+{{- define "vault.internalAddress" -}}
+{{ include "vault.scheme" . }}://{{ template "vault.fullname" . }}{{- if eq .mode "ha" -}}-active{{- end -}}.{{ include "vault.namespace" . }}.svc:{{ .Values.server.service.port }}
+{{- end -}}
