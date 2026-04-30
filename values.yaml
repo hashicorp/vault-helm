@@ -488,6 +488,30 @@ server:
     #    hosts:
     #      - chart-example.local
 
+  httproute:
+    enabled: false
+    labels: {}
+    annotations: {}
+
+    activeService: true
+    
+    hostnames: []
+      # - host-example
+    
+    parentRefs: []
+      # - name: vault-gateway-example
+      #   namespace: example-ns
+    
+    matches:
+      - path:
+          type: PathPrefix
+          value: /
+    ## Filters define the filters that are applied to requests that match this rule.
+    filters: []
+
+    ## Additional custom rules that can be added to the route
+    additionalRules: []
+
   # hostAliases is a list of aliases to be added to /etc/hosts. Specified as a YAML list.
   hostAliases: []
   # - ip: 127.0.0.1
