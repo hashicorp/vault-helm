@@ -68,7 +68,7 @@ injector:
   # image sets the repo and tag of the vault-k8s image to use for the injector.
   image:
     repository: "hashicorp/vault-k8s"
-    tag: "1.7.2"
+    tag: "1.7.3"
     pullPolicy: IfNotPresent
 
   # agentImage sets the repo and tag of the Vault image to use for the Vault Agent
@@ -1140,7 +1140,7 @@ csi:
 
   image:
     repository: "hashicorp/vault-csi-provider"
-    tag: "1.7.0"
+    tag: "1.7.1"
     pullPolicy: IfNotPresent
 
   # volumes is a list of volumes made available to all containers. These are rendered
