@@ -15,6 +15,7 @@ injector:
     repository: "registry.connect.redhat.com/hashicorp/vault"
     tag: "1.21.2-ubi"
 
+
 server:
   image:
     repository: "registry.connect.redhat.com/hashicorp/vault"
