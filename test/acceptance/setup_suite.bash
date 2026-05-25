@@ -1,4 +1,6 @@
 #!/usr/bin/env bats
+# Copyright IBM Corp. 2018, 2026
+
 
 setup_suite() {
     local INJECTOR_AGENT_VERSION SERVER_VAULT_VERSION CSI_AGENT_VERSION CHART_VALUES

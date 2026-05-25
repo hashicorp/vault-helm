@@ -1,4 +1,4 @@
-# Copyright IBM Corp. 2018, 2025
+# Copyright IBM Corp. 2018, 2026
 # SPDX-License-Identifier: MPL-2.0
 
 # chart_dir returns the directory for the chart
