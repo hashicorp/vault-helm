@@ -874,10 +874,8 @@
                             "type": "object"
                         },
                         "matches": {
-                            "type": [
-                                "array",
-                                "object"
-                            ]
+                            "type":
+                                "array"
                         },
                         "parentRefs": {
                             "type": "array"

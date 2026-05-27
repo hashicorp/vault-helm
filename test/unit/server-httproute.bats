@@ -47,8 +47,8 @@ load _helpers
       --show-only templates/server-httproute.yaml \
       --set 'server.httproute.enabled=true' \
       --set 'server.httproute.hostnames[0]=test.com' \
-      --set 'server.httproute.matches.path[0].type=PathPrefix' \
-      --set 'server.httproute.matches.path[0].value=/' \
+      --set 'server.httproute.matches[0].path.type=PathPrefix' \
+      --set 'server.httproute.matches[0].path.value=/' \
       . | tee /dev/stderr |
       yq  -r '.spec.hostnames[0]' | tee /dev/stderr)
   [ "${actual}" = 'test.com' ]
@@ -57,10 +57,10 @@ load _helpers
       --show-only templates/server-httproute.yaml \
       --set 'server.httproute.enabled=true' \
       --set 'server.httproute.hostnames[0]=test.com' \
-      --set 'server.httproute.matches.path[0].type=PathPrefix' \
-      --set 'server.httproute.matches.path[0].value=/' \
+      --set 'server.httproute.matches[0].path.type=PathPrefix' \
+      --set 'server.httproute.matches[0].path.value=/' \
       . | tee /dev/stderr |
-      yq  -r '.spec.rules[0].matches.path[0].value' | tee /dev/stderr)
+      yq  -r '.spec.rules[0].matches[0].path.value' | tee /dev/stderr)
   [ "${actual}" = '/' ]
 }
 
@@ -69,20 +69,20 @@ load _helpers
   local actual=$(helm template \
       --show-only templates/server-httproute.yaml \
       --set 'server.httproute.enabled=true' \
-      --set 'server.httproute.matches.path[0].type=PathPrefix' \
-      --set 'server.httproute.matches.path[0].value=/foo/' \
+      --set 'server.httproute.matches[0].path.type=PathPrefix' \
+      --set 'server.httproute.matches[0].path.value=/foo/' \
       . | tee /dev/stderr |
-      yq  -r '.spec.rules[0].matches.path[0].type' | tee /dev/stderr)
+      yq  -r '.spec.rules[0].matches[0].path.type' | tee /dev/stderr)
   [ "${actual}" = 'PathPrefix' ]
 
   local actual=$(helm template \
       --show-only templates/server-httproute.yaml \
       --set 'server.httproute.enabled=true' \
       --set 'server.httproute.hostnames[0]=test.com' \
-      --set 'server.httproute.matches.path[0].type=PathPrefix' \
-      --set 'server.httproute.matches.path[0].value=/foo/' \
+      --set 'server.httproute.matches[0].path.type=PathPrefix' \
+      --set 'server.httproute.matches[0].path.value=/foo/' \
       . | tee /dev/stderr |
-      yq  -r '.spec.rules[0].matches.path[0].value' | tee /dev/stderr)
+      yq  -r '.spec.rules[0].matches[0].path.value' | tee /dev/stderr)
   [ "${actual}" = '/foo/' ]
 }
 
@@ -93,8 +93,8 @@ load _helpers
       --show-only templates/server-httproute.yaml \
       --set 'server.httproute.enabled=true' \
       --set 'server.httproute.hostnames[0]=test.com' \
-      --set 'server.httproute.matches.path[0].type=PathPrefix' \
-      --set 'server.httproute.matches.path[0].value=/' \
+      --set 'server.httproute.matches[0].path.type=PathPrefix' \
+      --set 'server.httproute.matches[0].path.value=/' \
       . | tee /dev/stderr |
       yq  -r '.spec.rules[0].backendRefs[0].name  | length > 0' | tee /dev/stderr)
   [ "${actual}" = "true" ]
