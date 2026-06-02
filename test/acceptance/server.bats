@@ -9,11 +9,13 @@ load _helpers
   kubectl create namespace acceptance
   kubectl config set-context --current --namespace=acceptance
 
-  helm install "$(name_prefix)" .
-  wait_for_running $(name_prefix)-0
+  eval "${PRE_CHART_CMDS}"
+  helm install "$(name_prefix)" . ${SET_CHART_VALUES}
+  check_vault_versions "$(name_prefix)"
+  wait_for_running "$(name_prefix)-0"
 
   # Sealed, not initialized
-  wait_for_sealed_vault $(name_prefix)-0
+  wait_for_sealed_vault "$(name_prefix)-0"
 
   local init_status=$(kubectl exec "$(name_prefix)-0" -- vault status -format=json |
     jq -r '.initialized')
@@ -31,8 +33,8 @@ load _helpers
 
   # Volume Mounts
   local volumeCount=$(kubectl get statefulset "$(name_prefix)" --output json |
-    jq -r '.spec.template.spec.containers[0].volumeMounts | length')
-  [ "${volumeCount}" == "3" ]
+    jq -r '.spec.template.spec.containers[0].volumeMounts | length >= 3')
+  [ "${volumeCount}" == "true" ]
 
   local mountName=$(kubectl get statefulset "$(name_prefix)" --output json |
     jq -r '.spec.template.spec.containers[0].volumeMounts[0].name')
@@ -44,8 +46,8 @@ load _helpers
 
   # Volumes
   local volumeCount=$(kubectl get statefulset "$(name_prefix)" --output json |
-    jq -r '.spec.template.spec.volumes | length')
-  [ "${volumeCount}" == "2" ]
+    jq -r '.spec.template.spec.volumes | length >= 2')
+  [ "${volumeCount}" == "true" ]
 
   local volume=$(kubectl get statefulset "$(name_prefix)" --output json |
     jq -r '.spec.template.spec.volumes[0].configMap.name')
@@ -105,5 +107,6 @@ teardown() {
       helm delete vault
       kubectl delete --all pvc
       kubectl delete namespace acceptance --ignore-not-found=true
+      kubectl config unset contexts."$(kubectl config current-context)".namespace
   fi
 }

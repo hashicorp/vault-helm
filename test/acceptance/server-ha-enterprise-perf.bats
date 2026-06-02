@@ -3,15 +3,18 @@
 load _helpers
 
 @test "server/ha-enterprise-raft: testing performance replica deployment" {
+  if [ ! "$ENT_TESTS" = "true" ]; then
+    skip "Enterprise tests are not enabled"
+  fi
+
   cd `chart_dir`
 
-  helm install "$(name_prefix)-east" \
+  helm install "$(name_prefix)-east" . \
     --set='injector.enabled=false' \
-    --set='server.image.repository=hashicorp/vault-enterprise' \
-    --set="server.image.tag=$(yq -r '.server.image.tag' values.yaml)-ent" \
     --set='server.ha.enabled=true' \
     --set='server.ha.raft.enabled=true' \
-    --set='server.enterpriseLicense.secretName=vault-license' .
+    ${SET_CHART_VALUES}
+  check_vault_versions "$(name_prefix)-east"
   wait_for_running "$(name_prefix)-east-0"
 
   # Sealed, not initialized
@@ -72,13 +75,12 @@ load _helpers
   [ "${secondary_replica_token}" != "" ]
 
   # Install vault-west
-  helm install "$(name_prefix)-west" \
+  helm install "$(name_prefix)-west" . \
     --set='injector.enabled=false' \
-    --set='server.image.repository=hashicorp/vault-enterprise' \
-    --set="server.image.tag=$(yq -r '.server.image.tag' values.yaml)-ent" \
     --set='server.ha.enabled=true' \
     --set='server.ha.raft.enabled=true' \
-    --set='server.enterpriseLicense.secretName=vault-license' .
+    ${SET_CHART_VALUES}
+  check_vault_versions "$(name_prefix)-west"
   wait_for_running "$(name_prefix)-west-0"
 
   # Sealed, not initialized
@@ -149,7 +151,7 @@ setup() {
   kubectl delete namespace acceptance --ignore-not-found=true
   kubectl create namespace acceptance
   kubectl config set-context --current --namespace=acceptance
-  kubectl create secret generic vault-license --from-literal license=$VAULT_LICENSE_CI
+  eval "${PRE_CHART_CMDS}"
 }
 
 #cleanup
@@ -160,5 +162,6 @@ teardown() {
       helm delete vault-west
       kubectl delete --all pvc
       kubectl delete namespace acceptance --ignore-not-found=true
+      kubectl config unset contexts."$(kubectl config current-context)".namespace
   fi
 }

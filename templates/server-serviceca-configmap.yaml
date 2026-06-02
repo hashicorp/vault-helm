@@ -3,19 +3,20 @@ Copyright IBM Corp. 2018, 2025
 SPDX-License-Identifier: MPL-2.0
 */}}
 
-{{ template "vault.serverServiceAccountSecretCreationEnabled" . }}
-{{- if .serverServiceAccountSecretCreationEnabled -}}
+{{- if and .Values.global.openshift .Values.server.serviceCA.enabled }}
+# ConfigMap for OpenShift service-ca operator
+# The service-ca operator will automatically inject the CA bundle
 apiVersion: v1
-kind: Secret
+kind: ConfigMap
 metadata:
-  name: {{ template "vault.serviceAccount.name" . }}-token
+  name: {{ .Values.server.serviceCA.configMapName }}
   namespace: {{ include "vault.namespace" . }}
-  annotations:
-    kubernetes.io/service-account.name: {{ template "vault.serviceAccount.name" . }}
   labels:
     helm.sh/chart: {{ include "vault.chart" . }}
     app.kubernetes.io/name: {{ include "vault.name" . }}
     app.kubernetes.io/instance: {{ .Release.Name }}
     app.kubernetes.io/managed-by: {{ .Release.Service }}
-type: kubernetes.io/service-account-token
-{{ end }}
+  annotations:
+    service.beta.openshift.io/inject-cabundle: "true"
+data: {}
+{{- end }}

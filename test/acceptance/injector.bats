@@ -19,9 +19,12 @@ load _helpers
 
   kubectl label secret test app=vault-agent-demo
 
-  helm install "$(name_prefix)" \
+  eval "${PRE_CHART_CMDS}"
+  helm install "$(name_prefix)" . \
     --set="server.extraVolumes[0].type=secret" \
-    --set="server.extraVolumes[0].name=test" .
+    --set="server.extraVolumes[0].name=test" \
+    ${SET_CHART_VALUES}
+  check_vault_versions "$(name_prefix)"
   wait_for_running $(name_prefix)-0
 
   wait_for_ready $(kubectl get pod -l component=webhook -o jsonpath="{.items[0].metadata.name}")
@@ -54,5 +57,6 @@ teardown() {
       kubectl delete job pgdump
       kubectl delete deployment postgres
       kubectl delete namespace acceptance
+      kubectl config unset contexts."$(kubectl config current-context)".namespace
   fi
 }

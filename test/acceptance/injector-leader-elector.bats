@@ -5,14 +5,13 @@ load _helpers
 @test "injector: testing leader elector" {
   cd `chart_dir`
 
-  kubectl delete namespace acceptance --ignore-not-found=true
-  kubectl create namespace acceptance
-  kubectl config set-context --current --namespace=acceptance
-
-  helm install "$(name_prefix)" \
+  eval "${PRE_CHART_CMDS}"
+  helm install "$(name_prefix)" . \
     --wait \
     --timeout=5m \
-    --set="injector.replicas=3" .
+    --set="injector.replicas=3" \
+    ${SET_CHART_VALUES}
+  check_vault_versions "$(name_prefix)"
   kubectl wait --for condition=Ready pod -l app.kubernetes.io/name=vault-agent-injector --timeout=5m
 
   pods=($(kubectl get pods -l app.kubernetes.io/name=vault-agent-injector -o json | jq -r '.items[] | .metadata.name'))
@@ -48,5 +47,6 @@ teardown() {
       helm delete vault
       kubectl delete --all pvc
       kubectl delete namespace acceptance
+      kubectl config unset contexts."$(kubectl config current-context)".namespace
   fi
 }

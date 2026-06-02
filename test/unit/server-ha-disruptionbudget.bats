@@ -128,3 +128,46 @@ load _helpers
       yq '.apiVersion == "policy/v1"' | tee /dev/stderr)
   [ "${actual}" = "true" ]
 }
+
+@test "server/DisruptionBudget: redundancy zones: maxUnavailable defaults to 1 with n=6" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      --show-only templates/server-disruptionbudget.yaml  \
+      --set 'server.ha.enabled=true' \
+      --set 'server.ha.replicas=6' \
+      --set 'server.ha.raft.enabled=true' \
+      --set 'server.ha.raft.redundancyZones.enabled=true' \
+      --set-string 'server.ha.raft.config=storage "raft" { path = "/vault/data" autopilot_redundancy_zone = "VAULT_REDUNDANCY_ZONE" } service_registration "kubernetes" {}' \
+      . | tee /dev/stderr |
+      yq '.spec.maxUnavailable' | tee /dev/stderr)
+  [ "${actual}" = "1" ]
+}
+
+@test "server/DisruptionBudget: redundancy zones: maxUnavailable defaults to 1 with n=5" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      --show-only templates/server-disruptionbudget.yaml  \
+      --set 'server.ha.enabled=true' \
+      --set 'server.ha.replicas=5' \
+      --set 'server.ha.raft.enabled=true' \
+      --set 'server.ha.raft.redundancyZones.enabled=true' \
+      --set-string 'server.ha.raft.config=storage "raft" { path = "/vault/data" autopilot_redundancy_zone = "VAULT_REDUNDANCY_ZONE" } service_registration "kubernetes" {}' \
+      . | tee /dev/stderr |
+      yq '.spec.maxUnavailable' | tee /dev/stderr)
+  [ "${actual}" = "1" ]
+}
+
+@test "server/DisruptionBudget: redundancy zones: explicit maxUnavailable override still works" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      --show-only templates/server-disruptionbudget.yaml  \
+      --set 'server.ha.enabled=true' \
+      --set 'server.ha.replicas=6' \
+      --set 'server.ha.raft.enabled=true' \
+      --set 'server.ha.raft.redundancyZones.enabled=true' \
+      --set 'server.ha.disruptionBudget.maxUnavailable=2' \
+      --set-string 'server.ha.raft.config=storage "raft" { path = "/vault/data" autopilot_redundancy_zone = "VAULT_REDUNDANCY_ZONE" } service_registration "kubernetes" {}' \
+      . | tee /dev/stderr |
+      yq '.spec.maxUnavailable' | tee /dev/stderr)
+  [ "${actual}" = "2" ]
+}

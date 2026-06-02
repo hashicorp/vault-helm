@@ -1,4 +1,4 @@
-# Copyright (c) HashiCorp, Inc.
+# Copyright IBM Corp. 2018, 2025
 # SPDX-License-Identifier: MPL-2.0
 
 # Available parameters and their default values for the Vault chart.
@@ -68,7 +68,7 @@ injector:
   # image sets the repo and tag of the vault-k8s image to use for the injector.
   image:
     repository: "hashicorp/vault-k8s"
-    tag: "1.7.0"
+    tag: "1.7.2"
     pullPolicy: IfNotPresent
 
   # agentImage sets the repo and tag of the Vault image to use for the Vault Agent
@@ -76,7 +76,7 @@ injector:
   # required.
   agentImage:
     repository: "hashicorp/vault"
-    tag: "1.20.4"
+    tag: "1.21.2"
 
   # The default values for the injected Vault Agent containers.
   agentDefaults:
@@ -371,9 +371,53 @@ server:
     # The key within the Kubernetes secret that holds the enterprise license.
     secretKey: "license"
 
+  # OpenShift service-ca operator integration
+  # Automates TLS certificate generation via the service-ca operator
+  serviceCA:
+    # Enable service-ca operator annotations and ConfigMap creation
+    # Requires: global.openshift=true
+    enabled: false
+    
+    # Secret name where service-ca will store the generated certificate
+    # IMPORTANT: Must match the secret name in server.volumes below
+    secretName: "vault-tls"
+    
+    # ConfigMap name for service-ca CA bundle injection
+    # IMPORTANT: Must match the ConfigMap name in server.volumes below
+    configMapName: "service-ca-bundle"
+  
+  # IMPORTANT: Configure server.volumes, server.volumeMounts, AND server config to use service-ca
+  #
+  # Step 1: Mount the service-ca resources as volumes
+  # volumes:
+  #   - name: vault-tls
+  #     secret:
+  #       secretName: vault-tls  # Must match serviceCA.secretName above
+  #   - name: service-ca-bundle
+  #     configMap:
+  #       name: service-ca-bundle  # Must match serviceCA.configMapName above
+  #
+  # volumeMounts:
+  #   - name: vault-tls
+  #     mountPath: /vault/userconfig/vault-tls
+  #     readOnly: true
+  #   - name: service-ca-bundle
+  #     mountPath: /vault/userconfig/service-ca-bundle
+  #     readOnly: true
+  #
+  # Step 2: Configure Vault listener to use the certificates (in server.ha.config or server.ha.raft.config)
+  # listener "tcp" {
+  #   tls_disable = 0
+  #   address = "[::]:8200"
+  #   cluster_address = "[::]:8201"
+  #   tls_cert_file = "/vault/userconfig/vault-tls/tls.crt"
+  #   tls_key_file  = "/vault/userconfig/vault-tls/tls.key"
+  #   tls_client_ca_file = "/vault/userconfig/service-ca-bundle/service-ca.crt"
+  # }
+
   image:
     repository: "hashicorp/vault"
-    tag: "1.20.4"
+    tag: "1.21.2"
     # Overrides the default Image Pull Policy
     pullPolicy: IfNotPresent
 
@@ -929,6 +973,25 @@ server:
       # Set the Node Raft ID to the name of the pod
       setNodeId: false
 
+      # Vault Enterprise Redundancy Zones
+      # Enables automatic zone detection for Vault Enterprise autopilot redundancy zones.
+      # Requires:
+      #   - Kubernetes 1.35+ (PodTopologyLabelsAdmission enabled by default)
+      #   - Vault Enterprise
+      #   - server.ha.enabled=true and server.ha.raft.enabled=true
+      #   - Nodes labeled with topology.kubernetes.io/zone
+      #   - VAULT_REDUNDANCY_ZONE placeholder in server.ha.raft.config
+      #   - server.topologySpreadConstraints with topology.kubernetes.io/zone (optional but recommended for proper zone separation)
+      # When enabled:
+      #   - The zone label from the node is exposed as VAULT_REDUNDANCY_ZONE
+      #     environment variable and substituted into the raft config.
+      #   - The PDB maxUnavailable defaults to 1 (instead of ⌊(n-1)/2⌋) because
+      #     the PDB cannot distinguish voting from non-voting pods. Override with
+      #     server.ha.disruptionBudget.maxUnavailable if needed.
+      # See: https://developer.hashicorp.com/vault/docs/enterprise/redundancy-zones
+      redundancyZones:
+        enabled: false
+
       # Note: Configuration files are stored in ConfigMaps so sensitive data
       # such as passwords should be either mounted through extraSecretEnvironmentVars
       # or through a Kube secret.  For more information see:
@@ -949,6 +1012,8 @@ server:
 
         storage "raft" {
           path = "/vault/data"
+          # Uncomment for Vault Enterprise redundancy zones (requires server.ha.raft.redundancyZones.enabled = true)
+          # autopilot_redundancy_zone = "VAULT_REDUNDANCY_ZONE"
         }
 
         service_registration "kubernetes" {}
@@ -999,8 +1064,9 @@ server:
     disruptionBudget:
       enabled: true
 
-    # maxUnavailable will default to (n/2)-1 where n is the number of
-    # replicas. If you'd like a custom value, you can specify an override here.
+    # maxUnavailable will default to ⌊(n-1)/2⌋ (equivalently, ceil(n/2)-1) where
+    # n is the number of replicas. If you'd like a custom value, you can specify
+    # an override here.
       maxUnavailable: null
 
   # Definition of the serviceAccount used to run Vault.
@@ -1120,7 +1186,7 @@ csi:
 
   image:
     repository: "hashicorp/vault-csi-provider"
-    tag: "1.5.1"
+    tag: "1.7.0"
     pullPolicy: IfNotPresent
 
   # volumes is a list of volumes made available to all containers. These are rendered
@@ -1211,7 +1277,7 @@ csi:
 
     image:
       repository: "hashicorp/vault"
-      tag: "1.20.4"
+      tag: "1.21.2"
       pullPolicy: IfNotPresent
 
     logFormat: standard
@@ -1366,6 +1432,21 @@ serverTelemetry:
     #   - sourceLabels: [cluster]
     #     targetLabel: vault_cluster
     metricRelabelings: []
+
+    # matchLabels configures the service selector labels for the ServiceMonitor.
+    # By default, the ServiceMonitor targets services with:
+    #   - HA mode: vault-active: "true" (scrapes the raft leader only)
+    #   - Standalone mode: vault-internal: "true"
+    #
+    # To scrape metrics from all Vault pods including standbys (Enterprise only):
+    # 1. Enable unauthenticated_metrics_access in your Vault listener telemetry config
+    # 2. Set matchLabels to target the vault-internal headless service
+    # See: https://developer.hashicorp.com/vault/docs/configuration/telemetry#prometheus
+    #
+    # Example:
+    # matchLabels:
+    #   vault-internal: "true"
+    matchLabels: {}
 
   prometheusRules:
       # The Prometheus operator *must* be installed before enabling this feature,

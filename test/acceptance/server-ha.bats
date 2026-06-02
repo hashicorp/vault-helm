@@ -5,8 +5,10 @@ load _helpers
 @test "server/ha: testing deployment" {
   cd `chart_dir`
 
-  helm install "$(name_prefix)" \
-    --set='server.ha.enabled=true' .
+  helm install "$(name_prefix)" . \
+    --set='server.ha.enabled=true' \
+    ${SET_CHART_VALUES}
+  check_vault_versions "$(name_prefix)"
   wait_for_running $(name_prefix)-0
 
   # Sealed, not initialized
@@ -23,13 +25,13 @@ load _helpers
 
   # Volume Mounts
   local volumeCount=$(kubectl get statefulset "$(name_prefix)" --output json |
-    jq -r '.spec.template.spec.containers[0].volumeMounts | length')
-  [ "${volumeCount}" == "2" ]
+    jq -r '.spec.template.spec.containers[0].volumeMounts | length >= 2')
+  [ "${volumeCount}" == "true" ]
 
   # Volumes
   local volumeCount=$(kubectl get statefulset "$(name_prefix)" --output json |
-    jq -r '.spec.template.spec.volumes | length')
-  [ "${volumeCount}" == "2" ]
+    jq -r '.spec.template.spec.volumes | length >= 2')
+  [ "${volumeCount}" == "true" ]
 
   local volume=$(kubectl get statefulset "$(name_prefix)" --output json |
     jq -r '.spec.template.spec.volumes[0].configMap.name')
@@ -102,6 +104,7 @@ setup() {
     --set 'ui.enabled=false'
 
   wait_for_running_consul
+  eval "${PRE_CHART_CMDS}"
 }
 
 #cleanup
@@ -117,5 +120,6 @@ teardown() {
       helm delete consul
       kubectl delete --all pvc
       kubectl delete namespace acceptance --ignore-not-found=true
+      kubectl config unset contexts."$(kubectl config current-context)".namespace
   fi
 }

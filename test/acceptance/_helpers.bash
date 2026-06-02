@@ -1,4 +1,4 @@
-# Copyright (c) HashiCorp, Inc.
+# Copyright IBM Corp. 2018, 2025
 # SPDX-License-Identifier: MPL-2.0
 
 # name_prefix returns the prefix of the resources within Kubernetes.
@@ -41,6 +41,32 @@ helm_install_ha() {
         --set 'server.enabled=false' \
         --set 'serverHA.enabled=true' \
         ${BATS_TEST_DIRNAME}/../..
+}
+
+# check_vault_versions checks the deployed helm chart values match the expected
+# vault version, where expected is either specified by the VAULT_VERSION
+# environment variable or the defaults in values.yaml.
+check_vault_versions(){
+    helm_deployment_name=$1
+    local expected_version
+    if [ -n "${VAULT_VERSION}" ]; then
+        expected_version=${VAULT_VERSION}
+    else
+        # expect the defaults in values.yaml to all be the same
+        expected_version=$(yq -r '.server.image.tag' values.yaml)
+        [ "${expected_version}" = "$(yq -r '.injector.agentImage.tag' values.yaml)" ]
+        [ "${expected_version}" = "$(yq -r '.csi.agent.image.tag' values.yaml)" ]
+    fi
+
+    if [ "${ENT_TESTS}" = "true" ]; then
+        expected_version="${expected_version}-ent"
+    fi
+
+    local values
+    values=$(helm get values "${helm_deployment_name}" --all)
+    [ "${expected_version}" = "$(echo "${values}" | yq -r '.server.image.tag')" ]
+    [ "${expected_version}" = "$(echo "${values}" | yq -r '.injector.agentImage.tag')" ]
+    [ "${expected_version}" = "$(echo "${values}" | yq -r '.csi.agent.image.tag')" ]
 }
 
 # wait for consul to be ready
@@ -160,4 +186,20 @@ wait_for_complete_job() {
 
     echo "${POD_NAME} never completed."
     return 1
+}
+
+# skip_if_k8s_version_lt skips the test if Kubernetes version is less than the specified version
+# Usage: skip_if_k8s_version_lt "1.35"
+skip_if_k8s_version_lt() {
+    local required_version=$1
+    local required_major=$(echo $required_version | cut -d. -f1)
+    local required_minor=$(echo $required_version | cut -d. -f2)
+
+    local k8s_version=$(kubectl version -o json | jq -r '.serverVersion.gitVersion' | sed 's/v//')
+    local k8s_major=$(echo $k8s_version | cut -d. -f1)
+    local k8s_minor=$(echo $k8s_version | cut -d. -f2)
+
+    if [ "$k8s_major" -lt "$required_major" ] || ([ "$k8s_major" -eq "$required_major" ] && [ "$k8s_minor" -lt "$required_minor" ]); then
+        skip "Test requires Kubernetes >= ${required_version}, current version is ${k8s_version}"
+    fi
 }
