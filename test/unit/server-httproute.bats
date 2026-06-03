@@ -2,6 +2,7 @@
 
 load _helpers
 
+# Verifies the HTTPRoute template is not rendered unless explicitly enabled.
 @test "server/httproute: disabled by default" {
   cd `chart_dir`
   local actual=$( (helm template \
@@ -11,6 +12,7 @@ load _helpers
   [ "${actual}" = "false" ]
 }
 
+# Verifies namespace selection and that global.namespace overrides the release namespace.
 @test "server/httproute: namespace" {
   cd `chart_dir`
   local actual=$(helm template \
@@ -30,6 +32,7 @@ load _helpers
   [ "${actual}" = "bar" ]
 }
 
+# Verifies HTTPRoute rendering is disabled when injector.externalVaultAddr is configured.
 @test "server/httproute: disable by injector.externalVaultAddr" {
   cd `chart_dir`
   local actual=$( (helm template \
@@ -41,6 +44,7 @@ load _helpers
   [ "${actual}" = "false" ]
 }
 
+# Verifies hostnames are rendered and the configured root path (/) match is preserved.
 @test "server/httproute: checking host entry gets added and path is /" {
   cd `chart_dir`
   local actual=$(helm template \
@@ -64,6 +68,7 @@ load _helpers
   [ "${actual}" = '/' ]
 }
 
+# Verifies custom path match type and value are rendered in rule matches.
 @test "server/httproute: checking custom matches path" {
   cd `chart_dir`
   local actual=$(helm template \
@@ -86,6 +91,7 @@ load _helpers
   [ "${actual}" = '/foo/' ]
 }
 
+# Verifies a Vault backendRef is rendered when a route match/path is configured.
 @test "server/httproute: vault backend should be added when I specify a path" {
   cd `chart_dir`
 
@@ -101,6 +107,7 @@ load _helpers
 
 }
 
+# Verifies custom labels are added to HTTPRoute metadata.
 @test "server/httproute: labels gets added to object" {
   cd `chart_dir`
 
@@ -114,6 +121,7 @@ load _helpers
   [ "${actual}" = "external" ]
 }
 
+# Verifies annotations supplied as a string are parsed into metadata.annotations.
 @test "server/httproute: annotations added to object - string" {
   cd `chart_dir`
 
@@ -126,6 +134,7 @@ load _helpers
   [ "${actual}" = "nginx" ]
 }
 
+# Verifies annotations with escaped dotted keys are rendered correctly.
 @test "server/httproute: annotations added to object - yaml" {
   cd `chart_dir`
 
@@ -138,6 +147,7 @@ load _helpers
   [ "${actual}" = "nginx" ]
 }
 
+# Verifies configured parentRefs are rendered in spec.parentRefs.
 @test "server/httproute: parentRefs added to object spec" {
   cd `chart_dir`
 
@@ -160,6 +170,7 @@ load _helpers
   [ "${actual}" = "test-ns" ]  
 }
 
+# Verifies parentRefs are omitted when not explicitly configured.
 @test "server/httproute: parentRefs not added by default" {
   cd `chart_dir`
 
@@ -172,6 +183,7 @@ load _helpers
 }
 
 
+# Verifies HA mode defaults backendRef service selection to the active service.
 @test "server/httproute: uses active service when ha by default - yaml" {
   cd `chart_dir`
 
@@ -186,6 +198,7 @@ load _helpers
   [ "${actual}" = "release-name-vault-active" ]
 }
 
+# Verifies HA mode can be configured to use the regular service instead of active.
 @test "server/httproute: uses regular service when configured with ha - yaml" {
   cd `chart_dir`
 
@@ -201,6 +214,7 @@ load _helpers
   [ "${actual}" = "release-name-vault" ]
 }
 
+# Verifies non-HA mode uses the regular Vault service backend.
 @test "server/httproute: uses regular service when not ha - yaml" {
   cd `chart_dir`
 
@@ -215,6 +229,7 @@ load _helpers
   [ "${actual}" = "release-name-vault" ]
 }
 
+# Verifies backend service reference formatting remains correct on Kubernetes 1.26.3.
 @test "server/httproute: k8s 1.26.3 uses correct service format when not ha - yaml" {
   cd `chart_dir`
 
@@ -230,6 +245,7 @@ load _helpers
   [ "${actual}" = "release-name-vault" ]
 }
 
+# Verifies activeService does not alter backend selection when HA is disabled.
 @test "server/httproute: uses regular service when not ha and activeService is true - yaml" {
   cd `chart_dir`
 
@@ -245,6 +261,7 @@ load _helpers
   [ "${actual}" = "release-name-vault" ]
 }
 
+# Verifies custom rule filters are rendered, including header name and value.
 @test "server/httproute: checking custom filters" {
   cd `chart_dir`
   local actual=$(helm template \
@@ -278,6 +295,7 @@ load _helpers
   [ "${actual}" = 'new-test-header-value' ]
 }
 
+# Verifies filters are omitted when not configured.
 @test "server/httproute: filters not added by default" {
   cd `chart_dir`
 
@@ -289,6 +307,7 @@ load _helpers
   [ "${actual}" = "null" ]
 }
 
+# Verifies fully customized additionalRules are rendered with filters and path matches.
 @test "server/httproute: checking fullyCustomizedRule" {
   cd `chart_dir`
   local actual=$(helm template \
@@ -352,6 +371,7 @@ load _helpers
   [ "${actual}" = '/foo/' ]
 }
 
+# Verifies no additionalRules are rendered by default.
 @test "server/httproute: additionalRules not added by default" {
   cd `chart_dir`
 
