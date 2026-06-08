@@ -18,7 +18,7 @@ inputs:
     default: 'vault-helm'
   bats-version:
     description: 'Version of bats to run tests with'
-    default: '1.12.0'
+    default: '1.13.0'
   vault-license:
     description: 'Vault license to use for enterprise tests'
     required: true
@@ -33,7 +33,7 @@ runs:
         cluster_name: ${{ inputs.kind-cluster-name }}
         config: test/kind/config.yaml
         node_image: kindest/node:v${{ inputs.k8s-version }}
-        version: "v0.31.0"
+        version: "v0.32.0"
 
     - name: Create kind export log root
       id: create_kind_export_log_root

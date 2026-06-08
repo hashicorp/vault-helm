@@ -13,12 +13,12 @@ injector:
 
   agentImage:
     repository: "registry.connect.redhat.com/hashicorp/vault"
-    tag: "2.0.0-ubi"
+    tag: "2.0.2-ubi"
 
 server:
   image:
     repository: "registry.connect.redhat.com/hashicorp/vault"
-    tag: "2.0.0-ubi"
+    tag: "2.0.2-ubi"
 
   readinessProbe:
     path: "/v1/sys/health?uninitcode=204"
@@ -26,9 +26,9 @@ server:
 csi:
   image:
     repository: "registry.connect.redhat.com/hashicorp/vault-csi-provider"
-    tag: "1.7.1-ubi"
+    tag: "1.7.2-ubi"
 
   agent:
     image:
       repository: "registry.connect.redhat.com/hashicorp/vault"
-      tag: "2.0.0-ubi"
+      tag: "2.0.2-ubi"

@@ -1,4 +1,13 @@
-## Unreleased
+## 0.33.0 (June 8, 2026)
+
+Changes:
+* Default `vault` version updated to v2.0.2
+* Default `vault-csi-provider` version updated to v1.7.2
+* Default `vault-k8s` version updated to v1.7.4
+* Tested with Vault v2.0.2, v1.21-v1.19
+* Tested with Kubernetes versions v1.36-1.32
+* Tested with Kind v0.32.0
+* Tested with Bats v1.13.0
 
 Features:
 
