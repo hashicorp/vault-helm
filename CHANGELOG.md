@@ -11,7 +11,6 @@ Changes:
 * Tested with Bats v1.13.0
 * build(deps): Bump actions/setup-go from 6.0.0 to 6.4.0 in the github-actions-backward-compatible group: [#1159](https://github.com/hashicorp/vault-helm/pull/1159)
 * build(deps): Bump actions/checkout from 5.0.1 to 6.0.2 in the github-actions-breaking group: [#1182](https://github.com/hashicorp/vault-helm/pull/1182)
-* Add consumption team as code owners: [#1181](https://github.com/hashicorp/vault-helm/pull/1181)
 * Dependency update for actions/checkout from 6.0.2 to 6.0.3. Cherry-picked from [#1187](https://github.com/hashicorp/vault-helm/pull/1187)
 
 Features:
