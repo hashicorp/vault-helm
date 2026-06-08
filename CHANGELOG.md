@@ -14,7 +14,7 @@ Changes:
 * Dependency update for actions/checkout from 6.0.2 to 6.0.3
 
 Features:
-* server: Add Vault Enterprise redundancy zones support (requires Kubernetes 1.35+) [#1170](https://github.com/hashicorp/vault-helm/pull/1170)
+* Add Vault Enterprise redundancy zones support (requires Kubernetes 1.35+) [#1170](https://github.com/hashicorp/vault-helm/pull/1170)
 
 ## 0.32.0 (January 14, 2026)
 
