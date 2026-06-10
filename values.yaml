@@ -1,4 +1,4 @@
-# Copyright IBM Corp. 2018, 2025
+# Copyright IBM Corp. 2018, 2026
 # SPDX-License-Identifier: MPL-2.0
 
 # Available parameters and their default values for the Vault chart.
@@ -68,7 +68,7 @@ injector:
   # image sets the repo and tag of the vault-k8s image to use for the injector.
   image:
     repository: "hashicorp/vault-k8s"
-    tag: "1.7.2"
+    tag: "1.7.4"
     pullPolicy: IfNotPresent
 
   # agentImage sets the repo and tag of the Vault image to use for the Vault Agent
@@ -76,7 +76,7 @@ injector:
   # required.
   agentImage:
     repository: "hashicorp/vault"
-    tag: "1.21.2"
+    tag: "2.0.2"
 
   # The default values for the injected Vault Agent containers.
   agentDefaults:
@@ -417,7 +417,7 @@ server:
 
   image:
     repository: "hashicorp/vault"
-    tag: "1.21.2"
+    tag: "2.0.2"
     # Overrides the default Image Pull Policy
     pullPolicy: IfNotPresent
 
@@ -1186,7 +1186,7 @@ csi:
 
   image:
     repository: "hashicorp/vault-csi-provider"
-    tag: "1.7.0"
+    tag: "1.7.2"
     pullPolicy: IfNotPresent
 
   # volumes is a list of volumes made available to all containers. These are rendered
@@ -1277,7 +1277,7 @@ csi:
 
     image:
       repository: "hashicorp/vault"
-      tag: "1.21.2"
+      tag: "2.0.2"
       pullPolicy: IfNotPresent
 
     logFormat: standard
