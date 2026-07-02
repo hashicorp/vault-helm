@@ -1,4 +1,12 @@
-## Unreleased
+## 0.34.0 (July 2, 2026)
+
+Changes:
+
+* Default `vault` version updated to v2.0.3
+* Default `vault-csi-provider` version updated to v1.7.3
+* Default `vault-k8s` version updated to v1.7.5
+* Tested with Vault v2.0.3, v1.21-v1.19
+* build(deps): bump actions/checkout from 6.0.3 to 7.0.0 in the github-actions-breaking group across 1 directory [#1142](https://github.com/hashicorp/vault-helm/pull/1142)
 
 Features:
 
