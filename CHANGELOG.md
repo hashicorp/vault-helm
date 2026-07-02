@@ -7,6 +7,7 @@ Changes:
 * Default `vault-k8s` version updated to v1.7.5
 * Tested with Vault v2.0.3, v1.21-v1.19
 * build(deps): bump actions/checkout from 6.0.3 to 7.0.0 in the github-actions-breaking group across 1 directory [#1142](https://github.com/hashicorp/vault-helm/pull/1142)
+* build(deps): bump actions/setup-go from 6.4.0 to 6.5.0
 
 Features:
 
