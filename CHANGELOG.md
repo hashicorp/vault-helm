@@ -1,5 +1,8 @@
 ## Unreleased
 
+Features:
+* injector: add `injector.webhook.matchConditions` support for fine-grained webhook request filtering [GH-1079](https://github.com/hashicorp/vault-helm/pull/1079)
+
 ## 0.29.1 (November 20, 2024)
 
 Bugs:

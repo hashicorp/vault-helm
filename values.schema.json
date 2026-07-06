@@ -587,7 +587,17 @@
                         "matchConditions": {
                             "type": "array",
                             "items": {
-                                "type": "object"
+                                "type": "object",
+                                "required": ["name", "expression"],
+                                "properties": {
+                                    "name": {
+                                        "type": "string"
+                                    },
+                                    "expression": {
+                                        "type": "string"
+                                    }
+                                },
+                                "additionalProperties": false
                             }
                         },
                         "matchPolicy": {
