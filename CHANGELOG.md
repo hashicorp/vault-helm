@@ -1,3 +1,9 @@
+## Unreleased
+
+Features:
+
+* Add `global.extraLabels` to apply custom labels to every resource created by the chart (including the server, injector, and CSI provider pod templates), and add the standard `app.kubernetes.io/version` (set from the chart's `appVersion`, overridable via `global.extraLabels`) and `helm.sh/chart` labels to every resource. Rendering fails with a clear error if `global.extraLabels` attempts to override a chart-managed label [GH-1197](https://github.com/hashicorp/vault-helm/issues/1197)
+
 ## 0.34.0 (July 2, 2026)
 
 Changes:

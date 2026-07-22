@@ -17,6 +17,25 @@ global:
   # imagePullSecrets:
   #   - name: image-pull-secret
 
+  # extraLabels is a map of extra labels added to every resource created by
+  # this chart, including the pod templates of the server StatefulSet, the
+  # injector Deployment and the CSI provider DaemonSet, so the labels also
+  # appear on the pods themselves. Labels set here are never added to
+  # selectors or other immutable fields (such as the server StatefulSet
+  # volumeClaimTemplates), so they can be safely added or changed on an
+  # existing installation. Resource-specific labels
+  # (e.g. server.extraLabels) take precedence on duplicate keys. The chart
+  # itself adds the recommended helm.sh/chart and app.kubernetes.io/version
+  # labels to every resource; app.kubernetes.io/version defaults to the
+  # chart's appVersion and may be overridden here when the deployed version
+  # differs. All other chart-managed labels (app.kubernetes.io/name,
+  # app.kubernetes.io/instance, app.kubernetes.io/managed-by,
+  # helm.sh/chart, component, vault-active, vault-internal) must not be set
+  # here: rendering fails with an error if they are, because they would
+  # produce duplicate label keys and conflict with the labels used in
+  # selectors and HA request routing.
+  extraLabels: {}
+
   # TLS for end-to-end encrypted transport
   tlsDisable: true
 

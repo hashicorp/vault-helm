@@ -37,6 +37,38 @@ Expand the name of the chart.
 {{- end -}}
 
 {{/*
+Common labels added to every resource created by this chart: the standard
+helm.sh/chart and app.kubernetes.io/version labels, plus any user-defined
+global.extraLabels. app.kubernetes.io/version defaults to the chart's
+appVersion and is the only chart-managed label that global.extraLabels may
+override, since the deployed app version can legitimately differ from the
+chart default. Overriding any other chart-managed label fails rendering:
+it would produce duplicate label keys (ambiguous YAML that trips linters
+and policy engines) and conflict with the labels used in selectors and HA
+request routing. Values are coerced to strings since Kubernetes rejects
+non-string label values. These labels are intentionally never included in
+selectors or other immutable fields (such as the server StatefulSet
+volumeClaimTemplates), so they stay safe to add or change on existing
+installations. Resource-specific labels (e.g. server.extraLabels) are
+rendered after these and take precedence on duplicate keys.
+*/}}
+{{- define "vault.commonLabels" -}}
+{{- $reserved := list "app.kubernetes.io/name" "app.kubernetes.io/instance" "app.kubernetes.io/managed-by" "helm.sh/chart" "component" "vault-active" "vault-internal" -}}
+{{- range $k, $v := .Values.global.extraLabels -}}
+{{- if has $k $reserved -}}
+{{- fail (printf "global.extraLabels must not set %q: this label is managed by the chart and overriding it would produce duplicate label keys. app.kubernetes.io/version may be overridden here; use custom label keys for everything else." $k) -}}
+{{- end -}}
+{{- end -}}
+{{- $labels := dict
+      "helm.sh/chart" (include "vault.chart" .)
+      "app.kubernetes.io/version" (.Chart.AppVersion | toString | replace "+" "_" | trunc 63 | trimSuffix "-") -}}
+{{- range $k, $v := .Values.global.extraLabels -}}
+{{- $_ := set $labels $k ($v | toString) -}}
+{{- end -}}
+{{- toYaml $labels -}}
+{{- end -}}
+
+{{/*
 Allow the release namespace to be overridden
 */}}
 {{- define "vault.namespace" -}}

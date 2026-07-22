@@ -1141,6 +1141,16 @@ load _helpers
   [ "${actual}" = "bar" ]
 }
 
+@test "server/standalone-StatefulSet: specify global.extraLabels" {
+  cd `chart_dir`
+  local output=$(helm template \
+      --show-only templates/server-statefulset.yaml \
+      --set 'global.extraLabels.foo=bar' \
+      . | tee /dev/stderr)
+  [ "$(echo "$output" | yq -r '.metadata.labels.foo')" = "bar" ]
+  [ "$(echo "$output" | yq -r '.spec.template.metadata.labels.foo')" = "bar" ]
+}
+
 # extra annotations
 
 @test "server/standalone-StatefulSet: default statefulSet.annotations" {
