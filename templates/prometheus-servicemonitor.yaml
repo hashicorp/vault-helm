@@ -11,10 +11,10 @@ kind: ServiceMonitor
 metadata:
   name: {{ template "vault.fullname" . }}
   labels:
-    helm.sh/chart: {{ include "vault.chart" . }}
     app.kubernetes.io/name: {{ include "vault.name" . }}
     app.kubernetes.io/instance: {{ .Release.Name }}
     app.kubernetes.io/managed-by: {{ .Release.Service }}
+    {{- include "vault.commonLabels" . | nindent 4 }}
     {{- /* update the selectors docs in values.yaml whenever the defaults below change. */ -}}
     {{- $selectors := .Values.serverTelemetry.serviceMonitor.selectors }}
     {{- if $selectors }}

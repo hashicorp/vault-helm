@@ -938,6 +938,16 @@ EOF
   [ "${actual}" = "bar" ]
 }
 
+@test "injector/deployment: specify global.extraLabels" {
+  cd `chart_dir`
+  local output=$(helm template \
+      --show-only templates/injector-deployment.yaml \
+      --set 'global.extraLabels.foo=bar' \
+      . | tee /dev/stderr)
+  [ "$(echo "$output" | yq -r '.metadata.labels.foo')" = "bar" ]
+  [ "$(echo "$output" | yq -r '.spec.template.metadata.labels.foo')" = "bar" ]
+}
+
 #--------------------------------------------------------------------
 # hostNetwork
 

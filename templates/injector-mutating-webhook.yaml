@@ -17,6 +17,7 @@ metadata:
     app.kubernetes.io/name: {{ include "vault.name" . }}-agent-injector
     app.kubernetes.io/instance: {{ .Release.Name }}
     app.kubernetes.io/managed-by: {{ .Release.Service }}
+    {{- include "vault.commonLabels" . | nindent 4 }}
   {{- template "injector.webhookAnnotations" . }}
 webhooks:
   - name: vault.hashicorp.com

@@ -46,7 +46,7 @@ load _helpers
       --set 'serverTelemetry.prometheusRules.rules[0].foo=bar' \
       . ) | tee /dev/stderr)
 
-  [ "$(echo "$output" | yq -r '.metadata.labels | length')" = "5" ]
+  [ "$(echo "$output" | yq -r '.metadata.labels | length')" = "6" ]
   [ "$(echo "$output" | yq -r '.metadata.labels.release')" = "prometheus" ]
 }
 
@@ -60,7 +60,7 @@ load _helpers
       --set 'serverTelemetry.prometheusRules.selectors.bar=foo' \
       . ) | tee /dev/stderr)
 
-  [ "$(echo "$output" | yq -r '.metadata.labels | length')" = "6" ]
+  [ "$(echo "$output" | yq -r '.metadata.labels | length')" = "7" ]
   [ "$(echo "$output" | yq -r '.metadata.labels | has("app")')" = "false" ]
   [ "$(echo "$output" | yq -r '.metadata.labels | has("kube-prometheus-stack")')" = "false" ]
   [ "$(echo "$output" | yq -r '.metadata.labels.baz')" = "qux" ]
