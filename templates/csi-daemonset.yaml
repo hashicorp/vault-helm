@@ -19,6 +19,9 @@ metadata:
     {{- end -}}
   {{ template "csi.daemonSet.annotations" . }}
 spec:
+  {{- if .Values.csi.daemonSet.revisionHistoryLimit }}
+  revisionHistoryLimit: {{ .Values.csi.daemonSet.revisionHistoryLimit }}
+  {{- end }}
   updateStrategy:
     type: {{ .Values.csi.daemonSet.updateStrategy.type }}
     {{- if .Values.csi.daemonSet.updateStrategy.maxUnavailable }}

@@ -18,6 +18,9 @@ metadata:
     component: webhook
 spec:
   replicas: {{ .Values.injector.replicas }}
+  {{- if .Values.injector.revisionHistoryLimit }}
+  revisionHistoryLimit: {{ .Values.injector.revisionHistoryLimit }}
+  {{- end }}
   selector:
     matchLabels:
       app.kubernetes.io/name: {{ template "vault.name" . }}-agent-injector
