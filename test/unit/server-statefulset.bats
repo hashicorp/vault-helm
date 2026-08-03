@@ -222,6 +222,28 @@ load _helpers
 }
 
 #--------------------------------------------------------------------
+# revisionHistoryLimit
+
+@test "server/standalone-StatefulSet: revisionHistoryLimit not set by default" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      --show-only templates/server-statefulset.yaml  \
+      . | tee /dev/stderr |
+      yq -r '.spec.revisionHistoryLimit' | tee /dev/stderr)
+  [ "${actual}" = "null" ]
+}
+
+@test "server/standalone-StatefulSet: revisionHistoryLimit can be set" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      --show-only templates/server-statefulset.yaml  \
+      --set 'server.revisionHistoryLimit=5' \
+      . | tee /dev/stderr |
+      yq -r '.spec.revisionHistoryLimit' | tee /dev/stderr)
+  [ "${actual}" = "5" ]
+}
+
+#--------------------------------------------------------------------
 # persistentVolumeClaimRetentionPolicy
 
 @test "server/standalone-StatefulSet: persistentVolumeClaimRetentionPolicy not set by default when kubernetes < 1.23" {
