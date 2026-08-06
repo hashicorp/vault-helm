@@ -125,6 +125,41 @@ Compute if the ui is enabled.
 {{- end -}}
 
 {{/*
+Resolve the Vault server image repository.
+If server.image.repository is explicitly set to a non-default value, use it.
+Otherwise, auto-select hashicorp/vault-enterprise when an enterprise license
+secret is configured, falling back to hashicorp/vault for Community Edition.
+*/}}
+{{- define "vault.imageRepository" -}}
+{{- if and .Values.server.image.repository (ne .Values.server.image.repository "hashicorp/vault") -}}
+  {{- .Values.server.image.repository -}}
+{{- else if and .Values.server.enterpriseLicense.secretName .Values.server.enterpriseLicense.secretKey -}}
+  hashicorp/vault-enterprise
+{{- else -}}
+  {{- .Values.server.image.repository | default "hashicorp/vault" -}}
+{{- end -}}
+{{- end -}}
+
+{{/*
+Resolve the Vault server image tag.
+If server.enterpriseLicense.secretName is set and the tag does not already
+carry the -ent suffix, append it automatically.
+Otherwise return the tag as-is.
+*/}}
+{{- define "vault.imageTag" -}}
+{{- $tag := .Values.server.image.tag | default "latest" -}}
+{{- if and .Values.server.enterpriseLicense.secretName .Values.server.enterpriseLicense.secretKey -}}
+  {{- if not (hasSuffix "-ent" $tag) -}}
+    {{- printf "%s-ent" $tag -}}
+  {{- else -}}
+    {{- $tag -}}
+  {{- end -}}
+{{- else -}}
+  {{- $tag -}}
+{{- end -}}
+{{- end -}}
+
+{{/*
 Compute the maximum number of unavailable replicas for the PodDisruptionBudget.
 This defaults to ⌊(n-1)/2⌋ (equivalently, ceil(n/2)-1) where n is the number of
 members of the server cluster.
