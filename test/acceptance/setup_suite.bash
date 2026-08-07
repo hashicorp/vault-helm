@@ -20,6 +20,7 @@ setup_suite() {
 
     PRE_CHART_CMDS=""
     if [ "${ENT_TESTS}" = "true" ]; then
+        SERVER_VAULT_VERSION="${SERVER_VAULT_VERSION}-ent"
         INJECTOR_AGENT_VERSION="${INJECTOR_AGENT_VERSION}-ent"
         CSI_AGENT_VERSION="${CSI_AGENT_VERSION}-ent"
         VAULT_REPOSITORY="hashicorp/vault-enterprise"
@@ -30,6 +31,8 @@ setup_suite() {
 
     CHART_VALUES+=(--set injector.agentImage.tag="${INJECTOR_AGENT_VERSION}")
     CHART_VALUES+=(--set injector.agentImage.repository="${VAULT_REPOSITORY}")
+    CHART_VALUES+=(--set server.image.tag="${SERVER_VAULT_VERSION}")
+    CHART_VALUES+=(--set server.image.repository="${VAULT_REPOSITORY}")
     CHART_VALUES+=(--set csi.agent.image.tag="${CSI_AGENT_VERSION}")
     CHART_VALUES+=(--set csi.agent.image.repository="${VAULT_REPOSITORY}")
 

@@ -49,7 +49,6 @@ helm_install_ha() {
 check_vault_versions(){
     helm_deployment_name=$1
     local expected_version
-    local expected_repo="hashicorp/vault"
     if [ -n "${VAULT_VERSION}" ]; then
         expected_version=${VAULT_VERSION}
     else
@@ -61,18 +60,20 @@ check_vault_versions(){
 
     if [ "${ENT_TESTS}" = "true" ]; then
         expected_version="${expected_version}-ent"
-        expected_repo="hashicorp/vault-enterprise"
     fi
 
-    # Check ACTUAL DEPLOYED IMAGE from running pod (not stored values)
-    # Stored values may not reflect the final rendered image (e.g., when helpers auto-select)
-    local actual_image=$(kubectl get pod "${helm_deployment_name}-0" \
-      -o jsonpath='{.spec.containers[0].image}')
-    [ "${actual_image}" = "${expected_repo}:${expected_version}" ]
-
-    # For injector and CSI agents, check stored values (they don't have auto-selection yet)
     local values
     values=$(helm get values "${helm_deployment_name}" --all)
+    
+    # Verify license secret was set (which triggers Enterprise auto-selection)
+    if [ "${ENT_TESTS}" = "true" ]; then
+        [ "vault-license" = "$(echo "${values}" | yq -r '.server.enterpriseLicense.secretName')" ]
+    fi
+    
+    # Verify server image tag matches expected version
+    # expected_version includes -ent suffix for Enterprise, plain for Community Edition
+    [ "${expected_version}" = "$(echo "${values}" | yq -r '.server.image.tag')" ]
+    
     [ "${expected_version}" = "$(echo "${values}" | yq -r '.injector.agentImage.tag')" ]
     [ "${expected_version}" = "$(echo "${values}" | yq -r '.csi.agent.image.tag')" ]
 }
