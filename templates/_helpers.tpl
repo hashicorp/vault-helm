@@ -147,7 +147,7 @@ carry the -ent suffix, append it automatically.
 Otherwise return the tag as-is.
 */}}
 {{- define "vault.imageTag" -}}
-{{- $tag := .Values.server.image.tag | default "latest" -}}
+{{- $tag := .Values.server.image.tag | default .Chart.AppVersion -}}
 {{- if and .Values.server.enterpriseLicense.secretName .Values.server.enterpriseLicense.secretKey -}}
   {{- if not (hasSuffix "-ent" $tag) -}}
     {{- printf "%s-ent" $tag -}}
