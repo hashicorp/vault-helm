@@ -156,6 +156,62 @@ load _helpers
   [ "${actual}" = "Always" ]
 }
 
+@test "server/standalone-StatefulSet: Enterprise image auto-selected when secretName is set" {
+  cd `chart_dir`
+  local repo="hashicorp/vault-enterprise"
+  local tag="$(yq -r '.server.image.tag' values.yaml)-ent"
+
+  local actual=$(helm template \
+      --show-only templates/server-statefulset.yaml \
+      --set 'server.enterpriseLicense.secretName=foo' \
+      . | tee /dev/stderr |
+      yq -r '.spec.template.spec.containers[0].image' | tee /dev/stderr)
+  [ "${actual}" = "${repo}:${tag}" ]
+}
+
+@test "server/standalone-StatefulSet: Enterprise image tag not doubled when -ent suffix already present" {
+  cd `chart_dir`
+  local repo="hashicorp/vault-enterprise"
+  local tag="$(yq -r '.server.image.tag' values.yaml)-ent"
+
+  local actual=$(helm template \
+      --show-only templates/server-statefulset.yaml \
+      --set 'server.enterpriseLicense.secretName=foo' \
+      --set "server.image.tag=$(yq -r '.server.image.tag' values.yaml)-ent" \
+      . | tee /dev/stderr |
+      yq -r '.spec.template.spec.containers[0].image' | tee /dev/stderr)
+  [ "${actual}" = "${repo}:${tag}" ]
+}
+
+@test "server/standalone-StatefulSet: custom image repository respected with Enterprise license" {
+  cd `chart_dir`
+  local tag="$(yq -r '.server.image.tag' values.yaml)-ent"
+
+  local actual=$(helm template \
+      --show-only templates/server-statefulset.yaml \
+      --set 'server.enterpriseLicense.secretName=foo' \
+      --set 'server.image.repository=mycorp/vault' \
+      . | tee /dev/stderr |
+      yq -r '.spec.template.spec.containers[0].image' | tee /dev/stderr)
+
+  # repo must NOT be overridden to hashicorp/vault-enterprise
+  [[ "${actual}" == "mycorp/vault:"* ]]
+  # -ent tag must still be appended
+  [ "${actual}" = "mycorp/vault:${tag}" ]
+}
+
+@test "server/standalone-StatefulSet: Community Edition image unchanged when no license secret set" {
+  cd `chart_dir`
+  local repo="$(yq -r '.server.image.repository' values.yaml)"
+  local tag="$(yq -r '.server.image.tag' values.yaml)"
+
+  local actual=$(helm template \
+      --show-only templates/server-statefulset.yaml \
+      . | tee /dev/stderr |
+      yq -r '.spec.template.spec.containers[0].image' | tee /dev/stderr)
+  [ "${actual}" = "${repo}:${tag}" ]
+}
+
 @test "server/standalone-StatefulSet: Custom imagePullSecrets" {
   cd `chart_dir`
   local object=$(helm template \
