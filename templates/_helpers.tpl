@@ -147,7 +147,88 @@ carry the -ent suffix, append it automatically.
 Otherwise return the tag as-is.
 */}}
 {{- define "vault.imageTag" -}}
-{{- $tag := .Values.server.image.tag | default .Chart.AppVersion -}}
+{{- $tag := .Values.server.image.tag | default "latest" -}}
+{{- if and .Values.server.enterpriseLicense.secretName .Values.server.enterpriseLicense.secretKey -}}
+  {{- if not (hasSuffix "-ent" $tag) -}}
+    {{- printf "%s-ent" $tag -}}
+  {{- else -}}
+    {{- $tag -}}
+  {{- end -}}
+{{- else -}}
+  {{- $tag -}}
+{{- end -}}
+{{- end -}}
+
+{{/*
+This helper mirrors the logic of vault.imageRepository:
+- If the user has explicitly overridden injector.agentImage.repository to
+  something other than the default "hashicorp/vault", honour that value as-is
+  (custom registry scenario).
+- If server.enterpriseLicense.secretName + secretKey are both set, auto-select
+  hashicorp/vault-enterprise so the agent edition always matches the server.
+- Otherwise fall back to hashicorp/vault (CE).
+*/}}
+{{- define "vault.agentImageRepository" -}}
+{{- if and .Values.injector.agentImage.repository (ne .Values.injector.agentImage.repository "hashicorp/vault") -}}
+  {{- .Values.injector.agentImage.repository -}}
+{{- else if and .Values.server.enterpriseLicense.secretName .Values.server.enterpriseLicense.secretKey -}}
+  hashicorp/vault-enterprise
+{{- else -}}
+  {{- .Values.injector.agentImage.repository | default "hashicorp/vault" -}}
+{{- end -}}
+{{- end -}}
+
+{{/*
+Companion to vault.agentImageRepository. Vault Enterprise images use a
+"-ent" tag suffix (e.g. 2.0.3-ent). This helper appends "-ent" automatically when the enterprise license
+is configured, matching the behaviour of vault.imageTag for the server.
+If the tag already carries the suffix it is left unchanged (idempotent).
+*/}}
+{{- define "vault.agentImageTag" -}}
+{{- $tag := .Values.injector.agentImage.tag | default "latest" -}}
+{{- if and .Values.server.enterpriseLicense.secretName .Values.server.enterpriseLicense.secretKey -}}
+  {{- if not (hasSuffix "-ent" $tag) -}}
+    {{- printf "%s-ent" $tag -}}
+  {{- else -}}
+    {{- $tag -}}
+  {{- end -}}
+{{- else -}}
+  {{- $tag -}}
+{{- end -}}
+{{- end -}}
+
+{{/*
+This helper mirrors the logic of vault.imageRepository and
+vault.agentImageRepository:
+- If csi.agent.image.repository is explicitly set to a non-default value,
+  honour it as-is (custom registry scenario).
+- If server.enterpriseLicense.secretName + secretKey are both set,
+  auto-select hashicorp/vault-enterprise so the CSI agent edition always
+  matches the server.
+- Otherwise fall back to hashicorp/vault (CE), preserving existing behaviour.
+*/}}
+{{- define "vault.csiAgentImageRepository" -}}
+{{- if and .Values.csi.agent.image.repository (ne .Values.csi.agent.image.repository "hashicorp/vault") -}}
+  {{- .Values.csi.agent.image.repository -}}
+{{- else if and .Values.server.enterpriseLicense.secretName .Values.server.enterpriseLicense.secretKey -}}
+  hashicorp/vault-enterprise
+{{- else -}}
+  {{- .Values.csi.agent.image.repository | default "hashicorp/vault" -}}
+{{- end -}}
+{{- end -}}
+
+{{/*
+Companion to vault.csiAgentImageRepository. Vault Enterprise images on
+DockerHub require the "-ent" tag suffix (e.g. 2.0.3-ent). Fixing the
+repository to hashicorp/vault-enterprise without also fixing the tag would
+result in an ImagePullBackOff because hashicorp/vault-enterprise:2.0.3
+does not exist. This helper appends "-ent" automatically when the enterprise
+license is configured, matching the behaviour of vault.imageTag for the server
+and vault.agentImageTag for the injector sidecar.
+If the tag already carries the "-ent" suffix it is left unchanged (idempotent).
+*/}}
+{{- define "vault.csiAgentImageTag" -}}
+{{- $tag := .Values.csi.agent.image.tag | default "latest" -}}
 {{- if and .Values.server.enterpriseLicense.secretName .Values.server.enterpriseLicense.secretKey -}}
   {{- if not (hasSuffix "-ent" $tag) -}}
     {{- printf "%s-ent" $tag -}}

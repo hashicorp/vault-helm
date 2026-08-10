@@ -1126,3 +1126,58 @@ EOF
       yq -r '.spec.strategy.rollingUpdate.maxUnavailable' | tee /dev/stderr)
   [ "${actual}" = "1" ]
 }
+
+@test "injector/deployment: AGENT_INJECT_VAULT_IMAGE defaults to CE image" {
+  cd `chart_dir`
+  local repo="$(yq -r '.injector.agentImage.repository' values.yaml)"
+  local tag="$(yq -r '.injector.agentImage.tag' values.yaml)"
+
+  local actual=$(helm template \
+      --show-only templates/injector-deployment.yaml \
+      . | tee /dev/stderr |
+      yq -r '.spec.template.spec.containers[0].env[] | select(.name=="AGENT_INJECT_VAULT_IMAGE") | .value' | tee /dev/stderr)
+  [ "${actual}" = "${repo}:${tag}" ]
+}
+
+@test "injector/deployment: AGENT_INJECT_VAULT_IMAGE auto-selects Enterprise image when license secret set" {
+  cd `chart_dir`
+  local repo="hashicorp/vault-enterprise"
+  local tag="$(yq -r '.injector.agentImage.tag' values.yaml)-ent"
+
+  local actual=$(helm template \
+      --show-only templates/injector-deployment.yaml \
+      --set 'server.enterpriseLicense.secretName=foo' \
+      . | tee /dev/stderr |
+      yq -r '.spec.template.spec.containers[0].env[] | select(.name=="AGENT_INJECT_VAULT_IMAGE") | .value' | tee /dev/stderr)
+  [ "${actual}" = "${repo}:${tag}" ]
+}
+
+@test "injector/deployment: AGENT_INJECT_VAULT_IMAGE -ent tag suffix not doubled when already present" {
+  cd `chart_dir`
+  local repo="hashicorp/vault-enterprise"
+  local tag="$(yq -r '.injector.agentImage.tag' values.yaml)-ent"
+
+  local actual=$(helm template \
+      --show-only templates/injector-deployment.yaml \
+      --set 'server.enterpriseLicense.secretName=foo' \
+      --set "injector.agentImage.tag=$(yq -r '.injector.agentImage.tag' values.yaml)-ent" \
+      . | tee /dev/stderr |
+      yq -r '.spec.template.spec.containers[0].env[] | select(.name=="AGENT_INJECT_VAULT_IMAGE") | .value' | tee /dev/stderr)
+  [ "${actual}" = "${repo}:${tag}" ]
+}
+
+@test "injector/deployment: AGENT_INJECT_VAULT_IMAGE custom repository respected with Enterprise license" {
+  cd `chart_dir`
+  local tag="$(yq -r '.injector.agentImage.tag' values.yaml)-ent"
+
+  local actual=$(helm template \
+      --show-only templates/injector-deployment.yaml \
+      --set 'server.enterpriseLicense.secretName=foo' \
+      --set 'injector.agentImage.repository=mycorp/vault' \
+      . | tee /dev/stderr |
+      yq -r '.spec.template.spec.containers[0].env[] | select(.name=="AGENT_INJECT_VAULT_IMAGE") | .value' | tee /dev/stderr)
+  # custom repo must be preserved, not overridden to hashicorp/vault-enterprise
+  [[ "${actual}" == "mycorp/vault:"* ]]
+  # -ent tag must still be appended
+  [ "${actual}" = "mycorp/vault:${tag}" ]
+}
