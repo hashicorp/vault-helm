@@ -46,10 +46,8 @@ load _helpers
   [ "${actual}" = "foo:1.2.3" ]
 }
 
-@test "server/dev-StatefulSet: image tag defaults to Chart.AppVersion" {
+@test "server/dev-StatefulSet: image tag defaults to latest when tag is empty" {
   cd `chart_dir`
-  local appVersion="$(yq -r '.appVersion' Chart.yaml)"
-
   local actual=$(helm template \
       --show-only templates/server-statefulset.yaml  \
       --set 'server.image.repository=foo' \
@@ -57,7 +55,7 @@ load _helpers
       --set 'server.dev.enabled=true' \
       . | tee /dev/stderr |
       yq -r '.spec.template.spec.containers[0].image' | tee /dev/stderr)
-  [ "${actual}" = "foo:${appVersion}" ]
+  [ "${actual}" = "foo:latest" ]
 }
 
 @test "server/dev-StatefulSet: Enterprise image auto-selected when secretName is set" {
