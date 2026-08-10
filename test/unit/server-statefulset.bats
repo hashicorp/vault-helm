@@ -1904,13 +1904,21 @@ load _helpers
 # enterprise license autoload support
 @test "server/StatefulSet: adds volume for license secret when enterprise license secret name and key are provided" {
   cd `chart_dir`
-  local actual=$(helm template \
+  local object=$(helm template \
       -s templates/server-statefulset.yaml  \
       --set 'server.enterpriseLicense.secretName=foo' \
       --set 'server.enterpriseLicense.secretKey=bar' \
       . | tee /dev/stderr |
-      yq -r -c '.spec.template.spec.volumes[] | select(.name == "vault-license")' | tee /dev/stderr)
-      [ "${actual}" = '{"name":"vault-license","secret":{"secretName":"foo","defaultMode":288}}' ]
+      yq '.spec.template.spec.volumes[] | select(.name == "vault-license")' | tee /dev/stderr)
+
+  local name=$(echo "$object" | yq -r '.name')
+  local secretName=$(echo "$object" | yq -r '.secret.secretName')
+  local defaultMode=$(echo "$object" | yq -r '.secret.defaultMode')
+
+  [ "${name}" = "vault-license" ]
+  [ "${secretName}" = "foo" ]
+  # 0440 octal = 288 decimal; yq v4 may render either form
+  [[ "${defaultMode}" = "288" || "${defaultMode}" = "440" || "${defaultMode}" = "0440" ]]
 }
 
 @test "server/StatefulSet: adds volume mount for license secret when enterprise license secret name and key are provided" {
