@@ -1,0 +1,27 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: dapi-test-pod
+  labels:
+    vault: downwardAPI
+spec:
+  containers:
+    - name: test-container
+      image: gcr.io/google_containers/busybox
+      command: [ "/bin/sh", "-c", "env" ]
+      env:
+        - name: MY_POD_NAME
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.name
+        - name: INPUT_ENV_VAR_FROM_FIELD_PATH
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.labels['vault']
+        - name: MY_POD_IP
+          valueFrom:
+            fieldRef:
+              fieldPath: status.podIP
+        - name: OUTPUT_ENV_VAR_FROM_FIELD_PATH
+          value: $(INPUT_ENV_VAR_FROM_FIELD_PATH)
+  restartPolicy: Never

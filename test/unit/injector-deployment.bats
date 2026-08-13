@@ -697,6 +697,32 @@ EOF
 }
 
 #--------------------------------------------------------------------
+# extraEnvironmentVarsFieldPath
+
+@test "injector/deployment: set extraEnvironmentVarsFieldPath" {
+  cd `chart_dir`
+  local object=$(helm template \
+      --show-only templates/injector-deployment.yaml  \
+      --set "injector.extraEnvironmentVarsFieldPath.FOO=metadata.labels['test']" \
+      --set 'injector.extraEnvironmentVarsFieldPath.FOOBAR=spec.nodeName' \
+      --set 'injector.extraEnvironmentVarsFieldPath.lower\.case=sanitized' \
+      . | tee /dev/stderr |
+      yq -r '.spec.template.spec.containers[0].env' | tee /dev/stderr)
+
+  local value=$(echo $object |
+      yq -r 'map(select(.name=="FOO")) | .[] .valueFrom.fieldRef.fieldPath' | tee /dev/stderr)
+  [ "${value}" = "metadata.labels['test']" ]
+
+  local value=$(echo $object |
+      yq -r 'map(select(.name=="FOOBAR")) | .[] .valueFrom.fieldRef.fieldPath' | tee /dev/stderr)
+  [ "${value}" = "spec.nodeName" ]
+
+  local value=$(echo $object |
+      yq -r 'map(select(.name=="LOWER_CASE")) | .[] .valueFrom.fieldRef.fieldPath' | tee /dev/stderr)
+  [ "${value}" = "sanitized" ]
+}
+
+#--------------------------------------------------------------------
 # extra annotations
 
 @test "injector/deployment: default annotations" {
