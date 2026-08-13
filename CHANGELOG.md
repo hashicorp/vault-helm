@@ -121,6 +121,9 @@ Bugs:
 * server: Fix invalid yaml in server test when volumeMounts or volumes are empty [GH-855](https://github.com/hashicorp/vault-helm/pull/855)
 * injector: Add RBAC for deleting configmaps [GH-1100](https://github.com/hashicorp/vault-helm/pull/1100)
 
+Features:
+* injector: add `injector.webhook.matchConditions` support for fine-grained webhook request filtering [GH-1079](https://github.com/hashicorp/vault-helm/pull/1079)
+
 ## 0.29.1 (November 20, 2024)
 
 Bugs:

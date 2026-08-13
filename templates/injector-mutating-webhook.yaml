@@ -41,5 +41,9 @@ webhooks:
     namespaceSelector:
 {{ toYaml (((.Values.injector.webhook)).namespaceSelector | default .Values.injector.namespaceSelector) | indent 6}}
 {{ end }}
+{{- if (((.Values.injector.webhook)).matchConditions) }}
+    matchConditions:
+{{ toYaml ((.Values.injector.webhook)).matchConditions | indent 6}}
+{{ end }}
 {{- template "injector.objectSelector" . -}}
 {{ end }}
