@@ -80,6 +80,27 @@ load _helpers
   [ "${actual}" = "foo:1.2.3" ]
 }
 
+@test "injector/deployment: global.imageRegistry prepends registry to injector and agent images" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      --show-only templates/injector-deployment.yaml  \
+      --set 'global.imageRegistry=registry.example.com' \
+      --set 'injector.image.repository=foo' \
+      --set 'injector.image.tag=1.2.3' \
+      . | tee /dev/stderr |
+      yq -r '.spec.template.spec.containers[0].image' | tee /dev/stderr)
+  [ "${actual}" = "registry.example.com/foo:1.2.3" ]
+
+  local actual=$(helm template \
+      --show-only templates/injector-deployment.yaml  \
+      --set 'global.imageRegistry=registry.example.com' \
+      --set 'injector.agentImage.repository=bar' \
+      --set 'injector.agentImage.tag=4.5.6' \
+      . | tee /dev/stderr |
+      yq -r '.spec.template.spec.containers[0].env[] | select(.name=="AGENT_INJECT_VAULT_IMAGE") | .value' | tee /dev/stderr)
+  [ "${actual}" = "registry.example.com/bar:4.5.6" ]
+}
+
 @test "injector/deployment: default imagePullPolicy" {
   cd `chart_dir`
   local actual=$(helm template \

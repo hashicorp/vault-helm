@@ -113,6 +113,25 @@ load _helpers
   [ "${actual}" = "PullPolicy2" ]
 }
 
+@test "csi/daemonset: global.imageRegistry prepends registry to csi and agent images" {
+  cd `chart_dir`
+  local object=$(helm template \
+      --show-only templates/csi-daemonset.yaml \
+      --set "csi.enabled=true" \
+      --set "global.imageRegistry=registry.example.com" \
+      --set "csi.image.repository=Image1" \
+      --set "csi.image.tag=0.0.1" \
+      --set "csi.agent.image.repository=Image2" \
+      --set "csi.agent.image.tag=0.0.2" \
+      . | tee /dev/stderr |
+      yq -r '.spec.template.spec.containers' | tee /dev/stderr)
+
+  local actual=$(echo $object | yq -r '.[0].image' | tee /dev/stderr)
+  [ "${actual}" = "registry.example.com/Image1:0.0.1" ]
+  local actual=$(echo $object | yq -r '.[1].image' | tee /dev/stderr)
+  [ "${actual}" = "registry.example.com/Image2:0.0.2" ]
+}
+
 @test "csi/daemonset: Custom imagePullSecrets" {
   cd `chart_dir`
   local object=$(helm template \

@@ -37,6 +37,24 @@ Expand the name of the chart.
 {{- end -}}
 
 {{/*
+Returns the global image registry prefix, including a trailing slash, when
+global.imageRegistry is set; otherwise returns an empty string.
+
+Prepend the result to a component's image.repository so a single
+global.imageRegistry value can repoint every image in the chart (useful for
+private mirrors / air-gapped installs) while preserving the existing
+per-component image.repository values as the default when unset.
+
+Usage:
+  image: {{ include "vault.imageRegistry" . }}{{ .Values.server.image.repository }}:{{ .Values.server.image.tag }}
+*/}}
+{{- define "vault.imageRegistry" -}}
+{{- if .Values.global.imageRegistry -}}
+{{- printf "%s/" (.Values.global.imageRegistry | trimSuffix "/") -}}
+{{- end -}}
+{{- end -}}
+
+{{/*
 Allow the release namespace to be overridden
 */}}
 {{- define "vault.namespace" -}}

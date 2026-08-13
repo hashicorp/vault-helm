@@ -25,6 +25,7 @@ Changes:
 
 Features:
 
+* Add `global.imageRegistry` to optionally prefix a single registry to all chart images (server, injector, injector agent, CSI provider, and CSI agent)
 * Add support for Kubernetes Gateway API HTTPRoute resource [#1142](https://github.com/hashicorp/vault-helm/pull/1142)
 
 ## 0.33.0 (June 8, 2026)
