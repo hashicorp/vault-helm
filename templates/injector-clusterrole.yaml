@@ -14,13 +14,21 @@ metadata:
     app.kubernetes.io/instance: {{ .Release.Name }}
     app.kubernetes.io/managed-by: {{ .Release.Service }}
 rules:
-- apiGroups: ["admissionregistration.k8s.io"]
-  resources: ["mutatingwebhookconfigurations"]
+- apiGroups:
+    {{- $apiGroups := .Values.injector.clusterRole.apiGroups | default (list "admissionregistration.k8s.io") }}
+    {{- range $apiGroups }}
+    - {{ . | quote }}
+    {{- end }}
+  resources:
+    {{- $resources := .Values.injector.clusterRole.resources | default (list "mutatingwebhookconfigurations") }}
+    {{- range $resources }}
+    - {{ . | quote }}
+    {{- end }}
   verbs:
-    - "get"
-    - "list"
-    - "watch"
-    - "patch"
+    {{- $verbs := .Values.injector.clusterRole.verbs | default (list "get" "list" "watch" "patch") }}
+    {{- range $verbs }}
+    - {{ . | quote }}
+    {{- end }}
 {{- if and (eq (.Values.injector.leaderElector.enabled | toString) "true") (gt (.Values.injector.replicas | int) 1) }}
 - apiGroups: [""]
   resources: ["nodes"]
