@@ -1,8 +1,16 @@
-## Unreleased
+## 0.34.1 (August 13, 2026)
+
+Changes:
+
+* Default `vault` version updated to v2.0.4
+* Default `vault-csi-provider` version updated to v1.7.4
+* Default `vault-k8s` version updated to v1.7.6
+* Tested with Vault v2.0.4, v1.21.9, v1.20.14, v1.19.20
+* build(deps): bump actions/setup-go from 6.5.0 to 7.0.0 [#1198](https://github.com/hashicorp/vault-helm/pull/1198)
 
 Bug Fixes:
 
-* Fix `defaultMode` for license secret volume rendered as octal literal `0440` — changed to decimal `288` to ensure compatibility with `python-yq` >= 4.0.0 [GH-1203](https://github.com/hashicorp/vault-helm/pull/1203)
+* Fix `defaultMode` for license secret volume rendered as octal literal `0440` — changed to decimal `288` to ensure compatibility with `python-yq` >= 4.0.0 [#1203](https://github.com/hashicorp/vault-helm/pull/1203)
 
 ## 0.34.0 (July 2, 2026)
 
