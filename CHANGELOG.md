@@ -1,3 +1,9 @@
+## Unreleased
+
+Bug Fixes:
+
+* Fix `defaultMode` for license secret volume rendered as octal literal `0440` — changed to decimal `288` to ensure compatibility with `python-yq` >= 4.0.0 [GH-1203](https://github.com/hashicorp/vault-helm/pull/1203)
+
 ## 0.34.0 (July 2, 2026)
 
 Changes:
