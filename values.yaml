@@ -50,6 +50,10 @@ injector:
 
   replicas: 1
 
+  # Configures the number of old ReplicaSets to retain to allow rollback.
+  # If unset, the Kubernetes default (10) is used.
+  revisionHistoryLimit: null
+
   # Configures the port the injector should listen on
   port: 8080
 
@@ -424,6 +428,10 @@ server:
   # Configure the Update Strategy Type for the StatefulSet
   # See https://kubernetes.io/docs/concepts/workloads/controllers/statefulset/#update-strategies
   updateStrategyType: "OnDelete"
+
+  # Configures the number of old ControllerRevisions to retain to allow rollback.
+  # If unset, the Kubernetes default (10) is used.
+  revisionHistoryLimit: null
 
   # Configure the logging verbosity for the Vault server.
   # Supported log levels include: trace, debug, info, warn, error
@@ -1225,6 +1233,9 @@ csi:
 
   # Settings for the daemonSet used to run the provider.
   daemonSet:
+    # Configures the number of old ControllerRevisions to retain to allow
+    # rollback. If unset, the Kubernetes default (10) is used.
+    revisionHistoryLimit: null
     updateStrategy:
       type: RollingUpdate
       maxUnavailable: ""
