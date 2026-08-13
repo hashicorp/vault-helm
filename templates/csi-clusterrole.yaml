@@ -10,6 +10,7 @@ kind: ClusterRole
 metadata:
   name: {{ template "vault.fullname" . }}-csi-provider-clusterrole
   labels:
+    helm.sh/chart: {{ include "vault.chart" . }}
     app.kubernetes.io/name: {{ include "vault.name" . }}-csi-provider
     app.kubernetes.io/instance: {{ .Release.Name }}
     app.kubernetes.io/managed-by: {{ .Release.Service }}
