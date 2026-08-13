@@ -1984,6 +1984,28 @@ load _helpers
 }
 
 #--------------------------------------------------------------------
+# enableServiceLinks
+
+@test "server/StatefulSet: server.enableServiceLinks not set" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      --show-only templates/server-statefulset.yaml \
+      . | tee /dev/stderr |
+      yq -r '.spec.template.spec.enableServiceLinks' | tee /dev/stderr)
+  [ "${actual}" = "true" ]
+}
+
+@test "server/StatefulSet: server.enableServiceLinks is set" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      --show-only templates/server-statefulset.yaml \
+      --set 'server.enableServiceLinks=false' \
+      . | tee /dev/stderr |
+      yq -r '.spec.template.spec.enableServiceLinks' | tee /dev/stderr)
+  [ "${actual}" = "false" ]
+}
+
+#--------------------------------------------------------------------
 # hostAliases
 
 @test "server/StatefulSet: server.hostAliases not set" {
