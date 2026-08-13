@@ -64,7 +64,7 @@ spec:
             {{- else if .Values.injector.externalVaultAddr }}
               value: "{{ .Values.injector.externalVaultAddr }}"
             {{- else }}
-              value: {{ include "vault.scheme" . }}://{{ template "vault.fullname" . }}.{{ include "vault.namespace" . }}.svc:{{ .Values.server.service.port }}
+              value: {{ include "vault.internalAddress" . }}
             {{- end }}
             - name: AGENT_INJECT_VAULT_AUTH_PATH
               value: {{ .Values.injector.authPath }}

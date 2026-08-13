@@ -1126,3 +1126,27 @@ EOF
       yq -r '.spec.strategy.rollingUpdate.maxUnavailable' | tee /dev/stderr)
   [ "${actual}" = "1" ]
 }
+
+@test "injector/deployment: internal Vault standalone addr" {
+  cd `chart_dir`
+  local object=$(helm template \
+      --show-only templates/injector-deployment.yaml \
+      --set 'server.ha.enabled=false' \
+      . | tee /dev/stderr |
+      yq -r '.spec.template.spec.containers[0].env' | tee /dev/stderr)
+  local value=$(echo $object |
+      yq -r 'map(select(.name=="AGENT_INJECT_VAULT_ADDR")) | .[] .value' | tee /dev/stderr)
+  [ "${value}" = "http://release-name-vault.default.svc:8200" ]
+}
+
+@test "injector/deployment: internal Vault HA addr" {
+  cd `chart_dir`
+  local object=$(helm template \
+      --show-only templates/injector-deployment.yaml \
+      --set 'server.ha.enabled=true' \
+      . | tee /dev/stderr |
+      yq -r '.spec.template.spec.containers[0].env' | tee /dev/stderr)
+  local value=$(echo $object |
+      yq -r 'map(select(.name=="AGENT_INJECT_VAULT_ADDR")) | .[] .value' | tee /dev/stderr)
+  [ "${value}" = "http://release-name-vault-active.default.svc:8200" ]
+}

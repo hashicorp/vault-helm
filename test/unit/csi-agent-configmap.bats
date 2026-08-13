@@ -62,3 +62,25 @@ load _helpers
       yq -r '.data["config.hcl"]' | tee /dev/stderr)
   echo "${actual}" | grep "http://vault-outside"
 }
+
+@test "csi/Agent-ConfigMap: Vault internal addr" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      --show-only templates/csi-agent-configmap.yaml \
+      --set "csi.enabled=true" \
+      --set 'server.ha.enabled=false' \
+      . | tee /dev/stderr |
+      yq -r '.data["config.hcl"]' | tee /dev/stderr)
+  echo "${actual}" | grep "http://release-name-vault.default.svc:8200"
+}
+
+@test "csi/Agent-ConfigMap: Vault internal HA addr" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      --show-only templates/csi-agent-configmap.yaml \
+      --set "csi.enabled=true" \
+      --set 'server.ha.enabled=true' \
+      . | tee /dev/stderr |
+      yq -r '.data["config.hcl"]' | tee /dev/stderr)
+  echo "${actual}" | grep "http://release-name-vault-active.default.svc:8200"
+}
