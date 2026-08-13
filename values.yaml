@@ -263,6 +263,8 @@ injector:
   #    capabilities:
   #      drop:
   #        - ALL
+  #      add:
+  #        - IPC_LOCK
   securityContext:
     pod: {}
     container: {}

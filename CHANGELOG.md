@@ -46,6 +46,10 @@ Features:
 
 * Add Vault Enterprise redundancy zones support (requires Kubernetes 1.35+) [#1170](https://github.com/hashicorp/vault-helm/pull/1170)
 
+Bugs:
+
+* server: add IPC_LOCK container capability to prevent unecessary major page faults [GH-1139](https://github.com/hashicorp/vault-helm/pull/1139)
+
 ## 0.32.0 (January 14, 2026)
 
 Changes:
