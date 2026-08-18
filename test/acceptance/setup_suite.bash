@@ -23,18 +23,27 @@ setup_suite() {
         SERVER_VAULT_VERSION="${SERVER_VAULT_VERSION}-ent"
         INJECTOR_AGENT_VERSION="${INJECTOR_AGENT_VERSION}-ent"
         CSI_AGENT_VERSION="${CSI_AGENT_VERSION}-ent"
-        VAULT_REPOSITORY="hashicorp/vault-enterprise"
         VAULT_LICENSE_CI=${VAULT_LICENSE_CI:?"VAULT_LICENSE_CI must be set"}
+        # Set the license secret — this is what triggers the chart helpers
+        # (vault.imageRepository/Tag, vault.agentImageRepository/Tag,
+        # vault.csiAgentImageRepository/Tag) to auto-select hashicorp/vault-enterprise.
         CHART_VALUES+=(--set server.enterpriseLicense.secretName=vault-license)
         PRE_CHART_CMDS+="kubectl create secret generic vault-license --from-literal=license=${VAULT_LICENSE_CI?}"
     fi
 
+    # Pass explicit image tags for all installs so CI can pin a specific build.
+    # For Enterprise the tags already carry the -ent suffix (appended above).
+    # derive hashicorp/vault-enterprise automatically from the license secret.
     CHART_VALUES+=(--set injector.agentImage.tag="${INJECTOR_AGENT_VERSION}")
-    CHART_VALUES+=(--set injector.agentImage.repository="${VAULT_REPOSITORY}")
     CHART_VALUES+=(--set server.image.tag="${SERVER_VAULT_VERSION}")
-    CHART_VALUES+=(--set server.image.repository="${VAULT_REPOSITORY}")
     CHART_VALUES+=(--set csi.agent.image.tag="${CSI_AGENT_VERSION}")
-    CHART_VALUES+=(--set csi.agent.image.repository="${VAULT_REPOSITORY}")
+
+    if [ "${ENT_TESTS}" != "true" ]; then
+        # For CE installs also pin the repository so CI can use a custom registry.
+        CHART_VALUES+=(--set injector.agentImage.repository="${VAULT_REPOSITORY}")
+        CHART_VALUES+=(--set server.image.repository="${VAULT_REPOSITORY}")
+        CHART_VALUES+=(--set csi.agent.image.repository="${VAULT_REPOSITORY}")
+    fi
 
     SET_CHART_VALUES=${CHART_VALUES[*]}
     export SET_CHART_VALUES PRE_CHART_CMDS

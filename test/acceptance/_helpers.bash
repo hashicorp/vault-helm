@@ -64,7 +64,16 @@ check_vault_versions(){
 
     local values
     values=$(helm get values "${helm_deployment_name}" --all)
+    
+    # Verify license secret was set (which triggers Enterprise auto-selection)
+    if [ "${ENT_TESTS}" = "true" ]; then
+        [ "vault-license" = "$(echo "${values}" | yq -r '.server.enterpriseLicense.secretName')" ]
+    fi
+    
+    # Verify server image tag matches expected version
+    # expected_version includes -ent suffix for Enterprise, plain for Community Edition
     [ "${expected_version}" = "$(echo "${values}" | yq -r '.server.image.tag')" ]
+    
     [ "${expected_version}" = "$(echo "${values}" | yq -r '.injector.agentImage.tag')" ]
     [ "${expected_version}" = "$(echo "${values}" | yq -r '.csi.agent.image.tag')" ]
 }

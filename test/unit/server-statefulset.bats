@@ -117,7 +117,7 @@ load _helpers
   [ "${actual}" = "foo:1.2.3" ]
 }
 
-@test "server/standalone-StatefulSet: image tag defaults to latest" {
+@test "server/standalone-StatefulSet: image tag defaults to latest when tag is empty" {
   cd `chart_dir`
   local actual=$(helm template \
       --show-only templates/server-statefulset.yaml  \
@@ -154,6 +154,62 @@ load _helpers
       . | tee /dev/stderr |
       yq -r '.spec.template.spec.containers[0].imagePullPolicy' | tee /dev/stderr)
   [ "${actual}" = "Always" ]
+}
+
+@test "server/standalone-StatefulSet: Enterprise image auto-selected when secretName is set" {
+  cd `chart_dir`
+  local repo="hashicorp/vault-enterprise"
+  local tag="$(yq -r '.server.image.tag' values.yaml)-ent"
+
+  local actual=$(helm template \
+      --show-only templates/server-statefulset.yaml \
+      --set 'server.enterpriseLicense.secretName=foo' \
+      . | tee /dev/stderr |
+      yq -r '.spec.template.spec.containers[0].image' | tee /dev/stderr)
+  [ "${actual}" = "${repo}:${tag}" ]
+}
+
+@test "server/standalone-StatefulSet: Enterprise image tag not doubled when -ent suffix already present" {
+  cd `chart_dir`
+  local repo="hashicorp/vault-enterprise"
+  local tag="$(yq -r '.server.image.tag' values.yaml)-ent"
+
+  local actual=$(helm template \
+      --show-only templates/server-statefulset.yaml \
+      --set 'server.enterpriseLicense.secretName=foo' \
+      --set "server.image.tag=$(yq -r '.server.image.tag' values.yaml)-ent" \
+      . | tee /dev/stderr |
+      yq -r '.spec.template.spec.containers[0].image' | tee /dev/stderr)
+  [ "${actual}" = "${repo}:${tag}" ]
+}
+
+@test "server/standalone-StatefulSet: custom image repository respected with Enterprise license" {
+  cd `chart_dir`
+  local tag="$(yq -r '.server.image.tag' values.yaml)-ent"
+
+  local actual=$(helm template \
+      --show-only templates/server-statefulset.yaml \
+      --set 'server.enterpriseLicense.secretName=foo' \
+      --set 'server.image.repository=mycorp/vault' \
+      . | tee /dev/stderr |
+      yq -r '.spec.template.spec.containers[0].image' | tee /dev/stderr)
+
+  # repo must NOT be overridden to hashicorp/vault-enterprise
+  [[ "${actual}" == "mycorp/vault:"* ]]
+  # -ent tag must still be appended
+  [ "${actual}" = "mycorp/vault:${tag}" ]
+}
+
+@test "server/standalone-StatefulSet: Community Edition image unchanged when no license secret set" {
+  cd `chart_dir`
+  local repo="$(yq -r '.server.image.repository' values.yaml)"
+  local tag="$(yq -r '.server.image.tag' values.yaml)"
+
+  local actual=$(helm template \
+      --show-only templates/server-statefulset.yaml \
+      . | tee /dev/stderr |
+      yq -r '.spec.template.spec.containers[0].image' | tee /dev/stderr)
+  [ "${actual}" = "${repo}:${tag}" ]
 }
 
 @test "server/standalone-StatefulSet: Custom imagePullSecrets" {
@@ -1848,13 +1904,21 @@ load _helpers
 # enterprise license autoload support
 @test "server/StatefulSet: adds volume for license secret when enterprise license secret name and key are provided" {
   cd `chart_dir`
-  local actual=$(helm template \
+  local object=$(helm template \
       -s templates/server-statefulset.yaml  \
       --set 'server.enterpriseLicense.secretName=foo' \
       --set 'server.enterpriseLicense.secretKey=bar' \
       . | tee /dev/stderr |
-      yq -r -c '.spec.template.spec.volumes[] | select(.name == "vault-license")' | tee /dev/stderr)
-      [ "${actual}" = '{"name":"vault-license","secret":{"secretName":"foo","defaultMode":288}}' ]
+      yq '.spec.template.spec.volumes[] | select(.name == "vault-license")' | tee /dev/stderr)
+
+  local name=$(echo "$object" | yq -r '.name')
+  local secretName=$(echo "$object" | yq -r '.secret.secretName')
+  local defaultMode=$(echo "$object" | yq -r '.secret.defaultMode')
+
+  [ "${name}" = "vault-license" ]
+  [ "${secretName}" = "foo" ]
+  # 0440 octal = 288 decimal; yq v4 may render either form
+  [[ "${defaultMode}" = "288" || "${defaultMode}" = "440" || "${defaultMode}" = "0440" ]]
 }
 
 @test "server/StatefulSet: adds volume mount for license secret when enterprise license secret name and key are provided" {

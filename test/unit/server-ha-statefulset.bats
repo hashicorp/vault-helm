@@ -46,9 +46,8 @@ load _helpers
   [ "${actual}" = "foo:1.2.3" ]
 }
 
-@test "server/ha-StatefulSet: image tag defaults to latest" {
+@test "server/ha-StatefulSet: image tag defaults to latest when tag is empty" {
   cd `chart_dir`
-
   local actual=$(helm template \
       --show-only templates/server-statefulset.yaml  \
       --set 'server.image.repository=foo' \
@@ -57,6 +56,66 @@ load _helpers
       . | tee /dev/stderr |
       yq -r '.spec.template.spec.containers[0].image' | tee /dev/stderr)
   [ "${actual}" = "foo:latest" ]
+}
+
+@test "server/ha-StatefulSet: Enterprise image auto-selected when secretName is set" {
+  cd `chart_dir`
+  local repo="hashicorp/vault-enterprise"
+  local tag="$(yq -r '.server.image.tag' values.yaml)-ent"
+
+  local actual=$(helm template \
+      --show-only templates/server-statefulset.yaml \
+      --set 'server.ha.enabled=true' \
+      --set 'server.enterpriseLicense.secretName=foo' \
+      . | tee /dev/stderr |
+      yq -r '.spec.template.spec.containers[0].image' | tee /dev/stderr)
+  [ "${actual}" = "${repo}:${tag}" ]
+}
+
+@test "server/ha-StatefulSet: Enterprise image tag not doubled when -ent suffix already present" {
+  cd `chart_dir`
+  local repo="hashicorp/vault-enterprise"
+  local tag="$(yq -r '.server.image.tag' values.yaml)-ent"
+
+  local actual=$(helm template \
+      --show-only templates/server-statefulset.yaml \
+      --set 'server.ha.enabled=true' \
+      --set 'server.enterpriseLicense.secretName=foo' \
+      --set "server.image.tag=$(yq -r '.server.image.tag' values.yaml)-ent" \
+      . | tee /dev/stderr |
+      yq -r '.spec.template.spec.containers[0].image' | tee /dev/stderr)
+  [ "${actual}" = "${repo}:${tag}" ]
+}
+
+@test "server/ha-StatefulSet: custom image repository respected with Enterprise license" {
+  cd `chart_dir`
+  local tag="$(yq -r '.server.image.tag' values.yaml)-ent"
+
+  local actual=$(helm template \
+      --show-only templates/server-statefulset.yaml \
+      --set 'server.ha.enabled=true' \
+      --set 'server.enterpriseLicense.secretName=foo' \
+      --set 'server.image.repository=mycorp/vault' \
+      . | tee /dev/stderr |
+      yq -r '.spec.template.spec.containers[0].image' | tee /dev/stderr)
+
+  # repo must NOT be overridden to hashicorp/vault-enterprise
+  [[ "${actual}" == "mycorp/vault:"* ]]
+  # -ent tag must still be appended
+  [ "${actual}" = "mycorp/vault:${tag}" ]
+}
+
+@test "server/ha-StatefulSet: Community Edition image unchanged when no license secret set" {
+  cd `chart_dir`
+  local repo="$(yq -r '.server.image.repository' values.yaml)"
+  local tag="$(yq -r '.server.image.tag' values.yaml)"
+
+  local actual=$(helm template \
+      --show-only templates/server-statefulset.yaml \
+      --set 'server.ha.enabled=true' \
+      . | tee /dev/stderr |
+      yq -r '.spec.template.spec.containers[0].image' | tee /dev/stderr)
+  [ "${actual}" = "${repo}:${tag}" ]
 }
 
 #--------------------------------------------------------------------
