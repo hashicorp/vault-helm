@@ -136,7 +136,7 @@ secret is configured, falling back to hashicorp/vault for Community Edition.
 {{- else if and .Values.server.enterpriseLicense.secretName .Values.server.enterpriseLicense.secretKey -}}
   hashicorp/vault-enterprise
 {{- else -}}
-  {{- .Values.server.image.repository | default "hashicorp/vault" -}}
+  hashicorp/vault
 {{- end -}}
 {{- end -}}
 
@@ -174,7 +174,7 @@ This helper mirrors the logic of vault.imageRepository:
 {{- else if and .Values.server.enterpriseLicense.secretName .Values.server.enterpriseLicense.secretKey -}}
   hashicorp/vault-enterprise
 {{- else -}}
-  {{- .Values.injector.agentImage.repository | default "hashicorp/vault" -}}
+  hashicorp/vault
 {{- end -}}
 {{- end -}}
 
@@ -213,7 +213,7 @@ vault.agentImageRepository:
 {{- else if and .Values.server.enterpriseLicense.secretName .Values.server.enterpriseLicense.secretKey -}}
   hashicorp/vault-enterprise
 {{- else -}}
-  {{- .Values.csi.agent.image.repository | default "hashicorp/vault" -}}
+  hashicorp/vault
 {{- end -}}
 {{- end -}}
 
