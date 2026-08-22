@@ -1356,6 +1356,334 @@ csi:
   # for the available command line flags.
   extraArgs: []
 
+# Vault Proxy runs as a standalone Deployment that acts as a cluster-local
+# API proxy in front of a Vault server (in-cluster or external), providing
+# response caching and optional automatic authentication for its clients.
+# See https://developer.hashicorp.com/vault/docs/agent-and-proxy/proxy
+proxy:
+  # True if you want to deploy Vault Proxy. Unlike the other components, the
+  # proxy is not enabled by default via global.enabled and must be enabled
+  # explicitly.
+  enabled: false
+
+  # Number of proxy pods to run. The proxy is stateless (its cache is
+  # per-pod and in-memory), so it can be scaled horizontally; for a highly
+  # available deployment run 3 or more replicas spread across availability
+  # zones (see topologySpreadConstraints below) with a podDisruptionBudget.
+  replicas: 1
+
+  # image sets the repo and tag of the Vault image to use for the proxy.
+  # Vault Proxy is a subcommand of Vault itself, so this uses the official
+  # Vault image. Vault 1.14+ is required.
+  image:
+    repository: "hashicorp/vault"
+    tag: "2.0.4"
+    pullPolicy: IfNotPresent
+
+  # Port the proxy listens on. This must match the address of the
+  # listener "tcp" stanza in the proxy configuration below; it is used for
+  # the container port and as the default port for the liveness/readiness
+  # probes (overridable via livenessProbe.port / readinessProbe.port). The
+  # default of 8100 follows the Vault Proxy documentation convention and
+  # avoids confusion with the Vault server's 8200.
+  port: 8100
+
+  # TLS for the proxy listener. This must match the tls_disable setting of
+  # the listener "tcp" stanza in the proxy configuration below; it is used
+  # to derive the scheme for path-based health probes.
+  tlsDisable: true
+
+  # Configures the log level of the proxy. Supported log levels include:
+  # trace, debug, info, warn, and error.
+  logLevel: "info"
+
+  # Configures the log format of the proxy. Supported log formats:
+  # "standard", "json".
+  logFormat: "standard"
+
+  # Pass arbitrary additional arguments to vault proxy.
+  # See https://developer.hashicorp.com/vault/docs/agent-and-proxy/proxy#command-line-options
+  extraArgs: []
+
+  # The proxy configuration in Vault's HCL format. This is rendered as a
+  # template, so other values can be referenced from it; by default the
+  # vault address resolves to global.externalVaultAddr when set, otherwise
+  # to the chart's internal Vault service. A listener stanza is required
+  # and its address must match proxy.port above. An empty cache stanza
+  # enables caching of tokens and leased secrets that flow through the
+  # proxy. Requests that carry a client token keep that token: Vault
+  # enforces the client's own identity and policies, and responses are
+  # cached per client token. (The exception is setting use_auto_auth_token
+  # to "force" in the api_proxy stanza, which replaces even client-supplied
+  # tokens with the proxy's own.)
+  #
+  # To have the proxy authenticate on behalf of clients that send no
+  # token, add auto_auth and api_proxy stanzas as shown in the commented
+  # example; the Vault server must have the Kubernetes auth method
+  # configured with a role bound to the proxy's service account. WARNING:
+  # with use_auto_auth_token, tokenless requests — or all requests, when
+  # set to "force" — are performed with the proxy's own identity, so
+  # every client that can reach the proxy inherits the access of the
+  # proxy's Vault role. Only use this pattern
+  # when the proxy is dedicated to a single application or trust domain
+  # (for example, replicas of one workload that share the same access);
+  # keep the role's policies minimal and restrict access to the proxy
+  # Service, for example with a NetworkPolicy.
+  config: |
+    vault {
+      address = "{{ include "proxy.vaultAddress" . }}"
+    }
+
+    listener "tcp" {
+      address = "[::]:8100"
+      tls_disable = true
+    }
+
+    cache {
+    }
+  # config: |
+  #   vault {
+  #     address = "{{ include "proxy.vaultAddress" . }}"
+  #     retry {
+  #       num_retries = 5
+  #     }
+  #   }
+  #
+  #   listener "tcp" {
+  #     address = "[::]:8100"
+  #     tls_disable = true
+  #   }
+  #
+  #   auto_auth {
+  #     method "kubernetes" {
+  #       mount_path = "auth/kubernetes"
+  #       config = {
+  #         role = "vault-proxy"
+  #       }
+  #     }
+  #   }
+  #
+  #   api_proxy {
+  #     use_auto_auth_token = true
+  #   }
+  #
+  #   cache {
+  #   }
+
+  resources: {}
+  # resources:
+  #   requests:
+  #     memory: 128Mi
+  #     cpu: 100m
+  #   limits:
+  #     memory: 256Mi
+  #     cpu: 500m
+
+  # extraEnvironmentVars is a list of extra environment variables to set in
+  # the proxy deployment, for example VAULT_CACERT for a private CA or
+  # VAULT_SKIP_VERIFY for a self-signed Vault server certificate.
+  extraEnvironmentVars: {}
+    # VAULT_CACERT: /vault/tls/ca.crt
+
+  # extraSecretEnvironmentVars is a list of extra environment variables to
+  # set with the deployment. These variables take value from existing Secret
+  # objects.
+  extraSecretEnvironmentVars: []
+    # - envName: AWS_SECRET_ACCESS_KEY
+    #   secretName: vault
+    #   secretKey: AWS_SECRET_ACCESS_KEY
+
+  # volumes is a list of volumes made available to the proxy pods, for
+  # example to provide TLS certificates for the listener or the connection
+  # to the Vault server.
+  volumes: null
+  # volumes:
+  #   - name: listener-tls
+  #     secret:
+  #       secretName: vault-proxy-tls
+
+  # volumeMounts is a list of volumeMounts for the proxy container.
+  volumeMounts: null
+  # volumeMounts:
+  #   - mountPath: /vault/tls
+  #     name: listener-tls
+  #     readOnly: true
+
+  # Extra annotations to attach to the proxy pods.
+  # This can either be YAML or a YAML-formatted multi-line templated string
+  # map of the annotations to apply to the proxy pods.
+  annotations: {}
+
+  # Extra labels to attach to the proxy pods.
+  # This should be a YAML map of the labels to apply to the proxy pods.
+  extraLabels: {}
+
+  # Affinity Settings for proxy pods.
+  # This can either be a multi-line string or YAML matching the PodSpec's
+  # affinity field.
+  affinity: {}
+
+  # Topology settings for proxy pods.
+  # This can either be YAML or a YAML-formatted multi-line templated string
+  # map of the topologySpreadConstraints to apply to the proxy pods, for
+  # example to spread replicas across availability zones.
+  topologySpreadConstraints: []
+
+  # Toleration Settings for proxy pods.
+  # This should be either a multi-line string or YAML matching the
+  # Toleration array.
+  tolerations: []
+
+  # nodeSelector labels for proxy pod assignment.
+  # This should be either a multi-line string or YAML matching the
+  # nodeSelector type.
+  nodeSelector: {}
+
+  # Priority class for proxy pods.
+  priorityClassName: ""
+
+  # A disruption budget limits the number of pods of a replicated
+  # application that are down simultaneously from voluntary disruptions.
+  podDisruptionBudget: {}
+  # podDisruptionBudget:
+  #   minAvailable: 2
+
+  # strategy for updating the deployment. This can be a multi-line string
+  # or a YAML map.
+  strategy: {}
+  # strategy: |
+  #   rollingUpdate:
+  #     maxSurge: 25%
+  #     maxUnavailable: 25%
+  #   type: RollingUpdate
+
+  # Used to define custom livenessProbe settings. By default the probe is a
+  # TCP check on the listener at proxy.port: health requests through the
+  # proxy are forwarded to the Vault server, so an HTTP liveness probe would
+  # couple pod restarts to Vault availability — and restarting a proxy while
+  # Vault is unreachable also discards the cached secrets it can still
+  # serve. Set path to switch to an HTTP GET probe against the listener.
+  livenessProbe:
+    # When set, use an HTTP GET probe on this path (forwarded to the Vault
+    # server) instead of a TCP check on the listener.
+    path: ""
+    # Port to probe. Defaults to proxy.port; set this to probe a different
+    # listener defined in the proxy configuration.
+    # port: 8100
+    # When a probe fails, Kubernetes will try failureThreshold times before giving up
+    failureThreshold: 2
+    # Number of seconds after the container has started before probe initiates
+    initialDelaySeconds: 5
+    # How often (in seconds) to perform the probe
+    periodSeconds: 5
+    # Minimum consecutive successes for the probe to be considered successful after having failed
+    successThreshold: 1
+    # Number of seconds after which the probe times out.
+    timeoutSeconds: 3
+  # Used to define custom readinessProbe settings. Defaults to a TCP check
+  # on the listener at proxy.port, which keeps proxies serving cached
+  # secrets while the Vault server is unreachable. Set path to instead
+  # forward the probe to the Vault server, marking proxy pods unready when
+  # Vault is unhealthy; include standbyok=true and perfstandbyok=true so
+  # standby nodes (HTTP 429/473) are not treated as failures.
+  readinessProbe:
+    # When set, use an HTTP GET probe on this path (forwarded to the Vault
+    # server) instead of a TCP check on the listener.
+    path: ""
+    # path: "/v1/sys/health?standbyok=true&perfstandbyok=true"
+    # Port to probe. Defaults to proxy.port; set this to probe a different
+    # listener defined in the proxy configuration.
+    # port: 8100
+    # When a probe fails, Kubernetes will try failureThreshold times before giving up
+    failureThreshold: 2
+    # Number of seconds after the container has started before probe initiates
+    initialDelaySeconds: 5
+    # How often (in seconds) to perform the probe
+    periodSeconds: 5
+    # Minimum consecutive successes for the probe to be considered successful after having failed
+    successThreshold: 1
+    # Number of seconds after which the probe times out.
+    timeoutSeconds: 3
+
+  # Definition of the proxy Service.
+  service:
+    # Enables the proxy Service.
+    enabled: true
+    # Type of the Service. ClusterIP serves in-cluster clients; use
+    # LoadBalancer together with cloud-specific annotations below to expose
+    # the proxy outside the cluster.
+    type: ClusterIP
+    # Port on which the proxy Service is listening.
+    port: 8100
+    # Target port to which the Service should be mapped to. This should
+    # match proxy.port.
+    targetPort: 8100
+    # If type is set to "NodePort", a specific nodePort value can be
+    # configured, will be random if left blank.
+    # nodePort: 30100
+    # Denotes if this Service wants to route external traffic to node-local
+    # or cluster-wide endpoints. Applies to LoadBalancer and NodePort
+    # service types.
+    externalTrafficPolicy: Cluster
+    # Extra annotations for the Service definition. This can either be YAML
+    # or a YAML-formatted multi-line templated string map of the
+    # annotations to apply to the Service, for example the cloud provider
+    # specific load balancer annotations for AWS, GKE, Azure, or OpenStack.
+    annotations: {}
+
+    # Optional second Service that exposes Vault Proxy outside the cluster.
+    # Rendered as a separate resource (<fullname>-proxy-external, where fullname
+    # defaults to <release>-vault) so it can be managed independently of the
+    # cluster-internal Service above.
+    externalService:
+      # Set to true to render the external Service.
+      enabled: false
+      # Kubernetes Service type. Typically LoadBalancer for cloud NLB/ALB.
+      type: LoadBalancer
+      # Port the external Service listens on.
+      port: 8100
+      # Pod port the external Service forwards to. Should match proxy.port.
+      targetPort: 8100
+      # Restrict which source CIDRs can reach the load balancer.
+      # Applies only when type is LoadBalancer.
+      # loadBalancerSourceRanges: []
+      # Denotes if this Service wants to route external traffic to node-local
+      # or cluster-wide endpoints. Applies to LoadBalancer and NodePort types.
+      externalTrafficPolicy: Local
+      # Extra annotations for the external Service. This can either be YAML
+      # or a YAML-formatted multi-line templated string map of the
+      # annotations to apply to the Service, for example cloud provider
+      # specific load balancer annotations for AWS, GKE, Azure, or OpenStack.
+      annotations: {}
+
+  serviceAccount:
+    # Specifies whether a service account should be created.
+    # The service account is what the proxy authenticates with when the
+    # Kubernetes auto-auth method is configured, so the Vault role used in
+    # auto_auth must be bound to this service account.
+    create: true
+    # The name of the service account to use.
+    # If not set and create is true, a name is generated using the fullname
+    # template.
+    name: ""
+    # Extra annotations for the serviceAccount definition. This can either
+    # be YAML or a YAML-formatted multi-line templated string map of the
+    # annotations to apply to the serviceAccount.
+    annotations: {}
+    # Extra labels to attach to the serviceAccount.
+    # This should be a YAML map of the labels to apply to the serviceAccount.
+    extraLabels: {}
+
+  securityContext:
+    # Extra securityContext settings for the proxy pods.
+    # This can either be YAML or a YAML-formatted multi-line templated
+    # string map of the securityContext to apply to the proxy pods.
+    pod: {}
+    # Extra securityContext settings for the proxy container.
+    # This can either be YAML or a YAML-formatted multi-line templated
+    # string map of the securityContext to apply to the proxy container.
+    container: {}
+
 # Vault is able to collect and publish various runtime metrics.
 # Enabling this feature requires setting adding `telemetry{}` stanza to
 # the Vault configuration. There are a few examples included in the `config` sections above.

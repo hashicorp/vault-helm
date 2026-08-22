@@ -1,0 +1,118 @@
+{{/*
+Copyright IBM Corp. 2018, 2025
+SPDX-License-Identifier: MPL-2.0
+*/}}
+
+{{- template "vault.proxyEnabled" . -}}
+{{- if .proxyEnabled -}}
+# Deployment for Vault Proxy
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ template "vault.fullname" . }}-proxy
+  namespace: {{ include "vault.namespace" . }}
+  labels:
+    helm.sh/chart: {{ include "vault.chart" . }}
+    app.kubernetes.io/name: {{ include "vault.name" . }}-proxy
+    app.kubernetes.io/instance: {{ .Release.Name }}
+    app.kubernetes.io/managed-by: {{ .Release.Service }}
+    component: proxy
+spec:
+  replicas: {{ .Values.proxy.replicas }}
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: {{ template "vault.name" . }}-proxy
+      app.kubernetes.io/instance: {{ .Release.Name }}
+      component: proxy
+  {{ template "proxy.strategy" . }}
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: {{ template "vault.name" . }}-proxy
+        app.kubernetes.io/instance: {{ .Release.Name }}
+        component: proxy
+        {{- if  .Values.proxy.extraLabels -}}
+          {{- toYaml .Values.proxy.extraLabels | nindent 8 -}}
+        {{- end -}}
+      {{ template "proxy.annotations" . }}
+    spec:
+      {{ template "proxy.affinity" . }}
+      {{ template "proxy.topologySpreadConstraints" . }}
+      {{ template "proxy.tolerations" . }}
+      {{ template "proxy.nodeselector" . }}
+      {{- if .Values.proxy.priorityClassName }}
+      priorityClassName: {{ .Values.proxy.priorityClassName }}
+      {{- end }}
+      serviceAccountName: {{ template "proxy.serviceAccount.name" . }}
+      {{ template "proxy.securityContext.pod" . }}
+      containers:
+        - name: vault-proxy
+          {{ template "proxy.resources" . }}
+          image: "{{ .Values.proxy.image.repository }}:{{ .Values.proxy.image.tag }}"
+          imagePullPolicy: "{{ .Values.proxy.image.pullPolicy }}"
+          {{- template "proxy.securityContext.container" . }}
+          command:
+            - vault
+          args:
+            - proxy
+            - -config=/etc/vault/config.hcl
+            {{- if .Values.proxy.extraArgs }}
+            {{- toYaml .Values.proxy.extraArgs | nindent 12 }}
+            {{- end }}
+          ports:
+            - name: proxy
+              containerPort: {{ .Values.proxy.port }}
+          env:
+            - name: VAULT_LOG_LEVEL
+              value: "{{ .Values.proxy.logLevel }}"
+            - name: VAULT_LOG_FORMAT
+              value: "{{ .Values.proxy.logFormat }}"
+            {{- include "vault.extraEnvironmentVars" .Values.proxy | nindent 12 }}
+            {{- include "vault.extraSecretEnvironmentVars" .Values.proxy | nindent 12 }}
+          livenessProbe:
+            {{- if .Values.proxy.livenessProbe.path }}
+            httpGet:
+              path: {{ .Values.proxy.livenessProbe.path | quote }}
+              port: {{ default .Values.proxy.port .Values.proxy.livenessProbe.port }}
+              scheme: {{ include "proxy.scheme" . | upper }}
+            {{- else }}
+            tcpSocket:
+              port: {{ default .Values.proxy.port .Values.proxy.livenessProbe.port }}
+            {{- end }}
+            failureThreshold: {{ .Values.proxy.livenessProbe.failureThreshold }}
+            initialDelaySeconds: {{ .Values.proxy.livenessProbe.initialDelaySeconds }}
+            periodSeconds: {{ .Values.proxy.livenessProbe.periodSeconds }}
+            successThreshold: {{ .Values.proxy.livenessProbe.successThreshold }}
+            timeoutSeconds: {{ .Values.proxy.livenessProbe.timeoutSeconds }}
+          readinessProbe:
+            {{- if .Values.proxy.readinessProbe.path }}
+            httpGet:
+              path: {{ .Values.proxy.readinessProbe.path | quote }}
+              port: {{ default .Values.proxy.port .Values.proxy.readinessProbe.port }}
+              scheme: {{ include "proxy.scheme" . | upper }}
+            {{- else }}
+            tcpSocket:
+              port: {{ default .Values.proxy.port .Values.proxy.readinessProbe.port }}
+            {{- end }}
+            failureThreshold: {{ .Values.proxy.readinessProbe.failureThreshold }}
+            initialDelaySeconds: {{ .Values.proxy.readinessProbe.initialDelaySeconds }}
+            periodSeconds: {{ .Values.proxy.readinessProbe.periodSeconds }}
+            successThreshold: {{ .Values.proxy.readinessProbe.successThreshold }}
+            timeoutSeconds: {{ .Values.proxy.readinessProbe.timeoutSeconds }}
+          volumeMounts:
+            - name: config
+              mountPath: /etc/vault/config.hcl
+              subPath: config.hcl
+              readOnly: true
+            {{- if .Values.proxy.volumeMounts }}
+            {{- toYaml .Values.proxy.volumeMounts | nindent 12 }}
+            {{- end }}
+      volumes:
+        - name: config
+          configMap:
+            name: {{ template "vault.fullname" . }}-proxy-config
+        {{- if .Values.proxy.volumes }}
+        {{- toYaml .Values.proxy.volumes | nindent 8 }}
+        {{- end }}
+      {{- include "imagePullSecrets" . | nindent 6 }}
+{{ end }}
