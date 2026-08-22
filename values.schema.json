@@ -242,6 +242,13 @@
                 }
             }
         },
+        "extraObjects": {
+            "type": [
+                "array",
+                "object",
+                "null"
+            ]
+        },
         "global": {
             "type": "object",
             "properties": {
