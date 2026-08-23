@@ -1,3 +1,9 @@
+## Unreleased
+
+Features:
+
+* Add `extraObjects` for deploying additional Kubernetes objects as part of the chart's release. Accepts a list or a map, whose entries are either YAML maps or templated strings, and renders each entry with `tpl` against the chart's context [#1143](https://github.com/hashicorp/vault-helm/pull/1143)
+
 ## 0.34.1 (August 13, 2026)
 
 Changes:

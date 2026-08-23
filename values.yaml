@@ -1480,13 +1480,82 @@ serverTelemetry:
       #    labels:
       #      severity: critical
 
-
-# -- List of extra manifests to deploy
-extraObjects: []
-# - |
-#   apiVersion: v1
-#   kind: ConfigMap
-#   metadata:
-#     name: example-cm
-#   data:
-#     foo: bar
+# Additional Kubernetes objects to deploy alongside the chart's own resources.
+# Use this for objects the chart does not model, such as a cert-manager
+# Certificate issuing the Secret referenced by server.volumes, or a
+# NetworkPolicy for the CSI provider. Keeping them here puts them in the same
+# Helm release, so they share its lifecycle instead of being applied separately.
+#
+# Each entry is either a YAML map or a string. Both forms are rendered with
+# `tpl` against the chart's context, so they can call the chart's own templates
+# and values. Using helpers such as `vault.fullname`, `vault.name` and
+# `vault.namespace` keeps names, selectors and labels in step with the
+# resources the chart generates. An entry that is neither a map nor a string
+# fails rendering with an error naming its list index or its map key.
+#
+# extraObjects may also be given as a map of named entries instead of a list.
+# Helm replaces lists wholesale when merging values files but merges maps key
+# by key, so the map form lets a layered values file add or override a single
+# object without restating the others.
+#
+# These objects are not gated on global.enabled or on any component being
+# enabled. An entry that renders to nothing is skipped rather than emitting an
+# empty document, so an entry can be wrapped in a conditional to tie it to a
+# component: see the server and CSI provider example below. This matters when
+# one release enables more than one component, since each component needs its
+# own object under its own name.
+#
+# example, as a list of maps:
+# extraObjects:
+#   - apiVersion: cert-manager.io/v1
+#     kind: Certificate
+#     metadata:
+#       name: '{{ include "vault.fullname" . }}-tls'
+#       namespace: '{{ include "vault.namespace" . }}'
+#     spec:
+#       secretName: vault-tls
+#       issuerRef:
+#         name: internal-issuer
+#         kind: ClusterIssuer
+#       dnsNames:
+#         - vault.example.com
+#
+# example, as a map of templated strings, giving the server and the CSI
+# provider a certificate each. The CSI entry renders to nothing when the CSI
+# provider is disabled, so the same values file serves a release with either or
+# both:
+# extraObjects:
+#   serverCertificate: |
+#     apiVersion: cert-manager.io/v1
+#     kind: Certificate
+#     metadata:
+#       name: {{ include "vault.fullname" . }}-server-tls
+#       namespace: {{ include "vault.namespace" . }}
+#       labels:
+#         app.kubernetes.io/name: {{ include "vault.name" . }}
+#     spec:
+#       secretName: vault-server-tls
+#       issuerRef:
+#         name: internal-issuer
+#         kind: ClusterIssuer
+#       dnsNames:
+#         - vault.example.com
+#   csiCertificate: |
+#     {{- if .Values.csi.enabled }}
+#     apiVersion: cert-manager.io/v1
+#     kind: Certificate
+#     metadata:
+#       name: {{ include "vault.fullname" . }}-csi-tls
+#       namespace: {{ include "vault.namespace" . }}
+#     spec:
+#       secretName: vault-csi-tls
+#       issuerRef:
+#         name: internal-issuer
+#         kind: ClusterIssuer
+#       dnsNames:
+#         - vault-csi.example.com
+#     {{- end }}
+#
+# The default is null rather than an empty list so that neither the list nor
+# the map form conflicts with the default's type when values files are merged.
+extraObjects: null
