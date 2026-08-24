@@ -142,12 +142,14 @@ secret is configured, falling back to hashicorp/vault for Community Edition.
 
 {{/*
 Resolve the Vault server image tag.
+If server.image.tag is set, use it; otherwise fall back to $.Chart.AppVersion
+so that Chart.yaml is the single source of truth for the Vault version.
 If server.enterpriseLicense.secretName is set and the tag does not already
 carry the -ent suffix, append it automatically.
 Otherwise return the tag as-is.
 */}}
 {{- define "vault.imageTag" -}}
-{{- $tag := .Values.server.image.tag | default "latest" -}}
+{{- $tag := .Values.server.image.tag | default .Chart.AppVersion -}}
 {{- if and .Values.server.enterpriseLicense.secretName .Values.server.enterpriseLicense.secretKey -}}
   {{- if not (hasSuffix "-ent" $tag) -}}
     {{- printf "%s-ent" $tag -}}
@@ -182,10 +184,11 @@ This helper mirrors the logic of vault.imageRepository:
 Companion to vault.agentImageRepository. Vault Enterprise images use a
 "-ent" tag suffix (e.g. 2.0.3-ent). This helper appends "-ent" automatically when the enterprise license
 is configured, matching the behaviour of vault.imageTag for the server.
+If injector.agentImage.tag is not set, falls back to $.Chart.AppVersion.
 If the tag already carries the suffix it is left unchanged (idempotent).
 */}}
 {{- define "vault.agentImageTag" -}}
-{{- $tag := .Values.injector.agentImage.tag | default "latest" -}}
+{{- $tag := .Values.injector.agentImage.tag | default .Chart.AppVersion -}}
 {{- if and .Values.server.enterpriseLicense.secretName .Values.server.enterpriseLicense.secretKey -}}
   {{- if not (hasSuffix "-ent" $tag) -}}
     {{- printf "%s-ent" $tag -}}
@@ -225,10 +228,11 @@ result in an ImagePullBackOff because hashicorp/vault-enterprise:2.0.3
 does not exist. This helper appends "-ent" automatically when the enterprise
 license is configured, matching the behaviour of vault.imageTag for the server
 and vault.agentImageTag for the injector sidecar.
+If csi.agent.image.tag is not set, falls back to $.Chart.AppVersion.
 If the tag already carries the "-ent" suffix it is left unchanged (idempotent).
 */}}
 {{- define "vault.csiAgentImageTag" -}}
-{{- $tag := .Values.csi.agent.image.tag | default "latest" -}}
+{{- $tag := .Values.csi.agent.image.tag | default .Chart.AppVersion -}}
 {{- if and .Values.server.enterpriseLicense.secretName .Values.server.enterpriseLicense.secretKey -}}
   {{- if not (hasSuffix "-ent" $tag) -}}
     {{- printf "%s-ent" $tag -}}

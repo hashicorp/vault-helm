@@ -74,9 +74,11 @@ injector:
   # agentImage sets the repo and tag of the Vault image to use for the Vault Agent
   # containers.  This should be set to the official Vault image.  Vault 1.3.1+ is
   # required.
+  # tag: leave empty to use Chart.AppVersion (central default). Override with
+  # --set injector.agentImage.tag=<version> to pin independently.
   agentImage:
     repository: "hashicorp/vault"
-    tag: "2.0.4"
+    tag: ""
 
   # The default values for the injected Vault Agent containers.
   agentDefaults:
@@ -420,14 +422,14 @@ server:
   # }
 
   # image sets the repository and tag of the Vault server image.
-  # These fields only need to be overridden to pin a custom registry or
-  # a non-standard image name.
+  # tag: leave empty to use Chart.AppVersion (central default). Override with
+  # --set server.image.tag=<version> to pin independently.
   # When server.enterpriseLicense.secretName is set, the chart automatically
   # selects hashicorp/vault-enterprise and appends the -ent tag suffix —
   # no override of these fields is required for Enterprise installations.
   image:
     repository: "hashicorp/vault"
-    tag: "2.0.4"
+    tag: ""
     # Overrides the default Image Pull Policy
     pullPolicy: IfNotPresent
 
@@ -1286,9 +1288,11 @@ csi:
     enabled: true
     extraArgs: []
 
+    # tag: leave empty to use Chart.AppVersion (central default). Override with
+    # --set csi.agent.image.tag=<version> to pin independently.
     image:
       repository: "hashicorp/vault"
-      tag: "2.0.4"
+      tag: ""
       pullPolicy: IfNotPresent
 
     logFormat: standard
