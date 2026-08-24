@@ -956,7 +956,7 @@ load _helpers
 @test "csi/daemonset: agent image defaults to CE image" {
   cd `chart_dir`
   local repo="$(yq -r '.csi.agent.image.repository' values.yaml)"
-  local tag="$(yq -r '.csi.agent.image.tag' values.yaml)"
+  local tag="$(yq -r '.appVersion' Chart.yaml)"
 
   local actual=$(helm template \
       --show-only templates/csi-daemonset.yaml \
@@ -969,7 +969,7 @@ load _helpers
 @test "csi/daemonset: agent image auto-selects Enterprise image when license secret set" {
   cd `chart_dir`
   local repo="hashicorp/vault-enterprise"
-  local tag="$(yq -r '.csi.agent.image.tag' values.yaml)-ent"
+  local tag="$(yq -r '.appVersion' Chart.yaml)-ent"
 
   local actual=$(helm template \
       --show-only templates/csi-daemonset.yaml \
@@ -983,13 +983,13 @@ load _helpers
 @test "csi/daemonset: agent image -ent tag suffix not doubled when already present" {
   cd `chart_dir`
   local repo="hashicorp/vault-enterprise"
-  local tag="$(yq -r '.csi.agent.image.tag' values.yaml)-ent"
+  local tag="$(yq -r '.appVersion' Chart.yaml)-ent"
 
   local actual=$(helm template \
       --show-only templates/csi-daemonset.yaml \
       --set "csi.enabled=true" \
       --set 'server.enterpriseLicense.secretName=foo' \
-      --set "csi.agent.image.tag=$(yq -r '.csi.agent.image.tag' values.yaml)-ent" \
+      --set "csi.agent.image.tag=$(yq -r '.appVersion' Chart.yaml)-ent" \
       . | tee /dev/stderr |
       yq -r '.spec.template.spec.containers[1].image' | tee /dev/stderr)
   [ "${actual}" = "${repo}:${tag}" ]
@@ -997,7 +997,7 @@ load _helpers
 
 @test "csi/daemonset: agent image custom repository respected with Enterprise license" {
   cd `chart_dir`
-  local tag="$(yq -r '.csi.agent.image.tag' values.yaml)-ent"
+  local tag="$(yq -r '.appVersion' Chart.yaml)-ent"
 
   local actual=$(helm template \
       --show-only templates/csi-daemonset.yaml \

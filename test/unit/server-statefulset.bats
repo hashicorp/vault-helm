@@ -117,15 +117,17 @@ load _helpers
   [ "${actual}" = "foo:1.2.3" ]
 }
 
-@test "server/standalone-StatefulSet: image tag defaults to latest when tag is empty" {
+@test "server/standalone-StatefulSet: image tag defaults to Chart.AppVersion when tag is empty" {
   cd `chart_dir`
+  local appVersion="$(yq -r '.appVersion' Chart.yaml)"
+
   local actual=$(helm template \
       --show-only templates/server-statefulset.yaml  \
       --set 'server.image.repository=foo' \
       --set 'server.image.tag=' \
       . | tee /dev/stderr |
       yq -r '.spec.template.spec.containers[0].image' | tee /dev/stderr)
-  [ "${actual}" = "foo:latest" ]
+  [ "${actual}" = "foo:${appVersion}" ]
 
   local actual=$(helm template \
       --show-only templates/server-statefulset.yaml  \
@@ -134,7 +136,7 @@ load _helpers
       --set 'server.standalone.enabled=true' \
       . | tee /dev/stderr |
       yq -r '.spec.template.spec.containers[0].image' | tee /dev/stderr)
-  [ "${actual}" = "foo:latest" ]
+  [ "${actual}" = "foo:${appVersion}" ]
 }
 
 @test "server/standalone-StatefulSet: default imagePullPolicy" {
@@ -159,7 +161,7 @@ load _helpers
 @test "server/standalone-StatefulSet: Enterprise image auto-selected when secretName is set" {
   cd `chart_dir`
   local repo="hashicorp/vault-enterprise"
-  local tag="$(yq -r '.server.image.tag' values.yaml)-ent"
+  local tag="$(yq -r '.appVersion' Chart.yaml)-ent"
 
   local actual=$(helm template \
       --show-only templates/server-statefulset.yaml \
@@ -172,12 +174,12 @@ load _helpers
 @test "server/standalone-StatefulSet: Enterprise image tag not doubled when -ent suffix already present" {
   cd `chart_dir`
   local repo="hashicorp/vault-enterprise"
-  local tag="$(yq -r '.server.image.tag' values.yaml)-ent"
+  local tag="$(yq -r '.appVersion' Chart.yaml)-ent"
 
   local actual=$(helm template \
       --show-only templates/server-statefulset.yaml \
       --set 'server.enterpriseLicense.secretName=foo' \
-      --set "server.image.tag=$(yq -r '.server.image.tag' values.yaml)-ent" \
+      --set "server.image.tag=$(yq -r '.appVersion' Chart.yaml)-ent" \
       . | tee /dev/stderr |
       yq -r '.spec.template.spec.containers[0].image' | tee /dev/stderr)
   [ "${actual}" = "${repo}:${tag}" ]
@@ -185,7 +187,7 @@ load _helpers
 
 @test "server/standalone-StatefulSet: custom image repository respected with Enterprise license" {
   cd `chart_dir`
-  local tag="$(yq -r '.server.image.tag' values.yaml)-ent"
+  local tag="$(yq -r '.appVersion' Chart.yaml)-ent"
 
   local actual=$(helm template \
       --show-only templates/server-statefulset.yaml \
@@ -203,7 +205,7 @@ load _helpers
 @test "server/standalone-StatefulSet: Community Edition image unchanged when no license secret set" {
   cd `chart_dir`
   local repo="$(yq -r '.server.image.repository' values.yaml)"
-  local tag="$(yq -r '.server.image.tag' values.yaml)"
+  local tag="$(yq -r '.appVersion' Chart.yaml)"
 
   local actual=$(helm template \
       --show-only templates/server-statefulset.yaml \

@@ -1130,7 +1130,7 @@ EOF
 @test "injector/deployment: AGENT_INJECT_VAULT_IMAGE defaults to CE image" {
   cd `chart_dir`
   local repo="$(yq -r '.injector.agentImage.repository' values.yaml)"
-  local tag="$(yq -r '.injector.agentImage.tag' values.yaml)"
+  local tag="$(yq -r '.appVersion' Chart.yaml)"
 
   local actual=$(helm template \
       --show-only templates/injector-deployment.yaml \
@@ -1142,7 +1142,7 @@ EOF
 @test "injector/deployment: AGENT_INJECT_VAULT_IMAGE auto-selects Enterprise image when license secret set" {
   cd `chart_dir`
   local repo="hashicorp/vault-enterprise"
-  local tag="$(yq -r '.injector.agentImage.tag' values.yaml)-ent"
+  local tag="$(yq -r '.appVersion' Chart.yaml)-ent"
 
   local actual=$(helm template \
       --show-only templates/injector-deployment.yaml \
@@ -1155,12 +1155,12 @@ EOF
 @test "injector/deployment: AGENT_INJECT_VAULT_IMAGE -ent tag suffix not doubled when already present" {
   cd `chart_dir`
   local repo="hashicorp/vault-enterprise"
-  local tag="$(yq -r '.injector.agentImage.tag' values.yaml)-ent"
+  local tag="$(yq -r '.appVersion' Chart.yaml)-ent"
 
   local actual=$(helm template \
       --show-only templates/injector-deployment.yaml \
       --set 'server.enterpriseLicense.secretName=foo' \
-      --set "injector.agentImage.tag=$(yq -r '.injector.agentImage.tag' values.yaml)-ent" \
+      --set "injector.agentImage.tag=$(yq -r '.appVersion' Chart.yaml)-ent" \
       . | tee /dev/stderr |
       yq -r '.spec.template.spec.containers[0].env[] | select(.name=="AGENT_INJECT_VAULT_IMAGE") | .value' | tee /dev/stderr)
   [ "${actual}" = "${repo}:${tag}" ]
@@ -1168,7 +1168,7 @@ EOF
 
 @test "injector/deployment: AGENT_INJECT_VAULT_IMAGE custom repository respected with Enterprise license" {
   cd `chart_dir`
-  local tag="$(yq -r '.injector.agentImage.tag' values.yaml)-ent"
+  local tag="$(yq -r '.appVersion' Chart.yaml)-ent"
 
   local actual=$(helm template \
       --show-only templates/injector-deployment.yaml \
