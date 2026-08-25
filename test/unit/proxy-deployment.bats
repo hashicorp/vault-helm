@@ -153,14 +153,18 @@ load _helpers
 #--------------------------------------------------------------------
 # image, replicas, command
 
-@test "proxy/deployment: default image" {
+@test "proxy/deployment: default image is proxy.image.repository:tag" {
   cd `chart_dir`
+  # Read the expected image from values.yaml rather than pinning a version, so
+  # this does not need updating every time the default Vault image is bumped
+  local expected=$(yq -r '.proxy.image | .repository + ":" + .tag' values.yaml | tee /dev/stderr)
+
   local actual=$(helm template \
       --show-only templates/proxy-deployment.yaml \
       --set 'proxy.enabled=true' \
       . | tee /dev/stderr |
       yq -r '.spec.template.spec.containers[0].image' | tee /dev/stderr)
-  [ "${actual}" = "hashicorp/vault:2.0.3" ]
+  [ "${actual}" = "${expected}" ]
 }
 
 @test "proxy/deployment: specify image and pullPolicy" {
