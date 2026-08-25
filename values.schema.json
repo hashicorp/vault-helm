@@ -670,6 +670,49 @@
                         }
                     }
                 },
+                "ingress": {
+                    "type": "object",
+                    "properties": {
+                        "annotations": {
+                            "type": [
+                                "object",
+                                "string"
+                            ]
+                        },
+                        "enabled": {
+                            "type": "boolean"
+                        },
+                        "extraPaths": {
+                            "type": "array"
+                        },
+                        "hosts": {
+                            "type": "array",
+                            "items": {
+                                "type": "object",
+                                "properties": {
+                                    "host": {
+                                        "type": "string"
+                                    },
+                                    "paths": {
+                                        "type": "array"
+                                    }
+                                }
+                            }
+                        },
+                        "ingressClassName": {
+                            "type": "string"
+                        },
+                        "labels": {
+                            "type": "object"
+                        },
+                        "pathType": {
+                            "type": "string"
+                        },
+                        "tls": {
+                            "type": "array"
+                        }
+                    }
+                },
                 "livenessProbe": {
                     "type": "object",
                     "properties": {

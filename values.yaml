@@ -1656,6 +1656,56 @@ proxy:
       # specific load balancer annotations for AWS, GKE, Azure, or OpenStack.
       annotations: {}
 
+  # Ingress for the proxy. This is the HTTP-layer alternative to
+  # service.externalService for reaching the proxy from outside the cluster,
+  # and routes to the proxy Service above, so service.enabled must stay true.
+  #
+  # The proxy speaks the Vault API, so anything that can reach this Ingress
+  # can reach Vault through it. Terminate TLS at the ingress controller and
+  # restrict who can reach it. If the proxy configuration uses auto_auth
+  # together with api_proxy.use_auto_auth_token, every client that reaches
+  # the Ingress inherits the access of the proxy's own Vault role.
+  ingress:
+    enabled: false
+
+    # Extra labels to attach to the Ingress.
+    # This should be a YAML map of the labels to apply to the Ingress.
+    labels: {}
+      # traffic: external
+
+    # Extra annotations for the Ingress. This can either be YAML or a
+    # YAML-formatted multi-line templated string map of the annotations to
+    # apply to the Ingress.
+    annotations: {}
+      # |
+      # kubernetes.io/tls-acme: "true"
+      #   or
+      # nginx.ingress.kubernetes.io/backend-protocol: HTTP
+
+    # Optionally use ingressClassName instead of deprecated annotation.
+    # See: https://kubernetes.io/docs/concepts/services-networking/ingress/#deprecated-annotation
+    ingressClassName: ""
+
+    # As of Kubernetes 1.19, all Ingress Paths must have a pathType configured. The default value below should be sufficient in most cases.
+    # See: https://kubernetes.io/docs/concepts/services-networking/ingress/#path-types for other possible values.
+    pathType: Prefix
+
+    hosts:
+      - host: chart-example.local
+        paths: []
+    ## Extra paths to prepend to the host configuration. This is useful when working with annotation based services.
+    extraPaths: []
+    # - path: /*
+    #   backend:
+    #     service:
+    #       name: ssl-redirect
+    #       port:
+    #         number: use-annotation
+    tls: []
+    #  - secretName: chart-example-tls
+    #    hosts:
+    #      - chart-example.local
+
   serviceAccount:
     # Specifies whether a service account should be created.
     # The service account is what the proxy authenticates with when the

@@ -73,6 +73,15 @@ is still honored for consistency.
 {{- end -}}
 
 {{/*
+Compute if the proxy Service is enabled. The proxy Ingress routes to it, so it
+must exist for the Ingress to have a backend.
+*/}}
+{{- define "vault.proxyServiceEnabled" -}}
+{{- template "vault.proxyEnabled" . -}}
+{{- $_ := set . "proxyServiceEnabled" (and .proxyEnabled (eq (.Values.proxy.service.enabled | toString) "true")) -}}
+{{- end -}}
+
+{{/*
 Compute if the server is enabled.
 */}}
 {{- define "vault.serverEnabled" -}}
@@ -1130,6 +1139,21 @@ Sets extra proxy service annotations
       {{- tpl .Values.proxy.service.annotations . | nindent 4 }}
     {{- else }}
       {{- toYaml .Values.proxy.service.annotations | nindent 4 }}
+    {{- end }}
+  {{- end }}
+{{- end -}}
+
+{{/*
+Sets extra proxy ingress annotations
+*/}}
+{{- define "proxy.ingress.annotations" -}}
+  {{- if .Values.proxy.ingress.annotations }}
+  annotations:
+    {{- $tp := typeOf .Values.proxy.ingress.annotations }}
+    {{- if eq $tp "string" }}
+      {{- tpl .Values.proxy.ingress.annotations . | nindent 4 }}
+    {{- else }}
+      {{- toYaml .Values.proxy.ingress.annotations | nindent 4 }}
     {{- end }}
   {{- end }}
 {{- end -}}

@@ -2,7 +2,7 @@
 
 Features:
 
-* Add support for running Vault Proxy as a standalone Deployment via the new `proxy.*` values, providing a cluster-local caching API proxy in front of an in-cluster or external Vault server, with optional auto-auth via the Kubernetes auth method and an optional external Service [#1207](https://github.com/hashicorp/vault-helm/pull/1207)
+* Add support for running Vault Proxy as a standalone Deployment via the new `proxy.*` values, providing a cluster-local caching API proxy in front of an in-cluster or external Vault server, with optional auto-auth via the Kubernetes auth method and optional external Service and Ingress resources for exposing it outside the cluster [#1207](https://github.com/hashicorp/vault-helm/pull/1207)
 
 ## 0.34.1 (August 13, 2026)
 
