@@ -4,10 +4,7 @@ SPDX-License-Identifier: MPL-2.0
 */}}
 
 {{ template "vault.mode" . }}
-{{- if ne .mode "external" }}
-{{- if .serverEnabled -}}
-{{- if ne .mode "dev" -}}
-{{ if or (.Values.server.standalone.config) (.Values.server.ha.config) -}}
+{{- if and (ne .mode "dev") (ne .mode "external") (.serverEnabled) (or (.Values.server.standalone.config) (.Values.server.ha.config) (.Values.server.ha.raft.config)) }}
 apiVersion: v1
 kind: ConfigMap
 metadata:
@@ -25,7 +22,4 @@ metadata:
 data:
   extraconfig-from-values.hcl: |-
     {{ template "vault.config" . }}
-{{- end }}
-{{- end }}
-{{- end }}
 {{- end }}
