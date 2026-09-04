@@ -416,6 +416,29 @@
                         }
                     }
                 },
+                "clusterRole": {
+                    "type": "object",
+                    "properties": {
+                        "apiGroups": {
+                            "type": "array",
+                            "items": {
+                                "type": "string"
+                            }
+                        },
+                        "resources": {
+                            "type": "array",
+                            "items": {
+                                "type": "string"
+                            }
+                        },
+                        "verbs": {
+                            "type": "array",
+                            "items": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                },
                 "livenessProbe": {
                     "type": "object",
                     "properties": {
