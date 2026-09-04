@@ -653,6 +653,24 @@ load _helpers
   [ "${name}" = "foobar" ]
 }
 
+@test "server/standalone-StatefulSet: set extraEnvironmentVarsFromConfigMap" {
+  cd `chart_dir`
+  local object=$(helm template \
+      --show-only templates/server-statefulset.yaml  \
+      --set 'server.standalone.enabled=true' \
+      --set 'server.extraEnvironmentVarsFromConfigMap={foo,bar}' \
+      . | tee /dev/stderr |
+      yq -r '.spec.template.spec.containers[0].envFrom' | tee /dev/stderr)
+
+  local name=$(echo $object |
+      yq -r '.[0] .configMapRef.name' | tee /dev/stderr)
+  [ "${name}" = "foo" ]
+
+  local name=$(echo $object |
+      yq -r '.[1] .configMapRef.name' | tee /dev/stderr)
+  [ "${name}" = "bar" ]
+}
+
 #--------------------------------------------------------------------
 # storage class
 
