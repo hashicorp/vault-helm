@@ -5,6 +5,7 @@ SPDX-License-Identifier: MPL-2.0
 
 {{- template "vault.injectorEnabled" . -}}
 {{- if .injectorEnabled -}}
+{{- if eq (.Values.injector.serviceAccount.createClusterRoleAndBinding | toString) "true" }}
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
 metadata:
@@ -26,5 +27,6 @@ rules:
   resources: ["nodes"]
   verbs:
     - "get"
+{{ end }}
 {{ end }}
 {{ end }}
