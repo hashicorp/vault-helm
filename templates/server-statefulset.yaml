@@ -76,7 +76,7 @@ spec:
       containers:
         - name: vault
           {{ template "vault.resources" . }}
-          image: {{ .Values.server.image.repository }}:{{ .Values.server.image.tag | default "latest" }}
+          image: {{ include "vault.imageRegistry" . }}{{ .Values.server.image.repository }}:{{ .Values.server.image.tag | default "latest" }}
           imagePullPolicy: {{ .Values.server.image.pullPolicy }}
           command:
           - "/bin/sh"

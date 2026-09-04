@@ -52,7 +52,7 @@ spec:
         - name: {{ include "vault.name" . }}-csi-provider
           {{ template "csi.resources" . }}
           {{ template "csi.daemonSet.securityContext.container" . }}
-          image: "{{ .Values.csi.image.repository }}:{{ .Values.csi.image.tag }}"
+          image: "{{ include "vault.imageRegistry" . }}{{ .Values.csi.image.repository }}:{{ .Values.csi.image.tag }}"
           imagePullPolicy: {{ .Values.csi.image.pullPolicy }}
           args:
             - --endpoint=/provider/vault.sock
@@ -108,7 +108,7 @@ spec:
             timeoutSeconds: {{ .Values.csi.readinessProbe.timeoutSeconds }}
         {{- if eq (.Values.csi.agent.enabled | toString) "true" }}
         - name: {{ include "vault.name" . }}-agent
-          image: "{{ .Values.csi.agent.image.repository }}:{{ .Values.csi.agent.image.tag }}"
+          image: "{{ include "vault.imageRegistry" . }}{{ .Values.csi.agent.image.repository }}:{{ .Values.csi.agent.image.tag }}"
           imagePullPolicy: {{ .Values.csi.agent.image.pullPolicy }}
           {{ template "csi.agent.resources" . }}
           command:

@@ -254,6 +254,9 @@
                 "imagePullSecrets": {
                     "type": "array"
                 },
+                "imageRegistry": {
+                    "type": "string"
+                },
                 "namespace": {
                     "type": "string"
                 },

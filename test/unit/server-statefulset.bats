@@ -137,6 +137,29 @@ load _helpers
   [ "${actual}" = "foo:latest" ]
 }
 
+@test "server/standalone-StatefulSet: global.imageRegistry prepends registry to image" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      --show-only templates/server-statefulset.yaml  \
+      --set 'global.imageRegistry=registry.example.com' \
+      --set 'server.image.repository=foo' \
+      --set 'server.image.tag=1.2.3' \
+      . | tee /dev/stderr |
+      yq -r '.spec.template.spec.containers[0].image' | tee /dev/stderr)
+  [ "${actual}" = "registry.example.com/foo:1.2.3" ]
+}
+
+@test "server/standalone-StatefulSet: global.imageRegistry unset keeps default image" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      --show-only templates/server-statefulset.yaml  \
+      --set 'server.image.repository=foo' \
+      --set 'server.image.tag=1.2.3' \
+      . | tee /dev/stderr |
+      yq -r '.spec.template.spec.containers[0].image' | tee /dev/stderr)
+  [ "${actual}" = "foo:1.2.3" ]
+}
+
 @test "server/standalone-StatefulSet: default imagePullPolicy" {
   cd `chart_dir`
   local actual=$(helm template \
