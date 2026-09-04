@@ -385,6 +385,9 @@
                 "extraEnvironmentVars": {
                     "type": "object"
                 },
+                "extraEnvironmentVarsFieldPath": {
+                    "type": "object"
+                },
                 "extraLabels": {
                     "type": "object"
                 },
