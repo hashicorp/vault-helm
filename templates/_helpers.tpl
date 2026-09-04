@@ -564,6 +564,8 @@ securityContext for the injector container level.
             capabilities:
               drop:
                 - ALL
+              add:
+                - IPC_LOCK
   {{- end }}
 {{- end -}}
 
