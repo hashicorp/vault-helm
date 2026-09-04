@@ -22,6 +22,7 @@ webhooks:
   - name: vault.hashicorp.com
     failurePolicy: {{ ((.Values.injector.webhook)).failurePolicy | default .Values.injector.failurePolicy }}
     matchPolicy: {{ ((.Values.injector.webhook)).matchPolicy | default "Exact" }}
+    reinvocationPolicy: {{ ((.Values.injector.webhook)).reinvocationPolicy | default "Never" }}
     sideEffects: None
     timeoutSeconds: {{ ((.Values.injector.webhook)).timeoutSeconds | default "30" }}
     admissionReviewVersions: ["v1", "v1beta1"]

@@ -158,6 +158,41 @@ load _helpers
   [ "${actual}" = "50" ]
 }
 
+@test "injector/MutatingWebhookConfiguration: reinvocationPolicy 'Never' by default" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      --show-only templates/injector-mutating-webhook.yaml  \
+      --set 'injector.enabled=true' \
+      . | tee /dev/stderr |
+      yq '.webhooks[0].reinvocationPolicy' | tee /dev/stderr)
+
+  [ "${actual}" = "\"Never\"" ]
+}
+
+@test "injector/MutatingWebhookConfiguration: can set webhook.reinvocationPolicy to IfNeeded" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      --show-only templates/injector-mutating-webhook.yaml  \
+      --set 'injector.enabled=true' \
+      --set 'injector.webhook.reinvocationPolicy=IfNeeded' \
+      . | tee /dev/stderr |
+      yq '.webhooks[0].reinvocationPolicy' | tee /dev/stderr)
+
+  [ "${actual}" = "\"IfNeeded\"" ]
+}
+
+@test "injector/MutatingWebhookConfiguration: can set webhook.reinvocationPolicy to Never" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      --show-only templates/injector-mutating-webhook.yaml  \
+      --set 'injector.enabled=true' \
+      --set 'injector.webhook.reinvocationPolicy=Never' \
+      . | tee /dev/stderr |
+      yq '.webhooks[0].reinvocationPolicy' | tee /dev/stderr)
+
+  [ "${actual}" = "\"Never\"" ]
+}
+
 #--------------------------------------------------------------------
 # annotations
 
