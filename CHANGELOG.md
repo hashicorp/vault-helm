@@ -46,6 +46,10 @@ Features:
 
 * Add Vault Enterprise redundancy zones support (requires Kubernetes 1.35+) [#1170](https://github.com/hashicorp/vault-helm/pull/1170)
 
+Improvements:
+
+* Support custom exec command in the server readiness probe [GH-1106](https://github.com/hashicorp/vault-helm/pull/1106)
+
 ## 0.32.0 (January 14, 2026)
 
 Changes:

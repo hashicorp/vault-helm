@@ -1040,11 +1040,17 @@
                         "enabled": {
                             "type": "boolean"
                         },
+                        "execCommand": {
+                            "type": "array"
+                        },
                         "failureThreshold": {
                             "type": "integer"
                         },
                         "initialDelaySeconds": {
                             "type": "integer"
+                        },
+                        "path": {
+                            "type": "string"
                         },
                         "periodSeconds": {
                             "type": "integer"
