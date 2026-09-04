@@ -172,6 +172,66 @@ load _helpers
   [ "${actual}" = "true" ]
 }
 
+@test "server/Service: main annotations string" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      --show-only templates/server-service.yaml \
+      --set 'server.service.main.annotations=vaultIsAwesome: true' \
+      . | tee /dev/stderr |
+      yq -r '.metadata.annotations["vaultIsAwesome"]' | tee /dev/stderr)
+  [ "${actual}" = "true" ]
+}
+
+@test "server/Service: main annotations yaml" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      --show-only templates/server-service.yaml \
+      --set 'server.service.main.annotations.vaultIsAwesome=true' \
+      . | tee /dev/stderr |
+      yq -r '.metadata.annotations["vaultIsAwesome"]' | tee /dev/stderr)
+  [ "${actual}" = "true" ]
+}
+
+@test "server/Service: with both generic and main annotations set" {
+  cd `chart_dir`
+  local object=$(helm template \
+      --show-only templates/server-service.yaml \
+      --set 'server.service.main.annotations=vaultIsAwesome: true' \
+      --set 'server.service.annotations=vaultIsNotAwesome: false' \
+      . | tee /dev/stderr |
+      yq -r '.metadata' | tee /dev/stderr)
+
+  local actual=$(echo "$object" | yq '.annotations["vaultIsAwesome"]' | tee /dev/stderr)
+  [ "${actual}" = "true" ]
+  actual=$(echo "$object" | yq '.annotations["vaultIsNotAwesome"]' | tee /dev/stderr)
+  [ "${actual}" = "false" ]
+}
+
+@test "server/Service: main annotations override generic annotations" {
+  cd "$(chart_dir)"
+  local metadata
+  metadata=$(helm template \
+      --show-only templates/server-service.yaml \
+      --set 'server.service.main.annotations=myAnnotation: main' \
+      --set 'server.service.annotations=myAnnotation: general' \
+      . | tee /dev/stderr |
+      yq -r '.metadata' | tee /dev/stderr)
+
+  local actual
+  actual=$(echo "$metadata" | yq -r '.annotations["myAnnotation"]' | tee /dev/stderr)
+  [ "${actual}" = "main" ]
+}
+
+@test "server/Service: main annotations not applied to headless service" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      --show-only templates/server-headless-service.yaml \
+      --set 'server.service.main.annotations=vaultIsAwesome: true' \
+      . | tee /dev/stderr |
+      yq -r '.metadata.annotations["vaultIsAwesome"]' | tee /dev/stderr)
+  [ "${actual}" = "null" ]
+}
+
 @test "server/Service: publish not ready" {
   cd `chart_dir`
   local actual=$(helm template \

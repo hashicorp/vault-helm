@@ -1172,6 +1172,28 @@
                                 }
                             }
                         },
+                        "main": {
+                            "type": "object",
+                            "properties": {
+                                "annotations": {
+                                    "type": [
+                                        "object",
+                                        "string"
+                                    ]
+                                }
+                            }
+                        },
+                        "internal": {
+                            "type": "object",
+                            "properties": {
+                                "annotations": {
+                                    "type": [
+                                        "object",
+                                        "string"
+                                    ]
+                                }
+                            }
+                        },
                         "standbyNodePort": {
                             "type": "integer"
                         },
