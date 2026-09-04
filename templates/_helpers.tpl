@@ -62,6 +62,26 @@ Compute if the injector is enabled.
 {{- end -}}
 
 {{/*
+Compute if the proxy is enabled. Unlike the other components, the proxy is
+disabled by default and must be enabled explicitly, but the "-" convention
+is still honored for consistency.
+*/}}
+{{- define "vault.proxyEnabled" -}}
+{{- $_ := set . "proxyEnabled" (or
+  (eq (.Values.proxy.enabled | toString) "true")
+  (and (eq (.Values.proxy.enabled | toString) "-") (eq (.Values.global.enabled | toString) "true"))) -}}
+{{- end -}}
+
+{{/*
+Compute if the proxy Service is enabled. The proxy Ingress routes to it, so it
+must exist for the Ingress to have a backend.
+*/}}
+{{- define "vault.proxyServiceEnabled" -}}
+{{- template "vault.proxyEnabled" . -}}
+{{- $_ := set . "proxyServiceEnabled" (and .proxyEnabled (eq (.Values.proxy.service.enabled | toString) "true")) -}}
+{{- end -}}
+
+{{/*
 Compute if the server is enabled.
 */}}
 {{- define "vault.serverEnabled" -}}
@@ -1047,6 +1067,255 @@ Sets extra CSI service account annotations
 {{- end -}}
 
 {{/*
+Vault address the proxy uses to reach the Vault server: the value of
+global.externalVaultAddr when set, otherwise the chart's internal Vault
+service. Referenced from the default proxy.config value.
+*/}}
+{{- define "proxy.vaultAddress" -}}
+{{- if .Values.global.externalVaultAddr -}}
+{{- .Values.global.externalVaultAddr -}}
+{{- else -}}
+{{- printf "%s://%s.%s.svc:%v" (include "vault.scheme" .) (include "vault.fullname" .) (include "vault.namespace" .) .Values.server.service.port -}}
+{{- end -}}
+{{- end -}}
+
+{{/*
+Proxy configuration rendered with templating support, so values like
+proxy.vaultAddress can be referenced from proxy.config.
+*/}}
+{{- define "proxy.config" -}}
+{{- tpl .Values.proxy.config . -}}
+{{- end -}}
+
+{{/*
+Scheme for the proxy listener, used by path-based health probes. Follows
+proxy.tlsDisable, which must match the listener stanza in proxy.config.
+*/}}
+{{- define "proxy.scheme" -}}
+{{- if .Values.proxy.tlsDisable -}}
+{{ "http" }}
+{{- else -}}
+{{ "https" }}
+{{- end -}}
+{{- end -}}
+
+{{/*
+Create the name of the proxy service account to use
+*/}}
+{{- define "proxy.serviceAccount.name" -}}
+{{- if .Values.proxy.serviceAccount.create -}}
+    {{ default (printf "%s-proxy" (include "vault.fullname" .)) .Values.proxy.serviceAccount.name }}
+{{- else -}}
+    {{ default "default" .Values.proxy.serviceAccount.name }}
+{{- end -}}
+{{- end -}}
+
+{{/*
+Sets extra proxy pod annotations. The configuration checksum is always
+included so that the stateless proxy pods roll when their configuration
+changes.
+*/}}
+{{- define "proxy.annotations" }}
+      annotations:
+        vault.hashicorp.com/config-checksum: {{ include "proxy.config" . | sha256sum }}
+  {{- if .Values.proxy.annotations }}
+        {{- $tp := typeOf .Values.proxy.annotations }}
+        {{- if eq $tp "string" }}
+          {{- tpl .Values.proxy.annotations . | nindent 8 }}
+        {{- else }}
+          {{- toYaml .Values.proxy.annotations | nindent 8 }}
+        {{- end }}
+  {{- end }}
+{{- end -}}
+
+{{/*
+Sets extra proxy service annotations
+*/}}
+{{- define "proxy.service.annotations" -}}
+  {{- if .Values.proxy.service.annotations }}
+  annotations:
+    {{- $tp := typeOf .Values.proxy.service.annotations }}
+    {{- if eq $tp "string" }}
+      {{- tpl .Values.proxy.service.annotations . | nindent 4 }}
+    {{- else }}
+      {{- toYaml .Values.proxy.service.annotations | nindent 4 }}
+    {{- end }}
+  {{- end }}
+{{- end -}}
+
+{{/*
+Sets extra proxy ingress annotations
+*/}}
+{{- define "proxy.ingress.annotations" -}}
+  {{- if .Values.proxy.ingress.annotations }}
+  annotations:
+    {{- $tp := typeOf .Values.proxy.ingress.annotations }}
+    {{- if eq $tp "string" }}
+      {{- tpl .Values.proxy.ingress.annotations . | nindent 4 }}
+    {{- else }}
+      {{- toYaml .Values.proxy.ingress.annotations | nindent 4 }}
+    {{- end }}
+  {{- end }}
+{{- end -}}
+
+{{/*
+Sets extra proxy external service annotations
+*/}}
+{{- define "proxy.externalService.annotations" -}}
+  {{- if .Values.proxy.service.externalService.annotations }}
+  annotations:
+    {{- $tp := typeOf .Values.proxy.service.externalService.annotations }}
+    {{- if eq $tp "string" }}
+      {{- tpl .Values.proxy.service.externalService.annotations . | nindent 4 }}
+    {{- else }}
+      {{- toYaml .Values.proxy.service.externalService.annotations | nindent 4 }}
+    {{- end }}
+  {{- end }}
+{{- end -}}
+
+{{/*
+Sets extra proxy service account annotations
+*/}}
+{{- define "proxy.serviceAccount.annotations" -}}
+  {{- if .Values.proxy.serviceAccount.annotations }}
+  annotations:
+    {{- $tp := typeOf .Values.proxy.serviceAccount.annotations }}
+    {{- if eq $tp "string" }}
+      {{- tpl .Values.proxy.serviceAccount.annotations . | nindent 4 }}
+    {{- else }}
+      {{- toYaml .Values.proxy.serviceAccount.annotations | nindent 4 }}
+    {{- end }}
+  {{- end }}
+{{- end -}}
+
+{{/*
+securityContext for the proxy pod level.
+*/}}
+{{- define "proxy.securityContext.pod" -}}
+  {{- if .Values.proxy.securityContext.pod }}
+      securityContext:
+        {{- $tp := typeOf .Values.proxy.securityContext.pod }}
+        {{- if eq $tp "string" }}
+          {{- tpl .Values.proxy.securityContext.pod . | nindent 8 }}
+        {{- else }}
+          {{- toYaml .Values.proxy.securityContext.pod | nindent 8 }}
+        {{- end }}
+  {{- else if not .Values.global.openshift }}
+      securityContext:
+        runAsNonRoot: true
+        runAsGroup: {{ .Values.proxy.gid | default 1000 }}
+        runAsUser: {{ .Values.proxy.uid | default 100 }}
+        fsGroup: {{ .Values.proxy.gid | default 1000 }}
+  {{- end }}
+{{- end -}}
+
+{{/*
+securityContext for the proxy container level.
+*/}}
+{{- define "proxy.securityContext.container" -}}
+  {{- if .Values.proxy.securityContext.container }}
+          securityContext:
+            {{- $tp := typeOf .Values.proxy.securityContext.container }}
+            {{- if eq $tp "string" }}
+              {{- tpl .Values.proxy.securityContext.container . | nindent 12 }}
+            {{- else }}
+              {{- toYaml .Values.proxy.securityContext.container | nindent 12 }}
+            {{- end }}
+  {{- else if not .Values.global.openshift }}
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+                - ALL
+  {{- end }}
+{{- end -}}
+
+{{/*
+Sets the proxy affinity for pod placement
+*/}}
+{{- define "proxy.affinity" -}}
+  {{- if .Values.proxy.affinity }}
+      affinity:
+        {{ $tp := typeOf .Values.proxy.affinity }}
+        {{- if eq $tp "string" }}
+          {{- tpl .Values.proxy.affinity . | nindent 8 | trim }}
+        {{- else }}
+          {{- toYaml .Values.proxy.affinity | nindent 8 }}
+        {{- end }}
+  {{ end }}
+{{- end -}}
+
+{{/*
+Sets the proxy topologySpreadConstraints for pod placement
+*/}}
+{{- define "proxy.topologySpreadConstraints" -}}
+  {{- if .Values.proxy.topologySpreadConstraints }}
+      topologySpreadConstraints:
+        {{ $tp := typeOf .Values.proxy.topologySpreadConstraints }}
+        {{- if eq $tp "string" }}
+          {{- tpl .Values.proxy.topologySpreadConstraints . | nindent 8 | trim }}
+        {{- else }}
+          {{- toYaml .Values.proxy.topologySpreadConstraints | nindent 8 }}
+        {{- end }}
+  {{ end }}
+{{- end -}}
+
+{{/*
+Sets the proxy toleration for pod placement
+*/}}
+{{- define "proxy.tolerations" -}}
+  {{- if .Values.proxy.tolerations }}
+      tolerations:
+      {{- $tp := typeOf .Values.proxy.tolerations }}
+      {{- if eq $tp "string" }}
+        {{ tpl .Values.proxy.tolerations . | nindent 8 | trim }}
+      {{- else }}
+        {{- toYaml .Values.proxy.tolerations | nindent 8 }}
+      {{- end }}
+  {{- end }}
+{{- end -}}
+
+{{/*
+Sets the proxy node selector for pod placement
+*/}}
+{{- define "proxy.nodeselector" -}}
+  {{- if .Values.proxy.nodeSelector }}
+      nodeSelector:
+      {{- $tp := typeOf .Values.proxy.nodeSelector }}
+      {{- if eq $tp "string" }}
+        {{ tpl .Values.proxy.nodeSelector . | nindent 8 | trim }}
+      {{- else }}
+        {{- toYaml .Values.proxy.nodeSelector | nindent 8 }}
+      {{- end }}
+  {{- end }}
+{{- end -}}
+
+{{/*
+Sets the proxy deployment update strategy
+*/}}
+{{- define "proxy.strategy" -}}
+  {{- if .Values.proxy.strategy }}
+  strategy:
+  {{- $tp := typeOf .Values.proxy.strategy }}
+  {{- if eq $tp "string" }}
+    {{ tpl .Values.proxy.strategy . | nindent 4 | trim }}
+  {{- else }}
+    {{- toYaml .Values.proxy.strategy | nindent 4 }}
+  {{- end }}
+  {{- end }}
+{{- end -}}
+
+{{/*
+Sets the container resources if the user has set any.
+*/}}
+{{- define "proxy.resources" -}}
+  {{- if .Values.proxy.resources -}}
+          resources:
+{{ toYaml .Values.proxy.resources | indent 12}}
+  {{ end }}
+{{- end -}}
+
+{{/*
 Inject extra environment vars in the format key:value, if populated
 */}}
 {{- define "vault.extraEnvironmentVars" -}}
@@ -1121,7 +1390,13 @@ loadBalancer configuration for the the UI service.
 Supported inputs are Values.ui
 */}}
 {{- define "service.loadBalancer" -}}
-{{- if  eq (.serviceType | toString) "LoadBalancer" }}
+{{- $type := "" -}}
+{{- if .serviceType -}}
+{{- $type = .serviceType -}}
+{{- else if .type -}}
+{{- $type = .type -}}
+{{- end -}}
+{{- if eq $type "LoadBalancer" }}
 {{- if .loadBalancerIP }}
   loadBalancerIP: {{ .loadBalancerIP }}
 {{- end }}
