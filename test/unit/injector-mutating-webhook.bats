@@ -159,6 +159,31 @@ load _helpers
 }
 
 #--------------------------------------------------------------------
+# matchConditions
+
+@test "injector/MutatingWebhookConfiguration: matchConditions empty by default" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      --show-only templates/injector-mutating-webhook.yaml  \
+      --set 'injector.enabled=true' \
+      . | tee /dev/stderr |
+      yq '.webhooks[0].matchConditions' | tee /dev/stderr)
+  [ "${actual}" = "null" ]
+}
+
+@test "injector/MutatingWebhookConfiguration: can set webhook.matchConditions" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      --show-only templates/injector-mutating-webhook.yaml  \
+      --set 'injector.enabled=true' \
+      --set 'injector.webhook.matchConditions[0].name=include-vault-pods' \
+      --set 'injector.webhook.matchConditions[0].expression=has(object.metadata.annotations) && vault.hashicorp.com/agent-inject in object.metadata.annotations' \
+      . | tee /dev/stderr |
+      yq -r '.webhooks[0].matchConditions[0].name' | tee /dev/stderr)
+  [ "${actual}" = "include-vault-pods" ]
+}
+
+#--------------------------------------------------------------------
 # annotations
 
 @test "injector/MutatingWebhookConfiguration: default webhookAnnotations (deprecated)" {
