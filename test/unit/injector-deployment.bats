@@ -1126,3 +1126,22 @@ EOF
       yq -r '.spec.strategy.rollingUpdate.maxUnavailable' | tee /dev/stderr)
   [ "${actual}" = "1" ]
 }
+
+@test "injector/deployment: revisionHistoryLimit not set by default" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      --show-only templates/injector-deployment.yaml  \
+      . | tee /dev/stderr |
+      yq -r '.spec.revisionHistoryLimit' | tee /dev/stderr)
+  [ "${actual}" = "null" ]
+}
+
+@test "injector/deployment: revisionHistoryLimit can be set" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      --show-only templates/injector-deployment.yaml  \
+      --set 'injector.revisionHistoryLimit=5' \
+      . | tee /dev/stderr |
+      yq -r '.spec.revisionHistoryLimit' | tee /dev/stderr)
+  [ "${actual}" = "5" ]
+}
