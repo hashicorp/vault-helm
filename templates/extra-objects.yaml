@@ -1,0 +1,38 @@
+{{/*
+Copyright IBM Corp. 2018, 2026
+SPDX-License-Identifier: MPL-2.0
+*/}}
+
+{{- /*
+extraObjects is accepted as a list or as a map. Both are normalized to a list
+of entries keeping the list index or the map key, so that an entry of an
+unsupported type can be named in the error. An entry that renders to nothing is
+skipped rather than emitting an empty document, so that an entry may be wrapped
+in a conditional tying it to a component being enabled.
+*/ -}}
+{{- $entries := list -}}
+{{- $extraObjects := .Values.extraObjects | default list -}}
+{{- if kindIs "map" $extraObjects -}}
+{{- range $key, $object := $extraObjects -}}
+{{- $entries = append $entries (dict "id" $key "object" $object) -}}
+{{- end -}}
+{{- else -}}
+{{- range $index, $object := $extraObjects -}}
+{{- $entries = append $entries (dict "id" $index "object" $object) -}}
+{{- end -}}
+{{- end -}}
+{{- range $entry := $entries }}
+{{- $object := $entry.object }}
+{{- $rendered := "" }}
+{{- if kindIs "string" $object }}
+{{- $rendered = tpl $object $ }}
+{{- else if kindIs "map" $object }}
+{{- $rendered = tpl (toYaml $object) $ }}
+{{- else }}
+{{- fail (printf "extraObjects[%v]: expected a map or a string, got %s" $entry.id (kindOf $object)) }}
+{{- end }}
+{{- if trim $rendered }}
+---
+{{- $rendered | nindent 0 }}
+{{- end }}
+{{- end }}
