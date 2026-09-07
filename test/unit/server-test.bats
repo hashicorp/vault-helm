@@ -202,6 +202,8 @@ load _helpers
 
 @test "server/standalone-server-test-Pod: Enterprise image tag not doubled when -ent suffix already present" {
   cd `chart_dir`
+  # Repo is always promoted to vault-enterprise when a license is set.
+  # Tag is returned verbatim — no duplicate -ent appended.
   local repo="hashicorp/vault-enterprise"
   local tag="$(yq -r '.appVersion' Chart.yaml)-ent"
 
@@ -230,6 +232,24 @@ load _helpers
   # -ent tag must still be appended
   [ "${actual}" = "mycorp/vault:${tag}" ]
 }
+
+@test "server/standalone-server-test-Pod: custom repository and custom tag both preserved with Enterprise license" {
+  cd `chart_dir`
+
+  local actual=$(helm template \
+      --show-only templates/tests/server-test.yaml \
+      --set 'server.enterpriseLicense.secretName=foo' \
+      --set 'server.enterpriseLicense.secretKey=license' \
+      --set 'server.image.repository=mycorp/vault' \
+      --set 'server.image.tag=custom' \
+      . | tee /dev/stderr |
+      yq -r '.spec.containers[0].image' | tee /dev/stderr)
+
+  # Both repo and tag must be preserved exactly — no -ent mutation on the tag
+  [ "${actual}" = "mycorp/vault:custom" ]
+}
+
+
 
 @test "server/standalone-server-test-Pod: Community Edition image unchanged when no license secret set" {
   cd `chart_dir`

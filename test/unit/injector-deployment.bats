@@ -1154,6 +1154,8 @@ EOF
 
 @test "injector/deployment: AGENT_INJECT_VAULT_IMAGE -ent tag suffix not doubled when already present" {
   cd `chart_dir`
+  # Repo is always promoted to vault-enterprise when a license is set.
+  # Tag is returned verbatim — no duplicate -ent appended.
   local repo="hashicorp/vault-enterprise"
   local tag="$(yq -r '.appVersion' Chart.yaml)-ent"
 
@@ -1180,4 +1182,20 @@ EOF
   [[ "${actual}" == "mycorp/vault:"* ]]
   # -ent tag must still be appended
   [ "${actual}" = "mycorp/vault:${tag}" ]
+}
+
+@test "injector/deployment: AGENT_INJECT_VAULT_IMAGE custom repository and custom tag both preserved with Enterprise license" {
+  cd `chart_dir`
+
+  local actual=$(helm template \
+      --show-only templates/injector-deployment.yaml \
+      --set 'server.enterpriseLicense.secretName=foo' \
+      --set 'server.enterpriseLicense.secretKey=license' \
+      --set 'injector.agentImage.repository=mycorp/vault' \
+      --set 'injector.agentImage.tag=custom' \
+      . | tee /dev/stderr |
+      yq -r '.spec.template.spec.containers[0].env[] | select(.name=="AGENT_INJECT_VAULT_IMAGE") | .value' | tee /dev/stderr)
+
+  # Both repo and tag must be preserved exactly — no -ent mutation on the tag
+  [ "${actual}" = "mycorp/vault:custom" ]
 }

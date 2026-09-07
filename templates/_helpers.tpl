@@ -125,15 +125,26 @@ Compute if the ui is enabled.
 {{- end -}}
 
 {{/*
+Returns a non-empty string when an enterprise license secret is fully configured
+(both secretName and secretKey are set). Use with `if` or `and`:
+  {{- if include "vault.isEnterprise" . -}}
+*/}}
+{{- define "vault.isEnterprise" -}}
+{{- if and .Values.server.enterpriseLicense.secretName .Values.server.enterpriseLicense.secretKey -}}true{{- end -}}
+{{- end -}}
+
+{{/*
 Resolve the Vault server image repository.
 If server.image.repository is explicitly set to a non-default value, use it.
 Otherwise, auto-select hashicorp/vault-enterprise when an enterprise license
 secret is configured, falling back to hashicorp/vault for Community Edition.
+The repository decision is independent of the tag — a user-supplied tag does
+not suppress repository auto-selection.
 */}}
 {{- define "vault.imageRepository" -}}
 {{- if and .Values.server.image.repository (ne .Values.server.image.repository "hashicorp/vault") -}}
   {{- .Values.server.image.repository -}}
-{{- else if and .Values.server.enterpriseLicense.secretName .Values.server.enterpriseLicense.secretKey -}}
+{{- else if include "vault.isEnterprise" . -}}
   hashicorp/vault-enterprise
 {{- else -}}
   {{- .Values.server.image.repository | default "hashicorp/vault" -}}
@@ -142,13 +153,105 @@ secret is configured, falling back to hashicorp/vault for Community Edition.
 
 {{/*
 Resolve the Vault server image tag.
-If server.enterpriseLicense.secretName is set and the tag does not already
-carry the -ent suffix, append it automatically.
-Otherwise return the tag as-is.
+If server.image.tag is non-empty the user has explicitly supplied a tag —
+return it unchanged, no -ent suffix is appended.
+When server.image.tag is empty, fall back to Chart.AppVersion; if an enterprise
+license is also configured, append -ent automatically (idempotent if already
+present) so the image edition matches the server.
 */}}
 {{- define "vault.imageTag" -}}
-{{- $tag := .Values.server.image.tag | default "latest" -}}
-{{- if and .Values.server.enterpriseLicense.secretName .Values.server.enterpriseLicense.secretKey -}}
+{{- $tag := .Values.server.image.tag | default .Chart.AppVersion -}}
+{{- if and (not .Values.server.image.tag) (include "vault.isEnterprise" .) -}}
+  {{- if not (hasSuffix "-ent" $tag) -}}
+    {{- printf "%s-ent" $tag -}}
+  {{- else -}}
+    {{- $tag -}}
+  {{- end -}}
+{{- else -}}
+  {{- $tag -}}
+{{- end -}}
+{{- end -}}
+
+{{/*
+This helper mirrors the logic of vault.imageRepository:
+- If the user has explicitly overridden injector.agentImage.repository to
+  something other than the default "hashicorp/vault", honour that value as-is
+  (custom registry scenario).
+- If server.enterpriseLicense.secretName + secretKey are both set, auto-select
+  hashicorp/vault-enterprise so the agent edition always matches the server.
+- Otherwise fall back to hashicorp/vault (CE).
+The repository decision is independent of the tag — a user-supplied tag does
+not suppress repository auto-selection.
+*/}}
+{{- define "vault.agentImageRepository" -}}
+{{- if and .Values.injector.agentImage.repository (ne .Values.injector.agentImage.repository "hashicorp/vault") -}}
+  {{- .Values.injector.agentImage.repository -}}
+{{- else if include "vault.isEnterprise" . -}}
+  hashicorp/vault-enterprise
+{{- else -}}
+  hashicorp/vault
+{{- end -}}
+{{- end -}}
+
+{{/*
+Companion to vault.agentImageRepository. Vault Enterprise images use a
+"-ent" tag suffix (e.g. 2.0.3-ent).
+If injector.agentImage.tag is non-empty the user has explicitly supplied a
+tag — return it unchanged, no -ent suffix is appended.
+When injector.agentImage.tag is empty, fall back to Chart.AppVersion; if an
+enterprise license is also configured, append -ent automatically (idempotent
+if already present) so the agent edition matches the server.
+*/}}
+{{- define "vault.agentImageTag" -}}
+{{- $tag := .Values.injector.agentImage.tag | default .Chart.AppVersion -}}
+{{- if and (not .Values.injector.agentImage.tag) (include "vault.isEnterprise" .) -}}
+  {{- if not (hasSuffix "-ent" $tag) -}}
+    {{- printf "%s-ent" $tag -}}
+  {{- else -}}
+    {{- $tag -}}
+  {{- end -}}
+{{- else -}}
+  {{- $tag -}}
+{{- end -}}
+{{- end -}}
+
+{{/*
+This helper mirrors the logic of vault.imageRepository and
+vault.agentImageRepository:
+- If csi.agent.image.repository is explicitly set to a non-default value,
+  honour it as-is (custom registry scenario).
+- If server.enterpriseLicense.secretName + secretKey are both set,
+  auto-select hashicorp/vault-enterprise so the CSI agent edition always
+  matches the server.
+- Otherwise fall back to hashicorp/vault (CE), preserving existing behaviour.
+The repository decision is independent of the tag — a user-supplied tag does
+not suppress repository auto-selection.
+*/}}
+{{- define "vault.csiAgentImageRepository" -}}
+{{- if and .Values.csi.agent.image.repository (ne .Values.csi.agent.image.repository "hashicorp/vault") -}}
+  {{- .Values.csi.agent.image.repository -}}
+{{- else if include "vault.isEnterprise" . -}}
+  hashicorp/vault-enterprise
+{{- else -}}
+  hashicorp/vault
+{{- end -}}
+{{- end -}}
+
+{{/*
+Companion to vault.csiAgentImageRepository. Vault Enterprise images on
+DockerHub require the "-ent" tag suffix (e.g. 2.0.3-ent). Fixing the
+repository to hashicorp/vault-enterprise without also fixing the tag would
+result in an ImagePullBackOff because hashicorp/vault-enterprise:2.0.3
+does not exist.
+If csi.agent.image.tag is non-empty the user has explicitly supplied a tag —
+return it unchanged, no -ent suffix is appended.
+When csi.agent.image.tag is empty, fall back to Chart.AppVersion; if an
+enterprise license is also configured, append -ent automatically (idempotent
+if already present) so the CSI agent edition matches the server.
+*/}}
+{{- define "vault.csiAgentImageTag" -}}
+{{- $tag := .Values.csi.agent.image.tag | default .Chart.AppVersion -}}
+{{- if and (not .Values.csi.agent.image.tag) (include "vault.isEnterprise" .) -}}
   {{- if not (hasSuffix "-ent" $tag) -}}
     {{- printf "%s-ent" $tag -}}
   {{- else -}}
@@ -242,7 +345,7 @@ extra volumes the user may have specified (such as a secret with TLS).
   {{- if .Values.server.volumes }}
     {{- toYaml .Values.server.volumes | nindent 8}}
   {{- end }}
-  {{- if (and .Values.server.enterpriseLicense.secretName .Values.server.enterpriseLicense.secretKey) }}
+  {{- if include "vault.isEnterprise" . }}
         - name: vault-license
           secret:
             secretName: {{ .Values.server.enterpriseLicense.secretName }}
@@ -324,7 +427,7 @@ based on the mode configured.
   {{- if .Values.server.volumeMounts }}
     {{- toYaml .Values.server.volumeMounts | nindent 12}}
   {{- end }}
-  {{- if (and .Values.server.enterpriseLicense.secretName .Values.server.enterpriseLicense.secretKey) }}
+  {{- if include "vault.isEnterprise" . }}
             - name: vault-license
               mountPath: /vault/license
               readOnly: true
