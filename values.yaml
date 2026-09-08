@@ -1070,6 +1070,11 @@ server:
     # an override here.
       maxUnavailable: null
 
+    # unhealthyPodEvictionPolicy allows unhealthy pods to be evicted even when
+    # the disruption budget would otherwise be exceeded. Defaults to the
+    # Kubernetes default (IfHealthyBudget) when unset.
+      unhealthyPodEvictionPolicy: null
+
   # Definition of the serviceAccount used to run Vault.
   # These options are also used when using an external Vault server to validate
   # Kubernetes tokens.
