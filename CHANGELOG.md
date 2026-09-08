@@ -1,3 +1,9 @@
+## Unreleased
+
+Improvements:
+
+* server: Allow setting `unhealthyPodEvictionPolicy` on the disruption budget
+
 ## 0.34.1 (August 13, 2026)
 
 Changes:

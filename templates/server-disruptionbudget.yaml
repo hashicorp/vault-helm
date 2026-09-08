@@ -21,6 +21,9 @@ metadata:
     app.kubernetes.io/managed-by: {{ .Release.Service }}
 spec:
   maxUnavailable: {{ template "vault.pdb.maxUnavailable" . }}
+  {{- with .Values.server.ha.disruptionBudget.unhealthyPodEvictionPolicy }}
+  unhealthyPodEvictionPolicy: {{ . }}
+  {{- end }}
   selector:
     matchLabels:
       app.kubernetes.io/name: {{ include "vault.name" . }}

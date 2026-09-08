@@ -171,3 +171,24 @@ load _helpers
       yq '.spec.maxUnavailable' | tee /dev/stderr)
   [ "${actual}" = "2" ]
 }
+
+@test "server/DisruptionBudget: unhealthyPodEvictionPolicy is not set by default" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      --show-only templates/server-disruptionbudget.yaml  \
+      --set 'server.ha.enabled=true' \
+      . | tee /dev/stderr |
+      yq '.spec.unhealthyPodEvictionPolicy' | tee /dev/stderr)
+  [ "${actual}" = "null" ]
+}
+
+@test "server/DisruptionBudget: unhealthyPodEvictionPolicy can be set" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      --show-only templates/server-disruptionbudget.yaml  \
+      --set 'server.ha.enabled=true' \
+      --set 'server.ha.disruptionBudget.unhealthyPodEvictionPolicy=AlwaysAllow' \
+      . | tee /dev/stderr |
+      yq '.spec.unhealthyPodEvictionPolicy' | tee /dev/stderr)
+  [ "${actual}" = "\"AlwaysAllow\"" ]
+}
