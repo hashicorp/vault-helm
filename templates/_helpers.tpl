@@ -134,132 +134,83 @@ Returns a non-empty string when an enterprise license secret is fully configured
 {{- end -}}
 
 {{/*
-Resolve the Vault server image repository.
-If server.image.repository is explicitly set to a non-default value, use it.
-Otherwise, auto-select hashicorp/vault-enterprise when an enterprise license
-secret is configured, falling back to hashicorp/vault for Community Edition.
-The repository decision is independent of the tag — a user-supplied tag does
-not suppress repository auto-selection.
+Generic helper — resolves a Vault image repository.
+Accepts a dict: { "repo": <string>, "root": <top-level context> }
+
+Decision tree:
+  - repo is not one of the two known defaults → return as-is (custom registry)
+  - enterprise license configured             → hashicorp/vault-enterprise
+  - otherwise                                 → hashicorp/vault (CE)
+
+values.yaml defaults to hashicorp/vault-enterprise; this helper overrides it
+to hashicorp/vault when no license is present.
 */}}
+{{- define "vault.resolveImageRepository" -}}
+{{- $repo := .repo | default "hashicorp/vault" -}}
+{{- $isDefault := or (eq $repo "hashicorp/vault") (eq $repo "hashicorp/vault-enterprise") -}}
+{{- if not $isDefault -}}
+  {{- $repo -}}
+{{- else if include "vault.isEnterprise" .root -}}
+  hashicorp/vault-enterprise
+{{- else -}}
+  hashicorp/vault
+{{- end -}}
+{{- end -}}
+
+{{/*
+Generic helper — resolves a Vault image tag.
+Accepts a dict: { "tag": <string>, "root": <top-level context> }
+
+Decision tree:
+  - tag is not one of the two known defaults (AppVersion / AppVersion-ent)
+      → return as-is (custom tag, never append -ent)
+  - enterprise license configured → AppVersion-ent
+  - otherwise                     → plain AppVersion (CE)
+
+values.yaml defaults to AppVersion-ent; this helper overrides it to plain
+AppVersion when no license is present.
+*/}}
+{{- define "vault.resolveImageTag" -}}
+{{- $tag := .tag | default .root.Chart.AppVersion -}}
+{{- $entTag := printf "%s-ent" .root.Chart.AppVersion -}}
+{{- $isDefault := or (eq $tag .root.Chart.AppVersion) (eq $tag $entTag) -}}
+{{- if not $isDefault -}}
+  {{- $tag -}}
+{{- else if include "vault.isEnterprise" .root -}}
+  {{- $entTag -}}
+{{- else -}}
+  {{- .root.Chart.AppVersion -}}
+{{- end -}}
+{{- end -}}
+
+{{/* Vault server image repository — delegates to vault.resolveImageRepository. */}}
 {{- define "vault.imageRepository" -}}
-{{- if and .Values.server.image.repository (ne .Values.server.image.repository "hashicorp/vault") -}}
-  {{- .Values.server.image.repository -}}
-{{- else if include "vault.isEnterprise" . -}}
-  hashicorp/vault-enterprise
-{{- else -}}
-  {{- .Values.server.image.repository | default "hashicorp/vault" -}}
-{{- end -}}
+{{- include "vault.resolveImageRepository" (dict "repo" .Values.server.image.repository "root" .) -}}
 {{- end -}}
 
-{{/*
-Resolve the Vault server image tag.
-If server.image.tag is non-empty the user has explicitly supplied a tag —
-return it unchanged, no -ent suffix is appended.
-When server.image.tag is empty, fall back to Chart.AppVersion; if an enterprise
-license is also configured, append -ent automatically (idempotent if already
-present) so the image edition matches the server.
-*/}}
+{{/* Vault server image tag — delegates to vault.resolveImageTag. */}}
 {{- define "vault.imageTag" -}}
-{{- $tag := .Values.server.image.tag | default .Chart.AppVersion -}}
-{{- if and (not .Values.server.image.tag) (include "vault.isEnterprise" .) -}}
-  {{- if not (hasSuffix "-ent" $tag) -}}
-    {{- printf "%s-ent" $tag -}}
-  {{- else -}}
-    {{- $tag -}}
-  {{- end -}}
-{{- else -}}
-  {{- $tag -}}
-{{- end -}}
+{{- include "vault.resolveImageTag" (dict "tag" .Values.server.image.tag "root" .) -}}
 {{- end -}}
 
-{{/*
-This helper mirrors the logic of vault.imageRepository:
-- If the user has explicitly overridden injector.agentImage.repository to
-  something other than the default "hashicorp/vault", honour that value as-is
-  (custom registry scenario).
-- If server.enterpriseLicense.secretName + secretKey are both set, auto-select
-  hashicorp/vault-enterprise so the agent edition always matches the server.
-- Otherwise fall back to hashicorp/vault (CE).
-The repository decision is independent of the tag — a user-supplied tag does
-not suppress repository auto-selection.
-*/}}
+{{/* Injector agent image repository — delegates to vault.resolveImageRepository. */}}
 {{- define "vault.agentImageRepository" -}}
-{{- if and .Values.injector.agentImage.repository (ne .Values.injector.agentImage.repository "hashicorp/vault") -}}
-  {{- .Values.injector.agentImage.repository -}}
-{{- else if include "vault.isEnterprise" . -}}
-  hashicorp/vault-enterprise
-{{- else -}}
-  hashicorp/vault
-{{- end -}}
+{{- include "vault.resolveImageRepository" (dict "repo" .Values.injector.agentImage.repository "root" .) -}}
 {{- end -}}
 
-{{/*
-Companion to vault.agentImageRepository. Vault Enterprise images use a
-"-ent" tag suffix (e.g. 2.0.3-ent).
-If injector.agentImage.tag is non-empty the user has explicitly supplied a
-tag — return it unchanged, no -ent suffix is appended.
-When injector.agentImage.tag is empty, fall back to Chart.AppVersion; if an
-enterprise license is also configured, append -ent automatically (idempotent
-if already present) so the agent edition matches the server.
-*/}}
+{{/* Injector agent image tag — delegates to vault.resolveImageTag. */}}
 {{- define "vault.agentImageTag" -}}
-{{- $tag := .Values.injector.agentImage.tag | default .Chart.AppVersion -}}
-{{- if and (not .Values.injector.agentImage.tag) (include "vault.isEnterprise" .) -}}
-  {{- if not (hasSuffix "-ent" $tag) -}}
-    {{- printf "%s-ent" $tag -}}
-  {{- else -}}
-    {{- $tag -}}
-  {{- end -}}
-{{- else -}}
-  {{- $tag -}}
-{{- end -}}
+{{- include "vault.resolveImageTag" (dict "tag" .Values.injector.agentImage.tag "root" .) -}}
 {{- end -}}
 
-{{/*
-This helper mirrors the logic of vault.imageRepository and
-vault.agentImageRepository:
-- If csi.agent.image.repository is explicitly set to a non-default value,
-  honour it as-is (custom registry scenario).
-- If server.enterpriseLicense.secretName + secretKey are both set,
-  auto-select hashicorp/vault-enterprise so the CSI agent edition always
-  matches the server.
-- Otherwise fall back to hashicorp/vault (CE), preserving existing behaviour.
-The repository decision is independent of the tag — a user-supplied tag does
-not suppress repository auto-selection.
-*/}}
+{{/* CSI agent image repository — delegates to vault.resolveImageRepository. */}}
 {{- define "vault.csiAgentImageRepository" -}}
-{{- if and .Values.csi.agent.image.repository (ne .Values.csi.agent.image.repository "hashicorp/vault") -}}
-  {{- .Values.csi.agent.image.repository -}}
-{{- else if include "vault.isEnterprise" . -}}
-  hashicorp/vault-enterprise
-{{- else -}}
-  hashicorp/vault
-{{- end -}}
+{{- include "vault.resolveImageRepository" (dict "repo" .Values.csi.agent.image.repository "root" .) -}}
 {{- end -}}
 
-{{/*
-Companion to vault.csiAgentImageRepository. Vault Enterprise images on
-DockerHub require the "-ent" tag suffix (e.g. 2.0.3-ent). Fixing the
-repository to hashicorp/vault-enterprise without also fixing the tag would
-result in an ImagePullBackOff because hashicorp/vault-enterprise:2.0.3
-does not exist.
-If csi.agent.image.tag is non-empty the user has explicitly supplied a tag —
-return it unchanged, no -ent suffix is appended.
-When csi.agent.image.tag is empty, fall back to Chart.AppVersion; if an
-enterprise license is also configured, append -ent automatically (idempotent
-if already present) so the CSI agent edition matches the server.
-*/}}
+{{/* CSI agent image tag — delegates to vault.resolveImageTag. */}}
 {{- define "vault.csiAgentImageTag" -}}
-{{- $tag := .Values.csi.agent.image.tag | default .Chart.AppVersion -}}
-{{- if and (not .Values.csi.agent.image.tag) (include "vault.isEnterprise" .) -}}
-  {{- if not (hasSuffix "-ent" $tag) -}}
-    {{- printf "%s-ent" $tag -}}
-  {{- else -}}
-    {{- $tag -}}
-  {{- end -}}
-{{- else -}}
-  {{- $tag -}}
-{{- end -}}
+{{- include "vault.resolveImageTag" (dict "tag" .Values.csi.agent.image.tag "root" .) -}}
 {{- end -}}
 
 {{/*
