@@ -137,19 +137,15 @@ Returns a non-empty string when an enterprise license secret is fully configured
 Generic helper — resolves a Vault image repository.
 Accepts a dict: { "repo": <string>, "root": <top-level context> }
 
-Decision tree:
-  - repo is not one of the two known defaults → return as-is (custom registry)
-  - enterprise license configured             → hashicorp/vault-enterprise
-  - otherwise                                 → hashicorp/vault (CE)
-
-values.yaml defaults to hashicorp/vault-enterprise; this helper overrides it
-to hashicorp/vault when no license is present.
+- If repo is not set or is the default "hashicorp/vault":
+    license present → hashicorp/vault-enterprise
+    no license      → hashicorp/vault
+- Any other explicit repo (custom registry, hashicorp/vault-enterprise, etc.)
+  is always returned verbatim — never modified.
 */}}
 {{- define "vault.resolveImageRepository" -}}
-{{- $repo := .repo | default "hashicorp/vault" -}}
-{{- $isDefault := or (eq $repo "hashicorp/vault") (eq $repo "hashicorp/vault-enterprise") -}}
-{{- if not $isDefault -}}
-  {{- $repo -}}
+{{- if and .repo (ne .repo "hashicorp/vault") -}}
+  {{- .repo -}}
 {{- else if include "vault.isEnterprise" .root -}}
   hashicorp/vault-enterprise
 {{- else -}}
@@ -161,25 +157,21 @@ to hashicorp/vault when no license is present.
 Generic helper — resolves a Vault image tag.
 Accepts a dict: { "tag": <string>, "root": <top-level context> }
 
-Decision tree:
-  - tag is not one of the two known defaults (AppVersion / AppVersion-ent)
-      → return as-is (custom tag, never append -ent)
-  - enterprise license configured → AppVersion-ent
-  - otherwise                     → plain AppVersion (CE)
-
-values.yaml defaults to AppVersion-ent; this helper overrides it to plain
-AppVersion when no license is present.
+- If tag is not set:
+    license present → AppVersion-ent  (e.g. 2.0.4-ent)
+    no license      → AppVersion      (e.g. 2.0.4)
+- Any explicit tag is always returned verbatim — never modified.
 */}}
 {{- define "vault.resolveImageTag" -}}
-{{- $tag := .tag | default .root.Chart.AppVersion -}}
 {{- $entTag := printf "%s-ent" .root.Chart.AppVersion -}}
-{{- $isDefault := or (eq $tag .root.Chart.AppVersion) (eq $tag $entTag) -}}
-{{- if not $isDefault -}}
-  {{- $tag -}}
-{{- else if include "vault.isEnterprise" .root -}}
-  {{- $entTag -}}
+{{- if not .tag -}}
+  {{- if include "vault.isEnterprise" .root -}}
+    {{- $entTag -}}
+  {{- else -}}
+    {{- .root.Chart.AppVersion -}}
+  {{- end -}}
 {{- else -}}
-  {{- .root.Chart.AppVersion -}}
+  {{- .tag -}}
 {{- end -}}
 {{- end -}}
 
