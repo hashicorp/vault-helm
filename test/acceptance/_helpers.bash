@@ -52,10 +52,19 @@ check_vault_versions(){
     if [ -n "${VAULT_VERSION}" ]; then
         expected_version=${VAULT_VERSION}
     else
-        # expect the defaults in values.yaml to all be the same
+        # expect the defaults in values.yaml to all be the same,
+        # falling back to Chart.AppVersion when tag is empty (mirrors helper logic).
+        local chart_app_version
+        chart_app_version=$(yq -r '.appVersion' Chart.yaml)
         expected_version=$(yq -r '.server.image.tag' values.yaml)
-        [ "${expected_version}" = "$(yq -r '.injector.agentImage.tag' values.yaml)" ]
-        [ "${expected_version}" = "$(yq -r '.csi.agent.image.tag' values.yaml)" ]
+        expected_version=${expected_version:-${chart_app_version}}
+        local injector_version csi_version
+        injector_version=$(yq -r '.injector.agentImage.tag' values.yaml)
+        injector_version=${injector_version:-${chart_app_version}}
+        csi_version=$(yq -r '.csi.agent.image.tag' values.yaml)
+        csi_version=${csi_version:-${chart_app_version}}
+        [ "${expected_version}" = "${injector_version}" ]
+        [ "${expected_version}" = "${csi_version}" ]
     fi
 
     if [ "${ENT_TESTS}" = "true" ]; then

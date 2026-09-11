@@ -9,10 +9,16 @@ setup_suite() {
         SERVER_VAULT_VERSION=${VAULT_VERSION}
         CSI_AGENT_VERSION=${VAULT_VERSION}
     else
-        # If VAULT_VERSION is not set, use the defaults from values.yaml
+        # If VAULT_VERSION is not set, use the defaults from values.yaml,
+        # falling back to Chart.AppVersion when tag is empty (mirrors helper logic).
+        local CHART_APP_VERSION
+        CHART_APP_VERSION=$(yq -r '.appVersion' Chart.yaml)
         INJECTOR_AGENT_VERSION=$(yq -r '.injector.agentImage.tag' values.yaml)
+        INJECTOR_AGENT_VERSION=${INJECTOR_AGENT_VERSION:-${CHART_APP_VERSION}}
         SERVER_VAULT_VERSION=$(yq -r '.server.image.tag' values.yaml)
+        SERVER_VAULT_VERSION=${SERVER_VAULT_VERSION:-${CHART_APP_VERSION}}
         CSI_AGENT_VERSION=$(yq -r '.csi.agent.image.tag' values.yaml)
+        CSI_AGENT_VERSION=${CSI_AGENT_VERSION:-${CHART_APP_VERSION}}
     fi
 
     local VAULT_REPOSITORY
