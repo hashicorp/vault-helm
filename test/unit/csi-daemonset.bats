@@ -952,3 +952,81 @@ load _helpers
       yq -r '.spec.template.spec.containers[1].securityContext.foo' | tee /dev/stderr)
   [ "${actual}" = "bar" ]
 }
+
+@test "csi/daemonset: agent image defaults to CE image" {
+  cd `chart_dir`
+  local repo="$(yq -r '.csi.agent.image.repository' values.yaml)"
+  local tag="$(yq -r '.appVersion' Chart.yaml)"
+
+  local actual=$(helm template \
+      --show-only templates/csi-daemonset.yaml \
+      --set "csi.enabled=true" \
+      . | tee /dev/stderr |
+      yq -r '.spec.template.spec.containers[1].image' | tee /dev/stderr)
+  [ "${actual}" = "${repo}:${tag}" ]
+}
+
+@test "csi/daemonset: agent image auto-selects Enterprise image when license secret set" {
+  cd `chart_dir`
+  local repo="hashicorp/vault-enterprise"
+  local tag="$(yq -r '.appVersion' Chart.yaml)-ent"
+
+  local actual=$(helm template \
+      --show-only templates/csi-daemonset.yaml \
+      --set "csi.enabled=true" \
+      --set 'server.enterpriseLicense.secretName=foo' \
+      . | tee /dev/stderr |
+      yq -r '.spec.template.spec.containers[1].image' | tee /dev/stderr)
+  [ "${actual}" = "${repo}:${tag}" ]
+}
+
+@test "csi/daemonset: agent image -ent tag suffix not doubled when already present" {
+  cd `chart_dir`
+  # Repo is always promoted to vault-enterprise when a license is set.
+  # Tag is returned verbatim — no duplicate -ent appended.
+  local repo="hashicorp/vault-enterprise"
+  local tag="$(yq -r '.appVersion' Chart.yaml)-ent"
+
+  local actual=$(helm template \
+      --show-only templates/csi-daemonset.yaml \
+      --set "csi.enabled=true" \
+      --set 'server.enterpriseLicense.secretName=foo' \
+      --set "csi.agent.image.tag=$(yq -r '.appVersion' Chart.yaml)-ent" \
+      . | tee /dev/stderr |
+      yq -r '.spec.template.spec.containers[1].image' | tee /dev/stderr)
+  [ "${actual}" = "${repo}:${tag}" ]
+}
+
+@test "csi/daemonset: agent image custom repository respected with Enterprise license" {
+  cd `chart_dir`
+  local tag="$(yq -r '.appVersion' Chart.yaml)-ent"
+
+  local actual=$(helm template \
+      --show-only templates/csi-daemonset.yaml \
+      --set "csi.enabled=true" \
+      --set 'server.enterpriseLicense.secretName=foo' \
+      --set 'csi.agent.image.repository=mycorp/vault' \
+      . | tee /dev/stderr |
+      yq -r '.spec.template.spec.containers[1].image' | tee /dev/stderr)
+  # custom repo must be preserved, not overridden to hashicorp/vault-enterprise
+  [[ "${actual}" == "mycorp/vault:"* ]]
+  # -ent tag must still be appended
+  [ "${actual}" = "mycorp/vault:${tag}" ]
+}
+
+@test "csi/daemonset: agent image custom repository and custom tag both preserved with Enterprise license" {
+  cd `chart_dir`
+
+  local actual=$(helm template \
+      --show-only templates/csi-daemonset.yaml \
+      --set "csi.enabled=true" \
+      --set 'server.enterpriseLicense.secretName=foo' \
+      --set 'server.enterpriseLicense.secretKey=license' \
+      --set 'csi.agent.image.repository=mycorp/vault' \
+      --set 'csi.agent.image.tag=custom' \
+      . | tee /dev/stderr |
+      yq -r '.spec.template.spec.containers[1].image' | tee /dev/stderr)
+
+  # Both repo and tag must be preserved exactly — no -ent mutation on the tag
+  [ "${actual}" = "mycorp/vault:custom" ]
+}

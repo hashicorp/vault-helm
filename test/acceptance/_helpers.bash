@@ -52,10 +52,19 @@ check_vault_versions(){
     if [ -n "${VAULT_VERSION}" ]; then
         expected_version=${VAULT_VERSION}
     else
-        # expect the defaults in values.yaml to all be the same
+        # expect the defaults in values.yaml to all be the same,
+        # falling back to Chart.AppVersion when tag is empty (mirrors helper logic).
+        local chart_app_version
+        chart_app_version=$(yq -r '.appVersion' Chart.yaml)
         expected_version=$(yq -r '.server.image.tag' values.yaml)
-        [ "${expected_version}" = "$(yq -r '.injector.agentImage.tag' values.yaml)" ]
-        [ "${expected_version}" = "$(yq -r '.csi.agent.image.tag' values.yaml)" ]
+        expected_version=${expected_version:-${chart_app_version}}
+        local injector_version csi_version
+        injector_version=$(yq -r '.injector.agentImage.tag' values.yaml)
+        injector_version=${injector_version:-${chart_app_version}}
+        csi_version=$(yq -r '.csi.agent.image.tag' values.yaml)
+        csi_version=${csi_version:-${chart_app_version}}
+        [ "${expected_version}" = "${injector_version}" ]
+        [ "${expected_version}" = "${csi_version}" ]
     fi
 
     if [ "${ENT_TESTS}" = "true" ]; then
@@ -64,7 +73,16 @@ check_vault_versions(){
 
     local values
     values=$(helm get values "${helm_deployment_name}" --all)
+    
+    # Verify license secret was set (which triggers Enterprise auto-selection)
+    if [ "${ENT_TESTS}" = "true" ]; then
+        [ "vault-license" = "$(echo "${values}" | yq -r '.server.enterpriseLicense.secretName')" ]
+    fi
+    
+    # Verify server image tag matches expected version
+    # expected_version includes -ent suffix for Enterprise, plain for Community Edition
     [ "${expected_version}" = "$(echo "${values}" | yq -r '.server.image.tag')" ]
+    
     [ "${expected_version}" = "$(echo "${values}" | yq -r '.injector.agentImage.tag')" ]
     [ "${expected_version}" = "$(echo "${values}" | yq -r '.csi.agent.image.tag')" ]
 }

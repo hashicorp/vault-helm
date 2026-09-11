@@ -125,6 +125,87 @@ Compute if the ui is enabled.
 {{- end -}}
 
 {{/*
+Returns a non-empty string when an enterprise license secret is fully configured
+(both secretName and secretKey are set). Use with `if` or `and`:
+  {{- if include "vault.isEnterprise" . -}}
+*/}}
+{{- define "vault.isEnterprise" -}}
+{{- if and .Values.server.enterpriseLicense.secretName .Values.server.enterpriseLicense.secretKey -}}true{{- end -}}
+{{- end -}}
+
+{{/*
+Generic helper — resolves a Vault image repository.
+Accepts a dict: { "repo": <string>, "root": <top-level context> }
+
+- If repo is not set or is the default "hashicorp/vault":
+    license present → hashicorp/vault-enterprise
+    no license      → hashicorp/vault
+- Any other explicit repo (custom registry, hashicorp/vault-enterprise, etc.)
+  is always returned verbatim — never modified.
+*/}}
+{{- define "vault.resolveImageRepository" -}}
+{{- if and .repo (ne .repo "hashicorp/vault") -}}
+  {{- .repo -}}
+{{- else if include "vault.isEnterprise" .root -}}
+  hashicorp/vault-enterprise
+{{- else -}}
+  hashicorp/vault
+{{- end -}}
+{{- end -}}
+
+{{/*
+Generic helper — resolves a Vault image tag.
+Accepts a dict: { "tag": <string>, "root": <top-level context> }
+
+- If tag is not set:
+    license present → AppVersion-ent  (e.g. 2.0.4-ent)
+    no license      → AppVersion      (e.g. 2.0.4)
+- Any explicit tag is always returned verbatim — never modified.
+*/}}
+{{- define "vault.resolveImageTag" -}}
+{{- $entTag := printf "%s-ent" .root.Chart.AppVersion -}}
+{{- if not .tag -}}
+  {{- if include "vault.isEnterprise" .root -}}
+    {{- $entTag -}}
+  {{- else -}}
+    {{- .root.Chart.AppVersion -}}
+  {{- end -}}
+{{- else -}}
+  {{- .tag -}}
+{{- end -}}
+{{- end -}}
+
+{{/* Vault server image repository — delegates to vault.resolveImageRepository. */}}
+{{- define "vault.imageRepository" -}}
+{{- include "vault.resolveImageRepository" (dict "repo" .Values.server.image.repository "root" .) -}}
+{{- end -}}
+
+{{/* Vault server image tag — delegates to vault.resolveImageTag. */}}
+{{- define "vault.imageTag" -}}
+{{- include "vault.resolveImageTag" (dict "tag" .Values.server.image.tag "root" .) -}}
+{{- end -}}
+
+{{/* Injector agent image repository — delegates to vault.resolveImageRepository. */}}
+{{- define "vault.agentImageRepository" -}}
+{{- include "vault.resolveImageRepository" (dict "repo" .Values.injector.agentImage.repository "root" .) -}}
+{{- end -}}
+
+{{/* Injector agent image tag — delegates to vault.resolveImageTag. */}}
+{{- define "vault.agentImageTag" -}}
+{{- include "vault.resolveImageTag" (dict "tag" .Values.injector.agentImage.tag "root" .) -}}
+{{- end -}}
+
+{{/* CSI agent image repository — delegates to vault.resolveImageRepository. */}}
+{{- define "vault.csiAgentImageRepository" -}}
+{{- include "vault.resolveImageRepository" (dict "repo" .Values.csi.agent.image.repository "root" .) -}}
+{{- end -}}
+
+{{/* CSI agent image tag — delegates to vault.resolveImageTag. */}}
+{{- define "vault.csiAgentImageTag" -}}
+{{- include "vault.resolveImageTag" (dict "tag" .Values.csi.agent.image.tag "root" .) -}}
+{{- end -}}
+
+{{/*
 Compute the maximum number of unavailable replicas for the PodDisruptionBudget.
 This defaults to ⌊(n-1)/2⌋ (equivalently, ceil(n/2)-1) where n is the number of
 members of the server cluster.
@@ -207,7 +288,7 @@ extra volumes the user may have specified (such as a secret with TLS).
   {{- if .Values.server.volumes }}
     {{- toYaml .Values.server.volumes | nindent 8}}
   {{- end }}
-  {{- if (and .Values.server.enterpriseLicense.secretName .Values.server.enterpriseLicense.secretKey) }}
+  {{- if include "vault.isEnterprise" . }}
         - name: vault-license
           secret:
             secretName: {{ .Values.server.enterpriseLicense.secretName }}
@@ -289,7 +370,7 @@ based on the mode configured.
   {{- if .Values.server.volumeMounts }}
     {{- toYaml .Values.server.volumeMounts | nindent 12}}
   {{- end }}
-  {{- if (and .Values.server.enterpriseLicense.secretName .Values.server.enterpriseLicense.secretKey) }}
+  {{- if include "vault.isEnterprise" . }}
             - name: vault-license
               mountPath: /vault/license
               readOnly: true

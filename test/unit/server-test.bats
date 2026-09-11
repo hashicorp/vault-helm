@@ -146,15 +146,17 @@ load _helpers
   [ "${actual}" = "foo:1.2.3" ]
 }
 
-@test "server/standalone-server-test-Pod: image tag defaults to latest" {
+@test "server/standalone-server-test-Pod: image tag defaults to Chart.AppVersion when tag is empty" {
   cd `chart_dir`
+  local appVersion="$(yq -r '.appVersion' Chart.yaml)"
+
   local actual=$(helm template \
       --show-only templates/tests/server-test.yaml  \
       --set 'server.image.repository=foo' \
       --set 'server.image.tag=' \
       . | tee /dev/stderr |
       yq -r '.spec.containers[0].image' | tee /dev/stderr)
-  [ "${actual}" = "foo:latest" ]
+  [ "${actual}" = "foo:${appVersion}" ]
 
   local actual=$(helm template \
       --show-only templates/tests/server-test.yaml  \
@@ -163,7 +165,7 @@ load _helpers
       --set 'server.standalone.enabled=true' \
       . | tee /dev/stderr |
       yq -r '.spec.containers[0].image' | tee /dev/stderr)
-  [ "${actual}" = "foo:latest" ]
+  [ "${actual}" = "foo:${appVersion}" ]
 }
 
 @test "server/standalone-server-test-Pod: default imagePullPolicy" {
@@ -183,6 +185,82 @@ load _helpers
       . | tee /dev/stderr |
       yq -r '.spec.containers[0].imagePullPolicy' | tee /dev/stderr)
   [ "${actual}" = "Always" ]
+}
+
+@test "server/standalone-server-test-Pod: Enterprise image auto-selected when secretName is set" {
+  cd `chart_dir`
+  local repo="hashicorp/vault-enterprise"
+  local tag="$(yq -r '.appVersion' Chart.yaml)-ent"
+
+  local actual=$(helm template \
+      --show-only templates/tests/server-test.yaml \
+      --set 'server.enterpriseLicense.secretName=foo' \
+      . | tee /dev/stderr |
+      yq -r '.spec.containers[0].image' | tee /dev/stderr)
+  [ "${actual}" = "${repo}:${tag}" ]
+}
+
+@test "server/standalone-server-test-Pod: Enterprise image tag not doubled when -ent suffix already present" {
+  cd `chart_dir`
+  # Repo is always promoted to vault-enterprise when a license is set.
+  # Tag is returned verbatim — no duplicate -ent appended.
+  local repo="hashicorp/vault-enterprise"
+  local tag="$(yq -r '.appVersion' Chart.yaml)-ent"
+
+  local actual=$(helm template \
+      --show-only templates/tests/server-test.yaml \
+      --set 'server.enterpriseLicense.secretName=foo' \
+      --set "server.image.tag=$(yq -r '.appVersion' Chart.yaml)-ent" \
+      . | tee /dev/stderr |
+      yq -r '.spec.containers[0].image' | tee /dev/stderr)
+  [ "${actual}" = "${repo}:${tag}" ]
+}
+
+@test "server/standalone-server-test-Pod: custom image repository respected with Enterprise license" {
+  cd `chart_dir`
+  local tag="$(yq -r '.appVersion' Chart.yaml)-ent"
+
+  local actual=$(helm template \
+      --show-only templates/tests/server-test.yaml \
+      --set 'server.enterpriseLicense.secretName=foo' \
+      --set 'server.image.repository=mycorp/vault' \
+      . | tee /dev/stderr |
+      yq -r '.spec.containers[0].image' | tee /dev/stderr)
+
+  # repo must NOT be overridden to hashicorp/vault-enterprise
+  [[ "${actual}" == "mycorp/vault:"* ]]
+  # -ent tag must still be appended
+  [ "${actual}" = "mycorp/vault:${tag}" ]
+}
+
+@test "server/standalone-server-test-Pod: custom repository and custom tag both preserved with Enterprise license" {
+  cd `chart_dir`
+
+  local actual=$(helm template \
+      --show-only templates/tests/server-test.yaml \
+      --set 'server.enterpriseLicense.secretName=foo' \
+      --set 'server.enterpriseLicense.secretKey=license' \
+      --set 'server.image.repository=mycorp/vault' \
+      --set 'server.image.tag=custom' \
+      . | tee /dev/stderr |
+      yq -r '.spec.containers[0].image' | tee /dev/stderr)
+
+  # Both repo and tag must be preserved exactly — no -ent mutation on the tag
+  [ "${actual}" = "mycorp/vault:custom" ]
+}
+
+
+
+@test "server/standalone-server-test-Pod: Community Edition image unchanged when no license secret set" {
+  cd `chart_dir`
+  local repo="$(yq -r '.server.image.repository' values.yaml)"
+  local tag="$(yq -r '.appVersion' Chart.yaml)"
+
+  local actual=$(helm template \
+      --show-only templates/tests/server-test.yaml \
+      . | tee /dev/stderr |
+      yq -r '.spec.containers[0].image' | tee /dev/stderr)
+  [ "${actual}" = "${repo}:${tag}" ]
 }
 
 #--------------------------------------------------------------------
