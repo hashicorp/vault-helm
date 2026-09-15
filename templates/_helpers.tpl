@@ -44,6 +44,72 @@ Allow the release namespace to be overridden
 {{- end -}}
 
 {{/*
+Labels shared by every resource the chart renders.
+
+Emits the `helm.sh/chart` and `app.kubernetes.io/version` standard labels
+followed by the chart-wide `global.extraLabels`, so that a single value can
+label every object for cost allocation, ownership and policy enforcement.
+
+These are only ever added to `metadata.labels` and pod template labels. They are
+never added to `spec.selector`/`matchLabels`, which are immutable on an existing
+StatefulSet, Deployment, DaemonSet or Service, so the labels can be added or
+changed on a live installation without breaking `helm upgrade`.
+
+Accepts a dict:
+  ctx       - the root context (required)
+  extra     - per-resource extraLabels, a map, which take precedence over
+              global.extraLabels
+  omitChart - when true, `helm.sh/chart` is not emitted. Used for pod templates
+              that do not already carry it, so that a chart version bump alone
+              does not force a rollout of those pods.
+*/}}
+{{- define "vault.commonLabels" -}}
+  {{- $ctx := .ctx -}}
+  {{- $global := $ctx.Values.global.extraLabels | default dict -}}
+  {{- if kindIs "string" $global -}}
+    {{- $global = tpl $global $ctx | fromYaml -}}
+    {{- /* fromYaml does not fail on malformed input, it returns an Error key,
+           which would otherwise be rendered as a bogus label. */ -}}
+    {{- if $global.Error -}}
+      {{- fail (printf "global.extraLabels is not valid YAML: %s" $global.Error) -}}
+    {{- end -}}
+  {{- end -}}
+  {{- /* Identity labels are chart-managed: overriding them in metadata while the
+         matching selectors keep the original value would silently break the
+         association between a workload and its pods. */ -}}
+  {{- $managed := list "helm.sh/chart" "app.kubernetes.io/name" "app.kubernetes.io/instance" "app.kubernetes.io/managed-by" "component" "vault-active" "vault-internal" -}}
+  {{- range $key, $value := $global -}}
+    {{- if has $key $managed -}}
+      {{- fail (printf "global.extraLabels: %q is managed by the chart and cannot be overridden" $key) -}}
+    {{- end -}}
+  {{- end -}}
+  {{- $labels := dict -}}
+  {{- if not .omitChart -}}
+    {{- $_ := set $labels "helm.sh/chart" (include "vault.chart" $ctx) -}}
+  {{- end -}}
+  {{- if $ctx.Chart.AppVersion -}}
+    {{- $_ := set $labels "app.kubernetes.io/version" ($ctx.Chart.AppVersion | replace "+" "_" | trunc 63 | trimSuffix "-") -}}
+  {{- end -}}
+  {{- range $key, $value := $global -}}
+    {{- $_ := set $labels $key $value -}}
+  {{- end -}}
+  {{- $extra := .extra | default dict -}}
+  {{- range $key, $value := $extra -}}
+    {{- $_ := set $labels $key $value -}}
+  {{- end -}}
+  {{- $lines := list -}}
+  {{- range $key, $value := $labels -}}
+    {{- /* A map or list here would render as Go's debug formatting, producing a
+           label value that the API server rejects. */ -}}
+    {{- if or (kindIs "map" $value) (kindIs "slice" $value) -}}
+      {{- fail (printf "label %q must be a scalar value, got %s" $key (kindOf $value)) -}}
+    {{- end -}}
+    {{- $lines = append $lines (printf "%s: %s" $key (toString $value | quote)) -}}
+  {{- end -}}
+  {{- join "\n" $lines -}}
+{{- end -}}
+
+{{/*
 Compute if the csi driver is enabled.
 */}}
 {{- define "vault.csiEnabled" -}}

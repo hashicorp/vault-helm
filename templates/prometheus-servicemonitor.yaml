@@ -11,17 +11,12 @@ kind: ServiceMonitor
 metadata:
   name: {{ template "vault.fullname" . }}
   labels:
-    helm.sh/chart: {{ include "vault.chart" . }}
     app.kubernetes.io/name: {{ include "vault.name" . }}
     app.kubernetes.io/instance: {{ .Release.Name }}
     app.kubernetes.io/managed-by: {{ .Release.Service }}
     {{- /* update the selectors docs in values.yaml whenever the defaults below change. */ -}}
-    {{- $selectors := .Values.serverTelemetry.serviceMonitor.selectors }}
-    {{- if $selectors }}
-    {{- toYaml $selectors | nindent 4 }}
-    {{- else }}
-    release: prometheus
-    {{- end }}
+    {{- $selectors := .Values.serverTelemetry.serviceMonitor.selectors | default (dict "release" "prometheus") }}
+    {{- include "vault.commonLabels" (dict "ctx" . "extra" $selectors) | nindent 4 }}
 spec:
   selector:
     matchLabels:

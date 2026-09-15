@@ -11,6 +11,29 @@ global:
   # The namespace to deploy to. Defaults to the `helm` installation namespace.
   namespace: ""
 
+  # Extra labels applied to `metadata.labels` of every resource created by this
+  # chart, including the server, injector and CSI provider pod templates, so the
+  # labels also land on the pods themselves.
+  #
+  # These labels are never added to selectors or other immutable fields, so they
+  # can safely be added or changed on an existing installation. Note that adding
+  # or changing them does roll the pods, since pod template labels are part of
+  # the pod spec.
+  #
+  # Chart-managed identity labels (`helm.sh/chart`, the `app.kubernetes.io/name`,
+  # `instance` and `managed-by` labels, `component`, `vault-active` and
+  # `vault-internal`) cannot be overridden here and rendering fails if they are
+  # set. `app.kubernetes.io/version` defaults to the chart appVersion and may be
+  # overridden.
+  #
+  # Per-resource `extraLabels` values still apply and take precedence over these.
+  #
+  # This can either be YAML or a YAML-formatted multi-line templated string.
+  extraLabels: {}
+  # extraLabels:
+  #   team: platform
+  #   cost-center: "1234"
+
   # Image pull secret to use for registry authentication.
   # Alternatively, the value may be specified as an array of strings.
   imagePullSecrets: []
@@ -322,7 +345,8 @@ injector:
   annotations: {}
 
   # Extra labels to attach to the agent-injector
-  # This should be a YAML map of the labels to apply to the injector
+  # This should be a YAML map of the labels to apply to the injector Deployment
+  # and its pods.
   extraLabels: {}
 
   # Should the injector pods run on the host network (useful when using
@@ -736,8 +760,9 @@ server:
   # Priority class for server pods
   priorityClassName: ""
 
-  # Extra labels to attach to the server pods
-  # This should be a YAML map of the labels to apply to the server pods
+  # Extra labels to attach to the server
+  # This should be a YAML map of the labels to apply to the server StatefulSet,
+  # its pods, and the helm test pod.
   extraLabels: {}
 
   # Extra annotations to attach to the server pods

@@ -23,13 +23,10 @@ metadata:
   name: {{ template "vault.fullname" . }}
   namespace: {{ include "vault.namespace" . }}
   labels:
-    helm.sh/chart: {{ include "vault.chart" . }}
     app.kubernetes.io/name: {{ include "vault.name" . }}
     app.kubernetes.io/instance: {{ .Release.Name }}
     app.kubernetes.io/managed-by: {{ .Release.Service }}
-    {{- with .Values.server.ingress.labels }}
-      {{- toYaml . | nindent 4 }}
-    {{- end }}
+    {{- include "vault.commonLabels" (dict "ctx" . "extra" .Values.server.ingress.labels) | nindent 4 }}
   {{- template "vault.ingress.annotations" . }}
 spec:
 {{- if .Values.server.ingress.tls }}
