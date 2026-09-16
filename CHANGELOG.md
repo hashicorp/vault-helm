@@ -2,14 +2,7 @@
 
 Features:
 
-* Add `global.extraLabels` to apply a chart-wide set of labels to `metadata.labels` of every resource the chart renders, including pod templates. Per-resource `extraLabels` still apply and take precedence [#1197](https://github.com/hashicorp/vault-helm/issues/1197)
-* Set the recommended `app.kubernetes.io/version` label, and add the `helm.sh/chart` label to the resources that were missing it [#1183](https://github.com/hashicorp/vault-helm/pull/1183)
-* `server.extraLabels` and `injector.extraLabels` now also apply to the StatefulSet and Deployment `metadata.labels`, not only to their pod templates [#911](https://github.com/hashicorp/vault-helm/issues/911) [#992](https://github.com/hashicorp/vault-helm/issues/992)
-
-Upgrade notes:
-
-* The new `app.kubernetes.io/version` label is added to the pod templates, so the first upgrade rolls the server, injector and CSI provider pods even when no values change. Setting or changing `global.extraLabels` later rolls them again.
-* Labels are only added to `metadata.labels` and pod templates, never to selectors or `volumeClaimTemplates`, so no immutable field is modified.
+* Add `global.extraLabels` to apply a chart-wide set of labels to `metadata.labels` of every resource the chart renders, including pod templates. Also sets the recommended `app.kubernetes.io/version` label, adds `helm.sh/chart` to the resources that were missing it, and applies `server.extraLabels` and `injector.extraLabels` to the StatefulSet and Deployment `metadata.labels` in addition to their pod templates. Per-resource `extraLabels` still apply and take precedence. Labels are never added to selectors, but since the pod template labels change, the first upgrade restarts the server, injector and CSI provider pods [#1211](https://github.com/hashicorp/vault-helm/pull/1211)
 
 ## 0.34.1 (August 13, 2026)
 
