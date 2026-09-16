@@ -32,7 +32,7 @@ global:
   extraLabels: {}
   # extraLabels:
   #   team: platform
-  #   cost-center: "1234"
+  #   cost: "1234"
 
   # Image pull secret to use for registry authentication.
   # Alternatively, the value may be specified as an array of strings.

@@ -118,11 +118,11 @@ render_every_template() {
 @test "global/extraLabels: values are quoted so numbers stay strings" {
   cd `chart_dir`
   local output=$(helm template vault . \
-      --set 'global.extraLabels.cost-center=1234' \
+      --set 'global.extraLabels.cost=1234' \
       --show-only templates/server-service.yaml)
 
-  [ "$(echo "$output" | yq -r '.metadata.labels.cost-center')" = "1234" ]
-  echo "$output" | grep -q 'cost-center: "1234"'
+  [ "$(echo "$output" | yq -r '.metadata.labels.cost')" = "1234" ]
+  echo "$output" | grep -q 'cost: "1234"'
 }
 
 @test "global/extraLabels: accepts a templated string" {
