@@ -251,6 +251,12 @@
                 "externalVaultAddr": {
                     "type": "string"
                 },
+                "extraLabels": {
+                    "type": [
+                      "object",
+                      "string"
+                    ]
+                },
                 "imagePullSecrets": {
                     "type": "array"
                 },
