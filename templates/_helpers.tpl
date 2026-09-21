@@ -195,7 +195,7 @@ extra volumes the user may have specified (such as a secret with TLS).
             name: {{ template "vault.fullname" . }}-config
   {{ end }}
   {{- range .Values.server.extraVolumes }}
-        - name: userconfig-{{ .name }}
+        - name: {{ printf "userconfig-%s" .name | replace "." "-" | trunc 63 | trimSuffix "-" }}
           {{ .type }}:
           {{- if (eq .type "configMap") }}
             name: {{ .name }}
