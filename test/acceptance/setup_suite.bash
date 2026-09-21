@@ -21,8 +21,10 @@ setup_suite() {
         CSI_AGENT_VERSION=${CSI_AGENT_VERSION:-${CHART_APP_VERSION}}
     fi
 
-    local VAULT_REPOSITORY
-    VAULT_REPOSITORY=${VAULT_REPOSITORY:-hashicorp/vault}
+    # NOTE: declare and assign on the same line — `local VAULT_REPOSITORY`
+    # followed by a separate assignment would shadow the exported value with
+    # an empty local before the ${VAULT_REPOSITORY:-default} expansion runs.
+    local VAULT_REPOSITORY="${VAULT_REPOSITORY:-hashicorp/vault}"
 
     PRE_CHART_CMDS=""
     if [ "${ENT_TESTS}" = "true" ]; then
@@ -44,8 +46,12 @@ setup_suite() {
     CHART_VALUES+=(--set server.image.tag="${SERVER_VAULT_VERSION}")
     CHART_VALUES+=(--set csi.agent.image.tag="${CSI_AGENT_VERSION}")
 
-    if [ "${ENT_TESTS}" != "true" ]; then
-        # For CE installs also pin the repository so CI can use a custom registry.
+    if [ "${ENT_TESTS}" != "true" ] || [ "${VAULT_REPOSITORY}" != "hashicorp/vault" ]; then
+        # Pin the repository so CI can use a custom/mirror registry. For CE
+        # installs this is always set; for Enterprise installs it is only set
+        # when VAULT_REPOSITORY was explicitly overridden — otherwise the
+        # chart helper auto-selects hashicorp/vault-enterprise from the
+        # license secret.
         CHART_VALUES+=(--set injector.agentImage.repository="${VAULT_REPOSITORY}")
         CHART_VALUES+=(--set server.image.repository="${VAULT_REPOSITORY}")
         CHART_VALUES+=(--set csi.agent.image.repository="${VAULT_REPOSITORY}")
