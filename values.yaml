@@ -58,6 +58,24 @@ injector:
   leaderElector:
     enabled: true
 
+  # ClusterRole config for the injector.
+  clusterRole:
+    # apiGroups granted for the mutatingwebhookconfigurations rule. Customize
+    # if you need to restrict or extend the default permissions.
+    apiGroups:
+      - "admissionregistration.k8s.io"
+    # resources granted for the rule. Customize if you need to restrict or
+    # extend the default permissions.
+    resources:
+      - "mutatingwebhookconfigurations"
+    # verbs granted on the resources above. Customize if you need to
+    # restrict or extend the default permissions.
+    verbs:
+      - "get"
+      - "list"
+      - "watch"
+      - "patch"
+
   # If true, will enable a node exporter metrics endpoint at /metrics.
   metrics:
     enabled: false
