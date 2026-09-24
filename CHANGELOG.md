@@ -1,3 +1,9 @@
+## Unreleased
+
+Features:
+
+* Vault Enterprise installation eased out — with the default `secretKey: license`, setting `server.enterpriseLicense.secretName` auto-selects the `hashicorp/vault-enterprise` image and `-ent`-suffixed tag. Explicit `image.repository`/`image.tag` values are still honored verbatim, and CE installs are unaffected [#1202](https://github.com/hashicorp/vault-helm/pull/1202)
+
 ## 0.34.1 (August 13, 2026)
 
 Changes:
