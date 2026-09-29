@@ -62,15 +62,23 @@ Accepts a dict:
   omitChart - when true, `helm.sh/chart` is not emitted. Used for pod templates
               that do not already carry it, so that a chart version bump alone
               does not force a rollout of those pods.
+  version   - the version of the application this resource belongs to, used for
+              `app.kubernetes.io/version`. The chart ships three independently
+              versioned applications, so resources pass the image tag matching
+              their own `app.kubernetes.io/name`. Defaults to the chart
+              appVersion, which is the Vault server version.
 */}}
 {{- define "vault.commonLabels" -}}
   {{- $ctx := .ctx -}}
   {{- $global := $ctx.Values.global.extraLabels | default dict -}}
   {{- if kindIs "string" $global -}}
     {{- $global = tpl $global $ctx | fromYaml -}}
-    {{- /* fromYaml does not fail on malformed input, it returns an Error key,
-           which would otherwise be rendered as a bogus label. */ -}}
-    {{- if $global.Error -}}
+    {{- /* fromYaml reports a parse failure by returning a lone "Error" key whose
+           value is the parser message, rather than failing. Match that exact
+           shape so that "Error" stays usable as an ordinary label key: a real
+           failure is the only key present and its message begins with the
+           parser's "error " prefix. */ -}}
+    {{- if and (eq (len $global) 1) (hasKey $global "Error") (kindIs "string" $global.Error) (hasPrefix "error " $global.Error) -}}
       {{- fail (printf "global.extraLabels is not valid YAML: %s" $global.Error) -}}
     {{- end -}}
   {{- end -}}
@@ -87,8 +95,9 @@ Accepts a dict:
   {{- if not .omitChart -}}
     {{- $_ := set $labels "helm.sh/chart" (include "vault.chart" $ctx) -}}
   {{- end -}}
-  {{- if $ctx.Chart.AppVersion -}}
-    {{- $_ := set $labels "app.kubernetes.io/version" ($ctx.Chart.AppVersion | replace "+" "_" | trunc 63 | trimSuffix "-") -}}
+  {{- $version := .version | default $ctx.Chart.AppVersion -}}
+  {{- if $version -}}
+    {{- $_ := set $labels "app.kubernetes.io/version" ($version | toString | replace "+" "_" | trunc 63 | trimSuffix "-") -}}
   {{- end -}}
   {{- range $key, $value := $global -}}
     {{- $_ := set $labels $key $value -}}
@@ -99,10 +108,11 @@ Accepts a dict:
   {{- end -}}
   {{- $lines := list -}}
   {{- range $key, $value := $labels -}}
-    {{- /* A map or list here would render as Go's debug formatting, producing a
-           label value that the API server rejects. */ -}}
-    {{- if or (kindIs "map" $value) (kindIs "slice" $value) -}}
-      {{- fail (printf "label %q must be a scalar value, got %s" $key (kindOf $value)) -}}
+    {{- /* A map, list or null here would render as Go's debug formatting
+           (`map[]`, `[]`, `<nil>`), producing a label value that the API
+           server rejects. */ -}}
+    {{- if or (kindIs "map" $value) (kindIs "slice" $value) (kindIs "invalid" $value) -}}
+      {{- fail (printf "label %q must be a scalar value, got %s" $key (kindOf $value | replace "invalid" "null")) -}}
     {{- end -}}
     {{- $lines = append $lines (printf "%s: %s" $key (toString $value | quote)) -}}
   {{- end -}}

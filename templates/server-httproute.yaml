@@ -26,7 +26,7 @@ metadata:
     app.kubernetes.io/name: {{ include "vault.name" . }}
     app.kubernetes.io/instance: {{ .Release.Name }}
     app.kubernetes.io/managed-by: {{ .Release.Service }}
-    {{- include "vault.commonLabels" (dict "ctx" . "extra" .Values.server.httproute.labels) | nindent 4 }}
+    {{- include "vault.commonLabels" (dict "ctx" . "extra" .Values.server.httproute.labels "version" .Values.server.image.tag) | nindent 4 }}
   {{- template "vault.httproute.annotations" . }}
 spec:
   {{- with .Values.server.httproute.parentRefs }}

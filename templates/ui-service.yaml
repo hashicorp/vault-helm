@@ -17,7 +17,7 @@ metadata:
     app.kubernetes.io/name: {{ include "vault.name" . }}-ui
     app.kubernetes.io/instance: {{ .Release.Name }}
     app.kubernetes.io/managed-by: {{ .Release.Service }}
-    {{- include "vault.commonLabels" (dict "ctx" .) | nindent 4 }}
+    {{- include "vault.commonLabels" (dict "ctx" . "version" .Values.server.image.tag) | nindent 4 }}
   {{- template "vault.ui.annotations" . }}
 spec:
   {{- if (semverCompare ">= 1.23-0" .Capabilities.KubeVersion.Version) }}

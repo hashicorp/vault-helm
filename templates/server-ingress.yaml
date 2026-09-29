@@ -26,7 +26,7 @@ metadata:
     app.kubernetes.io/name: {{ include "vault.name" . }}
     app.kubernetes.io/instance: {{ .Release.Name }}
     app.kubernetes.io/managed-by: {{ .Release.Service }}
-    {{- include "vault.commonLabels" (dict "ctx" . "extra" .Values.server.ingress.labels) | nindent 4 }}
+    {{- include "vault.commonLabels" (dict "ctx" . "extra" .Values.server.ingress.labels "version" .Values.server.image.tag) | nindent 4 }}
   {{- template "vault.ingress.annotations" . }}
 spec:
 {{- if .Values.server.ingress.tls }}

@@ -14,7 +14,7 @@ metadata:
     app.kubernetes.io/name: {{ include "vault.name" . }}-csi-provider
     app.kubernetes.io/instance: {{ .Release.Name }}
     app.kubernetes.io/managed-by: {{ .Release.Service }}
-    {{- include "vault.commonLabels" (dict "ctx" . "extra" .Values.csi.daemonSet.extraLabels) | nindent 4 -}}
+    {{- include "vault.commonLabels" (dict "ctx" . "extra" .Values.csi.daemonSet.extraLabels "version" .Values.csi.image.tag) | nindent 4 -}}
   {{ template "csi.daemonSet.annotations" . }}
 spec:
   updateStrategy:
@@ -32,7 +32,9 @@ spec:
       labels:
         app.kubernetes.io/name: {{ template "vault.name" . }}-csi-provider
         app.kubernetes.io/instance: {{ .Release.Name }}
-        {{- include "vault.commonLabels" (dict "ctx" . "extra" .Values.csi.pod.extraLabels "omitChart" true) | nindent 8 -}}
+        {{- /* The pod also runs a Vault Agent sidecar, but the version label
+               tracks csi.image.tag to match app.kubernetes.io/name. */ -}}
+        {{- include "vault.commonLabels" (dict "ctx" . "extra" .Values.csi.pod.extraLabels "omitChart" true "version" .Values.csi.image.tag) | nindent 8 -}}
       {{ template "csi.pod.annotations" . }}
     spec:
       {{ template "csi.daemonSet.securityContext.pod" . }}

@@ -16,7 +16,7 @@ metadata:
     app.kubernetes.io/managed-by: {{ .Release.Service }}
     {{- /* update the selectors docs in values.yaml whenever the defaults below change. */ -}}
     {{- $selectors := .Values.serverTelemetry.serviceMonitor.selectors | default (dict "release" "prometheus") }}
-    {{- include "vault.commonLabels" (dict "ctx" . "extra" $selectors) | nindent 4 }}
+    {{- include "vault.commonLabels" (dict "ctx" . "extra" $selectors "version" .Values.server.image.tag) | nindent 4 }}
 spec:
   selector:
     matchLabels:

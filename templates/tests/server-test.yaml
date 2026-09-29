@@ -14,7 +14,7 @@ metadata:
   annotations:
     "helm.sh/hook": test
   labels:
-    {{- include "vault.commonLabels" (dict "ctx" . "extra" .Values.server.extraLabels) | nindent 4 }}
+    {{- include "vault.commonLabels" (dict "ctx" . "extra" .Values.server.extraLabels "version" .Values.server.image.tag) | nindent 4 }}
 spec:
   {{- include "imagePullSecrets" . | nindent 2 }}
   containers:

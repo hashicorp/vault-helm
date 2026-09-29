@@ -18,7 +18,7 @@ metadata:
     app.kubernetes.io/name: {{ include "vault.name" . }}
     app.kubernetes.io/instance: {{ .Release.Name }}
     app.kubernetes.io/managed-by: {{ .Release.Service }}
-    {{- include "vault.commonLabels" (dict "ctx" . "extra" .Values.server.extraLabels) | nindent 4 }}
+    {{- include "vault.commonLabels" (dict "ctx" . "extra" .Values.server.extraLabels "version" .Values.server.image.tag) | nindent 4 }}
   {{- template "vault.statefulSet.annotations" . }}
 spec:
   serviceName: {{ template "vault.fullname" . }}-internal
@@ -40,7 +40,7 @@ spec:
         app.kubernetes.io/name: {{ template "vault.name" . }}
         app.kubernetes.io/instance: {{ .Release.Name }}
         component: server
-        {{- include "vault.commonLabels" (dict "ctx" . "extra" .Values.server.extraLabels) | nindent 8 -}}
+        {{- include "vault.commonLabels" (dict "ctx" . "extra" .Values.server.extraLabels "version" .Values.server.image.tag) | nindent 8 -}}
       {{ template "vault.annotations" . }}
     spec:
       {{ template "vault.affinity" . }}
