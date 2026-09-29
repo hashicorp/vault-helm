@@ -320,10 +320,11 @@ load _helpers
 @test "server/standalone=server-test-Pod: no extraLabels set" {
   cd `chart_dir`
 
-  local actual=$(helm template \
+  local output=$(helm template \
       --show-only templates/tests/server-test.yaml  \
-      . | tee /dev/stderr |
-      yq -r '.metadata.labels // "null"' | tee /dev/stderr)
+      . | tee /dev/stderr)
 
-  [ "${actual}" = "null" ]
+  # The standard chart labels are always present, but no custom labels are.
+  [ "$(echo "$output" | yq -r '.metadata.labels.foo // "null"')" = "null" ]
+  [ "$(echo "$output" | yq -r '.metadata.labels["helm.sh/chart"]')" != "null" ]
 }
