@@ -1,0 +1,37 @@
+{{/*
+Copyright IBM Corp. 2018, 2025
+SPDX-License-Identifier: MPL-2.0
+*/}}
+
+{{- if not .Values.global.openshift }}
+{{ template "vault.mode" . }}
+{{- if ne .mode "external" }}
+{{- if .Values.server.listenerset.enabled -}}
+{{- if not (and .Values.server.listenerset.parentRef .Values.server.listenerset.parentRef.name) -}}
+{{- fail "server.listenerset.parentRef.name must be set when listenerset is enabled" -}}
+{{- end -}}
+{{- if not .Values.server.listenerset.listeners -}}
+{{- fail "server.listenerset.listeners must contain at least one listener when listenerset is enabled" -}}
+{{- end -}}
+apiVersion: gateway.networking.k8s.io/v1
+kind: ListenerSet
+metadata:
+  name: {{ template "vault.fullname" . }}
+  namespace: {{ include "vault.namespace" . }}
+  labels:
+    helm.sh/chart: {{ include "vault.chart" . }}
+    app.kubernetes.io/name: {{ include "vault.name" . }}
+    app.kubernetes.io/instance: {{ .Release.Name }}
+    app.kubernetes.io/managed-by: {{ .Release.Service }}
+    {{- with .Values.server.listenerset.labels }}
+    {{- toYaml . | nindent 4 }}
+    {{- end }}
+  {{- template "vault.listenerset.annotations" . }}
+spec:
+  parentRef:
+    {{- toYaml .Values.server.listenerset.parentRef | nindent 4 }}
+  listeners:
+    {{- tpl (toYaml .Values.server.listenerset.listeners) $ | nindent 4 }}
+{{- end }}
+{{- end }}
+{{- end }}

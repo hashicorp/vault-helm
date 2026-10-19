@@ -1,3 +1,9 @@
+## Unreleased
+
+Features:
+
+* Add support for Kubernetes Gateway API ListenerSet resource [#1213](https://github.com/hashicorp/vault-helm/issues/1213)
+
 ## 0.34.1 (August 13, 2026)
 
 Changes:

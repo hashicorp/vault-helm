@@ -513,6 +513,28 @@ server:
     ## Additional custom rules that can be added to the route
     additionalRules: []
 
+  # Requires Gateway API v1.5+ CRDs
+  listenerset:
+    enabled: false
+    labels: {}
+    annotations: {}
+
+    # Keep in mind parentRef.name field is required
+    parentRef: {}
+      # name: vault-gateway-example
+      # namespace: example-ns
+
+    # At least one listener is required
+    listeners: []
+      # - name: vault-https
+      #   hostname: vault.example.com
+      #   port: 443
+      #   protocol: HTTPS
+      #   tls:
+      #     mode: Terminate
+      #     certificateRefs:
+      #       - name: vault-tls
+
   # hostAliases is a list of aliases to be added to /etc/hosts. Specified as a YAML list.
   hostAliases: []
   # - ip: 127.0.0.1
