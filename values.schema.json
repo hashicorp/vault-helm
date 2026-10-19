@@ -955,6 +955,29 @@
                         }
                     }
                 },
+                "listenerset": {
+                    "type": "object",
+                    "properties": {
+                        "annotations": {
+                            "type": [
+                                "object",
+                                "string"
+                            ]
+                        },
+                        "enabled": {
+                            "type": "boolean"
+                        },
+                        "labels": {
+                            "type": "object"
+                        },
+                        "listeners": {
+                            "type": "array"
+                        },
+                        "parentRef": {
+                            "type": "object"
+                        }
+                    }
+                },
                 "livenessProbe": {
                     "type": "object",
                     "properties": {

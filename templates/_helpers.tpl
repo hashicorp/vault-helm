@@ -725,6 +725,21 @@ Sets extra httproute annotations
 {{- end -}}
 
 {{/*
+Sets extra listenerset annotations
+*/}}
+{{- define "vault.listenerset.annotations" -}}
+  {{- if .Values.server.listenerset.annotations }}
+  annotations:
+    {{- $tp := typeOf .Values.server.listenerset.annotations }}
+    {{- if eq $tp "string" }}
+      {{- tpl .Values.server.listenerset.annotations . | nindent 4 }}
+    {{- else }}
+      {{- toYaml .Values.server.listenerset.annotations | nindent 4 }}
+    {{- end }}
+  {{- end }}
+{{- end -}}
+
+{{/*
 Sets extra route annotations
 */}}
 {{- define "vault.route.annotations" -}}
