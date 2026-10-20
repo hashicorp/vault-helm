@@ -323,7 +323,19 @@ load _helpers
   local actual=$(helm template \
       --show-only templates/tests/server-test.yaml  \
       . | tee /dev/stderr |
-      yq -r '.metadata.labels // "null"' | tee /dev/stderr)
+      yq -r '.metadata.labels | keys | join(",")' | tee /dev/stderr)
 
-  [ "${actual}" = "null" ]
+  [ "${actual}" = "app.kubernetes.io/instance,app.kubernetes.io/managed-by,app.kubernetes.io/name,app.kubernetes.io/version,helm.sh/chart" ]
+}
+
+@test "server/standalone=server-test-Pod: specify global.extraLabels" {
+  cd `chart_dir`
+
+  local actual=$(helm template \
+      --show-only templates/tests/server-test.yaml  \
+      --set 'global.extraLabels.foo=bar' \
+      . | tee /dev/stderr |
+      yq -r '.metadata.labels.foo' | tee /dev/stderr)
+
+  [ "${actual}" = "bar" ]
 }

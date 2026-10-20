@@ -484,6 +484,17 @@ load _helpers
   [ "${actual}" = "bar" ]
 }
 
+@test "csi/daemonset: specify global.extraLabels" {
+  cd `chart_dir`
+  local output=$(helm template \
+      --show-only templates/csi-daemonset.yaml \
+      --set 'csi.enabled=true' \
+      --set 'global.extraLabels.foo=bar' \
+      . | tee /dev/stderr)
+  [ "$(echo "$output" | yq -r '.metadata.labels.foo')" = "bar" ]
+  [ "$(echo "$output" | yq -r '.spec.template.metadata.labels.foo')" = "bar" ]
+}
+
 
 #--------------------------------------------------------------------
 # volumes

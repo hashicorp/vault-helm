@@ -18,6 +18,7 @@ metadata:
     app.kubernetes.io/name: {{ include "vault.name" . }}
     app.kubernetes.io/instance: {{ .Release.Name }}
     app.kubernetes.io/managed-by: {{ .Release.Service }}
+    {{- include "vault.commonLabels" . | nindent 4 }}
   {{- template "vault.statefulSet.annotations" . }}
 spec:
   serviceName: {{ template "vault.fullname" . }}-internal
@@ -36,10 +37,10 @@ spec:
   template:
     metadata:
       labels:
-        helm.sh/chart: {{ template "vault.chart" . }}
         app.kubernetes.io/name: {{ template "vault.name" . }}
         app.kubernetes.io/instance: {{ .Release.Name }}
         component: server
+        {{- include "vault.commonLabels" . | nindent 8 }}
         {{- if  .Values.server.extraLabels -}}
           {{- toYaml .Values.server.extraLabels | nindent 8 -}}
         {{- end -}}

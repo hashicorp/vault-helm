@@ -13,10 +13,10 @@ metadata:
   namespace: {{ include "vault.namespace" . }}
   name: {{ template "vault.fullname" . }}-discovery-role
   labels:
-    helm.sh/chart: {{ include "vault.chart" . }}
     app.kubernetes.io/name: {{ include "vault.name" . }}
     app.kubernetes.io/instance: {{ .Release.Name }}
     app.kubernetes.io/managed-by: {{ .Release.Service }}
+    {{- include "vault.commonLabels" . | nindent 4 }}
 rules:
 - apiGroups: [""]
   resources: ["pods"]

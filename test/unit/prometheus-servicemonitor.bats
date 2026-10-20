@@ -81,7 +81,7 @@ load _helpers
       --set 'serverTelemetry.serviceMonitor.enabled=true' \
       . ) | tee /dev/stderr)
 
-  [ "$(echo "$output" | yq -r '.metadata.labels | length')" = "5" ]
+  [ "$(echo "$output" | yq -r '.metadata.labels | length')" = "6" ]
   [ "$(echo "$output" | yq -r '.metadata.labels.release')" = "prometheus" ]
 }
 
@@ -94,7 +94,7 @@ load _helpers
       --set 'serverTelemetry.serviceMonitor.selectors.bar=foo' \
       . ) | tee /dev/stderr)
 
-  [ "$(echo "$output" | yq -r '.metadata.labels | length')" = "6" ]
+  [ "$(echo "$output" | yq -r '.metadata.labels | length')" = "7" ]
   [ "$(echo "$output" | yq -r '.metadata.labels | has("app")')" = "false" ]
   [ "$(echo "$output" | yq -r '.metadata.labels.baz')" = "qux" ]
   [ "$(echo "$output" | yq -r '.metadata.labels.bar')" = "foo" ]

@@ -14,10 +14,10 @@ metadata:
   name: {{ template "vault.fullname" . }}
   namespace: {{ include "vault.namespace" . }}
   labels:
-    helm.sh/chart: {{ include "vault.chart" . }}
     app.kubernetes.io/name: {{ include "vault.name" . }}
     app.kubernetes.io/instance: {{ .Release.Name }}
     app.kubernetes.io/managed-by: {{ .Release.Service }}
+    {{- include "vault.commonLabels" . | nindent 4 }}
   annotations:
 {{ template "vault.service.annotations" .}}
 {{- if and .Values.global.openshift .Values.server.serviceCA.enabled }}

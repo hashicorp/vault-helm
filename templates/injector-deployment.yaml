@@ -16,6 +16,7 @@ metadata:
     app.kubernetes.io/instance: {{ .Release.Name }}
     app.kubernetes.io/managed-by: {{ .Release.Service }}
     component: webhook
+    {{- include "vault.commonLabels" . | nindent 4 }}
 spec:
   replicas: {{ .Values.injector.replicas }}
   selector:
@@ -30,6 +31,7 @@ spec:
         app.kubernetes.io/name: {{ template "vault.name" . }}-agent-injector
         app.kubernetes.io/instance: {{ .Release.Name }}
         component: webhook
+        {{- include "vault.commonLabels" . | nindent 8 }}
         {{- if  .Values.injector.extraLabels -}}
           {{- toYaml .Values.injector.extraLabels | nindent 8 -}}
         {{- end -}}

@@ -12,6 +12,7 @@ metadata:
   labels:
     app.kubernetes.io/name: {{ template "vault.name" . }}
     app.kubernetes.io/instance: {{ .Release.Name }}
+    {{- include "vault.commonLabels" . | nindent 4 }}
 spec:
   podSelector:
     matchLabels:

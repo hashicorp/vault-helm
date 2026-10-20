@@ -13,10 +13,14 @@ metadata:
   namespace: {{ include "vault.namespace" . }}
   annotations:
     "helm.sh/hook": test
-  {{- with .Values.server.extraLabels }}
   labels:
+    app.kubernetes.io/name: {{ include "vault.name" . }}
+    app.kubernetes.io/instance: {{ .Release.Name }}
+    app.kubernetes.io/managed-by: {{ .Release.Service }}
+    {{- include "vault.commonLabels" . | nindent 4 }}
+    {{- with .Values.server.extraLabels }}
     {{- toYaml . | nindent 4 }}
-  {{- end }}
+    {{- end }}
 spec:
   {{- include "imagePullSecrets" . | nindent 2 }}
   containers:
