@@ -99,6 +99,21 @@ spec:
             periodSeconds: {{ .Values.proxy.readinessProbe.periodSeconds }}
             successThreshold: {{ .Values.proxy.readinessProbe.successThreshold }}
             timeoutSeconds: {{ .Values.proxy.readinessProbe.timeoutSeconds }}
+          startupProbe:
+            {{- if .Values.proxy.startupProbe.path }}
+            httpGet:
+              path: {{ .Values.proxy.startupProbe.path | quote }}
+              port: {{ default .Values.proxy.port .Values.proxy.startupProbe.port }}
+              scheme: {{ include "proxy.scheme" . | upper }}
+            {{- else }}
+            tcpSocket:
+              port: {{ default .Values.proxy.port .Values.proxy.startupProbe.port }}
+            {{- end }}
+            failureThreshold: {{ .Values.proxy.startupProbe.failureThreshold }}
+            initialDelaySeconds: {{ .Values.proxy.startupProbe.initialDelaySeconds }}
+            periodSeconds: {{ .Values.proxy.startupProbe.periodSeconds }}
+            successThreshold: {{ .Values.proxy.startupProbe.successThreshold }}
+            timeoutSeconds: {{ .Values.proxy.startupProbe.timeoutSeconds }}
           volumeMounts:
             - name: config
               mountPath: /etc/vault/config.hcl

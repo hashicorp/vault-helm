@@ -1604,6 +1604,32 @@ proxy:
     successThreshold: 1
     # Number of seconds after which the probe times out.
     timeoutSeconds: 3
+  # Used to define custom startupProbe settings. Before it opens its
+  # listener, Vault Proxy calls sys/health on the Vault server using the
+  # retries and timeout of its vault stanza, so a proxy that starts while
+  # Vault is unreachable can take longer than the livenessProbe allows and
+  # would be restarted in a loop. The livenessProbe and readinessProbe only
+  # start once this probe succeeds. Defaults to a TCP check on the listener
+  # at proxy.port, allowing 10 minutes (failureThreshold x periodSeconds)
+  # for the proxy to start.
+  startupProbe:
+    # When set, use an HTTP GET probe on this path (forwarded to the Vault
+    # server) instead of a TCP check on the listener.
+    path: ""
+    # path: "/v1/sys/health?standbyok=true&perfstandbyok=true"
+    # Port to probe. Defaults to proxy.port; set this to probe a different
+    # listener defined in the proxy configuration.
+    # port: 8100
+    # When a probe fails, Kubernetes will try failureThreshold times before giving up
+    failureThreshold: 60
+    # Number of seconds after the container has started before probe initiates
+    initialDelaySeconds: 5
+    # How often (in seconds) to perform the probe
+    periodSeconds: 10
+    # Minimum consecutive successes for the probe to be considered successful after having failed
+    successThreshold: 1
+    # Number of seconds after which the probe times out.
+    timeoutSeconds: 3
 
   # Definition of the proxy Service.
   service:

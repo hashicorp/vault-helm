@@ -511,6 +511,51 @@ load _helpers
   [ "$(echo "$output" | yq -r '.spec.template.spec.containers[0].ports[0].containerPort')" = "8100" ]
 }
 
+@test "proxy/deployment: default startup probe is a tcp check that allows 10 minutes" {
+  cd `chart_dir`
+  local output=$(helm template \
+      --show-only templates/proxy-deployment.yaml \
+      --set 'proxy.enabled=true' \
+      . | tee /dev/stderr)
+  [ "$(echo "$output" | yq -r '.spec.template.spec.containers[0].startupProbe.tcpSocket.port')" = "8100" ]
+  [ "$(echo "$output" | yq -r '.spec.template.spec.containers[0].startupProbe.failureThreshold')" = "60" ]
+  [ "$(echo "$output" | yq -r '.spec.template.spec.containers[0].startupProbe.periodSeconds')" = "10" ]
+}
+
+@test "proxy/deployment: startup probe with path uses httpGet on the listener" {
+  cd `chart_dir`
+  local output=$(helm template \
+      --show-only templates/proxy-deployment.yaml \
+      --set 'proxy.enabled=true' \
+      --set 'proxy.startupProbe.path=/v1/sys/health?standbyok=true&perfstandbyok=true' \
+      . | tee /dev/stderr)
+  [ "$(echo "$output" | yq -r '.spec.template.spec.containers[0].startupProbe.httpGet.path')" = "/v1/sys/health?standbyok=true&perfstandbyok=true" ]
+  [ "$(echo "$output" | yq -r '.spec.template.spec.containers[0].startupProbe.httpGet.port')" = "8100" ]
+  [ "$(echo "$output" | yq -r '.spec.template.spec.containers[0].startupProbe.httpGet.scheme')" = "HTTP" ]
+  [ "$(echo "$output" | yq -r '.spec.template.spec.containers[0].startupProbe.tcpSocket')" = "null" ]
+}
+
+@test "proxy/deployment: specify startup probe settings and port" {
+  cd `chart_dir`
+  local output=$(helm template \
+      --show-only templates/proxy-deployment.yaml \
+      --set 'proxy.enabled=true' \
+      --set 'proxy.port=8300' \
+      --set 'proxy.startupProbe.failureThreshold=30' \
+      --set 'proxy.startupProbe.periodSeconds=5' \
+      . | tee /dev/stderr)
+  [ "$(echo "$output" | yq -r '.spec.template.spec.containers[0].startupProbe.tcpSocket.port')" = "8300" ]
+  [ "$(echo "$output" | yq -r '.spec.template.spec.containers[0].startupProbe.failureThreshold')" = "30" ]
+  [ "$(echo "$output" | yq -r '.spec.template.spec.containers[0].startupProbe.periodSeconds')" = "5" ]
+
+  local output=$(helm template \
+      --show-only templates/proxy-deployment.yaml \
+      --set 'proxy.enabled=true' \
+      --set 'proxy.startupProbe.port=8101' \
+      . | tee /dev/stderr)
+  [ "$(echo "$output" | yq -r '.spec.template.spec.containers[0].startupProbe.tcpSocket.port')" = "8101" ]
+}
+
 #--------------------------------------------------------------------
 # volumes
 
