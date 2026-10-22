@@ -1,0 +1,60 @@
+{{/*
+Copyright IBM Corp. 2018, 2025
+SPDX-License-Identifier: MPL-2.0
+*/}}
+
+{{- template "vault.proxyServiceEnabled" . -}}
+{{- if .proxyServiceEnabled -}}
+{{- if .Values.proxy.ingress.enabled -}}
+{{- $extraPaths := .Values.proxy.ingress.extraPaths -}}
+{{- $serviceName := printf "%s-proxy" (include "vault.fullname" .) -}}
+{{- $servicePort := .Values.proxy.service.port -}}
+{{- $pathType := .Values.proxy.ingress.pathType -}}
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: {{ template "vault.fullname" . }}-proxy
+  namespace: {{ include "vault.namespace" . }}
+  labels:
+    helm.sh/chart: {{ include "vault.chart" . }}
+    app.kubernetes.io/name: {{ include "vault.name" . }}-proxy
+    app.kubernetes.io/instance: {{ .Release.Name }}
+    app.kubernetes.io/managed-by: {{ .Release.Service }}
+    {{- with .Values.proxy.ingress.labels }}
+      {{- toYaml . | nindent 4 }}
+    {{- end }}
+  {{- template "proxy.ingress.annotations" . }}
+spec:
+{{- if .Values.proxy.ingress.tls }}
+  tls:
+  {{- range .Values.proxy.ingress.tls }}
+    - hosts:
+      {{- range .hosts }}
+        - {{ . | quote }}
+      {{- end }}
+      secretName: {{ .secretName }}
+  {{- end }}
+{{- end }}
+{{- if .Values.proxy.ingress.ingressClassName }}
+  ingressClassName: {{ .Values.proxy.ingress.ingressClassName }}
+{{- end }}
+  rules:
+  {{- range .Values.proxy.ingress.hosts }}
+    - host: {{ .host | quote }}
+      http:
+        paths:
+{{ if $extraPaths }}
+{{ toYaml $extraPaths | indent 10 }}
+{{- end }}
+        {{- range (.paths | default (list "/")) }}
+          - path: {{ . }}
+            pathType: {{ $pathType }}
+            backend:
+              service:
+                name: {{ $serviceName }}
+                port:
+                  number: {{ $servicePort }}
+        {{- end }}
+  {{- end }}
+{{- end }}
+{{- end }}

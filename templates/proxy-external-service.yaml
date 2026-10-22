@@ -1,0 +1,33 @@
+{{/*
+Copyright IBM Corp. 2018, 2025
+SPDX-License-Identifier: MPL-2.0
+*/}}
+
+{{- template "vault.proxyEnabled" . -}}
+{{- if .proxyEnabled -}}
+{{- if eq (.Values.proxy.service.externalService.enabled | toString) "true" }}
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ template "vault.fullname" . }}-proxy-external
+  namespace: {{ include "vault.namespace" . }}
+  labels:
+    helm.sh/chart: {{ include "vault.chart" . }}
+    app.kubernetes.io/name: {{ include "vault.name" . }}-proxy
+    app.kubernetes.io/instance: {{ .Release.Name }}
+    app.kubernetes.io/managed-by: {{ .Release.Service }}
+  {{ template "proxy.externalService.annotations" . }}
+spec:
+  type: {{ .Values.proxy.service.externalService.type }}
+{{- template "service.externalTrafficPolicy" .Values.proxy.service.externalService }}
+  {{- include "service.loadBalancer" .Values.proxy.service.externalService }}
+  ports:
+    - name: proxy
+      port: {{ .Values.proxy.service.externalService.port }}
+      targetPort: {{ .Values.proxy.service.externalService.targetPort }}
+  selector:
+    app.kubernetes.io/name: {{ include "vault.name" . }}-proxy
+    app.kubernetes.io/instance: {{ .Release.Name }}
+    component: proxy
+{{- end }}
+{{- end }}

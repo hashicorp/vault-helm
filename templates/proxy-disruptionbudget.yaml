@@ -1,0 +1,28 @@
+{{/*
+Copyright IBM Corp. 2018, 2025
+SPDX-License-Identifier: MPL-2.0
+*/}}
+
+{{- template "vault.proxyEnabled" . -}}
+{{- if .proxyEnabled -}}
+{{- if .Values.proxy.podDisruptionBudget -}}
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: {{ template "vault.fullname" . }}-proxy
+  namespace: {{ include "vault.namespace" . }}
+  labels:
+    helm.sh/chart: {{ include "vault.chart" . }}
+    app.kubernetes.io/name: {{ include "vault.name" . }}-proxy
+    app.kubernetes.io/instance: {{ .Release.Name }}
+    app.kubernetes.io/managed-by: {{ .Release.Service }}
+    component: proxy
+spec:
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: {{ template "vault.name" . }}-proxy
+      app.kubernetes.io/instance: {{ .Release.Name }}
+      component: proxy
+  {{- toYaml .Values.proxy.podDisruptionBudget | nindent 2 }}
+{{- end }}
+{{- end }}
