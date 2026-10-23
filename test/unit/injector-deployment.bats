@@ -1139,6 +1139,17 @@ EOF
   [ "${actual}" = "${repo}:${tag}" ]
 }
 
+@test "injector/deployment: explicit Enterprise repo preserved when no license secret set" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      --show-only templates/injector-deployment.yaml \
+      --set 'injector.agentImage.repository=hashicorp/vault-enterprise' \
+      --set 'injector.agentImage.tag=1.19.5-ent' \
+      . | tee /dev/stderr |
+      yq -r '.spec.template.spec.containers[0].env[] | select(.name=="AGENT_INJECT_VAULT_IMAGE") | .value' | tee /dev/stderr)
+  [ "${actual}" = "hashicorp/vault-enterprise:1.19.5-ent" ]
+}
+
 @test "injector/deployment: AGENT_INJECT_VAULT_IMAGE auto-selects Enterprise image when license secret set" {
   cd `chart_dir`
   local repo="hashicorp/vault-enterprise"

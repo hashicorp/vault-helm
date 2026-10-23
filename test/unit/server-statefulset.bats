@@ -214,6 +214,17 @@ load _helpers
   [ "${actual}" = "${repo}:${tag}" ]
 }
 
+@test "server/standalone-StatefulSet: explicit Enterprise repo preserved when no license secret set" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      --show-only templates/server-statefulset.yaml \
+      --set 'server.image.repository=hashicorp/vault-enterprise' \
+      --set 'server.image.tag=1.19.5-ent' \
+      . | tee /dev/stderr |
+      yq -r '.spec.template.spec.containers[0].image' | tee /dev/stderr)
+  [ "${actual}" = "hashicorp/vault-enterprise:1.19.5-ent" ]
+}
+
 @test "server/standalone-StatefulSet: Custom imagePullSecrets" {
   cd `chart_dir`
   local object=$(helm template \

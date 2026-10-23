@@ -119,6 +119,18 @@ load _helpers
   [ "${actual}" = "${repo}:${tag}" ]
 }
 
+@test "server/ha-StatefulSet: explicit Enterprise repo preserved when no license secret set" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      --show-only templates/server-statefulset.yaml \
+      --set 'server.ha.enabled=true' \
+      --set 'server.image.repository=hashicorp/vault-enterprise' \
+      --set 'server.image.tag=1.19.5-ent' \
+      . | tee /dev/stderr |
+      yq -r '.spec.template.spec.containers[0].image' | tee /dev/stderr)
+  [ "${actual}" = "hashicorp/vault-enterprise:1.19.5-ent" ]
+}
+
 #--------------------------------------------------------------------
 # TLS
 

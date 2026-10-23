@@ -365,9 +365,11 @@ server:
   # route, then leave secretName blank ("") or set it to null.
   # Requires Vault Enterprise 1.8 or later.
   #
-  # Setting secretName automatically selects the hashicorp/vault-enterprise
-  # image and appends the -ent tag suffix. You do not need to override
-  # server.image.repository or server.image.tag when using this field.
+  # Setting secretName selects the hashicorp/vault-enterprise image and
+  # derives an -ent tag from Chart.appVersion. You do not need to override
+  # server.image.repository or server.image.tag for a default Enterprise install.
+  # If you set tag explicitly, it is used verbatim — you must include the
+  # -ent suffix yourself if needed.
   enterpriseLicense:
     # The name of the Kubernetes secret that holds the enterprise license. The
     # secret must be in the same namespace that Vault is installed into.
@@ -423,8 +425,9 @@ server:
   # These fields only need to be overridden to pin a custom registry or
   # a non-standard image name.
   # When server.enterpriseLicense.secretName is set, the chart automatically
-  # selects hashicorp/vault-enterprise and appends the -ent tag suffix —
-  # no override of these fields is required for Enterprise installations.
+  # selects hashicorp/vault-enterprise and derives an -ent tag from
+  # Chart.appVersion. If you set tag explicitly, it is used verbatim —
+  # you must include the -ent suffix yourself.
   image:
     repository: "hashicorp/vault"
     tag: ""

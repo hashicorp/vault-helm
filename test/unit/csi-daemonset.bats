@@ -966,6 +966,18 @@ load _helpers
   [ "${actual}" = "${repo}:${tag}" ]
 }
 
+@test "csi/daemonset: explicit Enterprise repo preserved when no license secret set" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      --show-only templates/csi-daemonset.yaml \
+      --set 'csi.enabled=true' \
+      --set 'csi.agent.image.repository=hashicorp/vault-enterprise' \
+      --set 'csi.agent.image.tag=1.19.5-ent' \
+      . | tee /dev/stderr |
+      yq -r '.spec.template.spec.containers[1].image' | tee /dev/stderr)
+  [ "${actual}" = "hashicorp/vault-enterprise:1.19.5-ent" ]
+}
+
 @test "csi/daemonset: agent image auto-selects Enterprise image when license secret set" {
   cd `chart_dir`
   local repo="hashicorp/vault-enterprise"
