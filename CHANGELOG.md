@@ -1,3 +1,9 @@
+## Unreleased
+
+Bug Fixes:
+
+* server: Remove stray backslashes from the redundancy zones placeholder check, which made GNU grep 3.8+ print `stray \ before "` warnings on every server start
+
 ## 0.34.1 (August 13, 2026)
 
 Changes:
