@@ -906,7 +906,7 @@ local value=$(echo $rendered |
 
   # Verify grep pattern filters out commented lines and matches uncommented HCL (=) and JSON (:) formats
   [[ "${args_disabled}" == *"grep -vE '^[[:space:]]*(#|//)'"* ]]
-  [[ "${args_disabled}" == *'grep -qE '"'"'\"?autopilot_redundancy_zone\"?[[:space:]]*[=:][[:space:]]*\"VAULT_REDUNDANCY_ZONE\"'"'"* ]]
+  [[ "${args_disabled}" == *'grep -qE '"'"'"?autopilot_redundancy_zone"?[[:space:]]*[=:][[:space:]]*"VAULT_REDUNDANCY_ZONE"'"'"* ]]
 
   # Test sed pattern (used when feature is enabled to substitute placeholder)
   local args_enabled=$(helm template \

@@ -238,7 +238,7 @@ for users looking to use this chart with Consul Helm.
               exit 1;
             fi;
 {{- else if eq (.Values.server.ha.raft.enabled | toString) "true" }}
-            if grep -vE '^[[:space:]]*(#|//)' /tmp/storageconfig.hcl | grep -qE '\"?autopilot_redundancy_zone\"?[[:space:]]*[=:][[:space:]]*\"VAULT_REDUNDANCY_ZONE\"'; then
+            if grep -vE '^[[:space:]]*(#|//)' /tmp/storageconfig.hcl | grep -qE '"?autopilot_redundancy_zone"?[[:space:]]*[=:][[:space:]]*"VAULT_REDUNDANCY_ZONE"'; then
               echo "ERROR: autopilot_redundancy_zone placeholder found but server.ha.raft.redundancyZones.enabled=false. Enable the feature or remove the placeholder." >&2;
               exit 1;
             fi;
