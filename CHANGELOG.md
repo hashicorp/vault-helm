@@ -1,3 +1,9 @@
+## Unreleased
+
+Features:
+
+* server: `server.extraContainers`, `server.extraInitContainers`, `server.volumes` and `server.volumeMounts` accept a multi-line string rendered as a template, and `server.ha.apiAddr` is rendered as a template [GH-1220](https://github.com/hashicorp/vault-helm/pull/1220)
+
 ## 0.34.1 (August 13, 2026)
 
 Changes:
