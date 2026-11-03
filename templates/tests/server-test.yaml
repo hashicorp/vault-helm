@@ -49,11 +49,19 @@ spec:
           exit 0
       {{- if .Values.server.volumeMounts }}
       volumeMounts:
+        {{- if kindIs "string" .Values.server.volumeMounts }}
+          {{- tpl .Values.server.volumeMounts . | nindent 8 }}
+        {{- else }}
         {{- toYaml .Values.server.volumeMounts | nindent 8}}
+        {{- end }}
       {{- end }}
   {{- if .Values.server.volumes }}
   volumes:
+    {{- if kindIs "string" .Values.server.volumes }}
+      {{- tpl .Values.server.volumes . | nindent 4 }}
+    {{- else }}
     {{- toYaml .Values.server.volumes | nindent 4}}
+    {{- end }}
   {{- end }}
   restartPolicy: Never
 {{- end }}

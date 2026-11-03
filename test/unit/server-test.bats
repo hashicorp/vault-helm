@@ -253,6 +253,33 @@ load _helpers
   [ "${actual}" = "true" ]
 }
 
+@test "server/standalone-server-test-Pod: server.volumes and server.volumeMounts can be set as template strings" {
+  cd `chart_dir`
+  cat > "${BATS_TEST_TMPDIR}/values.yaml" <<'EOF'
+server:
+  volumes: |
+    - name: tls
+      secret:
+        secretName: '{{ include "vault.fullname" . }}-tls'
+  volumeMounts: |
+    - name: tls
+      mountPath: '/vault/{{ .Release.Name }}'
+EOF
+
+  local object=$(helm template \
+      --show-only templates/tests/server-test.yaml  \
+      --values "${BATS_TEST_TMPDIR}/values.yaml" \
+      . | tee /dev/stderr)
+
+  local actual=$(echo "$object" |
+      yq -r '.spec.volumes[] | select(.name == "tls") | .secret.secretName' | tee /dev/stderr)
+  [ "${actual}" = "release-name-vault-tls" ]
+
+  local actual=$(echo "$object" |
+      yq -r '.spec.containers[0].volumeMounts[] | select(.name == "tls") | .mountPath' | tee /dev/stderr)
+  [ "${actual}" = "/vault/release-name" ]
+}
+
 @test "server/standalone-server-test-Pod: no server.volumeMounts adds no volumeMounts" {
   cd `chart_dir`
 

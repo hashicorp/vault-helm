@@ -436,6 +436,20 @@ load _helpers
   [ "${value}" = "https://example.com:8200" ]
 }
 
+@test "server/ha-StatefulSet: api addr is rendered as a template" {
+  cd `chart_dir`
+  local object=$(helm template \
+      --show-only templates/server-statefulset.yaml \
+      --set 'server.ha.enabled=true' \
+      --set 'server.ha.apiAddr=https://$(VAULT_K8S_POD_NAME).{{ include "vault.fullname" . }}-internal:8200' \
+      . | tee /dev/stderr |
+      yq -r '.spec.template.spec.containers[0].env' | tee /dev/stderr)
+
+  local value=$(echo $object |
+      yq -r 'map(select(.name=="VAULT_API_ADDR")) | .[] .value' | tee /dev/stderr)
+  [ "${value}" = 'https://$(VAULT_K8S_POD_NAME).release-name-vault-internal:8200' ]
+}
+
 #--------------------------------------------------------------------
 # VAULT_CLUSTER_ADDR renders
 

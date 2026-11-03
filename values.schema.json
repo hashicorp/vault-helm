@@ -753,7 +753,8 @@
                 "extraContainers": {
                     "type": [
                         "null",
-                        "array"
+                        "array",
+                        "string"
                     ]
                 },
                 "extraEnvironmentVars": {
@@ -762,7 +763,8 @@
                 "extraInitContainers": {
                     "type": [
                         "null",
-                        "array"
+                        "array",
+                        "string"
                     ]
                 },
                 "extraLabels": {
@@ -1282,13 +1284,15 @@
                 "volumeMounts": {
                     "type": [
                         "null",
-                        "array"
+                        "array",
+                        "string"
                     ]
                 },
                 "volumes": {
                     "type": [
                         "null",
-                        "array"
+                        "array",
+                        "string"
                     ]
                 }
             }

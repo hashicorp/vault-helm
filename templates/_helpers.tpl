@@ -205,7 +205,11 @@ extra volumes the user may have specified (such as a secret with TLS).
             defaultMode: {{ .defaultMode | default 420 }}
   {{- end }}
   {{- if .Values.server.volumes }}
+    {{- if kindIs "string" .Values.server.volumes }}
+      {{- tpl .Values.server.volumes . | nindent 8 }}
+    {{- else }}
     {{- toYaml .Values.server.volumes | nindent 8}}
+    {{- end }}
   {{- end }}
   {{- if (and .Values.server.enterpriseLicense.secretName .Values.server.enterpriseLicense.secretKey) }}
         - name: vault-license
@@ -287,7 +291,11 @@ based on the mode configured.
               mountPath: {{ .path | default "/vault/userconfig" }}/{{ .name }}
   {{- end }}
   {{- if .Values.server.volumeMounts }}
+    {{- if kindIs "string" .Values.server.volumeMounts }}
+      {{- tpl .Values.server.volumeMounts . | nindent 12 }}
+    {{- else }}
     {{- toYaml .Values.server.volumeMounts | nindent 12}}
+    {{- end }}
   {{- end }}
   {{- if (and .Values.server.enterpriseLicense.secretName .Values.server.enterpriseLicense.secretKey) }}
             - name: vault-license

@@ -536,6 +536,24 @@ load _helpers
   [ "${actual}" = "{}" ]
 }
 
+@test "server/standalone-StatefulSet: server.volumes can be set as a template string" {
+  cd `chart_dir`
+  cat > "${BATS_TEST_TMPDIR}/values.yaml" <<'EOF'
+server:
+  volumes: |
+    - name: tls
+      secret:
+        secretName: '{{ include "vault.fullname" . }}-tls'
+EOF
+
+  local actual=$(helm template \
+      --show-only templates/server-statefulset.yaml  \
+      --values "${BATS_TEST_TMPDIR}/values.yaml" \
+      . | tee /dev/stderr |
+      yq -r '.spec.template.spec.volumes[] | select(.name == "tls") | .secret.secretName' | tee /dev/stderr)
+  [ "${actual}" = "release-name-vault-tls" ]
+}
+
 #--------------------------------------------------------------------
 # volumeMounts
 
@@ -558,6 +576,24 @@ load _helpers
   local actual=$(echo $object |
       yq -r '.readOnly' | tee /dev/stderr)
   [ "${actual}" = "true" ]
+}
+
+@test "server/standalone-StatefulSet: server.volumeMounts can be set as a template string" {
+  cd `chart_dir`
+  cat > "${BATS_TEST_TMPDIR}/values.yaml" <<'EOF'
+server:
+  volumeMounts: |
+    - name: tls
+      mountPath: '/vault/{{ .Release.Name }}'
+      readOnly: true
+EOF
+
+  local actual=$(helm template \
+      --show-only templates/server-statefulset.yaml  \
+      --values "${BATS_TEST_TMPDIR}/values.yaml" \
+      . | tee /dev/stderr |
+      yq -r '.spec.template.spec.containers[0].volumeMounts[] | select(.name == "tls") | .mountPath' | tee /dev/stderr)
+  [ "${actual}" = "/vault/release-name" ]
 }
 
 #--------------------------------------------------------------------
@@ -1020,6 +1056,25 @@ load _helpers
 
 }
 
+@test "server/standalone-StatefulSet: extraInitContainers can be set as a template string" {
+  cd `chart_dir`
+  cat > "${BATS_TEST_TMPDIR}/values.yaml" <<'EOF'
+server:
+  extraInitContainers: |
+    - name: init
+      image: test-image
+      args:
+        - '{{ include "vault.fullname" . }}-0'
+EOF
+
+  local actual=$(helm template \
+      --show-only templates/server-statefulset.yaml  \
+      --values "${BATS_TEST_TMPDIR}/values.yaml" \
+      . | tee /dev/stderr |
+      yq -r '.spec.template.spec.initContainers[] | select(.name == "init") | .args[0]' | tee /dev/stderr)
+  [ "${actual}" = "release-name-vault-0" ]
+}
+
 #--------------------------------------------------------------------
 # extraContainers
 
@@ -1100,6 +1155,25 @@ load _helpers
   local containers_count=$(echo $object |
       yq -r 'length' | tee /dev/stderr)
   [ "${containers_count}" = 1 ]
+}
+
+@test "server/standalone-StatefulSet: extraContainers can be set as a template string" {
+  cd `chart_dir`
+  cat > "${BATS_TEST_TMPDIR}/values.yaml" <<'EOF'
+server:
+  extraContainers: |
+    - name: sidecar
+      image: test-image
+      args:
+        - '{{ include "vault.fullname" . }}-0'
+EOF
+
+  local actual=$(helm template \
+      --show-only templates/server-statefulset.yaml  \
+      --values "${BATS_TEST_TMPDIR}/values.yaml" \
+      . | tee /dev/stderr |
+      yq -r '.spec.template.spec.containers[] | select(.name == "sidecar") | .args[0]' | tee /dev/stderr)
+  [ "${actual}" = "release-name-vault-0" ]
 }
 
 # sharedProcessNamespace
