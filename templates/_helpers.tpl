@@ -58,7 +58,8 @@ changed on a live installation without breaking `helm upgrade`.
 Accepts a dict:
   ctx       - the root context (required)
   extra     - per-resource extraLabels, a map, which take precedence over
-              global.extraLabels
+              global.extraLabels. Chart-managed identity keys are rejected
+              in both sources.
   omitChart - when true, `helm.sh/chart` is not emitted. Used for pod templates
               that do not already carry it, so that a chart version bump alone
               does not force a rollout of those pods.
@@ -66,7 +67,10 @@ Accepts a dict:
               `app.kubernetes.io/version`. The chart ships three independently
               versioned applications, so resources pass the image tag matching
               their own `app.kubernetes.io/name`. Defaults to the chart
-              appVersion, which is the Vault server version.
+              appVersion, which is the Vault server version. The derived label
+              omits any @digest suffix, replaces unsupported characters with
+              underscores, trims boundary punctuation and is limited to 63
+              characters; the image is unchanged.
 */}}
 {{- define "vault.commonLabels" -}}
   {{- $ctx := .ctx -}}
@@ -97,13 +101,17 @@ Accepts a dict:
   {{- end -}}
   {{- $version := .version | default $ctx.Chart.AppVersion -}}
   {{- if $version -}}
-    {{- $_ := set $labels "app.kubernetes.io/version" ($version | toString | replace "+" "_" | trunc 63 | trimSuffix "-") -}}
+    {{- $version = $version | toString | splitList "@" | first -}}
+    {{- $_ := set $labels "app.kubernetes.io/version" (regexReplaceAll "[^A-Za-z0-9_.-]" ($version | toString) "_" | trimAll "-_." | trunc 63 | trimAll "-_.") -}}
   {{- end -}}
   {{- range $key, $value := $global -}}
     {{- $_ := set $labels $key $value -}}
   {{- end -}}
   {{- $extra := .extra | default dict -}}
   {{- range $key, $value := $extra -}}
+    {{- if has $key $managed -}}
+      {{- fail (printf "per-resource labels: %q is managed by the chart and cannot be overridden" $key) -}}
+    {{- end -}}
     {{- $_ := set $labels $key $value -}}
   {{- end -}}
   {{- $lines := list -}}

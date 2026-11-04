@@ -225,6 +225,45 @@ render_every_template() {
   [ "${#version}" -le 63 ]
 }
 
+@test "global/extraLabels: version labels sanitize unusual tags without changing the image" {
+  cd `chart_dir`
+  check() {
+    local tag=$1 expected=$2 version
+    run helm template vault . \
+        --set-string "server.image.tag=${tag}" \
+        --show-only templates/server-statefulset.yaml
+    [ "$status" -eq 0 ]
+    version=$(echo "$output" | yq -r '.metadata.labels["app.kubernetes.io/version"]')
+    [ "$version" = "$expected" ]
+    [[ "$version" =~ ^([A-Za-z0-9]([-A-Za-z0-9_.]*[A-Za-z0-9])?)?$ ]]
+    [ "${#version}" -le 63 ]
+    [ "$(echo "$output" | yq -r '.spec.template.metadata.labels["app.kubernetes.io/version"]')" = "$expected" ]
+    [ "$(echo "$output" | yq -r '.spec.template.spec.containers[0].image')" = "$(yq -r '.server.image.repository' values.yaml):${tag}" ]
+  }
+
+  check '1.2.3' '1.2.3'
+  check '1.2.3-rc.1' '1.2.3-rc.1'
+  check '1.2.3+build.123' '1.2.3_build.123'
+  check '1.2.3-rc.1+build.123' '1.2.3-rc.1_build.123'
+  check '_custom' 'custom'
+  check '1.2.3_' '1.2.3'
+  check '1.2.3.' '1.2.3'
+  check '__1.2.3-._' '1.2.3'
+  check '_' ''
+  local digest="sha256:0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef"
+  check "2.0.4@${digest}" '2.0.4'
+  check "2.0.4-rc.1@${digest}" '2.0.4-rc.1'
+  check "_custom_@${digest}" 'custom'
+
+  local prefix=$(printf '%062d' 0 | tr '0' 'a')
+  check "${prefix}b" "${prefix}b"
+  check "${prefix}bcdef" "${prefix}b"
+  check "${prefix}.suffix" "$prefix"
+  check "${prefix}_suffix" "$prefix"
+  check "${prefix}-suffix" "$prefix"
+  check "__${prefix}bcdef" "${prefix}b"
+}
+
 @test "global/extraLabels: Error is usable as an ordinary label key" {
   cd `chart_dir`
   # fromYaml signals a parse failure with a lone "Error" key, so the check must
@@ -259,6 +298,53 @@ render_every_template() {
       --show-only templates/csi-daemonset.yaml
   [ "$status" -eq 1 ]
   [[ "$output" =~ "is managed by the chart and cannot be overridden" ]]
+}
+
+@test "global/extraLabels: per-resource labels reject every chart-managed key" {
+  cd `chart_dir`
+  for key in 'helm\.sh/chart' 'app\.kubernetes\.io/name' 'app\.kubernetes\.io/instance' \
+             'app\.kubernetes\.io/managed-by' 'component' 'vault-active' 'vault-internal'; do
+    run helm template vault . --set "server.extraLabels.${key}=hacked"
+    [ "$status" -eq 1 ]
+    [[ "$output" =~ "per-resource labels:" ]]
+    [[ "$output" =~ "is managed by the chart and cannot be overridden" ]]
+  done
+}
+
+@test "global/extraLabels: every per-resource label source rejects chart-managed keys" {
+  cd `chart_dir`
+  check() {
+    local values_key=$1
+    shift
+    run helm template vault . "$@" --set "${values_key}.component=hacked"
+    [ "$status" -eq 1 ]
+    [[ "$output" =~ 'per-resource labels: "component" is managed by the chart and cannot be overridden' ]]
+  }
+
+  check 'server.extraLabels'
+  check 'server.serviceAccount.extraLabels'
+  check 'injector.extraLabels' --set 'injector.enabled=true'
+  check 'csi.daemonSet.extraLabels' --set 'csi.enabled=true'
+  check 'csi.pod.extraLabels' --set 'csi.enabled=true'
+  check 'csi.serviceAccount.extraLabels' --set 'csi.enabled=true'
+  check 'server.ingress.labels' --set 'server.ingress.enabled=true'
+  check 'server.httproute.labels' --set 'server.httproute.enabled=true' \
+        --set 'server.httproute.parentRefs[0].name=gw'
+  check 'server.route.labels' --set 'global.openshift=true' --set 'server.route.enabled=true'
+  check 'serverTelemetry.serviceMonitor.selectors' --set 'serverTelemetry.serviceMonitor.enabled=true'
+  check 'serverTelemetry.prometheusRules.selectors' --set 'serverTelemetry.prometheusRules.enabled=true' \
+        --set-json 'serverTelemetry.prometheusRules.rules=[{"alert":"x","expr":"up"}]'
+}
+
+@test "global/extraLabels: per-resource version labels still override global values" {
+  cd `chart_dir`
+  run helm template vault . \
+      --set 'global.extraLabels.app\.kubernetes\.io/version=global' \
+      --set 'server.extraLabels.app\.kubernetes\.io/version=local' \
+      --show-only templates/server-statefulset.yaml
+  [ "$status" -eq 0 ]
+  [ "$(echo "$output" | yq -r '.metadata.labels["app.kubernetes.io/version"]')" = "local" ]
+  [ "$(echo "$output" | yq -r '.spec.template.metadata.labels["app.kubernetes.io/version"]')" = "local" ]
 }
 
 @test "global/extraLabels: per-resource overrides do not produce duplicate keys" {
