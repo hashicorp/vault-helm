@@ -116,7 +116,7 @@ render_every_template() {
   [ "$(echo "$output" | yq -r '.metadata.labels.env')" = "staging" ]
 }
 
-@test "global/extraLabels: values are quoted so numbers stay strings" {
+@test "global/extraLabels: integer values from --set render as strings" {
   cd `chart_dir`
   local output=$(helm template vault . \
       --set 'global.extraLabels.cost=1234' \
@@ -124,6 +124,44 @@ render_every_template() {
 
   [ "$(echo "$output" | yq -r '.metadata.labels.cost')" = "1234" ]
   echo "$output" | grep -q 'cost: "1234"'
+}
+
+@test "global/extraLabels: unquoted values-file numbers fail instead of changing representation" {
+  cd `chart_dir`
+  local source number
+  for source in global server; do
+    for number in 12345678 1234 1.25; do
+      run helm template vault . -f - <<EOF
+${source}:
+  extraLabels:
+    cost: ${number}
+EOF
+      [ "$status" -eq 1 ]
+      [[ "$output" =~ 'label "cost" has a floating-point value' ]]
+      [[ "$output" =~ "quote numeric label values" ]]
+    done
+  done
+}
+
+@test "global/extraLabels: quoted values-file numbers preserve their exact representation" {
+  cd `chart_dir`
+  local source
+  for source in global server; do
+    local output=$(helm template vault . \
+        -f - \
+        --show-only templates/server-statefulset.yaml <<EOF
+${source}:
+  extraLabels:
+    cost: "12345678"
+    identifier: "00123456789012345678901234567890"
+    fraction: "1.25"
+EOF
+    )
+    [ "$(echo "$output" | yq -r '.metadata.labels.cost')" = "12345678" ]
+    [ "$(echo "$output" | yq -r '.metadata.labels.identifier')" = "00123456789012345678901234567890" ]
+    [ "$(echo "$output" | yq -r '.metadata.labels.fraction')" = "1.25" ]
+    [ "$(echo "$output" | yq -r '.spec.template.metadata.labels.cost')" = "12345678" ]
+  done
 }
 
 @test "global/extraLabels: accepts a templated string" {

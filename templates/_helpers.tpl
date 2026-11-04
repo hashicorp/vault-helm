@@ -65,8 +65,8 @@ Accepts a dict:
               does not force a rollout of those pods.
   version   - the version of the application this resource belongs to, used for
               `app.kubernetes.io/version`. The chart ships three independently
-              versioned applications, so resources pass the image tag matching
-              their own `app.kubernetes.io/name`. Defaults to the chart
+              versioned applications, so resources pass the image tag of the
+              component that owns the resource. Defaults to the chart
               appVersion, which is the Vault server version. The derived label
               omits any @digest suffix, replaces unsupported characters with
               underscores, trims boundary punctuation and is limited to 63
@@ -118,6 +118,14 @@ Accepts a dict:
            server rejects. */ -}}
     {{- if or (kindIs "map" $value) (kindIs "slice" $value) (kindIs "invalid" $value) -}}
       {{- fail (printf "label %q must be a scalar value, got %s" $key (kindOf $value | replace "invalid" "null")) -}}
+    {{- end -}}
+    {{- /* Helm decodes every number in a values file, --set-json or the string
+           form of global.extraLabels as float64, which may already have changed
+           it (0755 becomes 493, 1.10 becomes 1.1, large numbers lose digits),
+           so the original text cannot be recovered. Integers only arrive from
+           --set, which keeps them exact. */ -}}
+    {{- if or (kindIs "float32" $value) (kindIs "float64" $value) -}}
+      {{- fail (printf "label %q has a floating-point value; quote numeric label values to preserve their exact representation" $key) -}}
     {{- end -}}
     {{- $lines = append $lines (printf "%s: %s" $key (toString $value | quote)) -}}
   {{- end -}}

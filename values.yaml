@@ -24,7 +24,7 @@ global:
   # Chart-managed identity labels (`helm.sh/chart`, the `app.kubernetes.io/name`,
   # `instance` and `managed-by` labels, `component`, `vault-active` and
   # `vault-internal`) cannot be overridden here and rendering fails if they are
-  # set. Existing per-resource labels retain their previous behavior.
+  # set.
   #
   # `app.kubernetes.io/version` is derived from each component's image tag,
   # excluding any digest suffix and sanitized for Kubernetes label constraints.
@@ -34,6 +34,9 @@ global:
   # Per-resource `extraLabels` values still apply and take precedence over these.
   #
   # This can either be YAML or a YAML-formatted multi-line templated string.
+  # Quote numeric label values, in both global and per-resource labels. Helm
+  # parses unquoted numbers in values files as floating-point, which can change
+  # them, so rendering fails for them.
   extraLabels: {}
   # extraLabels:
   #   team: platform
