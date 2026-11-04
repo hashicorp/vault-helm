@@ -16,9 +16,10 @@ global:
   # labels also land on the pods themselves.
   #
   # These labels are never added to selectors or other immutable fields, so they
-  # can safely be added or changed on an existing installation. Note that adding
-  # or changing them does roll the pods, since pod template labels are part of
-  # the pod spec.
+  # can safely be added or changed on an existing installation. Adding or changing
+  # them updates pod templates; existing pods receive the changes according to
+  # the workload's update strategy. With the server's default OnDelete strategy,
+  # existing pods must be deleted and recreated to receive the new labels.
   #
   # Chart-managed identity labels (`helm.sh/chart`, the `app.kubernetes.io/name`,
   # `instance` and `managed-by` labels, `component`, `vault-active` and

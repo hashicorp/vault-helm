@@ -51,9 +51,10 @@ followed by the chart-wide `global.extraLabels`, so that a single value can
 label every object for cost allocation, ownership and policy enforcement.
 
 These are only ever added to `metadata.labels` and pod template labels. They are
-never added to `spec.selector`/`matchLabels`, which are immutable on an existing
-StatefulSet, Deployment, DaemonSet or Service, so the labels can be added or
-changed on a live installation without breaking `helm upgrade`.
+never added to selectors: StatefulSet, Deployment and DaemonSet selectors are
+immutable, while changing a Service selector could change which pods it routes
+to. Keeping selectors unchanged allows labels to be added or changed on a live
+installation without breaking those associations.
 
 Accepts a dict:
   ctx       - the root context (required)

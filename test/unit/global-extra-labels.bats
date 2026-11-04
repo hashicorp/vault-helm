@@ -81,7 +81,8 @@ render_every_template() {
   cd `chart_dir`
   local output=$(render_every_template --set 'global.extraLabels.team=platform')
 
-  # matchLabels and Service selectors are immutable on an existing install.
+  # Workload selectors are immutable; Service selectors must retain their
+  # existing routing behavior even though they are mutable.
   local leaked=$(echo "$output" | \
       yq -r 'select(.spec.selector.matchLabels.team != null) | .kind + "/" + .metadata.name')
   [ "${leaked}" = "" ]
@@ -288,10 +289,8 @@ render_every_template() {
   done
 }
 
-@test "global/extraLabels: the managed-label check is independent of omitChart" {
+@test "global/extraLabels: chart-managed labels are rejected with CSI enabled" {
   cd `chart_dir`
-  # The CSI DaemonSet includes the helper twice, once with omitChart set, so a
-  # managed label must be rejected on both paths.
   run helm template vault . \
       --set 'csi.enabled=true' \
       --set 'global.extraLabels.component=hacked' \
@@ -413,15 +412,44 @@ render_every_template() {
   [ "$(echo "$output" | yq -r 'select(.kind == "DaemonSet") | .spec.template.metadata.labels["app.kubernetes.io/version"]')" = "$(yq -r '.csi.image.tag' values.yaml)" ]
 }
 
-@test "global/extraLabels: every resource's version agrees with its name label" {
+@test "global/extraLabels: every resource's version follows its component" {
   cd `chart_dir`
-  # Two resources claiming the same app.kubernetes.io/name must not report
-  # different versions.
-  local pairs=$(render_every_template | \
-      yq -r 'select(.kind != null) | select(.metadata.labels["app.kubernetes.io/name"] != null) | .metadata.labels["app.kubernetes.io/name"] + " " + .metadata.labels["app.kubernetes.io/version"]' | sort -u)
+  # Injector PSP resources retain their legacy name label, so classify by
+  # source template rather than assuming that label identifies the component.
+  run render_every_template \
+      --set-string 'server.image.tag=7.7.7' \
+      --set-string 'injector.image.tag=9.9.9' \
+      --set-string 'csi.image.tag=8.8.8'
+  [ "$status" -eq 0 ]
+  echo "$output" | awk '
+    /^# Source: vault\/templates\// {
+      expected = "7.7.7"
+      if ($0 ~ /\/injector-/) expected = "9.9.9"
+      if ($0 ~ /\/csi-/) expected = "8.8.8"
+    }
+    /^    app.kubernetes.io\/version:/ {
+      actual = $2
+      gsub(/"/, "", actual)
+      if (actual != expected) exit 1
+      count++
+    }
+    END { if (count == 0) exit 1 }
+  '
+}
 
-  # One line per name means each name maps to exactly one version.
-  [ "$(echo "$pairs" | wc -l)" = "$(echo "$pairs" | awk '{print $1}' | sort -u | wc -l)" ]
+@test "global/extraLabels: injector PSP resources use the injector image version" {
+  cd `chart_dir`
+  for template in injector-psp injector-psp-role injector-psp-rolebinding; do
+    run helm template vault . \
+        --set 'injector.enabled=true' \
+        --set 'global.psp.enable=true' \
+        --set-string 'server.image.tag=7.7.7' \
+        --set-string 'injector.image.tag=9.9.9' \
+        --show-only "templates/${template}.yaml"
+    [ "$status" -eq 0 ]
+    [ "$(echo "$output" | yq -r '.metadata.labels["app.kubernetes.io/version"]')" = "9.9.9" ]
+    [ "$(echo "$output" | yq -r '.metadata.labels["app.kubernetes.io/name"]')" = "vault" ]
+  done
 }
 
 @test "global/extraLabels: version label follows an image tag override" {

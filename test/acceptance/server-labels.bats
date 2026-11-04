@@ -161,6 +161,55 @@ load _helpers
   [ "${uidBefore}" != "${uidAfter}" ]
 }
 
+@test "server/labels: default OnDelete applies new labels only after pod recreation" {
+  cd `chart_dir`
+  kubectl delete namespace acceptance --ignore-not-found=true
+  kubectl create namespace acceptance
+  kubectl config set-context --current --namespace=acceptance
+
+  local noInjector="--set injector.enabled=false"
+
+  eval "${PRE_CHART_CMDS}"
+  helm install "$(name_prefix)" . ${noInjector} \
+      --set 'global.extraLabels=team: platform' ${SET_CHART_VALUES}
+  wait_for_running $(name_prefix)-0
+
+  local strategy=$(kubectl get statefulset "$(name_prefix)" --output json |
+    jq -r '.spec.updateStrategy.type')
+  [ "${strategy}" == "OnDelete" ]
+
+  local uidBefore=$(kubectl get pod "$(name_prefix)-0" --output json | jq -r '.metadata.uid')
+  local teamBefore=$(kubectl get pod "$(name_prefix)-0" --output json | jq -r '.metadata.labels.team')
+  [ "${teamBefore}" == "platform" ]
+
+  helm upgrade "$(name_prefix)" . ${noInjector} \
+      --set 'global.extraLabels=team: platform-two' ${SET_CHART_VALUES}
+
+  # Wait for the controller to observe the new template before checking that
+  # the existing pod was left alone.
+  local generation=$(kubectl get statefulset "$(name_prefix)" --output json |
+    jq -r '.metadata.generation')
+  kubectl wait "statefulset/$(name_prefix)" \
+      --for="jsonpath={.status.observedGeneration}=${generation}" --timeout=120s
+
+  local templateTeam=$(kubectl get statefulset "$(name_prefix)" --output json |
+    jq -r '.spec.template.metadata.labels.team')
+  [ "${templateTeam}" == "platform-two" ]
+
+  local uidAfter=$(kubectl get pod "$(name_prefix)-0" --output json | jq -r '.metadata.uid')
+  local teamAfter=$(kubectl get pod "$(name_prefix)-0" --output json | jq -r '.metadata.labels.team')
+  [ "${uidAfter}" == "${uidBefore}" ]
+  [ "${teamAfter}" == "platform" ]
+
+  kubectl delete pod "$(name_prefix)-0" --wait=true --timeout=120s
+  wait_for_running $(name_prefix)-0
+
+  local uidRecreated=$(kubectl get pod "$(name_prefix)-0" --output json | jq -r '.metadata.uid')
+  local teamRecreated=$(kubectl get pod "$(name_prefix)-0" --output json | jq -r '.metadata.labels.team')
+  [ "${uidRecreated}" != "${uidBefore}" ]
+  [ "${teamRecreated}" == "platform-two" ]
+}
+
 @test "server/labels: a chart-managed label is rejected before anything is applied" {
   cd `chart_dir`
   kubectl delete namespace acceptance --ignore-not-found=true
