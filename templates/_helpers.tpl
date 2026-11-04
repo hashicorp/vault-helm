@@ -58,8 +58,7 @@ changed on a live installation without breaking `helm upgrade`.
 Accepts a dict:
   ctx       - the root context (required)
   extra     - per-resource extraLabels, a map, which take precedence over
-              global.extraLabels. Chart-managed identity keys are rejected
-              in both sources.
+              global.extraLabels
   omitChart - when true, `helm.sh/chart` is not emitted. Used for pod templates
               that do not already carry it, so that a chart version bump alone
               does not force a rollout of those pods.
@@ -109,9 +108,6 @@ Accepts a dict:
   {{- end -}}
   {{- $extra := .extra | default dict -}}
   {{- range $key, $value := $extra -}}
-    {{- if has $key $managed -}}
-      {{- fail (printf "per-resource labels: %q is managed by the chart and cannot be overridden" $key) -}}
-    {{- end -}}
     {{- $_ := set $labels $key $value -}}
   {{- end -}}
   {{- $lines := list -}}

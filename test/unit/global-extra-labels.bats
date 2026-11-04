@@ -300,40 +300,15 @@ render_every_template() {
   [[ "$output" =~ "is managed by the chart and cannot be overridden" ]]
 }
 
-@test "global/extraLabels: per-resource labels reject every chart-managed key" {
+@test "global/extraLabels: existing per-resource chart-managed labels are still accepted" {
   cd `chart_dir`
-  for key in 'helm\.sh/chart' 'app\.kubernetes\.io/name' 'app\.kubernetes\.io/instance' \
-             'app\.kubernetes\.io/managed-by' 'component' 'vault-active' 'vault-internal'; do
-    run helm template vault . --set "server.extraLabels.${key}=hacked"
-    [ "$status" -eq 1 ]
-    [[ "$output" =~ "per-resource labels:" ]]
-    [[ "$output" =~ "is managed by the chart and cannot be overridden" ]]
-  done
-}
-
-@test "global/extraLabels: every per-resource label source rejects chart-managed keys" {
-  cd `chart_dir`
-  check() {
-    local values_key=$1
-    shift
-    run helm template vault . "$@" --set "${values_key}.component=hacked"
-    [ "$status" -eq 1 ]
-    [[ "$output" =~ 'per-resource labels: "component" is managed by the chart and cannot be overridden' ]]
-  }
-
-  check 'server.extraLabels'
-  check 'server.serviceAccount.extraLabels'
-  check 'injector.extraLabels' --set 'injector.enabled=true'
-  check 'csi.daemonSet.extraLabels' --set 'csi.enabled=true'
-  check 'csi.pod.extraLabels' --set 'csi.enabled=true'
-  check 'csi.serviceAccount.extraLabels' --set 'csi.enabled=true'
-  check 'server.ingress.labels' --set 'server.ingress.enabled=true'
-  check 'server.httproute.labels' --set 'server.httproute.enabled=true' \
-        --set 'server.httproute.parentRefs[0].name=gw'
-  check 'server.route.labels' --set 'global.openshift=true' --set 'server.route.enabled=true'
-  check 'serverTelemetry.serviceMonitor.selectors' --set 'serverTelemetry.serviceMonitor.enabled=true'
-  check 'serverTelemetry.prometheusRules.selectors' --set 'serverTelemetry.prometheusRules.enabled=true' \
-        --set-json 'serverTelemetry.prometheusRules.rules=[{"alert":"x","expr":"up"}]'
+  run helm template vault . \
+      --set 'server.extraLabels.component=server' \
+      --show-only templates/server-statefulset.yaml
+  [ "$status" -eq 0 ]
+  [ "$(echo "$output" | yq -r '.metadata.labels.component')" = "server" ]
+  [ "$(echo "$output" | yq -r '.spec.template.metadata.labels.component')" = "server" ]
+  [ "$(echo "$output" | yq -r '.spec.selector.matchLabels.component')" = "server" ]
 }
 
 @test "global/extraLabels: per-resource version labels still override global values" {

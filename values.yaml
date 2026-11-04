@@ -22,9 +22,8 @@ global:
   #
   # Chart-managed identity labels (`helm.sh/chart`, the `app.kubernetes.io/name`,
   # `instance` and `managed-by` labels, `component`, `vault-active` and
-  # `vault-internal`) cannot be overridden here or through per-resource labels.
-  # Rendering fails if they are set, including in existing per-resource label
-  # configurations.
+  # `vault-internal`) cannot be overridden here and rendering fails if they are
+  # set. Existing per-resource labels retain their previous behavior.
   #
   # `app.kubernetes.io/version` is derived from each component's image tag,
   # excluding any digest suffix and sanitized for Kubernetes label constraints.
