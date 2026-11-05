@@ -9,8 +9,9 @@ https://developer.hashicorp.com/vault/docs
 
 Your release is named {{ .Release.Name }}. To learn more about the release, try:
 
-  $ helm status {{ .Release.Name }}
-  $ helm get manifest {{ .Release.Name }}
+  $ helm status {{ .Release.Name }} {{- if and .Release.Namespace (ne .Release.Namespace "default") }} -n {{ .Release.Namespace }} {{- end }}
+  $ helm get manifest {{ .Release.Name }} {{- if and .Release.Namespace (ne .Release.Namespace "default") }} -n {{ .Release.Namespace }} {{- end }}
+
 {{- if and (eq (.Values.server.ha.raft.redundancyZones.enabled | toString) "true") (not .Values.server.topologySpreadConstraints) }}
 
 ##############################################################################
