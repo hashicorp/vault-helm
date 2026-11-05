@@ -17,6 +17,9 @@ metadata:
     {{- include "vault.commonLabels" (dict "ctx" . "extra" .Values.csi.daemonSet.extraLabels "version" .Values.csi.image.tag) | nindent 4 -}}
   {{ template "csi.daemonSet.annotations" . }}
 spec:
+  {{- if .Values.csi.daemonSet.revisionHistoryLimit }}
+  revisionHistoryLimit: {{ .Values.csi.daemonSet.revisionHistoryLimit }}
+  {{- end }}
   updateStrategy:
     type: {{ .Values.csi.daemonSet.updateStrategy.type }}
     {{- if .Values.csi.daemonSet.updateStrategy.maxUnavailable }}

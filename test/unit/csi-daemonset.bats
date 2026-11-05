@@ -294,6 +294,29 @@ load _helpers
 }
 
 #--------------------------------------------------------------------
+# revisionHistoryLimit
+@test "csi/daemonset: revisionHistoryLimit not set by default" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      --show-only templates/csi-daemonset.yaml \
+      --set "csi.enabled=true" \
+      . | tee /dev/stderr |
+      yq -r '.spec.revisionHistoryLimit' | tee /dev/stderr)
+  [ "${actual}" = "null" ]
+}
+
+@test "csi/daemonset: revisionHistoryLimit can be set" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      --show-only templates/csi-daemonset.yaml \
+      --set "csi.enabled=true" \
+      --set "csi.daemonSet.revisionHistoryLimit=5" \
+      . | tee /dev/stderr |
+      yq -r '.spec.revisionHistoryLimit' | tee /dev/stderr)
+  [ "${actual}" = "5" ]
+}
+
+#--------------------------------------------------------------------
 # Extra annotations
 @test "csi/daemonset: default csi.daemonSet.annotations" {
   cd `chart_dir`
