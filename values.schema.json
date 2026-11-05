@@ -668,6 +668,9 @@
                         "mountPath": {
                             "type": "string"
                         },
+                        "name": {
+                            "type": "string"
+                        },
                         "size": {
                             "type": "string"
                         },
@@ -712,6 +715,9 @@
                             ]
                         },
                         "mountPath": {
+                            "type": "string"
+                        },
+                        "name": {
                             "type": "string"
                         },
                         "size": {
