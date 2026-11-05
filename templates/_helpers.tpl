@@ -44,6 +44,95 @@ Allow the release namespace to be overridden
 {{- end -}}
 
 {{/*
+Labels shared by every resource the chart renders.
+
+Emits the `helm.sh/chart` and `app.kubernetes.io/version` standard labels
+followed by the chart-wide `global.extraLabels`, so that a single value can
+label every object for cost allocation, ownership and policy enforcement.
+
+These are only ever added to `metadata.labels` and pod template labels. They are
+never added to selectors: StatefulSet, Deployment and DaemonSet selectors are
+immutable, while changing a Service selector could change which pods it routes
+to. Keeping selectors unchanged allows labels to be added or changed on a live
+installation without breaking those associations.
+
+Accepts a dict:
+  ctx       - the root context (required)
+  extra     - per-resource extraLabels, a map, which take precedence over
+              global.extraLabels
+  omitChart - when true, `helm.sh/chart` is not emitted. Used for pod templates
+              that do not already carry it, so that a chart version bump alone
+              does not force a rollout of those pods.
+  version   - the version of the application this resource belongs to, used for
+              `app.kubernetes.io/version`. The chart ships three independently
+              versioned applications, so resources pass the image tag of the
+              component that owns the resource. Defaults to the chart
+              appVersion, which is the Vault server version. The derived label
+              omits any @digest suffix, replaces unsupported characters with
+              underscores, trims boundary punctuation and is limited to 63
+              characters; the image is unchanged.
+*/}}
+{{- define "vault.commonLabels" -}}
+  {{- $ctx := .ctx -}}
+  {{- $global := $ctx.Values.global.extraLabels | default dict -}}
+  {{- if kindIs "string" $global -}}
+    {{- $global = tpl $global $ctx | fromYaml -}}
+    {{- /* fromYaml reports a parse failure by returning a lone "Error" key whose
+           value is the parser message, rather than failing. Match that exact
+           shape so that "Error" stays usable as an ordinary label key: a real
+           failure is the only key present and its message begins with the
+           parser's "error " prefix. */ -}}
+    {{- if and (eq (len $global) 1) (hasKey $global "Error") (kindIs "string" $global.Error) (hasPrefix "error " $global.Error) -}}
+      {{- fail (printf "global.extraLabels is not valid YAML: %s" $global.Error) -}}
+    {{- end -}}
+  {{- end -}}
+  {{- /* Identity labels are chart-managed: overriding them in metadata while the
+         matching selectors keep the original value would silently break the
+         association between a workload and its pods. */ -}}
+  {{- $managed := list "helm.sh/chart" "app.kubernetes.io/name" "app.kubernetes.io/instance" "app.kubernetes.io/managed-by" "component" "vault-active" "vault-internal" -}}
+  {{- range $key, $value := $global -}}
+    {{- if has $key $managed -}}
+      {{- fail (printf "global.extraLabels: %q is managed by the chart and cannot be overridden" $key) -}}
+    {{- end -}}
+  {{- end -}}
+  {{- $labels := dict -}}
+  {{- if not .omitChart -}}
+    {{- $_ := set $labels "helm.sh/chart" (include "vault.chart" $ctx) -}}
+  {{- end -}}
+  {{- $version := .version | default $ctx.Chart.AppVersion -}}
+  {{- if $version -}}
+    {{- $version = $version | toString | splitList "@" | first -}}
+    {{- $_ := set $labels "app.kubernetes.io/version" (regexReplaceAll "[^A-Za-z0-9_.-]" ($version | toString) "_" | trimAll "-_." | trunc 63 | trimAll "-_.") -}}
+  {{- end -}}
+  {{- range $key, $value := $global -}}
+    {{- $_ := set $labels $key $value -}}
+  {{- end -}}
+  {{- $extra := .extra | default dict -}}
+  {{- range $key, $value := $extra -}}
+    {{- $_ := set $labels $key $value -}}
+  {{- end -}}
+  {{- $lines := list -}}
+  {{- range $key, $value := $labels -}}
+    {{- /* A map, list or null here would render as Go's debug formatting
+           (`map[]`, `[]`, `<nil>`), producing a label value that the API
+           server rejects. */ -}}
+    {{- if or (kindIs "map" $value) (kindIs "slice" $value) (kindIs "invalid" $value) -}}
+      {{- fail (printf "label %q must be a scalar value, got %s" $key (kindOf $value | replace "invalid" "null")) -}}
+    {{- end -}}
+    {{- /* Helm decodes every number in a values file, --set-json or the string
+           form of global.extraLabels as float64, which may already have changed
+           it (0755 becomes 493, 1.10 becomes 1.1, large numbers lose digits),
+           so the original text cannot be recovered. Integers only arrive from
+           --set, which keeps them exact. */ -}}
+    {{- if or (kindIs "float32" $value) (kindIs "float64" $value) -}}
+      {{- fail (printf "label %q has a floating-point value; quote numeric label values to preserve their exact representation" $key) -}}
+    {{- end -}}
+    {{- $lines = append $lines (printf "%s: %s" $key (toString $value | quote)) -}}
+  {{- end -}}
+  {{- join "\n" $lines -}}
+{{- end -}}
+
+{{/*
 Compute if the csi driver is enabled.
 */}}
 {{- define "vault.csiEnabled" -}}

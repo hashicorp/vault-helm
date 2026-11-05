@@ -11,6 +11,37 @@ global:
   # The namespace to deploy to. Defaults to the `helm` installation namespace.
   namespace: ""
 
+  # Extra labels applied to `metadata.labels` of every resource created by this
+  # chart, including the server, injector and CSI provider pod templates, so the
+  # labels also land on the pods themselves.
+  #
+  # These labels are never added to selectors or other immutable fields, so they
+  # can safely be added or changed on an existing installation. Adding or changing
+  # them updates pod templates; existing pods receive the changes according to
+  # the workload's update strategy. With the server's default OnDelete strategy,
+  # existing pods must be deleted and recreated to receive the new labels.
+  #
+  # Chart-managed identity labels (`helm.sh/chart`, the `app.kubernetes.io/name`,
+  # `instance` and `managed-by` labels, `component`, `vault-active` and
+  # `vault-internal`) cannot be overridden here and rendering fails if they are
+  # set.
+  #
+  # `app.kubernetes.io/version` is derived from each component's image tag,
+  # excluding any digest suffix and sanitized for Kubernetes label constraints.
+  # It falls back to chart appVersion when the tag is empty and may be overridden
+  # through global or per-resource labels.
+  #
+  # Per-resource `extraLabels` values still apply and take precedence over these.
+  #
+  # This can either be YAML or a YAML-formatted multi-line templated string.
+  # Quote numeric label values, in both global and per-resource labels. Helm
+  # parses unquoted numbers in values files as floating-point, which can change
+  # them, so rendering fails for them.
+  extraLabels: {}
+  # extraLabels:
+  #   team: platform
+  #   cost: "1234"
+
   # Image pull secret to use for registry authentication.
   # Alternatively, the value may be specified as an array of strings.
   imagePullSecrets: []
@@ -322,7 +353,8 @@ injector:
   annotations: {}
 
   # Extra labels to attach to the agent-injector
-  # This should be a YAML map of the labels to apply to the injector
+  # This should be a YAML map of the labels to apply to the injector Deployment
+  # and its pods.
   extraLabels: {}
 
   # Should the injector pods run on the host network (useful when using
@@ -736,8 +768,9 @@ server:
   # Priority class for server pods
   priorityClassName: ""
 
-  # Extra labels to attach to the server pods
-  # This should be a YAML map of the labels to apply to the server pods
+  # Extra labels to attach to the server
+  # This should be a YAML map of the labels to apply to the server StatefulSet,
+  # its pods, and the helm test pod.
   extraLabels: {}
 
   # Extra annotations to attach to the server pods

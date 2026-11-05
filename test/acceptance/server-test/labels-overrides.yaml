@@ -1,0 +1,19 @@
+# Copyright IBM Corp. 2018, 2026
+# SPDX-License-Identifier: MPL-2.0
+
+global:
+  # The YAML-formatted string form, which is templated against the release.
+  extraLabels: |
+    team: platform
+    cost: "1234"
+    release-name: "{{ .Release.Name }}"
+
+injector:
+  enabled: true
+  # The map form, which takes precedence over global.extraLabels.
+  extraLabels:
+    team: injector-team
+
+server:
+  extraLabels:
+    owner: sre
