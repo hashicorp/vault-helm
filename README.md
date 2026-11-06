@@ -34,6 +34,8 @@ and run `helm install`:
 $ helm repo add hashicorp https://helm.releases.hashicorp.com
 "hashicorp" has been added to your repositories
 
+$ helm repo update
+
 $ helm install vault hashicorp/vault
 ```
 
