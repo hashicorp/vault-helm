@@ -110,7 +110,7 @@ spec:
           imagePullPolicy: {{ .Values.csi.agent.image.pullPolicy }}
           {{ template "csi.agent.resources" . }}
           command:
-            - vault
+            - {{ .Values.csi.agent.binary | quote }}
           args:
             - agent
             - -config=/etc/vault/config.hcl

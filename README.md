@@ -41,3 +41,20 @@ Please see the many options supported in the `values.yaml` file. These are also
 fully documented directly on the [Vault
 website](https://developer.hashicorp.com/vault/docs/platform/k8s/helm) along with more
 detailed installation instructions.
+
+### CSI Agent Binary
+
+The CSI agent sidecar uses `vault` by default. For an agent image that provides
+only `vault-client`, set `csi.agent.binary` to `vault-client` along with the
+appropriate `csi.agent.image.repository` and `csi.agent.image.tag`:
+
+```yaml
+csi:
+  enabled: true
+  agent:
+    binary: vault-client
+```
+
+This setting accepts an executable name or path inside the agent image. It
+applies only to the CSI agent sidecar, not to agents created by the Agent
+Injector.
