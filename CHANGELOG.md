@@ -4,6 +4,10 @@ Features:
 
 * Add `global.extraLabels` to apply a chart-wide set of labels to `metadata.labels` of every resource the chart renders, including pod templates. Also sets the recommended `app.kubernetes.io/version` label, adds `helm.sh/chart` to the resources that were missing it, and applies `server.extraLabels` and `injector.extraLabels` to the StatefulSet and Deployment `metadata.labels` in addition to their pod templates. Per-resource `extraLabels` still apply and take precedence. Labels are never added to selectors. The first upgrade changes pod templates; existing pods receive the changes according to the workload's update strategy. With the server's default `OnDelete` strategy, existing server pods must be deleted and recreated to receive the new labels [#1211](https://github.com/hashicorp/vault-helm/pull/1211)
 
+Bug Fixes:
+
+* Render the injector webhook's `caBundle` only when `injector.certs.caBundle` is set. With Helm 4's server-side apply, the empty value claimed the field that vault-k8s fills in, so every `helm upgrade` of a release installed with Helm 4 failed with a conflict on `clientConfig.caBundle` [#1223](https://github.com/hashicorp/vault-helm/pull/1223)
+
 ## 0.34.1 (August 13, 2026)
 
 Changes:
