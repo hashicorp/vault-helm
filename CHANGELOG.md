@@ -6,7 +6,7 @@ Features:
 
 Bug Fixes:
 
-* Render the injector webhook's `caBundle` only when `injector.certs.caBundle` is set. With Helm 4's server-side apply, the empty value claimed the field that vault-k8s fills in, so every `helm upgrade` of a release installed with Helm 4 failed with a conflict on `clientConfig.caBundle`
+* Render the injector webhook's `caBundle` only when `injector.certs.caBundle` is set. With Helm 4's server-side apply, the empty value claimed the field that vault-k8s fills in, so every `helm upgrade` of a release installed with Helm 4 failed with a conflict on `clientConfig.caBundle` [#1223](https://github.com/hashicorp/vault-helm/pull/1223)
 
 ## 0.34.1 (August 13, 2026)
 
