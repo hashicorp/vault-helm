@@ -96,3 +96,35 @@ load _helpers
       yq -r '.spec.ipFamilies' | tee /dev/stderr)
   [ "${actual}" = "null" ]
 }
+
+#--------------------------------------------------------------------
+# annotations
+
+@test "server/headless-Service: default annotations" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      --show-only templates/server-headless-service.yaml \
+      . | tee /dev/stderr |
+      yq '.metadata.annotations | length' | tee /dev/stderr)
+  [ "${actual}" = "0" ]
+}
+
+@test "server/headless-Service: specify headless annotations yaml" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      --show-only templates/server-headless-service.yaml \
+      --set 'server.service.headless.annotations.foo=bar' \
+      . | tee /dev/stderr |
+      yq -r '.metadata.annotations.foo' | tee /dev/stderr)
+  [ "${actual}" = "bar" ]
+}
+
+@test "server/headless-Service: specify headless annotations yaml string" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      --show-only templates/server-headless-service.yaml \
+      --set 'server.service.headless.annotations=foo: bar' \
+      . | tee /dev/stderr |
+      yq -r '.metadata.annotations.foo' | tee /dev/stderr)
+  [ "${actual}" = "bar" ]
+}

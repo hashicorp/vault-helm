@@ -21,6 +21,7 @@ metadata:
     vault-internal: "true"
   annotations:
 {{ template "vault.service.annotations" .}}
+{{ template "vault.service.headless.annotations" . }}
 spec:
   {{- if (semverCompare ">= 1.23-0" .Capabilities.KubeVersion.Version) }}
   {{- if .Values.server.service.ipFamilyPolicy }}
