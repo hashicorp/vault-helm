@@ -50,15 +50,27 @@ load _helpers
   [ "${actual}" = "\"bar\"" ]
 }
 
-@test "injector/MutatingWebhookConfiguration: caBundle is empty string" {
+@test "injector/MutatingWebhookConfiguration: caBundle is not rendered by default" {
   cd `chart_dir`
   local actual=$(helm template \
       --show-only templates/injector-mutating-webhook.yaml  \
       --set 'injector.enabled=true' \
       --namespace foo \
       . | tee /dev/stderr |
+      yq '.webhooks[0].clientConfig | has("caBundle")' | tee /dev/stderr)
+  [ "${actual}" = "false" ]
+}
+
+@test "injector/MutatingWebhookConfiguration: caBundle can be set" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      --show-only templates/injector-mutating-webhook.yaml  \
+      --set 'injector.enabled=true' \
+      --set 'injector.certs.caBundle=Zm9v' \
+      --namespace foo \
+      . | tee /dev/stderr |
       yq '.webhooks[0].clientConfig.caBundle' | tee /dev/stderr)
-  [ "${actual}" = "\"\"" ]
+  [ "${actual}" = "\"Zm9v\"" ]
 }
 
 @test "injector/MutatingWebhookConfiguration: failurePolicy 'Ignore' by default (deprecated)" {
