@@ -1,0 +1,136 @@
+---
+# Source: vault/templates/injector-deployment.yaml
+# Deployment for the injector
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: release-name-vault-agent-injector
+  namespace: default
+  labels:
+    app.kubernetes.io/name: vault-agent-injector
+    app.kubernetes.io/instance: release-name
+    app.kubernetes.io/managed-by: Helm
+    component: webhook
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: vault-agent-injector
+      app.kubernetes.io/instance: release-name
+      component: webhook
+  
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: vault-agent-injector
+        app.kubernetes.io/instance: release-name
+        component: webhook
+      annotations:
+        argocd.argoproj.io/tracking-id: cluster-1234
+    spec:
+      
+      affinity:
+        podAntiAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            - labelSelector:
+                matchLabels:
+                  app.kubernetes.io/name: vault-agent-injector
+                  app.kubernetes.io/instance: "release-name"
+                  component: webhook
+              topologyKey: kubernetes.io/hostname
+  
+      
+      
+      
+      # serviceAccountName: "release-name-vault-agent-injector"
+      
+      securityContext:
+        runAsNonRoot: true
+        runAsGroup: 1000
+        runAsUser: 100
+        fsGroup: 1000
+      hostNetwork: false
+      containers:
+        - name: sidecar-injector
+          
+          image: "busybox"
+          imagePullPolicy: "IfNotPresent"
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+                - ALL
+          env:
+            
+            - name: "CLUSTER_ID"
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.annotations['argocd.argoproj.io/tracking-id']
+            - name: AGENT_INJECT_LISTEN
+              value: :8080
+            - name: AGENT_INJECT_LOG_LEVEL
+              value: info
+            - name: AGENT_INJECT_VAULT_ADDR
+              value: http://release-name-vault.default.svc:8200
+            - name: AGENT_INJECT_VAULT_AUTH_PATH
+              value: /auth/Kubernetes/$(CLUSTER_ID)
+            - name: AGENT_INJECT_VAULT_IMAGE
+              value: "hashicorp/vault:1.18.1"
+            - name: AGENT_INJECT_TLS_AUTO
+              value: release-name-vault-agent-injector-cfg
+            - name: AGENT_INJECT_TLS_AUTO_HOSTS
+              value: release-name-vault-agent-injector-svc,release-name-vault-agent-injector-svc.default,release-name-vault-agent-injector-svc.default.svc
+            - name: AGENT_INJECT_LOG_FORMAT
+              value: standard
+            - name: AGENT_INJECT_REVOKE_ON_SHUTDOWN
+              value: "false"
+            - name: AGENT_INJECT_CPU_REQUEST
+              value: "250m"
+            - name: AGENT_INJECT_CPU_LIMIT
+              value: "500m"
+            - name: AGENT_INJECT_MEM_REQUEST
+              value: "64Mi"
+            - name: AGENT_INJECT_MEM_LIMIT
+              value: "128Mi"
+            - name: AGENT_INJECT_DEFAULT_TEMPLATE
+              value: "map"
+            - name: AGENT_INJECT_TEMPLATE_CONFIG_EXIT_ON_RETRY_FAILURE
+              value: "true"
+            
+            - name: POD_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.name
+          args:
+            - /bin/sleep
+            - "600"
+          # livenessProbe:
+          #   httpGet:
+          #     path: /health/ready
+          #     port: 8080
+          #     scheme: HTTPS
+          #   failureThreshold: 2
+          #   initialDelaySeconds: 5
+          #   periodSeconds: 2
+          #   successThreshold: 1
+          #   timeoutSeconds: 5
+          # readinessProbe:
+          #   httpGet:
+          #     path: /health/ready
+          #     port: 8080
+          #     scheme: HTTPS
+          #   failureThreshold: 2
+          #   initialDelaySeconds: 5
+          #   periodSeconds: 2
+          #   successThreshold: 1
+          #   timeoutSeconds: 5
+          # startupProbe:
+          #   httpGet:
+          #     path: /health/ready
+          #     port: 8080
+          #     scheme: HTTPS
+          #   failureThreshold: 12
+          #   initialDelaySeconds: 5
+          #   periodSeconds: 5
+          #   successThreshold: 1
+          #   timeoutSeconds: 5
