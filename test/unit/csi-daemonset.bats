@@ -113,6 +113,38 @@ load _helpers
   [ "${actual}" = "PullPolicy2" ]
 }
 
+@test "csi/daemonset: agent binary defaults to vault" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      --show-only templates/csi-daemonset.yaml \
+      --set "csi.enabled=true" \
+      . | tee /dev/stderr |
+        yq -r '.spec.template.spec.containers[1] | .command + .args | join(" ")' | tee /dev/stderr)
+      [ "${actual}" = "vault agent -config=/etc/vault/config.hcl" ]
+}
+
+@test "csi/daemonset: agent binary is configurable" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      --show-only templates/csi-daemonset.yaml \
+      --set "csi.enabled=true" \
+      --set "csi.agent.binary=vault-client" \
+      . | tee /dev/stderr |
+        yq -r '.spec.template.spec.containers[1] | .command + .args | join(" ")' | tee /dev/stderr)
+      [ "${actual}" = "vault-client agent -config=/etc/vault/config.hcl" ]
+}
+
+@test "csi/daemonset: empty agent binary is rejected" {
+  cd `chart_dir`
+  run helm template \
+      --show-only templates/csi-daemonset.yaml \
+      --set "csi.enabled=true" \
+      --set-string 'csi.agent.binary=' \
+      .
+  [ "${status}" -ne 0 ]
+  [[ "${output}" == *"minLength: got 0, want 1"* ]]
+}
+
 @test "csi/daemonset: Custom imagePullSecrets" {
   cd `chart_dir`
   local object=$(helm template \

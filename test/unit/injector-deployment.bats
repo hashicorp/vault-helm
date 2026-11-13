@@ -696,6 +696,26 @@ EOF
   [ "${value}" = "sanitized" ]
 }
 
+@test "injector/deployment: vault binary can be set with extraEnvironmentVars" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      --show-only templates/injector-deployment.yaml \
+      --set-string 'injector.extraEnvironmentVars.AGENT_INJECT_VAULT_BINARY=vault-client' \
+      . | tee /dev/stderr |
+      yq -r '.spec.template.spec.containers[0].env | map(select(.name=="AGENT_INJECT_VAULT_BINARY")) | .[0].value' | tee /dev/stderr)
+  [ "${actual}" = "vault-client" ]
+}
+
+@test "injector/deployment: empty vault binary extraEnvironmentVars is preserved" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      --show-only templates/injector-deployment.yaml \
+      --set-string 'injector.extraEnvironmentVars.AGENT_INJECT_VAULT_BINARY=' \
+      . | tee /dev/stderr |
+      yq -r '.spec.template.spec.containers[0].env | map(select(.name=="AGENT_INJECT_VAULT_BINARY")) | .[0].value' | tee /dev/stderr)
+  [ "${actual}" = "" ]
+}
+
 #--------------------------------------------------------------------
 # extra annotations
 
