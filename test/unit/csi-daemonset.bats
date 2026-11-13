@@ -134,6 +134,17 @@ load _helpers
       [ "${actual}" = "vault-client agent -config=/etc/vault/config.hcl" ]
 }
 
+@test "csi/daemonset: empty agent binary is rejected" {
+  cd `chart_dir`
+  run helm template \
+      --show-only templates/csi-daemonset.yaml \
+      --set "csi.enabled=true" \
+      --set-string 'csi.agent.binary=' \
+      .
+  [ "${status}" -ne 0 ]
+  [[ "${output}" == *"minLength: got 0, want 1"* ]]
+}
+
 @test "csi/daemonset: Custom imagePullSecrets" {
   cd `chart_dir`
   local object=$(helm template \
