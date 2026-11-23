@@ -123,6 +123,17 @@ load _helpers
       [ "${actual}" = "vault agent -config=/etc/vault/config.hcl" ]
 }
 
+@test "csi/daemonset: null agent binary defaults to vault" {
+  cd `chart_dir`
+  local actual=$(helm template \
+      --show-only templates/csi-daemonset.yaml \
+      --set "csi.enabled=true" \
+      --set "csi.agent.binary=null" \
+      . | tee /dev/stderr |
+        yq -r '.spec.template.spec.containers[1] | .command + .args | join(" ")' | tee /dev/stderr)
+      [ "${actual}" = "vault agent -config=/etc/vault/config.hcl" ]
+}
+
 @test "csi/daemonset: agent binary is configurable" {
   cd `chart_dir`
   local actual=$(helm template \
@@ -142,6 +153,7 @@ load _helpers
       --set-string 'csi.agent.binary=' \
       .
   [ "${status}" -ne 0 ]
+  [[ "${output}" == *"/csi/agent/binary"* ]]
   [[ "${output}" == *"minLength: got 0, want 1"* ]]
 }
 
