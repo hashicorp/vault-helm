@@ -2,7 +2,7 @@
 
 Changes:
 
-* CSI: grant the Vault CSI provider `get` on `serviceaccounts`, which the provider's `aws` auth type (vault-csi-provider 1.8.0+) requires to read the IAM role annotation from the requesting pod's service account
+* CSI: grant the Vault CSI provider `get` on `serviceaccounts`, which the provider's `aws` auth type (vault-csi-provider 1.8.0+) requires to read the IAM role annotation from the requesting pod's service account [#1225](https://github.com/hashicorp/vault-helm/pull/1225)
 
 Features:
 
