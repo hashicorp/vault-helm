@@ -8,6 +8,10 @@
                 "agent": {
                     "type": "object",
                     "properties": {
+                        "binary": {
+                            "type": "string",
+                            "minLength": 1
+                        },
                         "enabled": {
                             "type": "boolean"
                         },

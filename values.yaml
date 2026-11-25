@@ -1309,6 +1309,10 @@ csi:
     enabled: true
     extraArgs: []
 
+    # Executable name or path in the agent image. Set to "vault-client" for an
+    # image that provides vault-client instead of vault.
+    binary: "vault"
+
     image:
       repository: "hashicorp/vault"
       tag: "2.0.4"
