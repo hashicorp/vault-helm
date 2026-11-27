@@ -11,10 +11,10 @@ jobs:
       K8S_3: "1.34.8"
       K8S_4: "1.33.12"
       K8S_5: "1.32.11"
-      VAULT_N: "2.0.4"
-      VAULT_N_1: "1.21.9"
-      VAULT_N_2: "1.20.14"
-      VAULT_LTS_1: "1.19.20"
+      VAULT_N: "2.2.2"
+      VAULT_N_1: "1.21.14"
+      VAULT_N_2: "1.20.17"
+      VAULT_LTS_1: "1.19.26"
 
   kind-ce-vault:
     name: ce vault:${{ matrix.vault-version }} k8s:${{ matrix.k8s-version }}
@@ -32,7 +32,7 @@ jobs:
           - ${{ needs.versions.outputs.K8S_4 }}
           - ${{ needs.versions.outputs.K8S_5 }}
     steps:
-      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       - uses: ./.github/actions/acceptance-test
         name: vault:${{ matrix.vault-version }} kind:${{ matrix.k8s-version }}
         with:
@@ -60,7 +60,7 @@ jobs:
           - ${{ needs.versions.outputs.K8S_4 }}
           - ${{ needs.versions.outputs.K8S_5 }}
     steps:
-      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       - uses: ./.github/actions/acceptance-test
         name: vault:${{ matrix.vault-version }} kind:${{ matrix.k8s-version }}
         with:

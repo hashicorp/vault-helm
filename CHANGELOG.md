@@ -1,17 +1,24 @@
-## Unreleased
+## 0.35.0 (November 27, 2026)
 
-Changes:
+BUG FIXES:
 
-* CSI: grant the Vault CSI provider `get` on `serviceaccounts`, which the provider's `aws` auth type (vault-csi-provider 1.8.0+) requires to read the IAM role annotation from the requesting pod's service account [#1225](https://github.com/hashicorp/vault-helm/pull/1225)
+* Fix indentation of `secretKeyRef` in `server.extraSecretEnvironmentVars` [#1226](https://github.com/hashicorp/vault-helm/pull/1226)
+* Removed redundant Slack notification step from the `update-helm-charts-index.yml` workflow. ([#1208](https://github.com/hashicorp/vault-helm/pull/1208))
 
-Features:
+FEATURES:
 
 * csi: Add `csi.agent.binary` to support agent images containing only `vault-client`, while keeping `vault` as the default. Agent Injector binary selection requires `vault-k8s` 1.8.0 or later [#1222](https://github.com/hashicorp/vault-helm/pull/1222)
 * Add `global.extraLabels` to apply a chart-wide set of labels to `metadata.labels` of every resource the chart renders, including pod templates. Also sets the recommended `app.kubernetes.io/version` label, adds `helm.sh/chart` to the resources that were missing it, and applies `server.extraLabels` and `injector.extraLabels` to the StatefulSet and Deployment `metadata.labels` in addition to their pod templates. Per-resource `extraLabels` still apply and take precedence. Labels are never added to selectors. The first upgrade changes pod templates; existing pods receive the changes according to the workload's update strategy. With the server's default `OnDelete` strategy, existing server pods must be deleted and recreated to receive the new labels [#1211](https://github.com/hashicorp/vault-helm/pull/1211)
+* CSI: grant the Vault CSI provider `get` on `serviceaccounts`, which the provider's `aws` auth type (vault-csi-provider 1.8.0+) requires to read the IAM role annotation from the requesting pod's service account [#1225](https://github.com/hashicorp/vault-helm/pull/1225)
 
-Bug Fixes:
+DEPENDENCY UPDATES:
 
-* Fix indentation of `secretKeyRef` in `server.extraSecretEnvironmentVars` [#1226](https://github.com/hashicorp/vault-helm/pull/1226)
+<!-- release-prep changes: start -->
+* Bump Node.js from 20 to 26.13.1 in .github/actions/setup-test-tools/action.yaml
+* Bump Bats from 1.12.0 to 1.13.0 in .github/actions/setup-test-tools/action.yaml
+* Test with Vault 2.2.2, 1.21.14, 1.20.17, 1.19.26 (previously 2.0.4, 1.21.9, 1.20.14, 1.19.20)
+* Bump version from 0.34.1 to 0.35.0 in Chart.yaml
+<!-- release-prep changes: end -->
 
 ## 0.34.1 (August 13, 2026)
 
