@@ -5,24 +5,24 @@ Changes:
 * Default `vault` version updated to v2.2.2
 * Default `vault-csi-provider` version updated to v1.8.0
 * Default `vault-k8s` version updated to v1.8.0
-* Test with Vault 2.2.2, 1.21.14, 1.20.17, 1.19.26 (previously 2.0.4, 1.21.9, 1.20.14, 1.19.20)
-* Test with Kubernetes 1.37.0, 1.36.4, 1.35.8, 1.34.11 (previously 1.36.1, 1.35.5, 1.34.8, 1.33.12, 1.32.11)
+* Tested with Vault v2.2.2, v1.21.14, v1.20.17, v1.19.26 (previously v2.0.4, v1.21.9, v1.20.14, v1.19.20)
+* Tested with Kubernetes versions v1.37.0, v1.36.4, v1.35.8, v1.34.11 (previously v1.36.1, v1.35.5, v1.34.8, v1.33.12, v1.32.11)
 * Removed redundant Slack notification step from the `update-helm-charts-index.yml` workflow [#1208](https://github.com/hashicorp/vault-helm/pull/1208)
-* Test with Kind 0.33.0 (previously 0.32.0)
-* Test with Bats 1.13.0 (previously 1.12.0)
-* Test with Node 26.13.1 (previously 20)
+* Tested with Kind v0.33.0 (previously v0.32.0)
+* Tested with Bats v1.13.0 (previously v1.12.0)
+* Tested with Node v26.13.1 (previously v20)
 * Update GitHub Actions: `actions/checkout` v7.0.0 to v7.0.1, `actions/setup-go` v7.0.0 to v7.1.0, `actions/setup-node` v4.3.0 to v7.1.0, `actions/setup-python` v5.5.0 to v7.1.0, and `actions/upload-artifact` v4.6.2 to v7.0.2
 * Update `helm/kind-action` from v1.12.0 to v1.15.2
 * CSI: grant the Vault CSI provider `get` on `serviceaccounts`, which the provider's `aws` auth type (vault-csi-provider 1.8.0+) requires to read the IAM role annotation from the requesting pod's service account [#1225](https://github.com/hashicorp/vault-helm/pull/1225)
-
-Bug Fixes:
-
-* Fix indentation of `secretKeyRef` in `server.extraSecretEnvironmentVars` [#1226](https://github.com/hashicorp/vault-helm/pull/1226)
 
 Features:
 
 * csi: Add `csi.agent.binary` to support agent images containing only `vault-client`, while keeping `vault` as the default. Agent Injector binary selection requires `vault-k8s` 1.8.0 or later [#1222](https://github.com/hashicorp/vault-helm/pull/1222)
 * Add `global.extraLabels` to apply a chart-wide set of labels to `metadata.labels` of every resource the chart renders, including pod templates. Also sets the recommended `app.kubernetes.io/version` label, adds `helm.sh/chart` to the resources that were missing it, and applies `server.extraLabels` and `injector.extraLabels` to the StatefulSet and Deployment `metadata.labels` in addition to their pod templates. Per-resource `extraLabels` still apply and take precedence. Labels are never added to selectors. The first upgrade changes pod templates; existing pods receive the changes according to the workload's update strategy. With the server's default `OnDelete` strategy, existing server pods must be deleted and recreated to receive the new labels [#1211](https://github.com/hashicorp/vault-helm/pull/1211)
+
+Bug Fixes:
+
+* Fix indentation of `secretKeyRef` in `server.extraSecretEnvironmentVars` [#1226](https://github.com/hashicorp/vault-helm/pull/1226)
 
 ## 0.34.1 (August 13, 2026)
 
