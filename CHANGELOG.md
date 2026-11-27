@@ -1,5 +1,9 @@
 ## Unreleased
 
+Changes:
+
+* CSI: grant the Vault CSI provider `get` on `serviceaccounts`, which the provider's `aws` auth type (vault-csi-provider 1.8.0+) requires to read the IAM role annotation from the requesting pod's service account [#1225](https://github.com/hashicorp/vault-helm/pull/1225)
+
 Features:
 
 * csi: Add `csi.agent.binary` to support agent images containing only `vault-client`, while keeping `vault` as the default. Agent Injector binary selection requires `vault-k8s` 1.8.0 or later [#1222](https://github.com/hashicorp/vault-helm/pull/1222)

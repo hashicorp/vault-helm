@@ -21,4 +21,12 @@ rules:
   - serviceaccounts/token
   verbs:
   - create
+# Required by the vault-csi-provider "aws" auth type to read the IAM role
+# annotation from the requesting pod's service account.
+- apiGroups:
+  - ""
+  resources:
+  - serviceaccounts
+  verbs:
+  - get
 {{- end }}
