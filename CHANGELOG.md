@@ -1,6 +1,6 @@
 ## 0.35.0 (November 27, 2026)
 
-CHANGES:
+Changes:
 
 * Default `vault` version updated to v2.2.2
 * Default `vault-csi-provider` version updated to v1.8.0
@@ -13,16 +13,16 @@ CHANGES:
 * Test with Node 26.13.1 (previously 20)
 * Update GitHub Actions: `actions/checkout` v7.0.0 to v7.0.1, `actions/setup-go` v7.0.0 to v7.1.0, `actions/setup-node` v4.3.0 to v7.1.0, `actions/setup-python` v5.5.0 to v7.1.0, and `actions/upload-artifact` v4.6.2 to v7.0.2
 * Update `helm/kind-action` from v1.12.0 to v1.15.2
+* CSI: grant the Vault CSI provider `get` on `serviceaccounts`, which the provider's `aws` auth type (vault-csi-provider 1.8.0+) requires to read the IAM role annotation from the requesting pod's service account [#1225](https://github.com/hashicorp/vault-helm/pull/1225)
 
-BUG FIXES:
+Bug Fixes:
 
 * Fix indentation of `secretKeyRef` in `server.extraSecretEnvironmentVars` [#1226](https://github.com/hashicorp/vault-helm/pull/1226)
 
-FEATURES:
+Features:
 
 * csi: Add `csi.agent.binary` to support agent images containing only `vault-client`, while keeping `vault` as the default. Agent Injector binary selection requires `vault-k8s` 1.8.0 or later [#1222](https://github.com/hashicorp/vault-helm/pull/1222)
 * Add `global.extraLabels` to apply a chart-wide set of labels to `metadata.labels` of every resource the chart renders, including pod templates. Also sets the recommended `app.kubernetes.io/version` label, adds `helm.sh/chart` to the resources that were missing it, and applies `server.extraLabels` and `injector.extraLabels` to the StatefulSet and Deployment `metadata.labels` in addition to their pod templates. Per-resource `extraLabels` still apply and take precedence. Labels are never added to selectors. The first upgrade changes pod templates; existing pods receive the changes according to the workload's update strategy. With the server's default `OnDelete` strategy, existing server pods must be deleted and recreated to receive the new labels [#1211](https://github.com/hashicorp/vault-helm/pull/1211)
-* CSI: grant the Vault CSI provider `get` on `serviceaccounts`, which the provider's `aws` auth type (vault-csi-provider 1.8.0+) requires to read the IAM role annotation from the requesting pod's service account [#1225](https://github.com/hashicorp/vault-helm/pull/1225)
 
 ## 0.34.1 (August 13, 2026)
 
