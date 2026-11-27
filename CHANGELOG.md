@@ -7,14 +7,16 @@ CHANGES:
 * Default `vault-k8s` version updated to v1.8.0
 * Test with Vault 2.2.2, 1.21.14, 1.20.17, 1.19.26 (previously 2.0.4, 1.21.9, 1.20.14, 1.19.20)
 * Test with Kubernetes 1.37.0, 1.36.4, 1.35.8, 1.34.11 (previously 1.36.1, 1.35.5, 1.34.8, 1.33.12, 1.32.11)
+* Removed redundant Slack notification step from the `update-helm-charts-index.yml` workflow [#1208](https://github.com/hashicorp/vault-helm/pull/1208)
 * Test with Kind 0.33.0 (previously 0.32.0)
 * Test with Bats 1.13.0 (previously 1.12.0)
 * Test with Node 26.13.1 (previously 20)
+* Update GitHub Actions: `actions/checkout` v7.0.0 to v7.0.1, `actions/setup-go` v7.0.0 to v7.1.0, `actions/setup-node` v4.3.0 to v7.1.0, `actions/setup-python` v5.5.0 to v7.1.0, and `actions/upload-artifact` v4.6.2 to v7.0.2
+* Update `helm/kind-action` from v1.12.0 to v1.15.2
 
 BUG FIXES:
 
 * Fix indentation of `secretKeyRef` in `server.extraSecretEnvironmentVars` [#1226](https://github.com/hashicorp/vault-helm/pull/1226)
-* Removed redundant Slack notification step from the `update-helm-charts-index.yml` workflow. ([#1208](https://github.com/hashicorp/vault-helm/pull/1208))
 
 FEATURES:
 
